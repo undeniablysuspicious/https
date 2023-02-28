@@ -14538,7 +14538,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) 
                         if getgenv().roghoulsettings['usec'] == true then 
                             pressKey('C')
-                        end
+                        end 
                         -- task.wait(3)
                         print(string.lower(typeweapon)..' active')
                         -- print('quinque active')
@@ -14646,8 +14646,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             
                             return
                         end
-
-
+    
+                        
                         if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 then 
                             -- print('waiting for quinque')
                             print('waiting for '..string.lower(typeweapon))
@@ -17222,6 +17222,15 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
         mapteleports = {};
         selectedmap = nil;
         loadnpcs = false;
+        playeresp = false;
+        playerespcolour = Color3.new(255,255,255);
+        espframework = '{name}     {distance}     {health}';
+        flying = false;
+        flyspeed = 0;
+        speedtoggle = false;
+        speed = false;
+        noclip = false;
+        noclipfunction = nil;
     }
     -- arcane odssey cehest esp
     sector:AddToggle('Kill Aura',false,function(xstate)
@@ -17327,6 +17336,7 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
 
 
 
+
     sector:AddLabel('Risky Cheats')
     sector:AddToggle('Chest Farm',false,function(xstate)
         getgenv().arcaneodysseysettings['chestfarm'] = xstate
@@ -17417,6 +17427,185 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
     sector:AddButton('Rejoin',function()
         game:GetService('TeleportService'):teleport(game.PlaceId)
     end)
+
+
+    sector:AddButton('Infinite Level',function()
+        task.spawn(function()
+            azfakenotify('credits: skidnik',2)
+            azfakenotify('you need explosive barrel',2)
+            azfakenotify('this can crash you',5)
+            local replicatedStorage = game:GetService("ReplicatedStorage");
+            local npcs = Workspace.NPCs;
+            local carryRemote = replicatedStorage.RS.Remotes.Misc.Carry;
+            
+            for i,v in next, npcs:GetChildren() do
+                local shopName = v:FindFirstChild("Job",true);
+                if not shopName or shopName.Value ~= "Shipwright" then continue; end
+                task.spawn(function()
+                    for i = 1, 1e4 do 
+                        pcall(function()
+                            carryRemote:FireServer("Sell",v.Model.Value)
+                        end)
+                    end
+                end)
+            end
+        end)
+    end)
+
+    
+    local speedtgl = sector:AddToggle('Speed',false,function(xstate)
+        getgenv().arcaneodysseysettings['speedtoggle'] = xstate
+    end)
+
+
+    local ToggleBindFlySpeed = sector:AddToggle("Fly", false, function(e)
+        getgenv()['arcaneodysseysettings']['flying'] = e
+        if getgenv()['arcaneodysseysettings']['flying'] == false  then -- and getgenv().istyping == false
+            -- getgenv().CFloop:Disconnect()
+            --game.Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+            local Head = game.Players.LocalPlayer.Character:WaitForChild("Head")
+            Head.Anchored = false
+            -- getgenv().CFloop = nil
+        elseif getgenv()['arcaneodysseysettings']['flying'] == true and getgenv().istyping == false then
+
+            Players = game.Players
+            -- getgenv().flying = true
+            task.spawn(function()
+                repeat wait()
+                until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game.Players.LocalPlayer.Character:findFirstChild("Torso") and game.Players.LocalPlayer.Character:findFirstChild("Humanoid")
+                local mouse = game.Players.LocalPlayer:GetMouse()
+                repeat wait() until mouse
+                local plr = game.Players.LocalPlayer
+                local torso = plr.Character:WaitForChild('HumanoidRootPart')
+                local deb = true
+                local ctrl = {f = 0, b = 0, l = 0, r = 0}
+                local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+                local maxspeed = getgenv()['arcaneodysseysettings']['flyspeed']
+                local speed = maxspeed  
+                function Fly()
+                    local bv = Instance.new("BodyVelocity", game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"));bv.Name ='exploitation'
+                    bv.velocity = Vector3.new(0,0,0)
+                    bv.maxForce = Vector3.new(9e9, 9e9, 9e9) -- 9e9
+                    repeat task.wait(0.01)
+                        if game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and not game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild('exploitation') then 
+                            bv = Instance.new("BodyVelocity", game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"));bv.Name ='exploitation'
+                            bv.velocity = Vector3.new(0,0,0)
+                            bv.maxForce = Vector3.new(9e9, 9e9, 9e9) -- 9e9
+                        end
+                        if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                            local prevRotation = game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation
+                            speed = getgenv()['arcaneodysseysettings']['flyspeed'] --Options.FlySpeedSlide.Value
+                            maxspeed = getgenv()['arcaneodysseysettings']['flyspeed']
+                            if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+                                speed = maxspeed * 2
+                                -- if speed > maxspeed then
+                                --     speed = maxspeed
+                                -- end
+                                if speed ~= maxspeed * 10 then
+                                    speed = maxspeed * 2
+                                end
+                            elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
+                                speed = 0
+                                if speed < 0 then
+                                    speed = 0
+                                end
+                            end
+                                -- elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
+                            --     bv.velocity = ((game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.lookVector  )) *speed/2
+                            if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
+                                bv.velocity = (( game.Workspace.CurrentCamera.CoordinateFrame.lookVector  *  (ctrl.f+ctrl.b)  )) * speed -- ((game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.p))
+                                -- lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
+                                if (ctrl.r) ~= 0  then 
+                                    --repeat task.wait(0.005) until game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation ~= prevRotation
+                                    ctrl.r = ctrl.r - ctrl.l
+                                    bv.velocity += (( game.Workspace.CurrentCamera.CoordinateFrame.RightVector  )) * speed
+                                end
+                                if (ctrl.l) ~= 0 then 
+                                    --repeat task.wait(0.005) until game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation ~= prevRotation
+                                    ctrl.l = ctrl.l - ctrl.r
+                                    bv.velocity += (( game.Workspace.CurrentCamera.CoordinateFrame.RightVector    ))  * -speed
+                                end
+    
+                            else
+                                bv.velocity = Vector3.new(0,0,0)
+                            end
+                                --* CFrame.new((ctrl.l+ctrl.r),0,0) -- *50*speed/maxspeed * Vector3.new(0,0,0) --  
+                        end
+
+                    until getgenv()['arcaneodysseysettings']['flying']  == false or getgenv().loopsUnload == true
+
+                    ctrl = {f = 0, b = 0, l = 0, r = 0}
+                    lastctrl = {f = 0, b = 0, l = 0, r = 0}
+                    speed = 0
+                    bv:Destroy()
+                    plr.Character:WaitForChild('Humanoid').PlatformStand = false
+                    print('stop flying')
+                end
+                mouse.KeyDown:connect(function(key)
+                    if key:lower() == "w" then
+                        ctrl.f = 1
+                    elseif key:lower() == "s" then
+                        ctrl.b = -1
+                    elseif key:lower() == "a" then
+                        ctrl.l = -1
+                    elseif key:lower() == "d" then
+                        ctrl.r = 1
+                    end
+                end)
+                mouse.KeyUp:connect(function(key)
+                    if key:lower() == "w" then
+                        ctrl.f = 0
+                        speed = 0
+                    elseif key:lower() == "s" then
+                        ctrl.b = 0
+                    elseif key:lower() == "a" then
+                        ctrl.l = 0
+                    elseif key:lower() == "d" then
+                        ctrl.r = 0
+                    end
+                end)
+                Fly()  
+            end)
+        end
+    end)
+
+    local ToggleBindNoclip= sector:AddToggle("Noclip", false, function(e)
+        getgenv()['arcaneodysseysettings']['noclip'] = e 
+        if getgenv()['arcaneodysseysettings']['noclip']  ==false and getgenv().istyping == false then
+            getgenv()['arcaneodysseysettings']['noclipfunction']:Disconnect()
+        elseif getgenv()['arcaneodysseysettings']['noclip']  == true and getgenv().istyping == false then --  
+            task.wait(0.1)
+            local function NoclipLoop()
+                pcall(function()
+                    if getgenv()['pilgrammedsettings']['noclip']  == true and game.Players.LocalPlayer.Character  and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >= 0 then
+                        for _, child in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                            pcall(function()
+                                if child:IsA("BasePart") and child.CanCollide == true then
+                                    child.CanCollide = false
+                                end
+                            end)
+                        end
+                    else
+                        --getgenv()['pilgrammedsettings']['noclip'] = false -- if it was a global var like azfakeglobaltables[bloodlines]
+                        -- it would enable it but wont be in the game
+                        -- the games loop wouldnt run because it only recognises it in pilgrammed
+                        getgenv().arcaneodysseysettings['noclip'] = false;
+                        -- ToggleBindNoclip:Set(false)
+                    end
+                end)
+            end
+            getgenv()['pilgrammedsettings']['noclipfunction']  = game:GetService('RunService').Stepped:Connect(NoclipLoop)
+        end
+    end)
+    sector:AddSlider("Speed", 0, 0, 250, 1, function(State)
+        getgenv().arcaneodysseysettings['speed'] = State
+    end)
+    sector:AddSlider("Fly", 0, 0, 250, 1, function(State)
+        getgenv().arcaneodysseysettings['flyspeed'] = State
+    end)
+
+
+
     getgenv().AssignChestEsp = function(v)
         local sectionesp = Drawing.new('Text')
         sectionesp.Visible = false
@@ -17493,6 +17682,229 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
         end
         return connections
     end;
+
+    local cam = workspace.CurrentCamera
+    local worldToViewportPoint = cam.worldToViewportPoint
+    local head_offset =  Vector3.new(0,1.5,0)
+    local leg_offset = Vector3.new(0,10,0)
+    getgenv()['arcaneodysseysettings'].CreatePlayerEsp = function(v)
+        -- print(v.Name)
+        task.wait(0.1)
+        -- 
+            local esp = Drawing.new('Text')
+            esp.Visible = false
+            esp.Center = true 
+            esp.Outline = true 
+            esp.Font = 2 
+            esp.Size = 13
+            esp.Color = Color3.new(5,0,0)
+            esp.Text = 'SEXY'
+
+            local tracer = Drawing.new('Line')
+            tracer.Visible = false
+            tracer.Color = Color3.new(1,0,0)
+            tracer.Thickness = 1 
+            tracer.Transparency = 1 
+            
+            
+            local box_o = Drawing.new('Square')
+            box_o.Visible = false
+            box_o.Color = Color3.new(0,0,0)
+            box_o.Thickness = 2
+            box_o.Transparency =1 
+            box_o.Filled = false
+            
+            local box = Drawing.new('Square')
+            box.Visible = false
+            box.Color = Color3.new(1,0,0)
+            box.Thickness = 1.5
+            box.Transparency =1 
+            box.Filled = false
+        
+            local hb_o = Drawing.new('Square')
+            hb_o.Visible = false
+            hb_o.Color = Color3.new(0,0,0)
+            hb_o.Thickness = 1
+            hb_o.Transparency =1 
+            hb_o.Filled = false
+            
+            local hb = Drawing.new('Square')
+            hb.Visible = false
+            hb.Color = Color3.new(1,0,0)
+            hb.Thickness = 1
+            hb.Transparency =1 
+            hb.Filled = true
+            local health = Drawing.new('Text')
+            health.Visible = false
+            local distancex = Drawing.new('Text')
+            distancex.Visible = false
+        local function rootesp()
+            local xkeeptracer
+            local plsstoptracer = false
+            cam = workspace.CurrentCamera
+            xkeeptracer = game:GetService('RunService').RenderStepped:Connect(function()
+                task.wait(0.2)
+                if v and v.Character and v.Character:FindFirstChild('Humanoid') and v.Character:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer and v.Character.Humanoid.Health >0 then 
+                    local vect,onscreen = cam:worldToViewportPoint(v.Character.HumanoidRootPart.Position)
+                    
+                    if onscreen and getgenv()['arcaneodysseysettings']['playeresp'] and getgenv().tracers and tracer then 
+                        tracer.From = Vector2.new(cam.ViewportSize.X/2,cam.ViewportSize.Y/1)
+                        tracer.To = Vector2.new(vect.X,vect.Y)
+                        tracer.Visible = true
+                    else
+                        tracer.Visible = false
+                    end
+                    if not v or getgenv().loopsUnload == true then 
+                        plsstoptracer = true
+                    end
+                elseif not v or getgenv().loopsUnload == true or plsstoptracer then 
+                    xkeeptracer:Disconnect()
+                    if tracer then 
+                        pcall(function()
+                            tracer:Remove()
+                        end)
+                    end
+                else
+                    tracer.Visible = false
+                end
+            end) 
+        end
+        local function boxroot()
+            local xkeeprunning 
+            xkeeprunning = game:GetService('RunService').RenderStepped:Connect(function()
+                task.wait(0.1)
+                if v.Character and v.Character:FindFirstChild('Head') and v.Character:FindFirstChild('Humanoid') and v.Character:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer  then  -- and v.Character.Humanoid.Health >0
+                    local vect,onscreen = cam:worldToViewportPoint(v.Character.HumanoidRootPart.Position)
+                    
+                    local vroot = v.Character.HumanoidRootPart
+                    local head = v.Character.Head
+                    
+                    local rootpos,rootvis = worldToViewportPoint(cam,vroot.Position)
+                    local distance = (v.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart').Position).Magnitude
+                    if distance < 30 and distance > 5 then head_offset = Vector3.new(0,1.2,0); leg_offset = Vector3.new(0,5,0) 
+                    elseif distance < 100 and distance > 30 then head_offset = Vector3.new(0,1,0); leg_offset = Vector3.new(0,8,0)  end
+                    local headpos = worldToViewportPoint(cam,vroot.Position + head_offset)
+                    local legpos = worldToViewportPoint(cam,vroot.Position - leg_offset)
+                    
+                    if onscreen and getgenv()['arcaneodysseysettings']['playeresp'] and box then 
+                        cam = workspace.CurrentCamera
+                        --print('e: '..cam.ViewportSize.X..' '..tostring(rootpos)..' '..tostring(headpos)..' '..tostring(box_o))
+
+    
+                        if box_o and cam.ViewportSize and rootpos and headpos then 
+                            box_o.Size = Vector2.new(cam.ViewportSize.X/2/rootpos.Z,headpos.Y - legpos.Y)
+                            box_o.Position = Vector2.new(rootpos.X - box_o.Size.X / 1.5, rootpos.Y - box_o.Size.Y / 2)
+                            box_o.Visible = true 
+                        end
+                        if box then 
+                            box.Size = Vector2.new(cam.ViewportSize.X/2/rootpos.Z,headpos.Y - legpos.Y)
+                            box.Position = Vector2.new(rootpos.X - box.Size.X / 2, rootpos.Y - box.Size.Y / 2)
+                            box.Visible = true
+                        end
+
+                        hb_o.Size = Vector2.new(2,headpos.Y - legpos.Y)
+                        hb_o.Position = box_o.Position - Vector2.new(6,0)
+                        hb_o.Visible = true
+                        hb.Size = Vector2.new(2,(headpos.Y - legpos.Y) / (v.Character.Humanoid.MaxHealth / math.clamp(v.Character.Humanoid.Health, 0 , v.Character.Humanoid.MaxHealth) ))
+                        hb.Position = Vector2.new(box.Position.X - 6,box.Position.Y + (1/hb.Size.Y))
+                        hb.Color = Color3.fromRGB(255-255/(v.Character.Humanoid.MaxHealth /v.Character.Humanoid.Health ),255/(v.Character.Humanoid.MaxHealth /v.Character.Humanoid.Health ),0)
+                        hb.Visible = true
+
+                        -- local Talents = #v.Backpack:GetChildren()-1
+                        -- local Power = Talents--#Talents-1
+                        esp.Position = Vector2.new(vect.X,vect.Y ) + Vector2.new(0,-15)
+                        esp.Color = getgenv()['arcaneodysseysettings']['playerespcolour']
+                        local preframework = getgenv()['arcaneodysseysettings']['espframework']
+                        
+                        preframework =string.gsub(
+                            preframework,
+                            '{name}',
+                            v.Name
+                        )
+                        preframework = string.gsub(
+                            preframework,
+                            '{distance}',
+                            tostring(math.floor(distance))..'s'
+                        )
+                        preframework = string.gsub(
+                            preframework,
+                            '{health}',
+                            math.floor(v.Character.Humanoid.Health)..'/'..math.floor(v.Character.Humanoid.MaxHealth)--..' '..(math.floor(v.Character.Humanoid.Health) /  math.floor(v.Character.Humanoid.MaxHealth) * 100)..'%' -- add percentage
+                        )
+                        esp.Text = preframework
+                        if getgenv()['arcaneodysseysettings']['playeresp'] == true then esp.Visible = true end
+                     
+                    else
+                        pcall(function()
+                            box.Visible = false
+                        end)
+                        pcall(function()
+                            box_o.Visible = false
+                        end)
+                        pcall(function()
+                            hb.Visible = false
+                        end)
+                        pcall(function()
+                            hb_o.Visible = false
+                        end)
+                        pcall(function()
+                            esp.Visible = false
+                        end)
+                        pcall(function()
+                            distancex.Visible = false 
+                        end)
+                        pcall(function()
+                            health.Visible = false
+                        end)
+                       
+                        
+                        
+                    end
+                end
+                if not game.Players:FindFirstChild(v.Name) or getgenv().loopsUnload == true or getgenv()['arcaneodysseysettings']['playeresp'] == false then 
+                    xkeeprunning:Disconnect()
+                    pcall(function()
+                        box:Remove()
+                    end)
+                    pcall(function()
+                        box_o:Remove()
+                    end)
+                    pcall(function()
+                        hb:Remove()
+                    end)
+                    pcall(function()
+                        hb_o:Remove()
+                    end)
+                    pcall(function()
+                        esp:Remove()
+                    end)
+                    pcall(function()
+                        distancex:Remove()
+                    end)
+                    pcall(function()
+                        health:Remove()
+                    end)
+                end
+            end) 
+        end
+        task.spawn(function()
+            coroutine.wrap(rootesp)()
+            coroutine.wrap(boxroot)()
+        end)
+
+    end
+
+    -- arc - arcaneodysseysettings
+
+
+    espsector:AddToggle('Player Esp',false,function(xstate)
+        getgenv().arcaneodysseysettings['playeresp'] = xstate
+        for _,v in next, game:GetService('Players'):GetPlayers() do 
+            if getgenv()['arcaneodysseysettings']['playeresp'] == true then 
+                getgenv()['arcaneodysseysettings'].CreatePlayerEsp(v)
+            end 
+        end   
+    end)
     espsector:AddToggle('Chest Esp',false,function(xstate)
         getgenv().arcaneodysseysettings['chestesp'] = xstate
         if getgenv().arcaneodysseysettings['chestesp'] == true then 
@@ -17510,7 +17922,10 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
         getgenv().arcaneodysseysettings['chestespcolour'] = xstate
     end)
 
-
+    espsector:AddColorpicker('Player Colour',Color3.fromRGB(255, 255,255),function(xstate)
+        getgenv().arcaneodysseysettings['playerespcolour'] = xstate
+    end)
+    
 
 
 
@@ -17524,12 +17939,15 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
         local args = {...}
         local call_type = getnamecallmethod();
         if call_type == 'DealWeaponDamage'  then 
-            metahook(self,...)
-            metahook(self,...)
-            metahook(self,...)
-            return metahook(self,unpack({
-                1;args[2];args[3];args[4];args[5]
-            }))
+            if args[3] and game.Players.LocalPlayer.Character ~= nil and args[3] == game.Players.LocalPlayer.Character and getgenv().arcaneodysseysettings['godmode'] then 
+                return
+            end 
+            -- metahook(self,...)
+            -- metahook(self,...)
+            -- metahook(self,...)
+            -- return metahook(self,unpack({
+            --     1;args[2];args[3];args[4];args[5]
+            -- }))
         end
         return metahook(self,...)
     end)
@@ -17559,13 +17977,27 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
         while task.wait(0.01) do 
             if getgenv().loopsUnload == true then print('odyssey break end') break end
 
-            if getgenv().arcaneodysseysettings['godmode'] == true then 
-                local ohNumber1 = 0.001
-                local ohString2 = "Dodge"
+            -- if getgenv().arcaneodysseysettings['godmode'] == true then 
+            --     local ohNumber1 = 0.001
+            --     local ohString2 = "Dodge"
 
-                game:GetService("ReplicatedStorage").RS.Remotes.Combat.StaminaCost:FireServer(ohNumber1, ohString2)
+            --     game:GetService("ReplicatedStorage").RS.Remotes.Combat.StaminaCost:FireServer(ohNumber1, ohString2)
+            -- end
+            if getgenv()['arcaneodysseysettings']['speedtoggle'] == true then 
+                
+                if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health > 0 then 
+                    getgenv().arcaneodysseysettings['speedtoggle'] = nil
+                    game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').WalkSpeed = getgenv().arcaneodysseysettings['speed']
+                    local connection; connection = game.Players.LocalPlayer.Character:FindFirstChild('Humanoid'):GetPropertyChangedSignal('WalkSpeed'):Connect(function()-- getpropertychangedsignal could be used here 
+                        game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').WalkSpeed = getgenv().arcaneodysseysettings['speed']
+                    end) 
+                    task.spawn(function()
+                        repeat task.wait() until getgenv().arcaneodysseysettings['speedtoggle'] == false or getgenv().loopsUnload == true 
+                        connection:Disconnect()
+                    end)
+
+                end
             end
-
             if getgenv().arcaneodysseysettings['loadmap'] == true then 
                 for _,v in next, game.ReplicatedStorage.RS:GetChildren() do 
                     -- local success = pcall(string.split,v.Name,'Unload')
@@ -17669,7 +18101,7 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
                         end
                         if foundreg == true then 
                             for k,c in next, v:GetChildren() do 
-                                c.Parent = regvalue;
+                                c.Parent = regvalue:FindFirstChild(c.Name);
                             end
                         end 
                     end
