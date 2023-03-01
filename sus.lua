@@ -3908,7 +3908,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                         if isnetworkowner(v.PrimaryPart) and dist < getgenv().attemptkillrange then
                             print('is in range, '..v.Name)
                             pcall(function()
-                                v:FindFirstChildWhichIsA('Humanoid').Health = 1
+                                v:FindFirstChildWhichIsA('Head'):Destroy()
                             end)
                         end
                     end 
