@@ -17193,8 +17193,15 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
         x.Parent = game.CoreGui.ChatLogger.Frame.Logs
         x.Visible = true
     end
-
-
+    getgenv().istyping = false;
+    game:GetService('UserInputService').InputBegan:Connect(function(key,istyping) --// could put it inside the while loop and check if its not loaded to load it again
+        if istyping then getgenv().istyping = true  return end 
+        getgenv().istyping = false --//could make it so it sets a global variable for holding a key to true instead of getstat
+    end)
+    game:GetService('UserInputService').InputEnded:Connect(function(key,istyping) --// could put it inside the while loop and check if its not loaded to load it again
+        if istyping then getgenv().istyping = true  return end 
+        getgenv().istyping = false --//could make it so it sets a global variable for holding a key to true instead of getstat
+    end)
 
     local tab = window:CreateTab('Arcane Odyssey')
     local esptab = window:CreateTab('Esp')
@@ -17228,10 +17235,18 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
         flying = false;
         flyspeed = 0;
         speedtoggle = false;
-        speed = false;
+        speed = 0;
         noclip = false;
         noclipfunction = nil;
+        improvedloadsetting = false;
+        maps = {
+
+        };
+        selectedmap = '';
+        loadmapfunction = nil; -- json file that loads configs by going through the table
+        infinitestamina = false;
     }
+
     -- arcane odssey cehest esp
     sector:AddToggle('Kill Aura',false,function(xstate)
         getgenv().arcaneodysseysettings['killaura'] = xstate
@@ -17244,12 +17259,56 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
     sector:AddToggle('God Mode',false,function(xstate)
         getgenv().arcaneodysseysettings['godmode'] = xstate
     end)
+    sector:AddToggle('Infinite Stamina',false,function(xstate)
+        getgenv().arcaneodysseysettings['infinitestamina'] = xstate
+    end)
+    local improvedmethod = sector:AddToggle('Improved Loading Method',false,function(xstate)
+        getgenv().arcaneodysseysettings['improvedloadsetting'] = xstate
+    end)
+    local mapareas = {}
+    for _,v in next, getgenv().arcaneodysseysettings['maps'] do 
+
+    end
+    for _,v in next, workspace:WaitForChild('Map'):GetChildren() do 
+        if v:FindFirstChild('Center') then 
+            table.insert(getgenv().arcaneodysseysettings['maps'],v.Name)
+        end
+    end
+    local dpd = sector:AddDropdown("Load Map Area", getgenv().arcaneodysseysettings['maps'], "", false, function(dropdownv)
+        getgenv().arcaneodysseysettings['selectedmap'] = dropdownv -- could do instance or
+    end) -- make option visible if dropdown is equal to
+    local loadselectedmap = sector:AddButton('Load Selected Map',function()
+        if getgenv().arcaneodysseysettings['selectedmap'] ~= '' and workspace:FindFirstChild('Map'):FindFirstChild(getgenv().arcaneodysseysettings['selectedmap']) and game.ReplicatedStorage:WaitForChild('RS'):WaitForChild('Remotes'):WaitForChild('Misc').OnTeleport then 
+            if getgenv().arcaneodysseysettings['loadmapfunction'] ~= nil then 
+            else
+                for index, connection in next, getconnections(game.ReplicatedStorage.RS.Remotes.Misc.OnTeleport.OnClientEvent) do
+                    local env = connection.Function and getfenv(connection.Function)
+                
+                    if env and tostring(rawget(env, "script")) == "Unloading" then
+                        getgenv().arcaneodysseysettings['loadmapfunction'] = debug.getupvalue(connection.Function, 2)
+                        break
+                    end
+                end
+            end
+
+            getgenv().arcaneodysseysettings['loadmapfunction'](workspace:FindFirstChild('Map'):FindFirstChild(getgenv().arcaneodysseysettings['selectedmap']).Center.Position)
+        end
+    end)
+
+    improvedmethod:MakeVisibleIfActive(dpd)
+    improvedmethod:MakeVisibleIfActive(loadselectedmap)
+
     sector:AddToggle('Load Map',false,function(xstate)
         getgenv().arcaneodysseysettings['loadmap'] = xstate
     end)
     sector:AddToggle('Load Npcs',false,function(xstate)
         getgenv().arcaneodysseysettings['loadnpcs'] = xstate
     end)
+
+
+
+
+
     local unloadDirectories = {
 
     }
@@ -17429,28 +17488,28 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
     end)
 
 
-    sector:AddButton('Infinite Level',function()
-        task.spawn(function()
-            azfakenotify('credits: skidnik',2)
-            azfakenotify('you need explosive barrel',2)
-            azfakenotify('this can crash you',5)
-            local replicatedStorage = game:GetService("ReplicatedStorage");
-            local npcs = Workspace.NPCs;
-            local carryRemote = replicatedStorage.RS.Remotes.Misc.Carry;
+    -- sector:AddButton('Infinite Level',function()
+    --     task.spawn(function()
+    --         azfakenotify('credits: skidnik',2)
+    --         azfakenotify('you need explosive barrel',2)
+    --         azfakenotify('this can crash you',5)
+    --         local replicatedStorage = game:GetService("ReplicatedStorage");
+    --         local npcs = Workspace.NPCs;
+    --         local carryRemote = replicatedStorage.RS.Remotes.Misc.Carry;
             
-            for i,v in next, npcs:GetChildren() do
-                local shopName = v:FindFirstChild("Job",true);
-                if not shopName or shopName.Value ~= "Shipwright" then continue; end
-                task.spawn(function()
-                    for i = 1, 1e4 do 
-                        pcall(function()
-                            carryRemote:FireServer("Sell",v.Model.Value)
-                        end)
-                    end
-                end)
-            end
-        end)
-    end)
+    --         for i,v in next, npcs:GetChildren() do
+    --             local shopName = v:FindFirstChild("Job",true);
+    --             if not shopName or shopName.Value ~= "Shipwright" then continue; end
+    --             task.spawn(function()
+    --                 for i = 1, 1e4 do 
+    --                     pcall(function()
+    --                         carryRemote:FireServer("Sell",v.Model.Value)
+    --                     end)
+    --                 end
+    --             end)
+    --         end
+    --     end)
+    -- end)
 
     
     local speedtgl = sector:AddToggle('Speed',false,function(xstate)
@@ -17577,7 +17636,7 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
             task.wait(0.1)
             local function NoclipLoop()
                 pcall(function()
-                    if getgenv()['pilgrammedsettings']['noclip']  == true and game.Players.LocalPlayer.Character  and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >= 0 then
+                    if getgenv()['arcaneodysseysettings']['noclip']  == true and game.Players.LocalPlayer.Character  and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >= 0 then
                         for _, child in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
                             pcall(function()
                                 if child:IsA("BasePart") and child.CanCollide == true then
@@ -17948,6 +18007,9 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
             -- return metahook(self,unpack({
             --     1;args[2];args[3];args[4];args[5]
             -- }))
+        elseif call_type == 'FireServer' and self.Name == 'StaminaCost' and getgenv().arcaneodysseysettings['infinitestamina'] == true then 
+            args[1] = 0
+            return metahook(self,unpack(args))
         end
         return metahook(self,...)
     end)
