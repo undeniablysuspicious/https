@@ -3240,25 +3240,34 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             while task.wait(3) do 
                 if getgenv().loopsUnload == true then print('true mod break') break end
                 local ismod = false
-                for _,getmod in pairs(getgenv().moderators) do 
-                    task.wait(0.25)
-                    local split = string.split(getmod,'-')
-                    if game.Players:FindFirstChild(split[1]) then 
-                        getgenv().message('mod found > '..split[1]..' <')
-                        table.insert(getgenv().mods,game.Players:FindFirstChild(split[1]))
-                        ismod = true
-                        --print('mod',game.Players:FindFirstChild(split[1]))
-                    else
-                        for i,player in pairs(game.Players:GetChildren()) do 
-                            if tonumber(split[2]) == player.UserId then 
-                                getgenv().message('mod found > '..player.Name..' <')
-                                table.insert(getgenv().mods,player.Name)
-                                ismod = true
-                                --print('mod',player.Name)
-                            end
-                        end
+                -- for _,getmod in pairs(getgenv().moderators) do 
+                --     task.wait(0.25)
+                --     local split = string.split(getmod,'-')
+                --     if game.Players:FindFirstChild(split[1]) then 
+                --         getgenv().message('mod found > '..split[1]..' <')
+                --         table.insert(getgenv().mods,game.Players:FindFirstChild(split[1]))
+                --         ismod = true
+                --         --print('mod',game.Players:FindFirstChild(split[1]))
+                --     else
+                --         for i,player in pairs(game.Players:GetChildren()) do 
+                --             if tonumber(split[2]) == player.UserId then 
+                --                 getgenv().message('mod found > '..player.Name..' <')
+                --                 table.insert(getgenv().mods,player.Name)
+                --                 ismod = true
+                --                 --print('mod',player.Name)
+                --             end
+                --         end
+                --     end
+                -- end
+                local GroupService = game:GetService("GroupService")
+                local Players = game:GetService("Players")
+                local GROUP_ID = 7450839
+                for _,player in next,game.Players:GetPlayers() do 
+                    if player:IsInGroup(GROUP_ID) then 
+                        ismod = true;
                     end
                 end
+
                 if ismod == true and Toggles.ModLog.Value == true then 
                     repeat 
                         task.wait()
