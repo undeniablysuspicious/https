@@ -3575,7 +3575,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             end
         end
         --local pTab = window:CreateTab('Premium');
-        local PremiumSector = bloodlinesTab:CreateSector("Premium Access", "right") -- can be "left" --  pTab
+        local PremiumSector = bloodlinesTab:CreateSector("Premium Access", "extra") -- can be "left" --  pTab
         local Bots = window:CreateTab('Bots');
         PremiumSector:AddSeperator('Teleport Premium Functions')
         PremiumSector:AddTextbox('Waypoint',nil,function(State)
