@@ -5681,66 +5681,88 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     local vdown
     local venter
     local vleave
-    local function makeClickable()
-        for i,v in pairs(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.PlayerList.List:GetChildren()) do 
+    -- local function makeClickable()
+    --     for i,v in pairs(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.PlayerList.List:GetChildren()) do 
 
-            vdown = v.MouseButton1Down:Connect(function()
-                pcall(function()if game.Players:FindFirstChild(v.RealName.Value) then 
-                    local playerSave = game.Players:FindFirstChild(v.RealName.Value)
-                    game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
-                    --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
-                end end)
-            end)
-            venter = v.MouseEnter:Connect(function()
-                pcall(function() if v.RealName.Value == game.Players.LocalPlayer.Name then 
-                    v.PlayerName.TextColor3 = Color3.fromRGB(0,255,0)
-                    v.PlayerName.Text = 'HUH'
-                    v.PlayerName.Text = 'HUH'
-                    v.PlayerName.Text = 'HUH'
-                    -- v.RealName.Value = ''
-                else
-                    v.PlayerName.TextColor3 = Color3.fromRGB(255,255,255)
-                end 
-                if game.ReplicatedStorage.Settings:FindFirstChild(v.RealName.Value) and game.ReplicatedStorage.Settings:FindFirstChild(v.RealName.Value):FindFirstChild('Chakra Sense') then 
-                    v.PlayerName.TextColor3 = Color3.fromRGB(120,90,0)
-                end
-                end)
-            end)
-            vleave = v.MouseLeave:Connect(function()
-                pcall(function() if v.RealName.Value == game.Players.LocalPlayer.Name then 
-                    v.PlayerName.TextColor3 = Color3.fromRGB(0,255,0)
-                    v.PlayerName.Text = 'HUH'
-                    v.PlayerName.Text = 'HUH'
-                    v.PlayerName.Text = 'HUH'
-                    -- v.RealName.Value = ''
-                else
-                    v.PlayerName.TextColor3 = Color3.fromRGB(255,255,255)
-                end end)
-            end)
-            task.spawn(function()
-                repeat task.wait(2) until getgenv().disconnectClicks == true 
-                vdown:Disconnect()
-                venter:Disconnect()
-                vleave:Disconnect()
-            end)
-        end 
-    end
-    game.Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
-        task.wait(12)
-        getgenv().disconnectClicks = true
-        task.wait(1)
-        getgenv().disconnectClicks = false
-        makeClickable()
-    end)
+    --         vdown = v.MouseButton1Down:Connect(function()
+    --             pcall(function()if game.Players:FindFirstChild(v.RealName.Value) then 
+    --                 local playerSave = game.Players:FindFirstChild(v.RealName.Value)
+    --                 game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
+    --                 --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
+    --             end end)
+    --         end)
+    --         venter = v.MouseEnter:Connect(function()
+    --             pcall(function() if v.RealName.Value == game.Players.LocalPlayer.Name then 
+    --                 v.PlayerName.TextColor3 = Color3.fromRGB(0,255,0)
+    --                 v.PlayerName.Text = 'HUH'
+    --                 v.PlayerName.Text = 'HUH'
+    --                 v.PlayerName.Text = 'HUH'
+    --                 -- v.RealName.Value = ''
+    --             else
+    --                 v.PlayerName.TextColor3 = Color3.fromRGB(255,255,255)
+    --             end 
+    --             if game.ReplicatedStorage.Settings:FindFirstChild(v.RealName.Value) and game.ReplicatedStorage.Settings:FindFirstChild(v.RealName.Value):FindFirstChild('Chakra Sense') then 
+    --                 v.PlayerName.TextColor3 = Color3.fromRGB(120,90,0)
+    --             end
+    --             end)
+    --         end)
+    --         vleave = v.MouseLeave:Connect(function()
+    --             pcall(function() if v.RealName.Value == game.Players.LocalPlayer.Name then 
+    --                 v.PlayerName.TextColor3 = Color3.fromRGB(0,255,0)
+    --                 v.PlayerName.Text = 'HUH'
+    --                 v.PlayerName.Text = 'HUH'
+    --                 v.PlayerName.Text = 'HUH'
+    --                 -- v.RealName.Value = ''
+    --             else
+    --                 v.PlayerName.TextColor3 = Color3.fromRGB(255,255,255)
+    --             end end)
+    --         end)
+    --         task.spawn(function()
+    --             repeat task.wait(2) until getgenv().disconnectClicks == true 
+    --             vdown:Disconnect()
+    --             venter:Disconnect()
+    --             vleave:Disconnect()
+    --         end)
+    --     end 
+    -- end
+    -- game.Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
+    --     task.wait(12)
+    --     getgenv().disconnectClicks = true
+    --     task.wait(1)
+    --     getgenv().disconnectClicks = false
+    --     makeClickable()
+    -- end)
+
     
-    task.spawn(function()
-        while task.wait(100) do 
-            getgenv().disconnectClicks = true
-            task.wait(1)
-            getgenv().disconnectClicks = false
-            makeClickable()
-        end
+    for i,v in pairs(game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List'):GetChildren()) do 
+        v.MouseButton1Down:Connect(function()
+            pcall(function()if game.Players:FindFirstChild(v.RealName.Value) then 
+                local playerSave = game.Players:FindFirstChild(v.RealName.Value)
+                game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
+                --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
+            end end)
+        end)
+    end
+
+    game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List').ChildAdded:Connect(function(child)
+        child.MouseButton1Down:Connect(function()
+            pcall(function()if game.Players:FindFirstChild(child.RealName.Value) then 
+                local playerSave = game.Players:FindFirstChild(child.RealName.Value)
+                game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
+                --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
+            end end)
+        end)
     end)
+
+
+    -- task.spawn(function()
+    --     while task.wait(100) do 
+    --         getgenv().disconnectClicks = true
+    --         task.wait(1)
+    --         getgenv().disconnectClicks = false
+    --         makeClickable()
+    --     end
+    -- end)
     -- for i,v in pairs(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.PlayerList.List:GetChildren()) do 
     --     getgenv().disconnectClicks = true
     --     task.wait(1)
@@ -14185,7 +14207,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             if not obj:FindFirstChild('HumanoidRootPart') then cancel = true end 
             if not obj then cancel = true end 
             if getgenv().roghoulsettings['anotherexecutedwhentweening'] == true then print('another executed') getgenv().roghoulsettings['anotherexecutedwhentweening'] = false; cancel = true end
-            if registedchoice ~= getgenv()['roghoulsettings']['FinalChoice'] then differentChoice = true;cancel = true end
+            if registedchoice ~= getgenv()['roghoulsettings']['FinalChoice'] then differentChoice = true end -- ;cancel = true
             -- if getgenv().roghoulsettings['dontidle'] ==true then 
             --     getgenv().roghoulsettings['dontidle'] = false 
             --     wascancelledduetonodile = true;
@@ -14212,15 +14234,18 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             --     --     getgenv().GetClosestTarget()
             --     -- end)
             -- end
-            print('In Loop')
+            -- print('In Loop')
         until completedtween == true or holdState == true or differentChoice == true
         if holdState== true then 
+            print('HoldState is true')
             tween:Cancel()
             setaction('canquest')
             --return holdState
         end
         if differentChoice == true then 
             print('Different Choice, '..rname..' new = '..getgenv()['roghoulsettings']['FinalChoice'].Name)
+            tween:Cancel()
+            setaction('canquest')
             -- tween:Cancel()
            -- holdtween()
         end
@@ -14299,7 +14324,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         if differentChoice == false then 
            
         end --ndebug
-        if holdState == false then 
+        if holdState == false and differentChoice == false then 
             setaction('idle')
         end
 
@@ -14813,6 +14838,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         getgenv()['roghoulsettings']['action'] = 'canquest'
                         getgenv().roghoulsettings['callednotice'] = false;
                         getgenv()['roghoulsettings']['hasntstarted'] = true;
+                        return
                     end
                 elseif getgenv().roghoulsettings['farming'] == true and game:GetService("Workspace"):FindFirstChild('Gyakusatsu') and typeofnpc == 'gykat' and  getaction() == 'canquest' and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                     getgenv()['roghoulsettings']['action'] = 'fighting';
@@ -15899,7 +15925,7 @@ elseif game.PlaceId == 6735572261 then
                     if onscreen and isactive == true then 
                         sectionesp.Position = Vector2.new(vect.X,vect.Y ) + Vector2.new(0,15)
                         sectionesp.Visible = true
-                        sectionesp.Text = 'Ores: '..math.floor(distance)..'studs'..' '..contains
+                        sectionesp.Text = 'Ores: '..math.floor(distance)..'studs'..' '..contains -- make it show closest
                         sectionesp.Color = getgenv().pilgrammedsettings['oresespcolour']
                     elseif not onscreen and isactive == true  then
                         sectionesp.Visible = false
@@ -16998,11 +17024,172 @@ elseif game.PlaceId == 8568266872 then  -- kill to save princess
 elseif azfake.findintable_i(dungeon_quest_games,gameName) then 
     local tab = window:CreateTab(gameName)
     local sector = tab:CreateSector('Cheats','left')
+    local botsector = tab:CreateSector('Cheats','right')
+    local boteditsect = tab:CreateSector('Cheats','extra')
     getgenv().dungeonquestsettings = {
         instakill = false;
+        selectedbot = '';
+        usebotcommands = false;
+        configcommands = false;
+        configediting = '';
+        config = {};
+        adddelay = false;
+        delay = 0;
     }
     sector:AddToggle('Insta Kill',false,function(xstate)
         getgenv().dungeonquestsettings['instakill'] = xstate
+    end)
+    botsector:AddTextbox('Auto Dungeon Bot','',function(xstate)
+        getgenv().dungeonquestsettings['selectedbot'] = xstate
+    end)
+    -- check if txt isnt there
+    -- add a toggle so you dont have to type extension name
+    -- add a textbox for the extension ending it wants to add if the toggle for no extension name is on but the default is .txt
+    --botsector:AddSeperator('Bot functions')
+    local function compilesettings()
+        local str = 'settings = {}'
+        str = str:sub(1,string.len(str)-1)
+        for _,v in next, getgenv().dungeonquestsettings['config'] do 
+            -- {[1]=48444;} - {[1]=48444;
+            --if str ~= '{' then str = str..';' end
+            if type(v) == 'table' then 
+                str = str..'{point=CFrame.new('..tostring(v['point'])..');'..'delay='..tostring(v['delay'])..'};'
+            else
+                str = str..'point=CFrame.new('..tostring(v)..');'
+            end
+            
+        end
+        str = str..'}\nreturn settings'
+        return str
+    end
+    local function getsettings()
+        return compilesettings --loadstring(compilesettings())()
+    end
+    local function uncompile(x)
+        local str = x 
+        local outcome = loadstring(x)();
+        return outcome
+    end
+    botsector:AddButton('Run bot',function()
+        local file = getgenv().dungeonquestsettings['selectedbot']
+        if isfile(file) then 
+            azfakenotify('Loading File: '..file,1)
+            for _,v in next, getgenv().dungeonquestsettings['config'] do 
+                task.wait(0.01)
+                if type(v) == 'table' then 
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v['point']
+                    task.wait(v['delay'])
+                else
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v
+                end
+            end
+        else
+            azfakenotify('File: '..file..' Is not recognised.',3)
+        end
+    end)
+    botsector:AddButton('Load bot',function()
+        local file = getgenv().dungeonquestsettings['selectedbot']
+        if isfile(file) then 
+            azfakenotify('Loading File: '..file,'untilClick')
+            getgenv().dungeonquestsettings['config'] = uncompile(readfile(file)) --game:GetService('HttpService'):JSONDecode(readfile(file))
+        else
+            azfakenotify('File: '..file..' Is not recognised.',3)
+        end
+    end)
+    botsector:AddButton('Save bot',function()
+        local file = getgenv().dungeonquestsettings['selectedbot']
+        if isfile(file) then 
+            azfakenotify('Loading File: '..file,2)
+            --uncompile(compilesettings()) --do --writefile(file,game:GetService('HttpService'):JSONEncode(getgenv().dungeonquestsettings['config']))
+            writefile(file,compilesettings())
+        else
+            azfakenotify('File: '..file..' Is not recognised.',3)
+        end
+    end)
+    botsector:AddSeperator()
+    -- botsector:AddButton('Edit bot',function()
+    --     local file = getgenv().dungeonquestsettings['selectedbot']
+    --     if isfile(file) then 
+    --         azfakenotify('Editing File: '..file,'untilClick')
+    --         getgenv().dungeonquestsettings['config'] = uncompile(compilesettings()) -- compilesettings
+    --     else
+    --         azfakenotify('File: '..file..' Is not found.',3)
+    --     end
+    -- end)
+    botsector:AddButton('Create bot save file',function()
+        local file = getgenv().dungeonquestsettings['selectedbot']
+        if not isfile(file) then 
+            writefile(file,'')
+        else
+            azfakenotify('File exists',1)
+        end
+    end)
+    --botsector:AddSeperator('~')
+    local bottgl = boteditsect:AddToggle('Bot commands',false,function(xstate)
+        getgenv().dungeonquestsettings['usebotcommands'] = xstate
+    end)
+    local delay = boteditsect:AddToggle('Add Delay',false,function(xstate)
+        getgenv().dungeonquestsettings['adddelay'] = xstate
+    end)
+    local tbdelay = boteditsect:AddTextbox('Delay','',function(xstate)
+        if tonumber(xstate) then 
+            getgenv().dungeonquestsettings['delay'] = tonumber(xstate)
+        else
+            azfakenotify('Filtered Input not accepted')
+        end
+    end)
+    local displaydelaybutton = boteditsect:AddButton('Display Delay',function()
+        azfakenotify('Delay: '..tostring(getgenv().dungeonquestsettings['delay']))
+    end)
+    delay:MakeVisibleIfActive(tbdelay)
+    delay:MakeVisibleIfActive(displaydelaybutton)
+    local resetbutton = boteditsect:AddButton('Reset Editing Config',function()
+        getgenv().dungeonquestsettings['config'] = {}
+    end)
+    local addpoint = boteditsect:AddButton('Add Point',function()
+        local index = 1 
+        for _,v in next, getgenv().dungeonquestsettings['config']  do 
+            index = index + 1 -- index = _ + 1 or 
+        end
+        if getgenv().dungeonquestsettings['adddelay'] == true then 
+            getgenv().dungeonquestsettings['config'][index] = {
+                point = game.Players.LocalPlayer.Character.PrimaryPart.CFrame;
+                delay = getgenv().dungeonquestsettings['delay'];
+            }
+        else
+            getgenv().dungeonquestsettings['config'][index] = game.Players.LocalPlayer.Character.PrimaryPart.CFrame
+        end
+    end)
+    local removepoint = boteditsect:AddButton('Remove Previous Point',function()
+        local index = 1 
+        for _,v in next, getgenv().dungeonquestsettings['config']  do 
+            index = _ --index = index + 1 -- index = _ + 1 or 
+        end
+        table.remove(getgenv().dungeonquestsettings['config'],index)
+    end)
+    bottgl:MakeVisibleIfActive(resetbutton)
+    bottgl:MakeVisibleIfActive(addpoint)
+    bottgl:MakeVisibleIfActive(removepoint)
+    boteditsect:AddToggle('Bot config commands',false,function(xstate)
+        getgenv().dungeonquestsettings['configcommands'] = xstate
+    end)
+    game.Players.LocalPlayer.Chatted:Connect(function(msg)
+        if not getgenv().dungeonquestsettings['usebotcommands'] then return end
+        if msg == '/e resetstatus' then 
+            getgenv().dungeonquestsettings['config'] = {}
+        elseif msg == '/e createpoint' then 
+            local index = 1 
+            for _,v in next, getgenv().dungeonquestsettings['config']  do 
+                index = index + 1 -- index = _ + 1 or 
+            end
+            getgenv().dungeonquestsettings['config'][index] = game.Players.LocalPlayer.Character.PrimaryPart.CFrame
+        elseif msg == '/e deletepreviouspoint' then 
+            local index = 1 
+            for _,v in next, getgenv().dungeonquestsettings['config']  do 
+                index = _ --index = index + 1 -- index = _ + 1 or 
+            end
+            table.remove(getgenv().dungeonquestsettings['config'],index)
+        end
     end)
     task.spawn(function()
         while task.wait() do 
@@ -18022,7 +18209,7 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
         end
         return metahook(self,...)
     end)
--- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
+    -- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
 
     -- local ohNumber1 = 0
     -- local ohInstance2 = workspace["8qxl0"]
@@ -18219,11 +18406,14 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
                 for _,v in next, game:GetService("Workspace").Map:GetChildren() do 
                     if v:FindFirstChild('Chests') then 
                         for k,chest in next, v:FindFirstChild('Chests'):GetChildren() do 
-                            local dist = (v:FindFirstChildWhichIsA('MeshPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
-                            if dist.Magnitude < 10 then 
-                                for e,d in next, v:GetDescendants() do 
-                                    if d.Name == 'Prompt' then 
-                                        azfake.fireproximitypromt(d)
+                            if v:FindFirstChildWhichIsA('MeshPart') then  
+                                local dist = (v:FindFirstChildWhichIsA('MeshPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                                if dist.Magnitude < 10 then 
+                                    game:GetService("ReplicatedStorage").RS.Remotes.Misc.OpenChest:FireServer(chest)
+                                    for e,d in next, v:GetDescendants() do 
+                                        if d.Name == 'Prompt' then 
+                                            azfake.fireproximitypromt(d)
+                                        end
                                     end
                                 end
                             end
