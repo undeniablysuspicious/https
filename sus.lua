@@ -9040,7 +9040,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     task.spawn(function()
         while task.wait() do 
             if getgenv().loopsUnload == true then print('m1 break') break end
-            if getgenv().buttonUp == true then 
+            if getgenv().buttonUp == true and getgenv().fw3localFw3['m1hold'] == true then 
                 getgenv().M1()
                 task.wait(.2)
                 if getgenv().fw3localFw3['fastswing'] == true then 
