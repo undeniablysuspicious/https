@@ -17036,6 +17036,7 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
         adddelay = false;
         delay = 0;
         tpenemy = false;
+        antiafk = false;
     }
     sector:AddToggle('Insta Kill',false,function(xstate)
         getgenv().dungeonquestsettings['instakill'] = xstate
@@ -17043,8 +17044,16 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
     sector:AddToggle('Teleport to Enemies',false,function(xstate)
         getgenv().dungeonquestsettings['tpenemy'] = xstate
     end)
+    sector:AddToggle('Anti afk',false,function(xstate) -- Aafk
+        getgenv().dungeonquestsettings['antiafk'] = xstate
+    end)
     botsector:AddTextbox('Auto Dungeon Bot','',function(xstate)
         getgenv().dungeonquestsettings['selectedbot'] = xstate
+    end)
+    game.Players.LocalPlayer.Idled:Connect(function()
+        if getgenv().dungeonquestsettings['antiafk'] == true then 
+            game:GetService("VirtualUser"):ClickButton2(Vector2.new())
+        end
     end)
     -- check if txt isnt there
     -- add a toggle so you dont have to type extension name
@@ -17241,6 +17250,7 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
                                     if isnetworkowner(v.PrimaryPart) then
                                         pcall(function()
                                             v:FindFirstChild('Head'):Destroy()
+                                            v:FindFirstChildWhichIsA('Humanoid').Health = 0
                                             print('was owner')
                                             print(v.Name..' onw')
                                         end)
@@ -17259,6 +17269,7 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
                             if isnetworkowner(v.PrimaryPart) then
                                 pcall(function()
                                     v:FindFirstChild('Head'):Destroy()
+                                    v:FindFirstChildWhichIsA('Humanoid').Health = 0--DealDamage
                                     print('was owner')
                                     print(v.Name..' onw')
                                 end)
