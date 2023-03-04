@@ -17035,9 +17035,13 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
         config = {};
         adddelay = false;
         delay = 0;
+        tpenemy = false;
     }
     sector:AddToggle('Insta Kill',false,function(xstate)
         getgenv().dungeonquestsettings['instakill'] = xstate
+    end)
+    sector:AddToggle('Teleport to Enemies',false,function(xstate)
+        getgenv().dungeonquestsettings['tpenemy'] = xstate
     end)
     botsector:AddTextbox('Auto Dungeon Bot','',function(xstate)
         getgenv().dungeonquestsettings['selectedbot'] = xstate
@@ -17194,6 +17198,27 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
     task.spawn(function()
         while task.wait() do 
             if getgenv().loopsUnload == true then print('princess break end') break end 
+            if getgenv().dungeonquestsettings['tpenemy'] == true then 
+                getgenv().dungeonquestsettings['tpenemy'] = nil 
+                task.spawn(function()
+                    repeat 
+                        local dir = game:GetService("Workspace"):FindFirstChild('dungeon')
+                        if dir then 
+                            for _,c in next, dir:GetChildren() do 
+                                if c:FindFirstChild('enemyFolder') then 
+                                    for _,v in next,c:FindFirstChild('enemyFolder'):GetChildren() do 
+                                        if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer.Character and v:FindFirstChildWhichIsA('Humanoid') then  
+                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame
+                                            task.wait(.2)
+                                        end 
+                                    end
+                                end 
+                            end 
+                        end  
+                        task.wait()
+                    until getgenv().dungeonquestsettings['tpenemy'] == false
+                end)
+            end
             if getgenv().dungeonquestsettings['instakill'] == true then 
                 local dir = game:GetService("Workspace"):FindFirstChild('dungeon')
                 if dir then 
