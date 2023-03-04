@@ -17199,6 +17199,7 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
         while task.wait() do 
             if getgenv().loopsUnload == true then print('princess break end') break end 
             if getgenv().dungeonquestsettings['tpenemy'] == true then 
+                --game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = true
                 getgenv().dungeonquestsettings['tpenemy'] = nil 
                 task.spawn(function()
                     repeat 
@@ -17208,15 +17209,25 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
                                 if c:FindFirstChild('enemyFolder') then 
                                     for _,v in next,c:FindFirstChild('enemyFolder'):GetChildren() do 
                                         if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer.Character and v:FindFirstChildWhichIsA('Humanoid') then  
-                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame
-                                            task.wait(.2)
+                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,0,7)
+                                            task.wait(.1)
                                         end 
                                     end
                                 end 
                             end 
                         end  
+                        local dir2 = game:GetService("Workspace"):FindFirstChild('enemies')
+                        if dir2 then 
+                            for _,v in next, dir2:GetChildren() do 
+                                if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer.Character and v:FindFirstChildWhichIsA('Humanoid') then  
+                                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,0,7)
+                                    task.wait(.1)
+                                end 
+                            end 
+                        end  
                         task.wait()
                     until getgenv().dungeonquestsettings['tpenemy'] == false
+                    --game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = false
                 end)
             end
             if getgenv().dungeonquestsettings['instakill'] == true then 
@@ -17241,6 +17252,20 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
             
                     end 
                 end  
+                local dir2 = game:GetService("Workspace"):FindFirstChild('enemies')
+                if dir2 then 
+                    for _,v in next, dir2:GetChildren() do 
+                        if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer.Character and v:FindFirstChildWhichIsA('Humanoid') then  
+                            if isnetworkowner(v.PrimaryPart) then
+                                pcall(function()
+                                    v:FindFirstChild('Head'):Destroy()
+                                    print('was owner')
+                                    print(v.Name..' onw')
+                                end)
+                            end
+                        end 
+                    end 
+                end 
             end
         end
     end)
