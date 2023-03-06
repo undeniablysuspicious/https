@@ -6572,6 +6572,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     local Combat = Top:CreateSector('Combat Cheats','right')
     local CombatModifier = Top:CreateSector('Cheats','right')
     local BlatantCheats = Top:CreateSector('Blatant','left')
+    --local fakefix = Top:CreateSector('Cheats','extra')
     Combat:FixSize()
     getgenv().Distance = 0
     getgenv().Ping = 0
@@ -6611,7 +6612,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         walkspeedtoggle = false;
         momentumtoggle = false;
         momentum = 0;
-        CurrentTween = nil
+        CurrentTween = nil;
+        fixm1bug = false;
     }
 
 
@@ -6876,7 +6878,9 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     end)
     -- slider: min, default, max, decimals, callback, slider:Refresh()
 
-
+    -- CombatModifier:AddToggle('Remove M1 Bug',false,function(xtstae)
+    --     getgenv().fw3localFw3['fixm1bug'] = xtstae
+    -- end)
 
     CombatModifier:AddToggle("No Anims (Risky)", false, function(xstate)
         getgenv().fw3localFw3['noanims'] = xstate
@@ -6898,7 +6902,19 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         getgenv().fw3localFw3['jumpwhentargetragdolled'] = xstate
     end)
     CombatModifier:AddLabel('Jump when target ragdolled\nonly works when m1 when possible\nisactive.')
+
+
+
+
+
+    --fakefix:AddToggle('Fix ')
+
+
     -- jumpwhentargetragdolled
+
+
+
+
     if getgenv().adminCheck == true then 
         fakesect:AddSeperator('admin bruhh')
         getgenv().DisableAnticheat = function()
@@ -9093,6 +9109,13 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     task.spawn(function()
         while task.wait() do 
             if getgenv().loopsUnload == true then print('m1 loop anim loop break') break end 
+            if getgenv().fw3localFw3['fixm1bug'] == true then 
+                task.spawn(function()
+                    if cooldowns and cooldowns:FindFirstChild('M1') then 
+                        cooldowns:FindFirstChild('M1'):Destroy()
+                    end
+                end)
+            end
             if getgenv().fw3localFw3['possiblem1'] == true and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health > 0 and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                 -- print('@possiblem1')
                 for _,v in pairs(workspace.Characters:GetChildren()) do 
@@ -11701,6 +11724,7 @@ elseif game.PlaceId == 10371908957 or game.PlaceId == 10495850838 then  --- deep
 
     local function keepAlive(c)
         task.spawn(function()
+            task.wait(1)
             repeat task.wait(.1) until getgenv().loopsUnload == true 
             c:Disconnect()
         end)
@@ -12089,6 +12113,7 @@ elseif game.PlaceId == 10371908957 or game.PlaceId == 10495850838 then  --- deep
 
 
     task.spawn(function()
+        task.wait(1)
         repeat task.wait(.5) until getgenv().loopsUnload == true 
         print('workspace added loop break'); connectionAdded:Disconnect()
     end)
@@ -13153,7 +13178,7 @@ elseif game.PlaceId == 10889408214 then --// deflect
                     if vs == 'debug' then 
                         print('Tracking')
                     end
-                    if pos.Magnitude <= getgenv().deflecttbl['distance'] then 
+                    if pos.Magnitude <= getgenv().deflecttbl['distance'] *1 then 
                         print('Deflecting')
                         game.Players.LocalPlayer.Character.Deflection.Remote:FireServer('Deflect', workspace.CurrentCamera.CFrame.lookVector)
                     else
