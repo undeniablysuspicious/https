@@ -12002,56 +12002,63 @@ elseif game.PlaceId == 10371908957 or game.PlaceId == 10495850838 then  --- deep
         'walk';
         'run';
     }
-
+    local quickremoveanim = {
+        'http'
+    }--[|]
 
 
     for _,v in next, workspace.Live:GetChildren() do 
         print('on '..v.Name)
         if v.Name ~= game.Players.LocalPlayer.Name then 
             local workChar = v -- and not table.find(quickfilteranim,anim.Animation.Name)
-            workChar:WaitForChild('Humanoid')
-            local connection; connection = v:FindFirstChildWhichIsA('Humanoid').AnimationPlayed:Connect(function(anim)
-                -- print('played '..v.Name)
-                task.spawn(function()
-                    if getgenv()['dwdsettings']['autoparry'] == true and workChar:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
-                        -- print('a playing')
-                        local dist = (workChar:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
-                        if dist <= getgenv().dwdsettings['distance'] and not table.find(quickfilteranim,anim.Animation.Name) and anim.Animation.AnimationId:sub(1,3) == 'rbx' then 
-    
-                            getgenv().ParryAct(workChar,anim)
-                            -- print('act '..v.Name)
-                        else
-                            -- if getgenv().dwdsettings['distance'] > 0 then 
-                            --     task.spawn(function()
-                            --         local repeating = 0
-                            --         repeat 
-                            --             task.wait(0.1)
-                            --             repeating +=.1
-                            --             if repeating < 0.2 and workChar and workChar:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
-                            --                 dist = (workChar:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
-                            --                 if dist <= getgenv().dwdsettings['distance'] then 
-                            --                     -- getgenv().ParryAct(workChar,anim)
-                            --                     repeating = 0.2
-                            --                 end
-                            --             else
-                            --                 repeating = 0.2
-                            --             end
-    
-                            --         until repeating >= 0.2
-                            --     end)
-                            -- end
+            task.spawn(function()
+                --workChar:WaitForChild('Humanoid')
+                local connection; connection = v:FindFirstChildWhichIsA('Humanoid').AnimationPlayed:Connect(function(anim)
+                    -- print('played '..v.Name)
+                    task.spawn(function()
+                        if getgenv()['dwdsettings']['autoparry'] == true and workChar:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                            -- print('a playing')
+                            local dist = (workChar:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                            if dist <= getgenv().dwdsettings['distance'] and not table.find(quickfilteranim,anim.Animation.Name) and not table.find(quickremoveanim,anim.Animation.AnimationId:sub(1,4)) and anim.Animation.AnimationId:sub(1,3) == 'rbx'then  -- 
+        
+                                getgenv().ParryAct(workChar,anim)
+                                -- print('act '..v.Name)
+                            else
+                                -- if dist <= getgenv().dwdsettings['distance'] then print('ew') 
+                                --     --print(anim.Animation.AnimationId:sub(1,3))
+                                -- end
+                                -- if getgenv().dwdsettings['distance'] > 0 then 
+                                --     task.spawn(function()
+                                --         local repeating = 0
+                                --         repeat 
+                                --             task.wait(0.1)
+                                --             repeating +=.1
+                                --             if repeating < 0.2 and workChar and workChar:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                --                 dist = (workChar:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                                --                 if dist <= getgenv().dwdsettings['distance'] then 
+                                --                     -- getgenv().ParryAct(workChar,anim)
+                                --                     repeating = 0.2
+                                --                 end
+                                --             else
+                                --                 repeating = 0.2
+                                --             end
+        
+                                --         until repeating >= 0.2
+                                --     end)
+                                -- end
+                            end
                         end
-                    end
+                    end)
+    
                 end)
-
+    
+                v:FindFirstChildWhichIsA('Humanoid').Died:Connect(function()
+                    connection:Disconnect()
+                    print'died'
+                end)
+    
+                keepAlive(connection)
             end)
-
-            v:FindFirstChildWhichIsA('Humanoid').Died:Connect(function()
-                connection:Disconnect()
-                print'died'
-            end)
-
-            keepAlive(connection)
         end
     end
 
@@ -12063,45 +12070,48 @@ elseif game.PlaceId == 10371908957 or game.PlaceId == 10495850838 then  --- deep
         if xchild.Name ~= game.Players.LocalPlayer.Character.Name then
             local workChar = xchild
             -- print(xchild.Name..' added')
-            workChar:WaitForChild('Humanoid')
-            local connection; connection = workChar:FindFirstChildWhichIsA('Humanoid').AnimationPlayed:Connect(function(anim)
-                task.spawn(function()
-                    if getgenv()['dwdsettings']['autoparry'] == true and workChar:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
-                        -- print('anim')
-                        local dist = (workChar:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
-                        if dist <= getgenv().dwdsettings['distance'] and not table.find(quickfilteranim,anim.Animation.Name) and anim.Animation.AnimationId:sub(1,3) == 'rbx' then 
-                            -- print('in distance')
-                            getgenv().ParryAct(workChar,anim)
-                        else
-                            -- if getgenv().dwdsettings['distance'] > 0 then 
-                            --     task.spawn(function()
-                            --         local repeating = 0
-                            --         repeat 
-                            --             task.wait(0.1)
-                            --             repeating +=1 
-                            --             if repeating < 0.2 and workChar and workChar:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
-                            --                 dist = (workChar:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
-                            --                 if dist <= getgenv().dwdsettings['distance'] then 
-                            --                     getgenv().ParryAct(workChar,anim)
-                            --                     repeating = 0.2
-                            --                 end
-                            --             else
-                            --                 repeating = 0.2
-                            --             end
-                            --         until repeating >= 0.2
-                            --     end)
-                            -- end
+            task.spawn(function()
+                --workChar:WaitForChild('Humanoid')
+                local connection; connection = workChar:FindFirstChildWhichIsA('Humanoid').AnimationPlayed:Connect(function(anim)
+                    task.spawn(function()
+                        if getgenv()['dwdsettings']['autoparry'] == true and workChar:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                            -- print('anim')
+                            local dist = (workChar:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                            if dist <= getgenv().dwdsettings['distance'] and not table.find(quickfilteranim,anim.Animation.Name) and not table.find(quickremoveanim,anim.Animation.AnimationId:sub(1,4)) and anim.Animation.AnimationId:sub(1,3) == 'rbx' then 
+                                -- print('in distance')
+                                getgenv().ParryAct(workChar,anim)
+                            else
+                                --if dist <= getgenv().dwdsettings['distance'] then print('ew') end
+                                -- if getgenv().dwdsettings['distance'] > 0 then 
+                                --     task.spawn(function()
+                                --         local repeating = 0
+                                --         repeat 
+                                --             task.wait(0.1)
+                                --             repeating +=1 
+                                --             if repeating < 0.2 and workChar and workChar:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                --                 dist = (workChar:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                                --                 if dist <= getgenv().dwdsettings['distance'] then 
+                                --                     getgenv().ParryAct(workChar,anim)
+                                --                     repeating = 0.2
+                                --                 end
+                                --             else
+                                --                 repeating = 0.2
+                                --             end
+                                --         until repeating >= 0.2
+                                --     end)
+                                -- end
+                            end
                         end
-                    end
+                    end)
+    
                 end)
-
+    
+                keepAlive(connection)
+    
+                if getgenv()['dwdsettings']['espsettings']['esp'] == true and game:GetService('Players'):FindFirstChild(xchild.Name) then 
+                    getgenv().CreatePlayerEsp(game:GetService('Players'):FindFirstChild(xchild.Name))
+                end 
             end)
-
-            keepAlive(connection)
-
-            if getgenv()['dwdsettings']['espsettings']['esp'] == true and game:GetService('Players'):FindFirstChild(xchild.Name) then 
-                getgenv().CreatePlayerEsp(game:GetService('Players'):FindFirstChild(xchild.Name))
-            end 
         end
     end)
 
