@@ -10252,6 +10252,8 @@ elseif game.PlaceId == 10371908957 or game.PlaceId == 10495850838 then  --- deep
         selectedmantra = nil;
         alreadyparrying =false;
         noanims = false;
+        nomantracd = false;
+    
     } -- if they are asian and ur chatting to them online, you cant take that risk they might have small b
     -- getgenv()['dwdsettings']['objects'] could put getsynasset() stuff in here
 
@@ -10339,8 +10341,12 @@ elseif game.PlaceId == 10371908957 or game.PlaceId == 10495850838 then  --- deep
     sector:AddToggle("Auto Loot", false, function(xstate)
         getgenv().AzfakeGlobalTables['dwd']['autoloot'] = xstate
     end)
+    sector:AddToggle("No Mantra CD", false, function(xstate)
+        getgenv().dwdsettings['nomantracd'] = xstate
+    end)
+    local nomantracdattachment = sector:AddKeybindAttachment('Reset Mantra Cooldowns'):AddKeybind();
 
-
+    
 
 
 
@@ -11503,12 +11509,12 @@ elseif game.PlaceId == 10371908957 or game.PlaceId == 10495850838 then  --- deep
 
         
         if detect(v,'rbxassetid://10495935826') then -- Parry Dagger-SW1    
-            task.wait(.05)
+            task.wait(.02)
             getgenv().parry()
             
         end
         if detect(v,'rbxassetid://10495935882') then -- Parry Dagger-SW2
-            task.wait(.05)
+            task.wait(.02)
             getgenv().parry()
             
         end
@@ -12140,9 +12146,113 @@ elseif game.PlaceId == 10371908957 or game.PlaceId == 10495850838 then  --- deep
 
 
     Configiuration:CreateConfigSystem()
+
     task.spawn(function()
         while task.wait() do -- getgenv().est
             if getgenv().loopsUnload == true then print('dwd loop break') break end
+            if nomantracdattachment:IsPressed() == true then 
+                for _,v in next, game:GetService("Players").LocalPlayer:WaitForChild('PlayerGui'):WaitForChild('BackpackGui'):WaitForChild('MainFrame'):GetChildren() do 
+                    if v:FindFirstChild('Cooldown') and v:FindFirstChild('Cooldown').Visible == true and v:FindFirstChild('Cooldown').AbsoluteSize ~= Vector2.new(60,0) then  -- 
+                        v:FindFirstChild('Cooldown').Visible = false
+                        if v:FindFirstChild('Cooldown') and v:FindFirstChild('Cooldown').AbsoluteSize == Vector2.new(60,0) then return end
+                        --v:FindFirstChild('Cooldown').AbsoluteSize = Vector2.new(60,0)
+                        local tool = nil       --and v:FindFirstChild('Cooldown').Visible == true                   
+                        local function settool(x)
+                            for _,v in next, game.Players.LocalPlayer.Backpack:GetChildren() do if v.Name:find(x) then tool = v break end  end
+                            pcall(function() tool.Parent = game.Players.LocalPlayer.Character end)
+                            for _,v in next, game.Players.LocalPlayer.Character:GetChildren() do if v.Name:find(x) then tool = v break end  end
+                        end
+                        local toolname = ''
+                        local firstbracketreached = false;
+                        for i=1, string.len(v.Name) do 
+                            if v.Name:sub(i,i) == '{' and firstbracketreached == false then 
+                                firstbracketreached = true 
+                            elseif v.Name:sub(i,i) == '{' and firstbracketreached == true then 
+                                firstbracketreached = 'registername'
+                            elseif v.Name:sub(i,i) == '}' then 
+                                firstbracketreached = false
+                            elseif firstbracketreached == 'registername' then 
+                                toolname = toolname..v.Name:sub(i,i)
+                            end
+                        end
+                        if toolname ~= '' then 
+                            pcall(function()
+                                settool(toolname)
+                                tool:Activate()
+                                tool:Deactivate()
+                                repeat task.wait(); tool.Parent = game.Players.LocalPlayer.Backpack 
+                                until tool.Parent == game.Players.LocalPlayer.Backpack 
+                                
+                                
+                            end)
+                        end
+                    end
+                    --game:GetService("Players").LocalPlayer.PlayerGui.BackpackGui.MainFrame["003Mantra:StrongPunchFire{{Ash Slam}}"].Cooldown
+                end
+            end
+            if getgenv().dwdsettings['nomantracd'] == true then 
+                getgenv().dwdsettings['nomantracd']  = nil 
+                task.spawn(function()
+                    repeat 
+                        task.wait(.5)
+                        for _,v in next, game:GetService("Players").LocalPlayer:WaitForChild('PlayerGui'):WaitForChild('BackpackGui'):WaitForChild('MainFrame'):GetChildren() do 
+                            if v:FindFirstChild('Cooldown') and v:FindFirstChild('Cooldown').Visible == true and v:FindFirstChild('Cooldown').AbsoluteSize ~= Vector2.new(60,0) then  -- 
+                                v:FindFirstChild('Cooldown').Visible = false
+                                if v:FindFirstChild('Cooldown') and v:FindFirstChild('Cooldown').AbsoluteSize == Vector2.new(60,0) then return end
+                                --v:FindFirstChild('Cooldown').AbsoluteSize = Vector2.new(60,0)
+                                local tool = nil       --and v:FindFirstChild('Cooldown').Visible == true                   
+                                local function settool(x)
+                                    for _,v in next, game.Players.LocalPlayer.Backpack:GetChildren() do if v.Name:find(x) then tool = v break end  end
+                                    pcall(function() tool.Parent = game.Players.LocalPlayer.Character end)
+                                    for _,v in next, game.Players.LocalPlayer.Character:GetChildren() do if v.Name:find(x) then tool = v break end  end
+                                end
+                                local toolname = ''
+                                local firstbracketreached = false;
+                                for i=1, string.len(v.Name) do 
+                                    if v.Name:sub(i,i) == '{' and firstbracketreached == false then 
+                                        firstbracketreached = true 
+                                    elseif v.Name:sub(i,i) == '{' and firstbracketreached == true then 
+                                        firstbracketreached = 'registername'
+                                    elseif v.Name:sub(i,i) == '}' then 
+                                        firstbracketreached = false
+                                    elseif firstbracketreached == 'registername' then 
+                                        toolname = toolname..v.Name:sub(i,i)
+                                    end
+                                end
+                                local foundtool = false
+                                for _,v in next, getgenv().dwdsettings['objects'] do 
+                                    if v == tool then 
+                                        foundtool = true
+                                    end
+                                end
+                                if toolname ~= '' and foundtool == false then 
+                                    table.insert(getgenv().dwdsettings['objects'],tool)
+                                    task.delay(2,function()
+                                        for _,v in next, getgenv().dwdsettings['objects'] do 
+                                            if v == tool then 
+                                                table.remove(getgenv().dwdsettings['objects'],_)
+                                                -- foundtool = false
+                                            end
+                                        end
+                                    end)
+                                    pcall(function()
+                                        settool(toolname)
+                                        tool:Activate()
+                                        tool:Deactivate()
+                                        repeat task.wait(); tool.Parent = game.Players.LocalPlayer.Backpack 
+                                        until tool.Parent == game.Players.LocalPlayer.Backpack 
+                                        
+                                        -- task.wait(2)
+                                    end)
+                                end
+                            end
+                            --game:GetService("Players").LocalPlayer.PlayerGui.BackpackGui.MainFrame["003Mantra:StrongPunchFire{{Ash Slam}}"].Cooldown
+                        end
+                    until getgenv().dwdsettings['nomantracd'] == false or getgenv().loopsUnload == true
+                end)
+
+
+            end
             if getgenv().dwdsettings['noanims'] == true then 
                 getgenv().stopAnims()
             end
@@ -13027,21 +13137,47 @@ elseif game.PlaceId == 10889408214 then --// deflect
     deflect:AddSlider("Distance", -10, 5, 10, 10, function(State)
         getgenv().deflecttbl['distance'] = State
     end)
+    -- game:GetService('RunService').RenderStepped:Connect(function()
+    
+    -- end)
     task.spawn(function()
-        while task.wait(0.1) do 
+        while task.wait(0.01) do 
             if getgenv().loopsUnload == true then break end
-            if getgenv().deflecttbl['autodeflect'] == true and workspace:FindFirstChild('Ball') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+            if getgenv().deflecttbl['autodeflect'] == true and workspace:FindFirstChild('Ball') and workspace:FindFirstChild('Ball'):FindFirstChild('Tracking') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                 local ball = workspace:FindFirstChild('Ball')
                 local pos = ball:FindFirstChild('Main').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position
                 -- pos.Magnitude >= dist-pos.Magnitude: 30 10
                 -- check for red highlight
-                if pos.Magnitude <=getgenv().deflecttbl['distance'] and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA('Highlight') then 
+                if ball.Tracking.Value == game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA('Highlight')  then 
                     -- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
-
-                    local ohString1 = "Deflect"
-                    local ohVector32 = workspace.CurrentCamera.CFrame.lookVector
-
-                    game.Players.LocalPlayer.Character.Deflection.Remote:FireServer(ohString1, ohVector32)
+                    if vs == 'debug' then 
+                        print('Tracking')
+                    end
+                    if pos.Magnitude <= getgenv().deflecttbl['distance'] then 
+                        print('Deflecting')
+                        game.Players.LocalPlayer.Character.Deflection.Remote:FireServer('Deflect', workspace.CurrentCamera.CFrame.lookVector)
+                    else
+                        if pos.Magnitude <=getgenv().deflecttbl['distance'] * 1.2 then 
+                            local loopongoingfortoolong = false
+                            local stoploop = false;
+                            local looponfor = 0
+                            task.spawn(function()
+                                repeat 
+                                    task.wait(0.1)
+                                    looponfor += 0.1
+                                    if looponfor >= 1 then 
+                                        stoploop = true ;
+                                        loopongoingfortoolong = true;
+                                    end
+                                    if pos.Magnitude <=getgenv().deflecttbl['distance'] and stoploop == false then 
+                                        stoploop = true ;
+                                        game.Players.LocalPlayer.Character.Deflection.Remote:FireServer('Deflect', workspace.CurrentCamera.CFrame.lookVector)
+                                    end
+                                    if not workspace:FindFirstChild('Ball') then stoploop = true end
+                                until loopongoingfortoolong == true or stoploop == true
+                            end)
+                        end
+                    end
                 end
 
             end
@@ -14962,7 +15098,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         end
     end)
 
-elseif game.PlaceId == 6735572261 then 
+elseif game.PlaceId == 6735572261 then -- pilgrammed
     window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), Enum.KeyCode.LeftAlt)
     local tab = window:CreateTab(gameName)
     local Configuration = window:CreateTab('Configurations')
@@ -15270,6 +15406,7 @@ elseif game.PlaceId == 6735572261 then
             'Abidominal Snowman';
             'Mondo Prism';
             'The Matris';
+            'N';
             --'BOONDA' - npc
         };
         farmingconnections = {};
@@ -15645,24 +15782,22 @@ elseif game.PlaceId == 6735572261 then
         if getgenv()['pilgrammedsettings']['noclip']  ==false and getgenv().istyping == false then
             getgenv()['pilgrammedsettings']['noclipfunction']:Disconnect()
         elseif getgenv()['pilgrammedsettings']['noclip']  == true and getgenv().istyping == false then --  
-            task.wait(0.1)
-            local function NoclipLoop()
-                pcall(function()
-                    if getgenv()['pilgrammedsettings']['noclip']  == true and game.Players.LocalPlayer.Character  and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >= 0 then
-                        for _, child in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
-                            pcall(function()
-                                if child:IsA("BasePart") and child.CanCollide == true then
-                                    child.CanCollide = false
-                                end
-                            end)
-                        end
-                    else
-                        getgenv()['pilgrammedsettings']['noclip'] = false
-                        -- ToggleBindNoclip:Set(false)
+            -- task.wait(0.1)
+            -- local function NoclipLoop()
+            --     if getgenv()['pilgrammedsettings']['noclip']  == true and game.Players.LocalPlayer.Character  and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >= 0 then
+            -- end
+            getgenv()['pilgrammedsettings']['noclipfunction'] = game:GetService('RunService').Stepped:Connect(function()
+                for _, v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                    if v:IsA("Part") and v.CanCollide == true then
+                        v.CanCollide = false
                     end
-                end)
-            end
-            getgenv()['pilgrammedsettings']['noclipfunction']  = game:GetService('RunService').Stepped:Connect(NoclipLoop)
+                end
+                for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                    if v:IsA("BasePart") and v.CanCollide == true then
+                        v.CanCollide = false
+                    end
+                end
+            end)
         end
     end)
     sector:AddSlider("Speed", 0, 0, 250, 1, function(State)
@@ -15760,7 +15895,7 @@ elseif game.PlaceId == 6735572261 then
         getgenv().pilgrammedsettings['buyingitem'] =xstate  -- could use this for withdraw and deposit and rename this to selectionbox pilgrammedsettings.selectionbox
     end)
     othersector:AddButton('Purchase',function()
-        game:GetService("ReplicatedStorage").Remotes.Buy:FireServer(getgenv().pilgrammedsettings['buyingitem'])
+        game:GetService("ReplicatedStorage").Remotes.Buy:InvokeServer(getgenv().pilgrammedsettings['buyingitem'])
     end)
     
     othersector:AddTextbox('Money Withdraw/Deposit',nil,function(xstate)
@@ -15794,7 +15929,7 @@ elseif game.PlaceId == 6735572261 then
     farmingsector:AddDropdown("Boss Spawn", bosses, "", false, function(dropdownv)
         getgenv()['pilgrammedsettings']['selectedboss'] = dropdownv
     end)
-    farmingsector:AddButton('Spawn Boss',function()
+    local spawnbossbutton = farmingsector:AddButton('Spawn Boss',function()
         local foundboss = false
         local cframeofboss = nil
         for _,v in next, getgenv().pilgrammedsettings['bossspawns'] do 
@@ -15806,6 +15941,8 @@ elseif game.PlaceId == 6735572261 then
             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = cframeofboss
         end
     end)
+    spawnbossbutton:ActivateKnowledge()
+    spawnbossbutton:AddKnowledge('Teleports you to boss spawn')
     -- sector:AddSeperator()
     sector:AddTextbox('Equip Item','',function(xstate)
         getgenv().pilgrammedsettings['itemequip'] =xstate  -- could use this for withdraw and deposit and rename this to selectionbox pilgrammedsettings.selectionbox
@@ -16662,7 +16799,7 @@ elseif game.PlaceId == 6735572261 then
             end
 
             if getgenv().pilgrammedsettings['notifywhenmeteor'] == true then 
-                if game:GetService("ReplicatedStorage"):FindFirstChild('GameInfo'):FindFirstChild('Meteor').Value <= 20 then 
+                if game:GetService("ReplicatedStorage"):FindFirstChild('GameInfo'):FindFirstChild('Meteor').Value == 65 then 
                     task.spawn(function()
                         azfakenotify('Meteor has spawned','untilClick')
                         task.wait(5)
@@ -17037,6 +17174,12 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
         delay = 0;
         tpenemy = false;
         antiafk = false;
+        tweenenemy = false;
+        tweenspeed = 1;
+        tpenemysafe = false;
+        safedelay = 0;
+        speed = false;
+        speedval = 0;
     }
     sector:AddToggle('Insta Kill',false,function(xstate)
         getgenv().dungeonquestsettings['instakill'] = xstate
@@ -17044,11 +17187,39 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
     sector:AddToggle('Teleport to Enemies',false,function(xstate)
         getgenv().dungeonquestsettings['tpenemy'] = xstate
     end)
+    local tpsafe = sector:AddToggle('Teleport to Enemies Safe',false,function(xstate)
+        getgenv().dungeonquestsettings['tpenemysafe'] = xstate
+    end)
+    local safedelay = sector:AddSlider('Safe Delay',0,1,10,100,function(xtstae)
+        getgenv().dungeonquestsettings['safedelay'] = xtstae
+    end)
+    tpsafe:MakeVisibleIfActive(safedelay)
+    local tweenenemy = sector:AddToggle('Tween to Enemies',false,function(xstate)
+        getgenv().dungeonquestsettings['tweenenemy'] = xstate
+    end);--tweenenemy:AddHint('Tweens to enemies')
+    local tweenspeedslider = sector:AddSlider('Tween Speed',0,1,10,100,function(xtstae)
+        getgenv().dungeonquestsettings['tweenspeed'] = xtstae
+    end)
+    tweenenemy:MakeVisibleIfActive(tweenspeedslider)
     sector:AddToggle('Anti afk',false,function(xstate) -- Aafk
         getgenv().dungeonquestsettings['antiafk'] = xstate
     end)
+    sector:AddToggle('Walkspeed',false,function(xstate)
+        getgenv().dungeonquestsettings['speed'] = xstate
+    end)
+    sector:AddSlider('Speed',0,70,250,1,function(xtstae)-- 240 maximum
+        getgenv().dungeonquestsettings['speedval'] = xtstae
+    end)
     botsector:AddTextbox('Auto Dungeon Bot','',function(xstate)
         getgenv().dungeonquestsettings['selectedbot'] = xstate
+    end)
+    sector:AddButton('Destroy Map',function()
+        for _,v in next, workspace:GetChildren() do --descendants or loop through v children and destroy
+            --if not table.find(game.Players:GetPlayers(),)
+            if not game.Players:FindFirstChild(game.Players.LocalPlayer.Name) and v:IsA('Model') then 
+                v:Destroy()
+            end
+        end
     end)
     game.Players.LocalPlayer.Idled:Connect(function()
         if getgenv().dungeonquestsettings['antiafk'] == true then 
@@ -17129,7 +17300,7 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
     --         azfakenotify('File: '..file..' Is not found.',3)
     --     end
     -- end)
-    botsector:AddButton('Create bot save file',function()
+    local createsavefile = botsector:AddButton('Create bot save file',function()
         local file = getgenv().dungeonquestsettings['selectedbot']
         if not isfile(file) then 
             writefile(file,'')
@@ -17137,6 +17308,8 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
             azfakenotify('File exists',1)
         end
     end)
+    createsavefile:ActivateKnowledge();
+    createsavefile:AddKnowledge('Creates the file')
     --botsector:AddSeperator('~')
     local bottgl = boteditsect:AddToggle('Bot commands',false,function(xstate)
         getgenv().dungeonquestsettings['usebotcommands'] = xstate
@@ -17173,6 +17346,8 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
             getgenv().dungeonquestsettings['config'][index] = game.Players.LocalPlayer.Character.PrimaryPart.CFrame
         end
     end)
+    addpoint:ActivateKnowledge()
+    addpoint:AddKnowledge('Creates a point where you are standing')
     local removepoint = boteditsect:AddButton('Remove Previous Point',function()
         local index = 1 
         for _,v in next, getgenv().dungeonquestsettings['config']  do 
@@ -17204,21 +17379,83 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
             table.remove(getgenv().dungeonquestsettings['config'],index)
         end
     end)
+    local metahook;
+    metahook = hookmetamethod(game,'__namecall',function(self,...)
+        local args = {...}
+        local call_type = getnamecallmethod();
+        if call_type == 'GetState'  then 
+            return Enum.HumanoidStateType.PlatformStanding
+        elseif call_type == 'Kick' then 
+            warn('Attempted to kick')
+            return task.wait(math.huge)
+        else
+            return metahook(self,...)
+        end
+        return metahook(self,...)
+    end)
     task.spawn(function()
         while task.wait() do 
             if getgenv().loopsUnload == true then print('princess break end') break end 
+
+
+            if getgenv().dungeonquestsettings['speed'] == true then 
+                if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health > 0 then 
+                    getgenv().dungeonquestsettings['speed'] = nil
+                    game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').WalkSpeed = getgenv().dungeonquestsettings['speedval']
+                    local connection; connection = game.Players.LocalPlayer.Character:FindFirstChild('Humanoid'):GetPropertyChangedSignal('WalkSpeed'):Connect(function()-- getpropertychangedsignal could be used here 
+                        game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').WalkSpeed = getgenv().dungeonquestsettings['speedval']
+                    end) 
+                    task.spawn(function()
+                        repeat task.wait() until getgenv().dungeonquestsettings['speed'] == false or getgenv().loopsUnload == true 
+                        connection:Disconnect()
+                    end)
+
+                end
+            end
+
             if getgenv().dungeonquestsettings['tpenemy'] == true then 
                 --game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = true
                 getgenv().dungeonquestsettings['tpenemy'] = nil 
                 task.spawn(function()
                     repeat 
+                        for _, child in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                            pcall(function()
+                                if child:IsA("BasePart") and child.CanCollide == true then
+                                    child.CanCollide = false
+                                end
+                            end)
+                        end
                         local dir = game:GetService("Workspace"):FindFirstChild('dungeon')
                         if dir then 
                             for _,c in next, dir:GetChildren() do 
                                 if c:FindFirstChild('enemyFolder') then 
                                     for _,v in next,c:FindFirstChild('enemyFolder'):GetChildren() do 
                                         if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer.Character and v:FindFirstChildWhichIsA('Humanoid') then  
-                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,0,7)
+                                            if getgenv().dungeonquestsettings['tweenenemy'] == true then 
+                                                local tween = game:GetService('TweenService'):Create(
+                                                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'),
+                                                    TweenInfo.new(getgenv().dungeonquestsettings['tweenspeed'],Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,0,7)}
+                                                )
+                                                tween:Play()
+                                                -- task.spawn(function()
+                                                --     repeat task.wait() until tweencompleted or not v:FindFirstChild('HumanoidRootPart')
+                                                -- end)
+                                            else
+                                                if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and getgenv().dungeonquestsettings['tpenemysafe'] == true  then 
+                                                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame *= CFrame.new(0,50,0)
+                                                    task.wait(.1)
+                                                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,50,10)
+                                                    task.wait(.1)
+                                                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,0,10)
+                                                    task.wait(0.01)
+                                                    task.wait(getgenv().dungeonquestsettings['safedelay'])
+                                                else
+                                                    if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,0,7)
+                                                    end
+                                                end
+                                                
+                                            end
                                             task.wait(.1)
                                         end 
                                     end
@@ -17229,7 +17466,28 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) then
                         if dir2 then 
                             for _,v in next, dir2:GetChildren() do 
                                 if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer.Character and v:FindFirstChildWhichIsA('Humanoid') then  
-                                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,0,7)
+                                    if getgenv().dungeonquestsettings['tweenenemy'] == true then 
+                                        local tween = game:GetService('TweenService'):Create(
+                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'),
+                                            TweenInfo.new(getgenv().dungeonquestsettings['tweenspeed'],Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,0,7)}
+                                        )
+                                        tween:Play()
+                                    else
+                                        if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and getgenv().dungeonquestsettings['tpenemysafe'] == true  then 
+                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame *= CFrame.new(0,50,0)
+                                            task.wait(.1)
+                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,50,10)
+                                            task.wait(.1)
+                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,0,10)
+                                            task.wait(0.01)
+                                            task.wait(getgenv().dungeonquestsettings['safedelay'])
+                                        else
+                                            if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,0,7)
+                                            end
+                                        end
+                                        
+                                    end
                                     task.wait(.1)
                                 end 
                             end 
