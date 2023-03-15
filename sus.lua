@@ -14136,6 +14136,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         dontidle = false;
         autoinstakill = false;
         nokajirivelocity = false;
+        serverhopgykatsu = false;
+        gykustatsumobskill = false;
+        equiparata = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -14217,6 +14220,39 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     sector:AddToggle('Farm Gyakusatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['gykatfarm'] = xstate
     end)
+    sector:AddToggle('Server Hop For Gyakusatsu',false,function(xstate) 
+        getgenv()['roghoulsettings']['serverhopgykatsu'] = xstate
+    end)
+    sector:AddToggle('Attempt Kill Gyakusatsu Mobs',false,function(xstate) 
+        getgenv()['roghoulsettings']['gykustatsumobskill'] = xstate
+    end)
+    getgenv().serverhop = function()
+        local Http = game:GetService("HttpService")
+        local Api = "https://games.roblox.com/v1/games/"
+        
+        local _servers = Api..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+        
+        
+        
+        local _servers = Api..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+        function ListServers(cursor)
+           local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
+           return Http:JSONDecode(Raw)
+        end
+        
+        local listed = 0
+        local reg = {}
+        for _,server in next, ListServers(nil).data do 
+            pcall(function()
+                if server.id ~= game.JobId then 
+                    table.insert(reg,server.id)  
+                end
+                --print(server.id)
+            end)
+        end
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId,reg[math.random(1,#reg)],game.Players.LocalPlayer)
+        
+    end
     sector:AddSeperator('-')
     sector:AddToggle('Auto Absorb',true,function(xstate)
         getgenv()['roghoulsettings']['autoabsorb'] = xstate
@@ -14227,7 +14263,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     sector:AddSlider("Player Y", -25, 0, 30, 5, function(State)
         getgenv().roghoulsettings['playery'] = State
     end)
-    sector:AddSlider("Player Z", -25, 0, 25, 5, function(State)
+    sector:AddSlider("Player Z", -100, 0, 100, 5, function(State)
         getgenv().roghoulsettings['playerz'] = State
     end)
     sector:AddButton('Rejoin',function(xstate)
@@ -14254,6 +14290,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     end)
     othercheats:AddToggle('Click',true,function(xtstae)
         getgenv().roghoulsettings['click'] = xtstae
+    end)
+    othercheats:AddToggle('Auto Equip Arata',function(xstate)
+        getgenv().roghoulsettings['equiparata'] = xstate
     end)
     othercheats:AddToggle('No Kajiri Velocity',false,function(xstate)
         getgenv().roghoulsettings['nokajirivelocity'] = xstate
@@ -14665,6 +14704,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         
     end
 
+    local function equiparara()
+
+    end
     Configuration:CreateConfigSystem()
     task.spawn(function()
         while task.wait(0.01) do 
@@ -14814,6 +14856,15 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         print(string.lower(typeweapon)..' active')
                         -- print('quinque active')
                     end
+                    if not game.Players.LocalPlayer.Character:FindFirstChild('Arata') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 and getgenv().roghoulsettings['equiparata'] == true then 
+                        -- print('waiting for quinque')
+                        print('waiting for '..string.lower('arata'))
+                        pressKey('Zero')
+                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('arata') 
+                        -- task.wait(3)
+                        print(string.lower('arata')..' active')
+                        -- print('quinque active')
+                    end
                     local registedchoice = nil;
                     if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health > 0 and getgenv()['roghoulsettings']['FinalChoice']:FindFirstChild('HumanoidRootPart') then 
                         local dist = nil;
@@ -14938,7 +14989,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         --     getgenv()['roghoulsettings']['hasntstarted'] = true
                         --     return
                         -- end
-                        repeat task.wait(); getgenv().GetClosestTarget() until getaction() == 'idle' or getaction() == 'canquest'
+                        --repeat task.wait(); getgenv().GetClosestTarget() until getaction() == 'idle' or getaction() == 'canquest'
                         if getaction() == 'canquest' then 
                             getgenv().roghoulsettings['callednotice'] = false;
                             getgenv()['roghoulsettings']['hasntstarted'] = true
@@ -14954,12 +15005,12 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
 
 
 
-                        if registedchoice ~= getgenv()['roghoulsettings']['FinalChoice'] then 
-                            getgenv()['roghoulsettings']['action'] = 'canquest'
-                            getgenv().roghoulsettings['callednotice'] = false;
-                            getgenv()['roghoulsettings']['hasntstarted'] = true
-                            return
-                        end
+                        -- if registedchoice ~= getgenv()['roghoulsettings']['FinalChoice'] then 
+                        --     getgenv()['roghoulsettings']['action'] = 'canquest'
+                        --     getgenv().roghoulsettings['callednotice'] = false;
+                        --     getgenv()['roghoulsettings']['hasntstarted'] = true
+                        --     return
+                        -- end
                         task.spawn(function()
                             repeat task.wait(0.01) 
                                 if getgenv()['roghoulsettings']['FinalChoice'] and getgenv()['roghoulsettings']['FinalChoice']:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0  then 
@@ -14974,6 +15025,15 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         end
                                         -- task.wait(3)
                                         print(string.lower(typeweapon)..' active')
+                                        -- print('quinque active')
+                                    end
+                                    if not game.Players.LocalPlayer.Character:FindFirstChild('Arata') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 and getgenv().roghoulsettings['equiparata'] == true then 
+                                        -- print('waiting for quinque')
+                                        print('waiting for '..string.lower('arata'))
+                                        pressKey('Zero')
+                                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('arata') 
+                                        -- task.wait(3)
+                                        print(string.lower('arata')..' active')
                                         -- print('quinque active')
                                     end
                                     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = getgenv()['roghoulsettings']['FinalChoice']:FindFirstChild('HumanoidRootPart').CFrame * 
@@ -15079,51 +15139,129 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                     end
                 elseif getgenv().roghoulsettings['farming'] == true and game:GetService("Workspace"):FindFirstChild('Gyakusatsu') and typeofnpc == 'gykat' and  getaction() == 'canquest' and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                     getgenv()['roghoulsettings']['action'] = 'fighting';
-                    local gykatcurrently = nil
-                    local PlacesWithBlobs = {
-                        'BL';
-                        'BR';
-                        'FL';
-                        'FR';
-                    }
-                    local wasfound = false
-                    local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],getgenv()['roghoulsettings']['playery'],getgenv()['roghoulsettings']['playerz']) * CFrame.Angles(math.rad(90),0,0)
-                    local tween = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'),
-                    TweenInfo.new(4,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),
-                    {CFrame = game:GetService("Workspace").Gyakusatsu:FindFirstChild('BL').Spawn.CFrame* CFrameMultiplication})
-                    tween:Play()
-                    task.wait(4)
-                    for _,v in next, game:GetService("Workspace").Gyakusatsu:GetChildren() do 
-                        if table.find(PlacesWithBlobs,v.Name) then 
-                            wasfound = true 
-                            local stopteleporting = false
-                            task.spawn(function()
-                                repeat 
-                                    task.wait(0.01)
-                                    if game:GetService("Workspace").Gyakusatsu:FindFirstChild(v.Name) and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
-                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('Spawn').CFrame * CFrame.new(getgenv()['roghoulsettings']['playerx'],getgenv()['roghoulsettings']['playery'],getgenv()['roghoulsettings']['playerz']) * CFrame.Angles(math.rad(90),0,0)
-                                    elseif not game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game:GetService("Workspace").Gyakusatsu:FindFirstChild(v.Name) then
-                                        
-                                    else
-                                        stopteleporting = true
-                                    end
-                                until stopteleporting == true
-                            end)
-                            repeat task.wait() until not game:GetService("Workspace").Gyakusatsu:FindFirstChild(v.Name) or getgenv().loopsUnload ==true or getgenv().roghoulsettings['farming'] == false
-                            stopteleporting = true
+                    if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 then 
+                        -- print('waiting for quinque')
+                        print('waiting for '..string.lower(typeweapon))
+                        pressKey(getgenv().roghoulsettings['activestage'])
+                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) 
+                        if getgenv().roghoulsettings['usec'] == true then 
+                            pressKey('C')
+                        end 
+                        -- task.wait(3)
+                        print(string.lower(typeweapon)..' active')
+                        -- print('quinque active')
+                    end
+                    if not game.Players.LocalPlayer.Character:FindFirstChild('Arata') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 and getgenv().roghoulsettings['equiparata'] == true then 
+                        -- print('waiting for quinque')
+                        print('waiting for '..string.lower('arata'))
+                        pressKey('Zero')
+                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('arata') 
+                        -- task.wait(3)
+                        print(string.lower('arata')..' active')
+                        -- print('quinque active')
+                    end
+                    local enemymodel = nil
+                    for u,c in next, game:GetService("Workspace").NPCSpawns:GetChildren() do 
+                        if c.Name == 'GyakusatsuSpawn' and c:FindFirstChildWhichIsA('Model') then 
+                            enemymodel = c
                         end
                     end
-                    if wasfound == false then 
-                        local spawn = game:GetService("Workspace"):FindFirstChild('Gyakusatsu').Body.Spawn.CFrame
-                        local tween = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'),
-                        TweenInfo.new(4,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),
-                        {CFrame = spawn* CFrameMultiplication})
-                        tween:Play()
-                        repeat 
-                            task.wait(0.01)
-                            game:GetService("ReplicatedStorage").Remotes.CamCF:FireServer(ohCFrame1)
-                        until not game:GetService("Workspace"):FindFirstChild('Gyakusatsu')
+
+
+                    local function usemoves()
+                        if getgenv().roghoulsettings['click'] then 
+                            task.delay(.1,function()
+                                pressKey('Mouse1')
+                            end)
+                        end
+                        -- CFrame.Angles(math.rad(90),0,0) upside down for gykatsu
+                        task.spawn(function()
+                            if getgenv().roghoulsettings['usee'] == true then 
+                                pressKey('E')
+                                task.wait(1)
+                            end
+                            if getgenv().roghoulsettings['user'] == true then 
+                                pressKey('R')
+                                task.wait(1)
+                            end
+                            if getgenv().roghoulsettings['usef'] == true then 
+                                pressKey('F')
+                                task.wait(1)
+                            end
+                        end)
                     end
+                    if enemymodel then 
+                        for _,v in next, enemymodel:GetChildren() do 
+                            if v.Name ~= 'Gyakusatsu' and v.Name ~= 'Mob' then 
+                                repeat 
+                                    task.wait(0.01)
+                                    pcall(function()
+                                        local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],getgenv()['roghoulsettings']['playery'],getgenv()['roghoulsettings']['playerz']) * CFrame.Angles(math.rad(90),0,0)
+                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
+                                        usemoves()
+                                    end)
+                                until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
+                            end
+                        end -- v:FindFirstChildWhichIsA('Humanoid').Health == 0
+                        for _,v in next, enemymodel:GetChildren() do 
+                            if v.Name == 'Gyakusatsu' then 
+                                repeat 
+                                    task.wait(0.01)
+                                    pcall(function()
+                                        local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],13.2,-3.4) * CFrame.Angles(math.rad(90),0,0)
+                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
+                                        usemoves()
+                                    end)
+                                until not workspace:FindFirstChild('Gyakusatsu') or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
+                            end
+                        end
+                    end
+
+                    -- local gykatcurrently = nil
+                    -- local PlacesWithBlobs = {
+                    --     'BL';
+                    --     'BR';
+                    --     'FL';
+                    --     'FR';
+                    -- }
+                    -- local wasfound = false
+                    -- local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],getgenv()['roghoulsettings']['playery'],getgenv()['roghoulsettings']['playerz']) * CFrame.Angles(math.rad(90),0,0)
+                    -- local tween = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'),
+                    -- TweenInfo.new(4,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),
+                    -- {CFrame = game:GetService("Workspace").Gyakusatsu:FindFirstChild('BL').Spawn.CFrame* CFrameMultiplication})
+                    -- tween:Play()
+                    -- task.wait(4)
+                    -- for _,v in next, game:GetService("Workspace").Gyakusatsu:GetChildren() do 
+                    --     if table.find(PlacesWithBlobs,v.Name) then 
+                    --         wasfound = true 
+                    --         local stopteleporting = false
+                    --         task.spawn(function()
+                    --             repeat 
+                    --                 task.wait(0.01)
+                    --                 if game:GetService("Workspace").Gyakusatsu:FindFirstChild(v.Name) and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                    --                     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('Spawn').CFrame * CFrame.new(getgenv()['roghoulsettings']['playerx'],getgenv()['roghoulsettings']['playery'],getgenv()['roghoulsettings']['playerz']) * CFrame.Angles(math.rad(90),0,0)
+                    --                 elseif not game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game:GetService("Workspace").Gyakusatsu:FindFirstChild(v.Name) then
+                                        
+                    --                 else
+                    --                     stopteleporting = true
+                    --                 end
+                    --             until stopteleporting == true
+                    --         end)
+                    --         repeat task.wait() until not game:GetService("Workspace").Gyakusatsu:FindFirstChild(v.Name) or getgenv().loopsUnload ==true or getgenv().roghoulsettings['farming'] == false
+                    --         stopteleporting = true
+                    --     end
+                    -- end
+                    -- if wasfound == false then 
+                    --     local spawn = game:GetService("Workspace"):FindFirstChild('Gyakusatsu').Body.Spawn.CFrame
+                    --     local tween = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'),
+                    --     TweenInfo.new(4,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),
+                    --     {CFrame = spawn* CFrameMultiplication})
+                    --     tween:Play()
+                    --     repeat 
+                    --         task.wait(0.01)
+                    --         game:GetService("ReplicatedStorage").Remotes.CamCF:FireServer(ohCFrame1)
+                    --     until not game:GetService("Workspace"):FindFirstChild('Gyakusatsu')
+                    -- end
                     
                 end
             end)
@@ -15195,6 +15333,26 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
 
                     until getgenv().roghoulsettings['autotrainer'] == false
                 end)
+            end
+            if getgenv()['roghoulsettings']['serverhopgykatsu'] == true and not workspace:FindFirstChild('Gyakusatsu') then 
+                getgenv().serverhop()
+            end
+            if getgenv()['roghoulsettings']['gykustatsumobskill'] then 
+                local enemymodel = nil
+                for u,c in next, game:GetService("Workspace").NPCSpawns:GetChildren() do 
+                    if c.Name == 'GyakusatsuSpawn' and c:FindFirstChildWhichIsA('Model') then 
+                        enemymodel = c
+                    end
+                end
+                if enemymodel ~= nil then 
+                    for i,child in next, enemymodel:GetChildren() do 
+                        if child.PrimaryPart then 
+                            if isnetworkowner(child.HumanoidRootPart) then 
+                                child:FindFirstChildWhichIsA('Humanoid').Health = 0
+                            end
+                        end
+                    end
+                end
             end
         end
     end)
