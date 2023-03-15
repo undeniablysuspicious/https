@@ -626,6 +626,9 @@ getgenv().AzfakeGlobalTables = {
         anti_ban = true;
         checkstats = false;
         voidwalk = true;
+        modnotifier = true;
+        checkforcombat = false;
+        serverhopwhenmod = false;
     };
     shonen = {
         no_fall = true
@@ -656,7 +659,7 @@ local function encrypt(info)
 
     local encrypted = info.str -- encrypted = enc(info.str)
 
-    EncryptionLib.sha256(
+    encrypted = EncryptionLib.sha256(
         enc(info.str)
     )
     return encrypted
@@ -3235,6 +3238,19 @@ elseif game.PlaceId == 10266164381 then --// shitlines
 
 
 
+    sector:AddToggle('Mod Notifier',function(xstate)
+        getgenv().AzfakeGlobalTables['bloodlines']['modnotifer'] = xstate
+    end)
+    sector:AddToggle('Serverhop when Mod',function(xstate)
+        getgenv().AzfakeGlobalTables['bloodlines']['serverhopwhenmod'] = xstate
+    end)
+    sector:AddToggle('Check if Combat',function(xstate)
+        getgenv().AzfakeGlobalTables['bloodlines']['checkforcombat'] = xstate
+    end)
+
+    -- AzfakeGlobalTables = 
+
+    getgenv().modsfound = {}
     getgenv().modalert = function()
         task.spawn(function()
             while task.wait(3) do 
@@ -3263,12 +3279,23 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                 local Players = game:GetService("Players")
                 local GROUP_ID = 7450839
                 for _,player in next,game.Players:GetPlayers() do 
-                    if player:IsInGroup(GROUP_ID) then 
+                    if player:IsInGroup(GROUP_ID) and not table.find(getgenv().modsfound,player.Name) then 
                         ismod = true;
+                        table.insert(getgenv().modsfound,player.Name)
+                        pcall(function()
+                            moderatorjoined = Instance.new('Sound')
+                            moderatorjoined.SoundId = getsynasset('Azfake Hub V3/new layer 2 bell.mp3')
+                            moderatorjoined.Parent = game:GetService('Workspace');
+                            moderatorjoined:Play()
+                            task.spawn(function()
+                                repeat task.wait(1) until moderatorjoined.Playing == false; 
+                                moderatorjoined:Destroy()
+                            end)
+                        end)
                     end
                 end
 
-                if ismod == true and Toggles.ModLog.Value == true then 
+                if ismod == true and getgenv().AzfakeGlobalTables['bloodlines']['modnotifer'] == true and getgenv().AzfakeGlobalTables['bloodlines']['serverhopwhenmod'] and getgenv().AzfakeGlobalTables['bloodlines']['checkforcombat'] == false then 
                     repeat 
                         task.wait()
                         local teleportId = ''
@@ -3282,7 +3309,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                         end
                         game.ReplicatedStorage.Events.DataEvent:FireServer('ServerTeleport',teleportId)
                     until game.JobId ~= game.JobId
-                elseif ismod == true and Toggles.ModLogNotCombat.Value == true then 
+                elseif ismod == true and getgenv().AzfakeGlobalTables['bloodlines']['checkforcombat'] == true and getgenv().AzfakeGlobalTables['bloodlines']['serverhopwhenmod'] then 
                     repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.ClientGui.Mainframe.Danger.Visible == false
 
                     repeat 
@@ -3299,10 +3326,11 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                         game.ReplicatedStorage.Events.DataEvent:FireServer('ServerTeleport',teleportId)
                     until game.JobId ~= game.JobId
                 end
-                for i,v in pairs(getgenv().mods) do 
+                for i,v in pairs(getgenv().modsfound) do 
                     if not game.Players:FindFirstChild(v) then 
-                        table.remove(getgenv().mods,i)
-                        getgenv().message('mod left > '..v..' <')
+                        table.remove(getgenv().modsfound,i)
+                        --getgenv().message('mod left > '..v..' <')
+                        azfakenotify('Mod Left - '..v..' >')
                     end
                 end
             end
@@ -13809,19 +13837,6 @@ elseif game.PlaceId == 6678877691 then -- zo
         getgenv().zo1zo['distance'] = State
     end)
 
-    local function detect(v,dect)
-        local x = false
-        if v:FindFirstChild('Humanoid') then 
-            for i,anim in pairs(v.Humanoid:GetPlayingAnimationTracks()) do 
-                if anim.Animation.AnimationId == dect then
-                    x =  true
-                end
-            end
-        end
-
-        return x
-    end
-     
 
     getgenv().parry = function()
         task.spawn(function()
@@ -13836,22 +13851,34 @@ elseif game.PlaceId == 6678877691 then -- zo
         end)
     end
 
-    getgenv().ParryAct = function(v)
+    getgenv().ParryAct = function(v,animx)
 
-        if not game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then return end
-        if (v:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude > getgenv().zo1zo['distance'] then return end
+        if not game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then print('no humanoidrootpart') return end
+        -- if (v:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude > getgenv().zo1zo['distance'] then return end
 
         local cancelAll = false 
 
-
+        local function detect(v,dect)
+            local x = false
+            if v:FindFirstChild('Humanoid') then 
+                for i,anim in pairs(v.Humanoid:GetPlayingAnimationTracks()) do 
+                    if anim.Animation.AnimationId == dect and animx.Animation.AnimationId == dect then
+                        -- rconsoleprint('\ndetected '..anim.Animation.AnimationId)
+                        x =  true
+                        break
+                    end
+                end
+            end
+            return x
+        end
 
         if detect(v,'rbxassetid://6678919174') then -- sword swing 1
             print('swung')
-            task.wait(.2)
+            task.wait(.35)
             getgenv().parry()
         end
         if detect(v,'rbxassetid://6678919949') then -- sword swing 1
-            task.wait(.2)
+            task.wait(.35)
             getgenv().parry()
         end
         
@@ -13979,24 +14006,43 @@ elseif game.PlaceId == 6678877691 then -- zo
 
     end
 
+    local function read(x)
+        return getgenv().zo1zo[x]
+    end
     for _,v in next, game:GetService('Players'):GetChildren() do 
         if v ~= game.Players.LocalPlayer then 
             workspace:WaitForChild(v.Name) 
             local workChar = workspace:WaitForChild(v.Name) 
             local connection; connection = v.Character:WaitForChild('Humanoid').AnimationPlayed:Connect(function(anim)
-                getgenv().ParryAct(workChar)
+                local dist = (v.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                if getgenv().zo1zo['autoparry'] == true and dist.Magnitude <= getgenv().zo1zo['distance'] then 
+                    --:DistanceFromCharacter()
+                    getgenv().ParryAct(workChar,anim)
+                end
             end)
-            table.insert(getgenv().autoparryconnections,connection)
+            task.spawn(function()
+                repeat task.wait(0.2) until getgenv().loopsUnload == true 
+                connection:Disconnect()
+            end)
+            -- table.insert(getgenv().autoparryconnections,connection)
         end
     end
     game:GetService('Players').ChildAdded:Connect(function(xchild)
         if v ~= game.Players.LocalPlayer then
-            workspace:WaitForChild(v.Name) 
-            local workChar = workspace:WaitForChild(v.Name) 
-            local connection; connection = v.Character:WaitForChild('Humanoid').AnimationPlayed:Connect(function(anim)
-                getgenv().ParryAct(workChar)
+            workspace:WaitForChild(xchild.Name) 
+            local workChar = workspace:WaitForChild(xchild.Name) 
+            local connection; connection = xchild.Character:WaitForChild('Humanoid').AnimationPlayed:Connect(function(anim)
+                local dist = (xchild.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                if getgenv().zo1zo['autoparry'] == true and dist.Magnitude <= getgenv().zo1zo['distance'] then 
+                    --:DistanceFromCharacter()
+                    getgenv().ParryAct(workChar,anim)
+                end
             end)
-            table.insert(getgenv().autoparryconnections,connection)
+            task.spawn(function()
+                repeat task.wait(0.2) until getgenv().loopsUnload == true 
+                connection:Disconnect()
+            end)
+            -- table.insert(getgenv().autoparryconnections,connection)
         end
     end)
 
@@ -14089,6 +14135,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         click = true;
         dontidle = false;
         autoinstakill = false;
+        nokajirivelocity = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -14207,6 +14254,25 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     end)
     othercheats:AddToggle('Click',true,function(xtstae)
         getgenv().roghoulsettings['click'] = xtstae
+    end)
+    othercheats:AddToggle('No Kajiri Velocity',false,function(xstate)
+        getgenv().roghoulsettings['nokajirivelocity'] = xstate
+        if getgenv().roghoulsettings['nokajirivelocity'] == true then 
+            local novelocity = game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart').ChildAdded:Connect(function(x)
+                if x.Name == 'BodyPNoSlide' and x:IsA('BodyVelocity') then 
+                    x.P = 0;
+                    x.MaxForce = Vector3.new(0,0,0)
+                    game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart').Anchored = true         
+                    x:Destroy() 
+                    game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart').Anchored = false
+                end
+                
+            end)
+            task.spawn(function()
+                repeat task.wait(0.1) until getgenv().loopsUnload == true or  getgenv().roghoulsettings['nokajirivelocity'] == false 
+                novelocity:Disconnect()
+            end)
+        end
     end)
     othercheats:AddButton('Attempt Insta Kill',function(xstate)
         local dir = game:GetService("Workspace").NPCSpawns
@@ -16776,15 +16842,18 @@ elseif game.PlaceId == 6735572261 then -- pilgrammed
                 if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                     for _,v in next, workspace.Mobs:GetChildren() do 
                         for k,c in next, v:GetChildren() do 
-                            if c:FindFirstChild('HumanoidRootPart') then 
-                                local dist = (c:FindFirstChild('HumanoidRootPart').Position-game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
-                                if previousroot == nil and dist < 50 then 
-                                    previousPos = dist;
-                                    previousroot = c:FindFirstChild('HumanoidRootPart')
-                                elseif dist < 50 and previousPos > dist then 
-                                    previousPos = dist;
-                                    previousroot = c:FindFirstChild('HumanoidRootPart')
+                            if c:FindFirstChild('HumanoidRootPart') and c.PrimaryPart then
+                                if isnetworkowner(c.PrimaryPart) then 
+                                    
                                 end
+                                -- local dist = (c:FindFirstChild('HumanoidRootPart').Position-game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                                -- if previousroot == nil and dist < 50 then 
+                                --     previousPos = dist;
+                                --     previousroot = c:FindFirstChild('HumanoidRootPart')
+                                -- elseif dist < 50 and previousPos > dist then 
+                                --     previousPos = dist;
+                                --     previousroot = c:FindFirstChild('HumanoidRootPart')
+                                -- end
                             end
                         end
                     end
@@ -18794,6 +18863,72 @@ elseif game.PlaceId == 12604352060 then -- arcane odyssey
         end
     end)
     --game:GetService("Workspace").Map["Elm Island"].TempChests["Treasure Chest"]
+
+elseif game.PlaceId == 11320933137 then 
+    local tab = window:CreateTab(gameName)
+    local betsector = tab:CreateSector('Cheats','left')
+
+    getgenv().vbet1bet = {
+        amountofmines = 0;
+        safespotmaximum = 3;
+    }
+
+    betsector:AddTextbox('Amount of Mines','',function(xstate)
+        if tonumber(xstate) then 
+            getgenv().vbet1bet['amountofmines'] = tonumber(xstate)
+            azfakenotify('Amount of mines set to: '..getgenv().vbet1bet['amountofmines'] ,2 )
+        else
+            azfakenotify('Unable to convert '..tostring(xstate)..' to a number',2)
+        end
+    end)
+    betsector:AddTextbox('Safe Spots','',function(xstate)
+        if tonumber(xstate) then 
+            getgenv().vbet1bet['safespotmaximum'] = tonumber(xstate)
+            azfakenotify('Safe Spots amount'..getgenv().vbet1bet['safespotmaximum'],2 )
+        else
+            azfakenotify('Unable to convert '..tostring(xstate)..' to a number',2)
+        end
+    end)
+    getgenv().PredictMinesFunction = function()
+
+    end
+    betsector:AddButton('Predict Mines',function()
+        if game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Background.Games["Game_Mines"]:FindFirstChild('Active').Value == true then 
+
+            return azfakenotify('Mines unable to calculate','untilClick')
+        end
+        local mines = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Background.Games["Game_Mines"].Minefield
+        local amountofmines = 0
+        for _,v in next, mines:GetChildren() do 
+            if v.Name == 'Mine' then amountofmines += 1 end -- v.Names
+            if v:FindFirstChild('prediction') then v:FindFirstChild('prediction'):Destroy() end
+            if v:FindFirstChildWhichIsA('TextLabel') then v:FindFirstChildWhichIsA('TextLabel'):Destroy() end
+        end
+        for i=1, getgenv().vbet1bet['safespotmaximum'] do 
+            local selection = mines:GetChildren()[math.random(2,amountofmines)]
+            local label = Instance.new('TextLabel',selection);
+            label.Name = 'prediction'
+            label.BackgroundTransparency = 1;
+            label.TextColor3 = Color3.fromRGB(255,255,255)
+            label.Text = 'Safe spot'
+            label.Position = selection.Position + UDim2.fromScale(0.5,0.5)
+        end
+    end)
+    betsector:AddButton('Predict Crash',function()
+        local Multis = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Background.Games["Game_Crash"].PastMultis
+        local multi = 1
+        for _,v in next, Multis:GetChildren() do 
+            if v:IsA('TextButton') and _ > #Multis:GetChildren()-2 then 
+                local number = tonumber(string.split(v.Text,'x')[1])
+                multi = number * multi*0.1 / math.random(1,2)
+            end
+        end 
+        multi = multi / math.random(1,2) * math.random(5,9) * (0.9*math.random(1,4)) *1.4 + (1.01)
+
+        azfakenotify('Crash expected to be around '..tostring(multi),1)
+    end)
+
+    betsector:AddLabel('Uses luck to predict')
 else
 
     -- PlayerExperience
