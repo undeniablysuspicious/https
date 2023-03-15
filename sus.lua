@@ -3238,15 +3238,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
 
 
 
-    sector:AddToggle('Mod Notifier',function(xstate)
-        getgenv().AzfakeGlobalTables['bloodlines']['modnotifer'] = xstate
-    end)
-    sector:AddToggle('Serverhop when Mod',function(xstate)
-        getgenv().AzfakeGlobalTables['bloodlines']['serverhopwhenmod'] = xstate
-    end)
-    sector:AddToggle('Check if Combat',function(xstate)
-        getgenv().AzfakeGlobalTables['bloodlines']['checkforcombat'] = xstate
-    end)
+
 
     -- AzfakeGlobalTables = 
 
@@ -4172,7 +4164,15 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     end)
 
     
-
+    sector:AddToggle('Mod Notifier',function(xstate)
+        getgenv().AzfakeGlobalTables['bloodlines']['modnotifer'] = xstate
+    end)
+    sector:AddToggle('Serverhop when Mod',function(xstate)
+        getgenv().AzfakeGlobalTables['bloodlines']['serverhopwhenmod'] = xstate
+    end)
+    sector:AddToggle('Check if Combat',function(xstate)
+        getgenv().AzfakeGlobalTables['bloodlines']['checkforcombat'] = xstate
+    end)
 
 
 
@@ -14291,7 +14291,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddToggle('Click',true,function(xtstae)
         getgenv().roghoulsettings['click'] = xtstae
     end)
-    othercheats:AddToggle('Auto Equip Arata',function(xstate)
+    othercheats:AddToggle('Auto Equip Arata',false,function(xstate)
         getgenv().roghoulsettings['equiparata'] = xstate
     end)
     othercheats:AddToggle('No Kajiri Velocity',false,function(xstate)
@@ -14860,7 +14860,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         -- print('waiting for quinque')
                         print('waiting for '..string.lower('arata'))
                         pressKey('Zero')
-                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('arata') 
+                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
                         -- task.wait(3)
                         print(string.lower('arata')..' active')
                         -- print('quinque active')
@@ -15031,7 +15031,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         -- print('waiting for quinque')
                                         print('waiting for '..string.lower('arata'))
                                         pressKey('Zero')
-                                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('arata') 
+                                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
                                         -- task.wait(3)
                                         print(string.lower('arata')..' active')
                                         -- print('quinque active')
@@ -15155,7 +15155,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         -- print('waiting for quinque')
                         print('waiting for '..string.lower('arata'))
                         pressKey('Zero')
-                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('arata') 
+                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
                         -- task.wait(3)
                         print(string.lower('arata')..' active')
                         -- print('quinque active')
