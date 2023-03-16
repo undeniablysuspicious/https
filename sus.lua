@@ -313,7 +313,12 @@ function Notify(titletxt, text, time)
     end
 end
 
-
+if not game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+    azfakenotify('Waiting for game to load','untilClick')
+    repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
+else
+    -- Loaded
+end
 
 
 
@@ -7543,7 +7548,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     getgenv().M1 = function()
         task.spawn(function()
             pcall(function()
-                game.Players.LocalPlayer.Character.CharacterHandler.M1:FireServer('Down', false)
+                game.Players.LocalPlayer.Character.CharacterHandler.M1:FireServer('Down', {ShiftLock = true,Origin = game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame})
                 task.wait()
                 game.Players.LocalPlayer.Character.CharacterHandler.M1:FireServer('Up')
             end)
@@ -7779,11 +7784,11 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     local function getmobrollwaittime()
 
     end
-
+    getgenv().ParryObjects = {}
     getgenv().ParryAct = function(v)--,hiting value;
 
         print('using parryct')
-
+        
         if getgenv().WhitelistMode ~= 'All' and getgenv().WhitelistMode~='Mobs' and getgenv().WhitelistMode ~= v.Name then print('whitelist mode return '..v.Name) return end
         if getgenv().WhitelistMode=='Mobs' then 
             if not v:FindFirstChild('Talents') then return end
@@ -7796,7 +7801,16 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         local IsBehindPlayer =false;
 
-
+        local function findparryobject(x)
+            local xvalue = false
+            for _v,v in next, getgenv().ParryObjects do 
+                if v == x then 
+                    xvalue = true 
+                    break
+                end
+            end
+            return xvalue
+        end
         
 
         if getgenv().fw3localFw3['parryfacingforward'] then
@@ -8102,8 +8116,11 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                                 endloop = true
                             end
                             -- and enemy statusfolder hitting value isnt the hitting value passed with parryact
-                        until finishedtick >= 1.6 or not enemyfolder:FindFirstChild('StatusFolder') or enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting')
-                        
+                        until finishedtick >= 1.6 or not enemyfolder:FindFirstChild('StatusFolder') or enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting') and not findparryobject(enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting'))
+                        -- what if enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting') was nil and it would check objects
+                        -- since its nil the object in parryobjects might be nil
+                        -- so it might find another nil object
+                        -- essenitally doing if nil == nil
                         if endloop == true then 
                             removeStuns()
                             cantParry = false; rolling = false; cancelAll = false;
@@ -8169,10 +8186,12 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                             --         remove_rollstuns()
                             --     end
                             -- end
-                            if getgenv().fw3localFw3['rollonfeint'] == true then 
+                            if getgenv().fw3localFw3['rollonfeint'] == true and not findparryobject(enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting')) then 
                                 cantParry = false; rolling = false; cancelAll = false;
                                 getgenv().fw3localFw3['rollnotparry'] = true
                                 print('feinted')
+                                table.insert(getgenv().ParryObjects,enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting'))
+                                
                             end
                         end
 
@@ -8500,6 +8519,14 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             getgenv().parry()
             cancelAll = true
         end  
+        if detect(v,'rbxassetid://10771933209') and cancelAll == false then -- greatsword runswing
+            task.wait(.4)
+            getgenv().parry()
+            cancelAll = true
+        end  
+
+
+        
         -- rbxassetid://10968567648 -- vent out -- could detect  vent in debrisparts to see if its close
         -- vent in rbxassetid://10878360726
 
@@ -8513,7 +8540,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 
                 if isJumpingOut == false then 
                     --rconsoleprint('thresher roll')
-                    task.wait(.35)
+                    task.wait(.45)
                     getgenv().roll()
                 end
 
@@ -14707,6 +14734,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     local function equiparara()
 
     end
+    -- get closest npc spawn instead of humanoidrootpart
     Configuration:CreateConfigSystem()
     task.spawn(function()
         while task.wait(0.01) do 
@@ -14730,6 +14758,15 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                     end
                     -- task.wait(3)
                     print(string.lower(typeweapon)..' active')
+                    -- print('quinque active')
+                end
+                if not game.Players.LocalPlayer.Character:FindFirstChild('Arata') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 and getgenv().roghoulsettings['equiparata'] == true then 
+                    -- print('waiting for quinque')
+                    print('waiting for '..string.lower('arata'))
+                    pressKey('Zero')
+                    repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                    -- task.wait(3)
+                    print(string.lower('arata')..' active')
                     -- print('quinque active')
                 end
             end
@@ -14983,7 +15020,15 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             print(string.lower(typeweapon)..' active')
                             -- print('quinque active')
                         end
-
+                        if not game.Players.LocalPlayer.Character:FindFirstChild('Arata') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 and getgenv().roghoulsettings['equiparata'] == true then 
+                            -- print('waiting for quinque')
+                            print('waiting for '..string.lower('arata'))
+                            pressKey('Zero')
+                            repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                            -- task.wait(3)
+                            print(string.lower('arata')..' active')
+                            -- print('quinque active')
+                        end
                         -- if results == true then 
                         --     getgenv()['roghoulsettings']['action'] = 'canquest'
                         --     getgenv()['roghoulsettings']['hasntstarted'] = true
