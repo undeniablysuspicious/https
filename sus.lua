@@ -14175,6 +14175,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         erelease = false; -- ereleasing
         rrelease = false; -- rreleasing
         frelease = false; -- freleasing
+        relctime = 0;
+        cpresswait = false;
+        cfarm = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -14318,7 +14321,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddToggle('Release E',false,function(xtstae)
         getgenv().roghoulsettings['rele'] = xtstae 
     end)
-    othercheats:AddSlider("When To Release E", -100, 0, 100, 5, function(State)
+    othercheats:AddSlider("When To Release E", 0, 0, 100, 5, function(State)
         getgenv().roghoulsettings['reletime'] = State
     end) -- press Key certain times to use others
 
@@ -14328,7 +14331,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddToggle('Release R',false,function(xtstae)
         getgenv().roghoulsettings['relr'] = xtstae 
     end)
-    othercheats:AddSlider("When To Release R", -100, 0, 100, 5, function(State)
+    othercheats:AddSlider("When To Release R", 0, 0, 100, 5, function(State)
         getgenv().roghoulsettings['relrtime'] = State
     end)
 
@@ -14338,15 +14341,18 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddToggle('Release F',false,function(xtstae)
         getgenv().roghoulsettings['relf'] = xtstae 
     end)
-    othercheats:AddSlider("When To Release F", -100, 0, 100, 5, function(State)
+    othercheats:AddSlider("When To Release F", 0, 0, 100, 5, function(State)
         getgenv().roghoulsettings['relftime'] = State
     end)
 
     othercheats:AddToggle('Use C',false,function(xtstae)
         getgenv().roghoulsettings['usec'] = xtstae
     end)
-    othercheats:AddSlider("When To Release C", -100, 0, 100, 5, function(State)
-        getgenv().roghoulsettings['playerz'] = State
+    othercheats:AddToggle('Use C Farming',false,function(xtstae)
+        getgenv().roghoulsettings['cfarm'] = xtstae
+    end)
+    othercheats:AddSlider("When To Press C", 0, 0, 100, 5, function(State)
+        getgenv().roghoulsettings['relctime'] = State
     end)
     othercheats:AddToggle('Click',true,function(xtstae)
         getgenv().roghoulsettings['click'] = xtstae
@@ -15235,6 +15241,15 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 end)
                                             end
                                         end
+                                        if getgenv().roghoulsettings['cfarm'] == true then 
+                                            if getgenv().roghoulsettings['cpresswait'] == false then --cwait
+                                                getgenv().roghoulsettings['cpresswait'] = true;
+                                                task.spawn(function()
+                                                    getgenv().roghoulsettings['relctime']
+                                                    pressKey('C')
+                                                end)
+                                            end
+                                        end
                                     end)
 
                                     if getgenv()['roghoulsettings']['autoinstakill'] then 
@@ -15397,6 +15412,15 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         task.wait(getgenv().roghoulsettings['relftime'])
                                         releaseKey('F')
                                         getgenv().roghoulsettings['frelease'] = false;
+                                    end)
+                                end
+                            end
+                            if getgenv().roghoulsettings['cfarm'] == true then 
+                                if getgenv().roghoulsettings['cpresswait'] == false then --cwait
+                                    getgenv().roghoulsettings['cpresswait'] = true;
+                                    task.spawn(function()
+                                        getgenv().roghoulsettings['relctime']
+                                        pressKey('C')
                                     end)
                                 end
                             end
