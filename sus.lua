@@ -15245,7 +15245,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                             if getgenv().roghoulsettings['cpresswait'] == false then --cwait
                                                 getgenv().roghoulsettings['cpresswait'] = true;
                                                 task.spawn(function()
-                                                    getgenv().roghoulsettings['relctime']
+                                                    task.wait(getgenv().roghoulsettings['relctime'])
                                                     pressKey('C')
                                                 end)
                                             end
@@ -15419,7 +15419,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                 if getgenv().roghoulsettings['cpresswait'] == false then --cwait
                                     getgenv().roghoulsettings['cpresswait'] = true;
                                     task.spawn(function()
-                                        getgenv().roghoulsettings['relctime']
+                                        task.wait(getgenv().roghoulsettings['relctime'])
                                         pressKey('C')
                                     end)
                                 end
