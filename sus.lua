@@ -14178,6 +14178,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         relctime = 0;
         cpresswait = false;
         cfarm = false;
+        safegykatsu = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -14264,6 +14265,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     end)
     sector:AddToggle('Attempt Kill Gyakusatsu Mobs',false,function(xstate) 
         getgenv()['roghoulsettings']['gykustatsumobskill'] = xstate
+    end)
+    sector:AddToggle('Safe Gykatsu',false,function(xstate) 
+        getgenv()['roghoulsettings']['safegykatsu'] = xstate
     end)
     getgenv().serverhop = function()
         local Http = game:GetService("HttpService")
@@ -15427,63 +15431,118 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         end)
                     end
                     if enemymodel then 
-                        for _,v in next, enemymodel:GetChildren() do 
-                            if v.Name ~= 'Gyakusatsu' and v.Name ~= 'Mob' then 
-                                repeat 
-                                    task.wait(0.01)
-                                    pcall(function()
-                                        local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],getgenv()['roghoulsettings']['playery'],getgenv()['roghoulsettings']['playerz']) * CFrame.Angles(math.rad(90),0,0)
-                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
-                                        usemoves()
-                                        if getgenv()['roghoulsettings']['gykustatsumobskill'] then 
-                                            local enemymodel = nil
-                                            for u,c in next, game:GetService("Workspace").NPCSpawns:GetChildren() do 
-                                                if c.Name == 'GyakusatsuSpawn' and c:FindFirstChildWhichIsA('Model') then 
-                                                    enemymodel = c
+                        if getgenv()['roghoulsettings']['safegykatsu'] == false then 
+                            for _,v in next, enemymodel:GetChildren() do 
+                                if v.Name ~= 'Gyakusatsu' and v.Name ~= 'Mob' then 
+                                    repeat 
+                                        task.wait(0.01)
+                                        pcall(function()
+                                            local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],getgenv()['roghoulsettings']['playery'],getgenv()['roghoulsettings']['playerz']) * CFrame.Angles(math.rad(90),0,0)
+                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
+                                            usemoves()
+                                            if getgenv()['roghoulsettings']['gykustatsumobskill'] then 
+                                                local enemymodel = nil
+                                                for u,c in next, game:GetService("Workspace").NPCSpawns:GetChildren() do 
+                                                    if c.Name == 'GyakusatsuSpawn' and c:FindFirstChildWhichIsA('Model') then 
+                                                        enemymodel = c
+                                                    end
                                                 end
-                                            end
-                                            if enemymodel ~= nil then 
-                                                for i,child in next, enemymodel:GetChildren() do 
-                                                    if child.PrimaryPart then 
-                                                        if isnetworkowner(child.HumanoidRootPart) then 
-                                                            child:FindFirstChildWhichIsA('Humanoid').Health = 0
+                                                if enemymodel ~= nil then 
+                                                    for i,child in next, enemymodel:GetChildren() do 
+                                                        if child.PrimaryPart then 
+                                                            if isnetworkowner(child.HumanoidRootPart) then 
+                                                                child:FindFirstChildWhichIsA('Humanoid').Health = 0
+                                                            end
                                                         end
                                                     end
                                                 end
                                             end
-                                        end
-                                    end)
-
-                                until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
+                                        end)
+    
+                                    until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
+                                end
+                            end -- v:FindFirstChildWhichIsA('Humanoid').Health == 0
+                        elseif getgenv()['roghoulsettings']['safegykatsu'] == true then 
+                            azfakenotify('Using Safe Gykatsu Mode','untilClick')
+                            local xfarmablemobs = {}
+                            for _,v in next, enemymodel:GetChildren() do  
+                                if v.Name ~= 'Mob' and v.Name ~= 'Gyakusatsu' then 
+                                    table.insert(xfarmablemobs,v)
+                                end
                             end
-                        end -- v:FindFirstChildWhichIsA('Humanoid').Health == 0
-                        for _,v in next, enemymodel:GetChildren() do 
-                            if v.Name == 'Gyakusatsu' then 
+                            local gyk = enemymodel:FindFirstChild('Gyakusatsu')
+                            for _,v in next, xfarmablemobs do 
+                                -- print(v.Name)
                                 repeat 
                                     task.wait(0.01)
                                     pcall(function()
-                                        local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],13.2,-3.4) * CFrame.Angles(math.rad(90),0,0)
-                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
+                                        local CFrameMultiplication = CFrame.new(0,40,-3.4) 
+                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame =  gyk:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
+                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame =CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,v:FindFirstChild('HumanoidRootPart').Position) 
                                         usemoves()
-                                        if getgenv()['roghoulsettings']['gykustatsumobskill'] then 
-                                            local enemymodel = nil
-                                            for u,c in next, game:GetService("Workspace").NPCSpawns:GetChildren() do 
-                                                if c.Name == 'GyakusatsuSpawn' and c:FindFirstChildWhichIsA('Model') then 
-                                                    enemymodel = c
+                                    end)
+                                until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().loopsUnload == true or getgenv().roghoulsettings['farming'] == false
+                            end
+                        end
+                        -- for _,v in next, enemymodel:GetChildren() do 
+                        --     if v.Name ~= 'Gyakusatsu' and v.Name ~= 'Mob' then 
+                        --         repeat 
+                        --             task.wait(0.01)
+                        --             pcall(function()
+                        --                 local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],getgenv()['roghoulsettings']['playery'],getgenv()['roghoulsettings']['playerz']) * CFrame.Angles(math.rad(90),0,0)
+                        --                 game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
+                        --                 usemoves()
+                        --                 if getgenv()['roghoulsettings']['gykustatsumobskill'] then 
+                        --                     local enemymodel = nil
+                        --                     for u,c in next, game:GetService("Workspace").NPCSpawns:GetChildren() do 
+                        --                         if c.Name == 'GyakusatsuSpawn' and c:FindFirstChildWhichIsA('Model') then 
+                        --                             enemymodel = c
+                        --                         end
+                        --                     end
+                        --                     if enemymodel ~= nil then 
+                        --                         for i,child in next, enemymodel:GetChildren() do 
+                        --                             if child.PrimaryPart then 
+                        --                                 if isnetworkowner(child.HumanoidRootPart) then 
+                        --                                     child:FindFirstChildWhichIsA('Humanoid').Health = 0
+                        --                                 end
+                        --                             end
+                        --                         end
+                        --                     end
+                        --                 end
+                        --             end)
+
+                        --         until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
+                        --     end
+                        -- end -- v:FindFirstChildWhichIsA('Humanoid').Health == 0
+                        if getgenv().loopsUnload == false and getgenv().roghoulsettings['farming'] == true then 
+                            for _,v in next, enemymodel:GetChildren() do 
+                                if v.Name == 'Gyakusatsu' then 
+                                    repeat 
+                                        task.wait(0.01)
+                                        pcall(function()
+                                            local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],13.2,-3.4) * CFrame.Angles(math.rad(90),0,0)
+                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
+                                            usemoves()
+                                            if getgenv()['roghoulsettings']['gykustatsumobskill'] then 
+                                                local enemymodel = nil
+                                                for u,c in next, game:GetService("Workspace").NPCSpawns:GetChildren() do 
+                                                    if c.Name == 'GyakusatsuSpawn' and c:FindFirstChildWhichIsA('Model') then 
+                                                        enemymodel = c
+                                                    end
                                                 end
-                                            end
-                                            if enemymodel ~= nil then 
-                                                for i,child in next, enemymodel:GetChildren() do 
-                                                    if child.PrimaryPart then 
-                                                        if isnetworkowner(child.HumanoidRootPart) then 
-                                                            child:FindFirstChildWhichIsA('Humanoid').Health = 0
+                                                if enemymodel ~= nil then 
+                                                    for i,child in next, enemymodel:GetChildren() do 
+                                                        if child.PrimaryPart then 
+                                                            if isnetworkowner(child.HumanoidRootPart) then 
+                                                                child:FindFirstChildWhichIsA('Humanoid').Health = 0
+                                                            end
                                                         end
                                                     end
                                                 end
                                             end
-                                        end
-                                    end)
-                                until not workspace:FindFirstChild('Gyakusatsu') or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
+                                        end)
+                                    until not workspace:FindFirstChild('Gyakusatsu') or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
+                                end
                             end
                         end
                     end
