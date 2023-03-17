@@ -14219,6 +14219,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         cfarm = false;
         safegykatsu = false;
         highgykatsu = false;
+        safedistance = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -14308,6 +14309,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     end)
     sector:AddToggle('Safe Gykatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['safegykatsu'] = xstate
+    end)
+    sector:AddSlider("Safe Distance", 0, 75, 125, 1, function(State)
+        getgenv().roghoulsettings['safedistance'] = State
     end)
     sector:AddToggle('End Gykatsu High',false,function(xstate) 
         getgenv()['roghoulsettings']['highgykatsu'] = xstate
@@ -15519,7 +15523,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                 repeat 
                                     task.wait(0.01)
                                     pcall(function()
-                                        local CFrameMultiplication = CFrame.new(0,75,-3.4) 
+                                        local CFrameMultiplication = CFrame.new(0,getgenv().roghoulsettings['safedistance'],-3.4) 
                                         game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame =  gyk:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
                                         game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame =CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,v:FindFirstChild('HumanoidRootPart').Position) 
                                         usemoves()
@@ -15565,7 +15569,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         pcall(function()
                                             local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],13.2,-3.4) * CFrame.Angles(math.rad(90),0,0)
                                             if getgenv()['roghoulsettings']['highgykatsu'] == true then 
-                                                CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],75,-3.4) * CFrame.Angles(math.rad(-90),0,0)
+                                                CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],getgenv().roghoulsettings['safedistance'],-3.4) * CFrame.Angles(math.rad(-90),0,0)
                                             end
                                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
                                             usemoves()
