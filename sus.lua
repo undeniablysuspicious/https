@@ -108,7 +108,46 @@ end
 -- could metatable hook this call so putting b wouldnt need a string
 
 
+azfake.__esp__call = function(instance,espstate,notinrangecallback,removedcallback,info)
+    local __esp = {}
+    __esp.object = Drawing.new('Text')
+    __esp.Visible = false
+    __esp.Center = true 
+    -- __esp.Outline = true 
+    __esp.Font = 6 
+    __esp.Size = 13
+    __esp.Color = Color3.new(0,0,0)
 
+    local connection = info.connection or nil 
+    -- local offsets = {x = info.xoffset or nil; y = info.yoffset or nil;}
+    local xoffset = info.xoffset or 0 ;
+    local yoffset = info.yoffset or 0;
+    local maxdistance = info.maxdistance or math.huge;
+
+    if connection == nil then -- funcyi
+        connection = game:GetService('RunService').RenderStepped:Connect(function()
+            if instance and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                local Distance = (instance.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                local vect,IsShowingOnScreen = cam:worldToViewportPoint(instance.Position)
+                if IsShowingOnScreen and Distance <= maxdistance then 
+                    __esp.Position = Vector3.new(vect.X,vect.Y) + Vector2.new(xoffset,yoffset)
+                    __esp.Visible = true;
+                else
+                    __esp.Visible = false;
+                end
+            elseif not instance then
+                if type(removedcallback) == 'function' then 
+                    removedcallback()
+                elseif type (removedcallback) == 'string' then 
+                    if tostring(removedcallback) == 'disconnect' then 
+                        connection:Disconnect() 
+                    end
+                end
+            end
+        end)
+    end
+    return __esp
+end
 
 -- azfake.repstring = {}
 -- local function oncall(_,v)
@@ -14179,6 +14218,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         cpresswait = false;
         cfarm = false;
         safegykatsu = false;
+        highgykatsu = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -14268,6 +14308,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     end)
     sector:AddToggle('Safe Gykatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['safegykatsu'] = xstate
+    end)
+    sector:AddToggle('End Gykatsu High',false,function(xstate) 
+        getgenv()['roghoulsettings']['highgykatsu'] = xstate
     end)
     getgenv().serverhop = function()
         local Http = game:GetService("HttpService")
@@ -15476,7 +15519,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                 repeat 
                                     task.wait(0.01)
                                     pcall(function()
-                                        local CFrameMultiplication = CFrame.new(0,40,-3.4) 
+                                        local CFrameMultiplication = CFrame.new(0,75,-3.4) 
                                         game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame =  gyk:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
                                         game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame =CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,v:FindFirstChild('HumanoidRootPart').Position) 
                                         usemoves()
@@ -15521,6 +15564,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         task.wait(0.01)
                                         pcall(function()
                                             local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],13.2,-3.4) * CFrame.Angles(math.rad(90),0,0)
+                                            if getgenv()['roghoulsettings']['highgykatsu'] == true then 
+                                                CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],75,-3.4) * CFrame.Angles(math.rad(-90),0,0)
+                                            end
                                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
                                             usemoves()
                                             if getgenv()['roghoulsettings']['gykustatsumobskill'] then 
