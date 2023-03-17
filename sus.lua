@@ -15564,8 +15564,51 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         if getgenv().loopsUnload == false and getgenv().roghoulsettings['farming'] == true then 
                             for _,v in next, enemymodel:GetChildren() do 
                                 if v.Name == 'Gyakusatsu' then 
+                                    local delaying = false;
+                                    local oldValue = nil;
+                                    local oldValueText = ';'
+                                    local canResetValueText = true;
+                                    local function findwithx(x)
+                                        local xfound = nil;
+                                        for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
+                                            if v.Name:find(x) then 
+                                                xfound = v
+                                                break
+                                            end
+                                        end
+                                        return xfound
+                                    end
                                     repeat 
                                         task.wait(0.01)
+                                        if canResetValueText == true  and delaying == false then 
+                                            oldValue = findwithx(game.Players.LocalPlayer.Name);
+                                            oldValueText = oldValue:FindFirstChild('GyaPerc').Text
+                                            oldValueText = string.split(oldValueText,'%')[1]
+                                            canResetValueText = false;
+                                        end
+                                        if delaying == false then 
+                                            delaying = true;
+                                            task.delay(2,function()
+                                                local Value = nil
+                                                task.spawn(function()
+                                                    repeat task.wait() Value = findwithx(game.Players.LocalPlayer.Name); until Value ~= nil
+                                                end)
+                                                Value = Value:FindFirstChild('GyaPerc').Text
+                                                Value = string.split(Value,'%')[1]
+
+                                                if Value == oldValueText then 
+                                                    if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                                                        game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0
+                                                    end
+                                                    -- pcall(function()
+                                                        
+                                                    -- end)
+                                                end
+                                                --GyaPerc
+                                            end)
+                                            canResetValueText = true;
+                                            delaying = false;
+                                        end
                                         pcall(function()
                                             local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],13.2,-3.4) * CFrame.Angles(math.rad(90),0,0)
                                             if getgenv()['roghoulsettings']['highgykatsu'] == true then 
