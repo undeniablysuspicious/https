@@ -15435,7 +15435,25 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],getgenv()['roghoulsettings']['playery'],getgenv()['roghoulsettings']['playerz']) * CFrame.Angles(math.rad(90),0,0)
                                         game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
                                         usemoves()
+                                        if getgenv()['roghoulsettings']['gykustatsumobskill'] then 
+                                            local enemymodel = nil
+                                            for u,c in next, game:GetService("Workspace").NPCSpawns:GetChildren() do 
+                                                if c.Name == 'GyakusatsuSpawn' and c:FindFirstChildWhichIsA('Model') then 
+                                                    enemymodel = c
+                                                end
+                                            end
+                                            if enemymodel ~= nil then 
+                                                for i,child in next, enemymodel:GetChildren() do 
+                                                    if child.PrimaryPart then 
+                                                        if isnetworkowner(child.HumanoidRootPart) then 
+                                                            child:FindFirstChildWhichIsA('Humanoid').Health = 0
+                                                        end
+                                                    end
+                                                end
+                                            end
+                                        end
                                     end)
+
                                 until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
                             end
                         end -- v:FindFirstChildWhichIsA('Humanoid').Health == 0
@@ -15447,12 +15465,29 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],13.2,-3.4) * CFrame.Angles(math.rad(90),0,0)
                                         game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
                                         usemoves()
+                                        if getgenv()['roghoulsettings']['gykustatsumobskill'] then 
+                                            local enemymodel = nil
+                                            for u,c in next, game:GetService("Workspace").NPCSpawns:GetChildren() do 
+                                                if c.Name == 'GyakusatsuSpawn' and c:FindFirstChildWhichIsA('Model') then 
+                                                    enemymodel = c
+                                                end
+                                            end
+                                            if enemymodel ~= nil then 
+                                                for i,child in next, enemymodel:GetChildren() do 
+                                                    if child.PrimaryPart then 
+                                                        if isnetworkowner(child.HumanoidRootPart) then 
+                                                            child:FindFirstChildWhichIsA('Humanoid').Health = 0
+                                                        end
+                                                    end
+                                                end
+                                            end
+                                        end
                                     end)
                                 until not workspace:FindFirstChild('Gyakusatsu') or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
                             end
                         end
                     end
-
+                    getgenv()['roghoulsettings']['action'] = 'canquest'
                     -- local gykatcurrently = nil
                     -- local PlacesWithBlobs = {
                     --     'BL';
