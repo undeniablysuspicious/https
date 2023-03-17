@@ -14166,9 +14166,15 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         serverhopgykatsu = false;
         gykustatsumobskill = false;
         equiparata = false;
-        rele = 0; 
-        relr = 0; 
-        relf = 0;
+        reletime = 0; 
+        relrtime = 0; 
+        relftime = 0;
+        rele = false ;
+        relr = false ;
+        relf = false ;
+        erelease = false; -- ereleasing
+        rrelease = false; -- rreleasing
+        frelease = false; -- freleasing
     }
     getgenv().divious_teleport = function(info)
 
@@ -14309,25 +14315,37 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddToggle('Use E',false,function(xtstae)
         getgenv().roghoulsettings['usee'] = xtstae
     end)
-    sector:AddSlider("When To Release E", -100, 0, 100, 5, function(State)
-        getgenv().roghoulsettings['rele'] = State
+    othercheats:AddToggle('Release E',false,function(xtstae)
+        getgenv().roghoulsettings['rele'] = xtstae 
+    end)
+    othercheats:AddSlider("When To Release E", -100, 0, 100, 5, function(State)
+        getgenv().roghoulsettings['reletime'] = State
     end) -- press Key certain times to use others
+
     othercheats:AddToggle('Use R',false,function(xtstae)
         getgenv().roghoulsettings['user'] = xtstae 
     end)
-    sector:AddSlider("When To Release R", -100, 0, 100, 5, function(State)
-        getgenv().roghoulsettings['relr'] = State
+    othercheats:AddToggle('Release R',false,function(xtstae)
+        getgenv().roghoulsettings['relr'] = xtstae 
     end)
+    othercheats:AddSlider("When To Release R", -100, 0, 100, 5, function(State)
+        getgenv().roghoulsettings['relrtime'] = State
+    end)
+
     othercheats:AddToggle('Use F',false,function(xtstae)
         getgenv().roghoulsettings['usef'] = xtstae
     end)
-    sector:AddSlider("When To Release F", -100, 0, 100, 5, function(State)
-        getgenv().roghoulsettings['relf'] = State
+    othercheats:AddToggle('Release F',false,function(xtstae)
+        getgenv().roghoulsettings['relf'] = xtstae 
     end)
+    othercheats:AddSlider("When To Release F", -100, 0, 100, 5, function(State)
+        getgenv().roghoulsettings['relftime'] = State
+    end)
+
     othercheats:AddToggle('Use C',false,function(xtstae)
         getgenv().roghoulsettings['usec'] = xtstae
     end)
-    sector:AddSlider("When To Release C", -100, 0, 100, 5, function(State)
+    othercheats:AddSlider("When To Release C", -100, 0, 100, 5, function(State)
         getgenv().roghoulsettings['playerz'] = State
     end)
     othercheats:AddToggle('Click',true,function(xtstae)
@@ -15184,26 +15202,38 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         if getgenv().roghoulsettings['usee'] == true then 
                                             pressKey('E')
                                             task.wait(1)
-                                            task.spawn(function()
-                                                task.wait(getgenv().roghoulsettings['rele'])
-                                                releaseKey('E')
-                                            end)
+                                            if getgenv().roghoulsettings['rele'] == true and getgenv().roghoulsettings['erelease'] == false then 
+                                                getgenv().roghoulsettings['erelease']  = true;
+                                                task.spawn(function()
+                                                    task.wait(getgenv().roghoulsettings['reletime'])
+                                                    releaseKey('E')
+                                                    getgenv().roghoulsettings['erelease']  = false;
+                                                end)
+                                            end
                                         end
                                         if getgenv().roghoulsettings['user'] == true then 
                                             pressKey('R')
                                             task.wait(1)
-                                            task.spawn(function()
-                                                task.wait(getgenv().roghoulsettings['relr'])
-                                                releaseKey('R')
-                                            end)
+                                            if getgenv().roghoulsettings['relr'] == true and getgenv().roghoulsettings['rrelease'] == false then 
+                                                getgenv().roghoulsettings['rrelease'] = true;
+                                                task.spawn(function()
+                                                    task.wait(getgenv().roghoulsettings['relrtime'])
+                                                    releaseKey('R')
+                                                    getgenv().roghoulsettings['rrelease'] = false;
+                                                end)
+                                            end
                                         end
                                         if getgenv().roghoulsettings['usef'] == true then 
                                             pressKey('F')
                                             task.wait(1)
-                                            task.spawn(function()
-                                                task.wait(getgenv().roghoulsettings['relf'])
-                                                releaseKey('F')
-                                            end)
+                                            if getgenv().roghoulsettings['relf'] == true and getgenv().roghoulsettings['frelease'] == false then 
+                                                getgenv().roghoulsettings['frelease'] = true;
+                                                task.spawn(function()
+                                                    task.wait(getgenv().roghoulsettings['relftime'])
+                                                    releaseKey('F')
+                                                    getgenv().roghoulsettings['frelease'] = false;
+                                                end)
+                                            end
                                         end
                                     end)
 
@@ -15325,7 +15355,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                     end
 
                     local Sacs = game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value
-                    azfakenotify('You Have: '..Sacs..' Gykatsu Sacs')
+                    azfakenotify('You Have: '..Sacs..' Gykatsu Sacs','untilClick')
                     local function usemoves()
                         if getgenv().roghoulsettings['click'] then 
                             task.delay(.1,function()
@@ -15337,26 +15367,38 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             if getgenv().roghoulsettings['usee'] == true then 
                                 pressKey('E')
                                 task.wait(1)
-                                task.spawn(function()
-                                    task.wait(getgenv().roghoulsettings['rele'])
-                                    releaseKey('E')
-                                end)
+                                if getgenv().roghoulsettings['rele'] == true and getgenv().roghoulsettings['erelease'] == false then 
+                                    getgenv().roghoulsettings['erelease']  = true;
+                                    task.spawn(function()
+                                        task.wait(getgenv().roghoulsettings['reletime'])
+                                        releaseKey('E')
+                                        getgenv().roghoulsettings['erelease']  = false;
+                                    end)
+                                end
                             end
                             if getgenv().roghoulsettings['user'] == true then 
                                 pressKey('R')
                                 task.wait(1)
-                                task.spawn(function()
-                                    task.wait(getgenv().roghoulsettings['relr'])
-                                    releaseKey('R')
-                                end)
+                                if getgenv().roghoulsettings['relr'] == true and getgenv().roghoulsettings['rrelease'] == false then 
+                                    getgenv().roghoulsettings['rrelease'] = true;
+                                    task.spawn(function()
+                                        task.wait(getgenv().roghoulsettings['relrtime'])
+                                        releaseKey('R')
+                                        getgenv().roghoulsettings['rrelease'] = false;
+                                    end)
+                                end
                             end
                             if getgenv().roghoulsettings['usef'] == true then 
                                 pressKey('F')
                                 task.wait(1)
-                                task.spawn(function()
-                                    task.wait(getgenv().roghoulsettings['relf'])
-                                    releaseKey('F')
-                                end)
+                                if getgenv().roghoulsettings['relf'] == true and getgenv().roghoulsettings['frelease'] == false then 
+                                    getgenv().roghoulsettings['frelease'] = true;
+                                    task.spawn(function()
+                                        task.wait(getgenv().roghoulsettings['relftime'])
+                                        releaseKey('F')
+                                        getgenv().roghoulsettings['frelease'] = false;
+                                    end)
+                                end
                             end
                         end)
                     end
