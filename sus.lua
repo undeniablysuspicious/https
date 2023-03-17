@@ -14166,6 +14166,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         serverhopgykatsu = false;
         gykustatsumobskill = false;
         equiparata = false;
+        rele = 0; 
+        relr = 0; 
+        relf = 0;
     }
     getgenv().divious_teleport = function(info)
 
@@ -14306,14 +14309,26 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddToggle('Use E',false,function(xtstae)
         getgenv().roghoulsettings['usee'] = xtstae
     end)
+    sector:AddSlider("When To Release E", -100, 0, 100, 5, function(State)
+        getgenv().roghoulsettings['rele'] = State
+    end) -- press Key certain times to use others
     othercheats:AddToggle('Use R',false,function(xtstae)
         getgenv().roghoulsettings['user'] = xtstae 
+    end)
+    sector:AddSlider("When To Release R", -100, 0, 100, 5, function(State)
+        getgenv().roghoulsettings['relr'] = State
     end)
     othercheats:AddToggle('Use F',false,function(xtstae)
         getgenv().roghoulsettings['usef'] = xtstae
     end)
+    sector:AddSlider("When To Release F", -100, 0, 100, 5, function(State)
+        getgenv().roghoulsettings['relf'] = State
+    end)
     othercheats:AddToggle('Use C',false,function(xtstae)
         getgenv().roghoulsettings['usec'] = xtstae
+    end)
+    sector:AddSlider("When To Release C", -100, 0, 100, 5, function(State)
+        getgenv().roghoulsettings['playerz'] = State
     end)
     othercheats:AddToggle('Click',true,function(xtstae)
         getgenv().roghoulsettings['click'] = xtstae
@@ -14670,6 +14685,11 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             fire(game.Players.LocalPlayer.Character:FindFirstChild('Remotes'):FindFirstChild('KeyEvent'), key, topress, "Down", game.Players.LocalPlayer:GetMouse().Hit, nil, workspace.Camera.CFrame)
         end
     end
+    local function releaseKey(torelease) -- futin
+        if game.Players.LocalPlayer.Character:FindFirstChild('Remotes') then 
+            fire(game.Players.LocalPlayer.Character:FindFirstChild('Remotes'):FindFirstChild('KeyEvent'), key, torelease, "Up", game.Players.LocalPlayer:GetMouse().Hit, nil, workspace.Camera.CFrame)
+        end
+    end
     local function getquest(x)
         getgenv().roghoulsettings['action'] = 'getting quest'
         game:GetService("Workspace").CCGBuilding:FindFirstChild('Yoshitoki'):FindFirstChild('HumanoidRootPart')
@@ -14734,6 +14754,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     local function equiparara()
 
     end
+    --print(game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value)
     -- get closest npc spawn instead of humanoidrootpart
     Configuration:CreateConfigSystem()
     task.spawn(function()
@@ -14764,7 +14785,14 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                     -- print('waiting for quinque')
                     print('waiting for '..string.lower('arata'))
                     pressKey('Zero')
-                    repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                    -- repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                    repeat task.wait() 
+                        task.delay(2.5,function()
+                            if not game.Players.LocalPlayer.Character:FindFirstChild('Arata')  then 
+                                pressKey('Zero')
+                            end
+                        end)
+                    until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
                     -- task.wait(3)
                     print(string.lower('arata')..' active')
                     -- print('quinque active')
@@ -14885,7 +14913,19 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         -- print('waiting for quinque')
                         print('waiting for '..string.lower(typeweapon))
                         pressKey(getgenv().roghoulsettings['activestage'])
-                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) 
+
+                        repeat task.wait() 
+                            task.delay(2.5,function()
+                                -- you see how you hookfunction print
+                                -- inside the hookfunction 
+                                -- if you use print it will crash game
+                                -- we can use a metatable to hook a call method
+                                -- then keep using the call we hooked to check for weapon
+                                if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon)  then 
+                                    pressKey(getgenv().roghoulsettings['activestage'])
+                                end
+                            end)
+                        until game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) 
                         if getgenv().roghoulsettings['usec'] == true then 
                             pressKey('C')
                         end 
@@ -14897,7 +14937,14 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         -- print('waiting for quinque')
                         print('waiting for '..string.lower('arata'))
                         pressKey('Zero')
-                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                        --repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                        repeat task.wait() 
+                            task.delay(2.5,function()
+                                if not game.Players.LocalPlayer.Character:FindFirstChild('Arata')  then 
+                                    pressKey('Zero')
+                                end
+                            end)
+                        until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
                         -- task.wait(3)
                         print(string.lower('arata')..' active')
                         -- print('quinque active')
@@ -15012,7 +15059,13 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             print('waiting for '..string.lower(typeweapon))
                             pressKey(getgenv().roghoulsettings['activestage'])
                             pressKey(getgenv().roghoulsettings['activestage'])
-                            repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) 
+                            repeat task.wait() 
+                                task.delay(2.5,function()
+                                    if not game.Players.LocalPlayer.Character:FindFirstChild('Arata')  then 
+                                        pressKey('Zero')
+                                    end
+                                end)
+                            until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
                             if getgenv().roghoulsettings['usec'] == true then 
                                 pressKey('C')
                             end
@@ -15024,7 +15077,14 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             -- print('waiting for quinque')
                             print('waiting for '..string.lower('arata'))
                             pressKey('Zero')
-                            repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                            -- repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                            repeat task.wait() 
+                                task.delay(2.5,function()
+                                    if not game.Players.LocalPlayer.Character:FindFirstChild('Arata')  then 
+                                        pressKey('Zero')
+                                    end
+                                end)
+                            until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
                             -- task.wait(3)
                             print(string.lower('arata')..' active')
                             -- print('quinque active')
@@ -15064,7 +15124,13 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         print('waiting for '..string.lower(typeweapon))
                                         pressKey(getgenv().roghoulsettings['activestage'])
                                         pressKey(getgenv().roghoulsettings['activestage'])
-                                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) 
+                                        repeat task.wait() 
+                                            task.delay(2.5,function()
+                                                if not game.Players.LocalPlayer.Character:FindFirstChild('Arata')  then 
+                                                    pressKey('Zero')
+                                                end
+                                            end)
+                                        until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
                                         if getgenv().roghoulsettings['usec'] == true then 
                                             pressKey('C')
                                         end
@@ -15076,7 +15142,14 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         -- print('waiting for quinque')
                                         print('waiting for '..string.lower('arata'))
                                         pressKey('Zero')
-                                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                                        --repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                                        repeat task.wait() 
+                                            task.delay(2.5,function()
+                                                if not game.Players.LocalPlayer.Character:FindFirstChild('Arata')  then 
+                                                    pressKey('Zero')
+                                                end
+                                            end)
+                                        until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
                                         -- task.wait(3)
                                         print(string.lower('arata')..' active')
                                         -- print('quinque active')
@@ -15093,18 +15166,44 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         end)
                                     end
                                     -- CFrame.Angles(math.rad(90),0,0) upside down for gykatsu
+                                    -- task.spawn(function()
+                                    --     if getgenv().roghoulsettings['usee'] == true then 
+                                    --         pressKey('E')
+                                    --         task.wait(1)
+                                    --     end
+                                    --     if getgenv().roghoulsettings['user'] == true then 
+                                    --         pressKey('R')
+                                    --         task.wait(1)
+                                    --     end
+                                    --     if getgenv().roghoulsettings['usef'] == true then 
+                                    --         pressKey('F')
+                                    --         task.wait(1)
+                                    --     end
+                                    -- end)
                                     task.spawn(function()
                                         if getgenv().roghoulsettings['usee'] == true then 
                                             pressKey('E')
                                             task.wait(1)
+                                            task.spawn(function()
+                                                task.wait(getgenv().roghoulsettings['rele'])
+                                                releaseKey('E')
+                                            end)
                                         end
                                         if getgenv().roghoulsettings['user'] == true then 
                                             pressKey('R')
                                             task.wait(1)
+                                            task.spawn(function()
+                                                task.wait(getgenv().roghoulsettings['relr'])
+                                                releaseKey('R')
+                                            end)
                                         end
                                         if getgenv().roghoulsettings['usef'] == true then 
                                             pressKey('F')
                                             task.wait(1)
+                                            task.spawn(function()
+                                                task.wait(getgenv().roghoulsettings['relf'])
+                                                releaseKey('F')
+                                            end)
                                         end
                                     end)
 
@@ -15188,7 +15287,13 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         -- print('waiting for quinque')
                         print('waiting for '..string.lower(typeweapon))
                         pressKey(getgenv().roghoulsettings['activestage'])
-                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) 
+                        repeat task.wait() 
+                            task.delay(2.5,function()
+                                if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon)  then 
+                                    pressKey(getgenv().roghoulsettings['activestage'])
+                                end
+                            end)
+                        until game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) 
                         if getgenv().roghoulsettings['usec'] == true then 
                             pressKey('C')
                         end 
@@ -15200,7 +15305,14 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         -- print('waiting for quinque')
                         print('waiting for '..string.lower('arata'))
                         pressKey('Zero')
-                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                        -- repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                        repeat task.wait() 
+                            task.delay(2.5,function()
+                                if not game.Players.LocalPlayer.Character:FindFirstChild('Arata')  then 
+                                    pressKey('Zero')
+                                end
+                            end)
+                        until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
                         -- task.wait(3)
                         print(string.lower('arata')..' active')
                         -- print('quinque active')
@@ -15212,7 +15324,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         end
                     end
 
-
+                    local Sacs = game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value
+                    azfakenotify('You Have: '..Sacs..' Gykatsu Sacs')
                     local function usemoves()
                         if getgenv().roghoulsettings['click'] then 
                             task.delay(.1,function()
@@ -15224,14 +15337,26 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             if getgenv().roghoulsettings['usee'] == true then 
                                 pressKey('E')
                                 task.wait(1)
+                                task.spawn(function()
+                                    task.wait(getgenv().roghoulsettings['rele'])
+                                    releaseKey('E')
+                                end)
                             end
                             if getgenv().roghoulsettings['user'] == true then 
                                 pressKey('R')
                                 task.wait(1)
+                                task.spawn(function()
+                                    task.wait(getgenv().roghoulsettings['relr'])
+                                    releaseKey('R')
+                                end)
                             end
                             if getgenv().roghoulsettings['usef'] == true then 
                                 pressKey('F')
                                 task.wait(1)
+                                task.spawn(function()
+                                    task.wait(getgenv().roghoulsettings['relf'])
+                                    releaseKey('F')
+                                end)
                             end
                         end)
                     end
