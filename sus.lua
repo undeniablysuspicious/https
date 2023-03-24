@@ -108,45 +108,161 @@ end
 -- could metatable hook this call so putting b wouldnt need a string
 
 
-azfake.__esp__call = function(instance,espstate,notinrangecallback,removedcallback,info)
+azfake.__esp__call = function(instance,info) -- espstate,notinrangecallback,removedcallback,
     local __esp = {}
     __esp.object = Drawing.new('Text')
-    __esp.Visible = false
-    __esp.Center = true 
+    __esp.object.Visible = false
+    __esp.object.Center = true 
     -- __esp.Outline = true 
-    __esp.Font = 6 
-    __esp.Size = 13
-    __esp.Color = Color3.new(0,0,0)
+    __esp.object.Font = 2
+    __esp.object.Size = 13
+    __esp.object.Color = Color3.new(255,255,255)
 
     local connection = info.connection or nil 
     -- local offsets = {x = info.xoffset or nil; y = info.yoffset or nil;}
     local xoffset = info.xoffset or 0 ;
     local yoffset = info.yoffset or 0;
     local maxdistance = info.maxdistance or math.huge;
+    __esp.maxdistance = maxdistance; -- We need to return this value for sliders;
+    local removedcallback = info.removedcallback or function() end
+    __esp.removedcallback = removedcallback -- clients can change this value;
+    local notinrangecallback = info.notinrangecallback or function() end
+    __esp.notinrangecallback = info.notinrangecallback 
+    local espstate = info.espstate
+    local esptext = info.esptext or 'no text given'
+    local function esptextfunc() end
+    if type(esptext) == 'function' then 
+        esptextfunc = esptextfunc
+    end
+    local inloopfunction = info.inloopfunction or function() end
+
+    --PROPERTY VALUES
+    __esp.__removed = false;
+    __esp.__remtable = {};
+
+    __esp.__remtable_f = function()
+        local Trues = 0;
+        if #__esp.__remtable ~= 0 then 
+            for _,Checking in next, __esp.__remtable do 
+                if Checking == true then Trues += 1 end 
+            end
+            if Trues == #__esp.__remtable then --voting
+                __esp.__removed = true;
+            end
+        end
+    end
+    -- Check for specific value
+
+    __esp.checkingvalue = info.checkingvalue or __esp.__removed
+    __esp.waitingvalue = true -- not __esp.removed
+    if __esp.checkingvalue and info.checkingvalue then 
+        __esp.checkingvalue = info.checkingvalue
+        __esp.waitingvalue = info.waitingvalue
+    else
+        __esp.waitingvalue = true;
+    end
+    
+    __charctersettings = false;
+    __esp.__charactersettings = false 
+    if info.charactersettings then __esp.__charactersettings = info.charactersettings end
+    __esp.__playersettings = false;
+    if info.playersettings then __esp.playersettings = true; __esp.__charactersettings = false; end
+    -- __removed and checkingvalue shouldnt be the same value
+    -- if info.checkingvalue then 
+    --     __esp.checkingvalue  = info.checkingvalue['value'] 
+    --     __esp.waitingvalue  = info.checkingvalue['check'] 
+    -- end
+    -- if info.checkingvalue then 
+    --     __esp.checkingvalue = not __esp.checkingvalue -- manually set if we want to remove it on false;
+    -- end
+
+
+
+
+    -- not info.checkingvalue doesnt swap from true to false by itself
+    -- you would think not info.checkingvalue checks if theres info.checking value which would return true but changes it to false cuz it has not
+    -- actually info.checkingvalue checks if theres info.checking value which would return the value but changes it to the opposite of the value cuz it has not
+    -- print(instance.Name)
+    
 
     if connection == nil then -- funcyi
         connection = game:GetService('RunService').RenderStepped:Connect(function()
             if instance and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
-                local Distance = (instance.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
-                local vect,IsShowingOnScreen = cam:worldToViewportPoint(instance.Position)
-                if IsShowingOnScreen and Distance <= maxdistance then 
-                    __esp.Position = Vector3.new(vect.X,vect.Y) + Vector2.new(xoffset,yoffset)
-                    __esp.Visible = true;
+                local Distance = nil;
+                local __instanceposition = nil;
+                if __esp.__playersettings == true and instance.Character and instance:FindFirstChild('HumanoidRootPart') then 
+                    Distance = (instance.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                    __instanceposition = instance.Position
+                elseif __esp.__charactersettings == true and instance:FindFirstChild('HumanoidRootPart')  then -- custom part
+                    Distance = (instance:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                    __instanceposition = instance:FindFirstChild('HumanoidRootPart').Position
                 else
-                    __esp.Visible = false;
+                    Distance = (instance.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                    __instanceposition = instance.Position
                 end
+                --local Distance = (instance.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+
+                local vect,IsShowingOnScreen = workspace.CurrentCamera:worldToViewportPoint(__instanceposition)
+                __esp.__remtable_f()
+                if __esp.waitingvalue == __esp.checkingvalue then __esp.removed = true end;
+                if IsShowingOnScreen and Distance.Magnitude <= __esp.maxdistance  then  -- maxdistance
+                    __esp.object.Position = Vector2.new(vect.X,vect.Y) + Vector2.new(xoffset,yoffset)
+                    __esp.inloopfunction() -- i want to use this to set esp
+                    -- esptext
+                    if type(esptext) == 'function' then esptextfunc() end;
+                    --if type(esptext) == 'string' and esptext ~= 'no text given' then __esp.object.Text = esptext end
+
+                    __esp.object.Visible = true;
+
+                elseif IsShowingOnScreen and Distance.Magnitude >= __esp.maxdistance then 
+                    if __esp.notinrangecallback then 
+                        __esp.notinrangecallback()
+                    end
+                    __esp.object.Visible = false;
+                else
+                    __esp.object.Visible = false;
+                end
+            elseif not instance:FindFirstChild('HumanoidRootPart') and __esp.__charactersettings == true then 
+                __esp.removed = true; -- or repeat until they have a root part
             elseif not instance then
-                if type(removedcallback) == 'function' then 
-                    removedcallback()
-                elseif type (removedcallback) == 'string' then 
-                    if tostring(removedcallback) == 'disconnect' then 
+                if type(__esp.removedcallback) == 'function' then 
+                    __esp.removedcallback()
+                elseif type (__esp.removedcallback) == 'string' then 
+                    if tostring(__esp.removedcallback) == 'disconnect' then 
                         connection:Disconnect() 
                     end
                 end
             end
+            if __esp.__removed  == true or getgenv().loopsUnload == true then 
+                __esp.object:Remove() -- Doesnt run removed callback
+                connection:Disconnect() -- Break
+            end
         end)
     end
     return __esp
+end
+
+
+azfake.__screen = function(info)
+    -- if info.yield == true then 
+
+    -- end
+    local CoverScreen = Instance.new('ScreenGui');
+        
+    local AZFAKEFRAME   = Instance.new('Frame',CoverScreen);
+    AZFAKEFRAME.ZIndex = 50;
+    AZFAKEFRAME.Size = UDim2.new(1,0,1,0)
+    AZFAKEFRAME.BackgroundColor3 = info.defaultcolour
+    CoverScreen.IgnoreGuiInset = true; 
+    CoverScreen.Parent = game.CoreGui;
+
+    game:GetService('TweenService'):Create(AZFAKEFRAME,TweenInfo.new(info.successtweentime),{BackgroundColor3 = info.successcolour}):Play()
+    task.wait(info.successtweentime)
+
+    game:GetService('TweenService'):Create(AZFAKEFRAME,TweenInfo.new(info.transparencytime),{BackgroundTransparency = 1}):Play()
+    task.wait(info.transparencytime)
+    AZFAKEFRAME:Destroy();
+    CoverScreen:Destroy()
 end
 
 -- azfake.repstring = {}
@@ -680,6 +796,7 @@ getgenv().AzfakeGlobalTables = {
     dwd = {
         autoloot = false;
     };
+    defaultespmaxdistance = 100;
 };
 if _G.wl_key == nil then vs = 'debug' end
 if vs == 'debug' then 
@@ -761,8 +878,8 @@ end
 
 
 local library =loadstring(game:HttpGet("https://raw.githubusercontent.com/hairlinebrockeb/-back-ups-for-libs/main/cat", true))()
--- 492, 598 "Azfake V3{"..vs..','..game.PlaceId..'}'
-local window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(492, 598), Enum.KeyCode.LeftAlt) -- 2nd argument is the size, 3rd is the show/hide ofc
+-- 492, 598 "Azfake V3{"..vs..','..game.PlaceId..'}' --Azfake V3
+local window = library:CreateWindow("M1xup V3{"..game.PlaceId..'}', Vector2.new(492, 598), Enum.KeyCode.LeftAlt) -- 2nd argument is the size, 3rd is the show/hide ofc
 local wtm = library:CreateWatermark('AZFAKE HUB V3',Vector3.new(100,100,50))
 
 
@@ -1057,9 +1174,116 @@ end
 
 
 
-local function setupEspTab(sectorgiven)
+local function setupEspTab(sectorgiven) -- Espwindow
+    local EspTab = window:AddTab('ESP')
+    local playerespsector = EspTab:CreateSector('Player Esp','left')
+    playerespsector:AddToggle("Player ESP", false, function(xstate)
+        getgenv().fightlocalgame['playeresp'] = xstate
+        if getgenv().fightlocalgame['playeresp'] == true then 
+            for _,loop_player in next, game.Players:GetChildren() do 
+                --if not table.find(game.Players:GetPlayers())
+                local v = loop_player.Character
+                local loop_character = loop_player.Character
+                task.spawn(function()
+                    local __assigned = azfake.__esp__call(loop_player,{
+                        esptext = '..';
+                        ['removedcallback'] = function()
+                            --__assigned.object:Remove()
+                        end; -- ojbecy
+                        ['inloopfunction'] = function()
+                            --
+                        end;
+                        playersettings = true;
+                        maxdistance = getgenv().fightlocalgame['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+                    })
+                    __assigned.inloopfunction = function()-- whati f no max health
+                        if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
+                            __assigned.object.Text = loop_character.Name..' - '..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                        end
+                        __assigned.maxdistance = getgenv().fightlocalgame['maxviewplayerdistance']
+                        __assigned.checkingvalue = getgenv().fightlocalgame['playeresp']
+                    end
+                    __assigned.removedcallback = function()
+                        pcall(function()
+                            __assigned.object:Remove()
+                        end)
+                    end
+                    __assigned.waitingvalue = false;
+                end)
+            end
+            local DirectoryAdded = game.Players.ChildAdded:Connect(function(loop_player)
+
+                local v = loop_player.Character
+                local loop_character = loop_player.Character
+                task.spawn(function()
+                    local __assigned = azfake.__esp__call(loop_player,{
+                        esptext = '..';
+                        ['removedcallback'] = function()
+                            --__assigned.object:Remove()
+                        end; -- ojbecy
+                        ['inloopfunction'] = function()
+                            --
+                        end;
+                        playersettings = true;
+                        maxdistance = getgenv().fightlocalgame['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+                    })
+                    __assigned.inloopfunction = function()-- whati f no max health
+                        if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
+                            __assigned.object.Text = loop_character.Name..' - '..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                        end
+                        __assigned.maxdistance = getgenv().fightlocalgame['maxviewplayerdistance']
+                        __assigned.checkingvalue = getgenv().fightlocalgame['playeresp']
+                    end
+                    __assigned.removedcallback = function()
+                        pcall(function()
+                            __assigned.object:Remove()
+                        end)
+                    end
+                    __assigned.waitingvalue = false;
+                end)
+                -- if not game.Players:FindFirstChild(v.Name) then 
+                --     task.spawn(function()
+                --         local __assigned = azfake.__esp__call(v,{
+                --             esptext = '..';
+                --             ['removedcallback'] = function()
+                --                 __assigned.object:Remove()
+                --             end; -- ojbecy
+                --             ['inloopfunction'] = function()
+                --                 --
+                --             end;
+                --             charactersettings = true;
+                --             maxdistance = getgenv().fightlocalgame['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+                --         })
+                --         __assigned.inloopfunction = function()-- whati f no max health
+                --             __assigned.object.Text = v.Name..' - '..math.floor(v:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(v:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(v:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(v:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                --             __assigned.maxdistance = getgenv().fightlocalgame['maxviewplayerdistance']
+                --         end
+                --         __assigned.removedcallback = function()
+                --             pcall(function()
+                --                 __assigned.object:Remove()
+                --             end)
+                --         end
+                --         __assigned.checkingvalue = getgenv().fightlocalgame['playeresp']
+                --         __assigned.waitingvalue = false;
+                --     end)
+                -- end
+            end)
+            task.spawn(function()
+                repeat task.wait(.3) until getgenv().loopsUnload == true ;
+                DirectoryAdded:Disconnect()
+            end)
+        end
+    end)
+    playerespsector:AddSlider('Player Esp Distance',0,100,10000,1,function(xstate)
+        getgenv().fightlocalgame['maxviewplayerdistance'] = xstate -- maxplayermobdistance
+    end)
 
 end
+
+
+
+
+
 
 getgenv().AddConfigurations = function()
     local Configiuration= window:CreateTab('Configiuration')
@@ -13555,13 +13779,39 @@ elseif game.PlaceId == 9380307595 then
 
 
 elseif game.PlaceId == 7162704734 then -- fighting game 
-    local tab = window:CreateTab(gameName)
+    local tab = window:CreateTab('Fighting Game')
+    local esptab = window:CreateTab('Esp')
     local sector = tab:CreateSector('Cheats','left')
+    local gamechangers = tab:CreateSector('Cheats','right')
+    local espsector = esptab:CreateSector('Esp','right')
+    local botssector = tab:CreateSector('Cheats','right')
 
     getgenv().fightlocalgame = {
+        nocooldown = false;
+        nocooldownsettings = {
+            rollcooldown = false;
+            runcooldown = false;
+            blockcooldown = false;
+            nojump = false;
+            dashcooldown = false;
+            freezecooldown = false;
+        };
         trinketesp = false;
         showinvisibletrinkets = false;
         mobesp = false;
+        fullbright = false;
+        nopackets = false;
+        maxviewtrinketdistance = 100;
+        autopickuptrinkets = false;
+        maxviewmobdistance = 100;
+        playeresp = false;
+        maxviewplayerdistance = 100;
+        npcesp = false;
+        maxviewnpcdistance = 100;
+        trinketbot = false;
+        action  = 'idle';
+        trinketbotserverhop = false;
+        teleportatingnpc = nil;--''; -- teleortatingnpc-- teleportingnpc
     }
     getgenv().CreateTrinketEsp = function(v) 
         local sectionesp = Drawing.new('Text')
@@ -13606,271 +13856,1287 @@ elseif game.PlaceId == 7162704734 then -- fighting game
         end
         coroutine.wrap(updPosition)()
     end 
-    sector:AddToggle("Trinket ESP", false, function(xstate)
-        getgenv().fightlocalgame['trinketesp'] = xstate
-        for _,v in next, DIR:GetChildren() do 
-            if xstate == true then 
-                getgenv().CreateTrinketEsp(v)
+
+
+    local no_coolsector = sector:AddToggle('No Cooldowns',false,function(xstate)
+        getgenv().fightlocalgame['nocooldown'] = xstate
+    end)
+    local RollCooldown = sector:AddToggle('Roll Cooldown',false,function(xtstae)
+        getgenv().fightlocalgame['nocooldownsettings']['rollcooldown'] = xtstae
+    end)
+    local RunCooldown = sector:AddToggle('Run Cooldown',false,function(xtstae)
+        getgenv().fightlocalgame['nocooldownsettings']['runcooldown'] = xtstae
+    end)
+    local BlockCooldown = sector:AddToggle('Block Cooldown',false,function(xtstae)
+        getgenv().fightlocalgame['nocooldownsettings']['blockcooldown'] = xtstae
+    end)
+    local DashCooldown = sector:AddToggle('Dash Cooldown',false,function(xtstae)
+        getgenv().fightlocalgame['nocooldownsettings']['dashcooldown'] = xtstae
+    end)
+    local JumpCooldown = sector:AddToggle('Jump Cooldown',false,function(xtstae)
+        getgenv().fightlocalgame['nocooldownsettings']['nojump'] = xtstae
+    end)
+    local FreezeCooldown = sector:AddToggle('Freeze Cooldown',false,function(xtstae)
+        getgenv().fightlocalgame['nocooldownsettings']['freezecooldown'] = xtstae
+    end)
+    no_coolsector:MakeVisibleIfActive(RollCooldown)
+    no_coolsector:MakeVisibleIfActive(RunCooldown)
+    no_coolsector:MakeVisibleIfActive(BlockCooldown)
+    no_coolsector:MakeVisibleIfActive(DashCooldown)
+    no_coolsector:MakeVisibleIfActive(JumpCooldown)
+    no_coolsector:MakeVisibleIfActive(FreezeCooldown)
+
+
+    sector:AddButton('Reset Character',function()
+        game.Players.LocalPlayer.Character:BreakJoints()
+    end)
+    sector:AddButton('Attempt to Crash Client',function()
+        game.RunService.RenderStepped:Connect(function()
+            local ohNumber1 = 42.92091715335846
+            game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+            game.RunService.RenderStepped:Connect(function()
+                local ohNumber1 = 42.92091715335846
+                game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                game.RunService.RenderStepped:Connect(function()
+                    local ohNumber1 = 42.92091715335846
+                    game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                    game.RunService.RenderStepped:Connect(function()
+                        local ohNumber1 = 42.92091715335846
+                        game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                        game.RunService.RenderStepped:Connect(function()
+                            local ohNumber1 = 42.92091715335846
+                            game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                            game.RunService.RenderStepped:Connect(function()
+                                local ohNumber1 = 42.92091715335846
+                                game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                game.RunService.RenderStepped:Connect(function()
+                                    local ohNumber1 = 42.92091715335846
+                                    game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                    game.RunService.RenderStepped:Connect(function()
+                                        local ohNumber1 = 42.92091715335846
+                                        game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                        game.RunService.RenderStepped:Connect(function()
+                                            local ohNumber1 = 42.92091715335846
+                                            game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                            game.RunService.RenderStepped:Connect(function()
+                                                local ohNumber1 = 42.92091715335846
+                                                game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)
+                                                game.RunService.RenderStepped:Connect(function()
+                                                    local ohNumber1 = 42.92091715335846
+                                                    game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                                    game.RunService.RenderStepped:Connect(function()
+                                                        local ohNumber1 = 42.92091715335846
+                                                        game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                                        game.RunService.RenderStepped:Connect(function()
+                                                            local ohNumber1 = 42.92091715335846
+                                                            game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                                            game.RunService.RenderStepped:Connect(function()
+                                                                local ohNumber1 = 42.92091715335846
+                                                                game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                                                game.RunService.RenderStepped:Connect(function()
+                                                                    local ohNumber1 = 42.92091715335846
+                                                                    game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                                                    game.RunService.RenderStepped:Connect(function()
+                                                                        local ohNumber1 = 42.92091715335846
+                                                                        game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                                                        game.RunService.RenderStepped:Connect(function()
+                                                                            local ohNumber1 = 42.92091715335846
+                                                                            game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                                                            game.RunService.RenderStepped:Connect(function()
+                                                                                local ohNumber1 = 42.92091715335846
+                                                                                game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                                                                game.RunService.RenderStepped:Connect(function()
+                                                                                    local ohNumber1 = 42.92091715335846
+                                                                                    game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                                                                    game.RunService.RenderStepped:Connect(function()
+                                                                                        local ohNumber1 = 42.92091715335846
+                                                                                        game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                                                                        game.RunService.RenderStepped:Connect(function()
+                                                                                            local ohNumber1 = 42.92091715335846
+                                                                                            game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)
+                                                                                            game.RunService.RenderStepped:Connect(function()
+                                                                                                local ohNumber1 = 42.92091715335846
+                                                                                                game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                                                                                game.RunService.RenderStepped:Connect(function()
+                                                                                                    local ohNumber1 = 42.92091715335846
+                                                                                                    game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
+                                                                                                end)
+                                                                                            end)  
+                                                                                        end)
+                                                                                    end)
+                                                                                end)
+                                                                            end)
+                                                                        end)
+                                                                    end)
+                                                                end)
+                                                            end)
+                                                        end)
+                                                    end)
+                                                end)  
+                                            end)
+                                        end)
+                                    end)
+                                end)
+                            end)
+                        end)
+                    end)
+                end)
+            end)
+        end)
+    end)
+
+    sector:AddButton('Serverhop',function()
+        local Http = game:GetService("HttpService")
+        local Api = "https://games.roblox.com/v1/games/"
+        
+        local _servers = Api..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+        
+        
+        
+        local _servers = Api..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+        function ListServers(cursor)
+           local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
+           return Http:JSONDecode(Raw)
+        end
+        
+        local listed = 0
+        local reg = {}
+        for _,server in next, ListServers(nil).data do 
+            pcall(function()
+                if server.id ~= game.JobId then 
+                    table.insert(reg,server.id)  
+                end
+                --print(server.id)
+            end)
+        end
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId,reg[math.random(1,#reg)],game.Players.LocalPlayer)
+    end)
+
+
+    local disableanticheatubutton = sector:AddButton('Attempt to Disable Anticheat',function()
+        local bypassanticheat = nil ;
+        local __bypassed = {}
+        local function __find(r,finding)
+            local found = {}
+            local __result = false
+            for _,v in next, debug.getconstants(r) do 
+                for k,c in next, finding do 
+                    if string.lower(tostring(v)) ==  c or v == c then 
+                        table.insert(found,{j = true}) 
+                    end
+                end
+            end
+            if #found == #finding then 
+                __result = true;
+            end
+            return __result
+        end
+        for _,nilinstance in next, getgc() do 
+            if type(nilinstance) == 'function' and islclosure(nilinstance) and not is_synapse_function(nilinstance) then 
+                local constants = debug.getconstants(nilinstance)
+                if getinfo(nilinstance).source:find('_CharacterClient') then 
+                    local statement = [[ SOURCE = {source} FNAME = {FNAME} ]]
+                    statement = string.gsub(statement,'{source}','C-Client') -- getinfo(nilinstance).source
+                    statement = string.gsub(statement,'{FNAME}',getinfo(nilinstance).name)
+                    --print(statement)
+                    if __find(nilinstance,{'ReplicatedStorage','GetService','getmetatable'}) then 
+                        bypassanticheat = nilinstance
+                        table.insert(__bypassed,bypassanticheat)
+                        local Saved = bypassanticheat; Saved = hookfunction(bypassanticheat,function(self,...)
+                            if table.find({'Taunt','DropItem','Grip','Carry','Seat','OpenDoor','Dash','Block','Attack'},self) then 
+                                print('found')
+                                return Saved(self,...)
+                            end
+                            return task.wait(math.huge)
+                        end)
+                    end
+                end
             end
         end
     end)
-    sector:AddToggle("Show Invisible Trinkets", false, function(xstate)
+    disableanticheatubutton:ActivateKnowledge()
+    disableanticheatubutton:AddKnowledge('Press Once')
+
+
+
+
+
+    sector:AddToggle('Stop Sending Packets',false,function(xstate)
+        getgenv().fightlocalgame['nopackets'] = xstate
+    end)
+
+
+    sector:AddToggle('Auto Pickup Trinkets',false,function(xstate)
+        getgenv().fightlocalgame['autopickuptrinkets'] = xstate
+    end)
+
+
+    sector:AddTextbox('NPC Teleportation','',function(xstate)
+
+        for _,v in next, workspace.NPCs:GetChildren() do 
+            if v.Name:sub(1,string.len(xstate)) == xstate then 
+                getgenv().fightlocalgame['teleportatingnpc'] = v
+            end
+        end
+        -- getgenv().fightlocalgame['teleportatingnpc'] = xstate
+    end)
+    sector:AddButton('Teleport',function()
+        if getgenv().fightlocalgame['teleportatingnpc'] ~= nil and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+            local CoverScreen = Instance.new('ScreenGui');
+        
+            local AZFAKEFRAME   = Instance.new('Frame',CoverScreen);
+            AZFAKEFRAME.ZIndex = 50;
+            AZFAKEFRAME.Size = UDim2.new(1,0,1,0)
+            AZFAKEFRAME.BackgroundColor3 = Color3.fromRGB(0,0,0)
+            CoverScreen.IgnoreGuiInset = true; 
+            CoverScreen.Parent = game.CoreGui;
+
+            game:GetService('TweenService'):Create(AZFAKEFRAME,TweenInfo.new(1),{BackgroundColor3 = Color3.new(0,255,0)}):Play()
+            task.wait(1)
+
+            local Root = game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart');
+            Root.Parent = nil;
+            Root.CFrame = getgenv().fightlocalgame['teleportatingnpc']:FindFirstChild('HumanoidRootPart').CFrame;
+            Root.Parent = game.Players.LocalPlayer.Character
+
+            game:GetService('TweenService'):Create(AZFAKEFRAME,TweenInfo.new(1),{BackgroundTransparency = 1}):Play()
+            task.wait(1)
+            AZFAKEFRAME:Destroy();
+            CoverScreen:Destroy()
+
+        end
+    end)
+
+
+
+    botssector:AddToggle('Trinket Bot',false,function(xtstae)
+        getgenv().fightlocalgame['trinketbot'] = xtstae
+        getgenv().fightlocalgame['action'] = 'idle'
+        if getgenv().fightlocalgame['trinketbot'] == true then 
+            getgenv().fightlocalgame['action'] = 'idle'
+        end
+    end)
+
+    botssector:AddToggle('Server Hop Bot',false,function(xtstae)
+        getgenv().fightlocalgame['trinketbotserverhop'] = xtstae
+    end)
+
+
+    getgenv().serverhop = function()
+        local Http = game:GetService("HttpService")
+        local Api = "https://games.roblox.com/v1/games/"
+        
+        local _servers = Api..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+        
+        
+        
+        local _servers = Api..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+        function ListServers(cursor)
+           local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
+           return Http:JSONDecode(Raw)
+        end
+        
+        local listed = 0
+        local reg = {}
+        for _,server in next, ListServers(nil).data do 
+            pcall(function()
+                if server.id ~= game.JobId then 
+                    table.insert(reg,server.id)  
+                end
+                --print(server.id)
+            end)
+        end
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId,reg[math.random(1,#reg)],game.Players.LocalPlayer)
+        
+    end
+
+
+    gamechangers:AddToggle('Full Bright',false,function(xstate)
+        getgenv().fightlocalgame['fullbright'] = xstate
+    end)
+
+    espsector:AddSlider('Trinket Distance',0,100,10000,1,function(xstate)
+        getgenv().fightlocalgame['maxviewtrinketdistance'] = xstate
+    end)
+
+    local trinketsector = esptab:CreateSector('Trinkets','left')
+    trinketsector:AddToggle("Trinket ESP", false, function(xstate)
+        getgenv().fightlocalgame['trinketesp'] = xstate
+        if getgenv().fightlocalgame['trinketesp'] == true then 
+            local TrinketDirectory = nil;
+
+            for _,v in next, workspace:GetChildren() do 
+                if v:IsA('Folder') and v:FindFirstChildWhichIsA('Part') and v:FindFirstChildWhichIsA('Part'):FindFirstChild('ClickDetector') then 
+                    TrinketDirectory =v;
+                end
+            end
+            print(TrinketDirectory)
+            for _,v in next, TrinketDirectory:GetChildren() do
+                --print(v.Name)
+                if v:IsA('Part') or v:IsA('MeshPart') then 
+                    task.spawn(function()
+                        local __assigned = azfake.__esp__call(v,{
+                            esptext = 'Trinket';
+                            ['removedcallback'] = function()
+                                __assigned.object:Remove()
+                            end; -- ojbecy
+                            ['inloopfunction'] = function()
+                                
+                                -- __assigned.object.Text = 'Trinket'
+                                -- __assigned.maxdistance = getgenv().fightlocalgame['maxviewtrinketdistance']
+                            end;
+                            maxdistance = getgenv().fightlocalgame['maxviewtrinketdistance'];
+                        })
+                        __assigned.inloopfunction = function()
+                            __assigned.object.Text = 'Trinket'
+                            __assigned.maxdistance = getgenv().fightlocalgame['maxviewtrinketdistance']
+                        end
+                        __assigned.removedcallback = function()
+                            pcall(function()
+                                __assigned.object:Remove()
+                            end)
+                        end
+                        __assigned.checkingvalue = getgenv().fightlocalgame['trinketesp']
+                        __assigned.waitingvalue = false;
+                        --[[ waits for assigned to become false before it toggles remove  ]]
+                    end)
+                end
+            end
+        end
+        -- for _,v in next, DIR:GetChildren() do 
+        --     if xstate == true then 
+        --         getgenv().CreateTrinketEsp(v)
+        --     end
+        -- end
+    end)
+    trinketsector:AddToggle("Show Invisible Trinkets", false, function(xstate)
         getgenv().fightlocalgame['showinvisibletrinkets'] = xstate
     end) -- show if showing function something else showing for a sector or toggle etc
-    sector:AddToggle("Mob ESP", false, function(xstate)
+    local mobespsector = esptab:CreateSector('Mob Esp','right')
+    mobespsector:AddToggle("Mob ESP", false, function(xstate)
         getgenv().fightlocalgame['mobesp'] = xstate
-    end)
+        if getgenv().fightlocalgame['mobesp'] == true then 
+            local Directory = workspace.Live 
+            for _,v in next, Directory:GetChildren() do 
+                --if not table.find(game.Players:GetPlayers())
+                if not game.Players:FindFirstChild(v.Name) then 
+                    task.spawn(function()
+                        local __assigned = azfake.__esp__call(v,{
+                            esptext = '..';
+                            ['removedcallback'] = function()
+                                __assigned.object:Remove()
+                            end; -- ojbecy
+                            ['inloopfunction'] = function()
+                                --
+                            end;
 
+                            maxdistance = getgenv().fightlocalgame['maxviewmobdistance'];
+                            charactersettings = true;
+                        })
+                        __assigned.inloopfunction = function()
+                            __assigned.object.Text = v.Name
+                            __assigned.maxdistance = getgenv().fightlocalgame['maxviewmobdistance']
+                        end
+                        __assigned.removedcallback = function()
+                            pcall(function()
+                                __assigned.object:Remove()
+                            end)
+                        end
+                        __assigned.checkingvalue = getgenv().fightlocalgame['mobesp']
+                        __assigned.waitingvalue = false;
+                    end)
+                end
+            end
+            local DirectoryAdded = Directory.ChildAdded:Connect(function(v)
+                if not game.Players:FindFirstChild(v.Name) then 
+                    task.spawn(function()
+                        local __assigned = azfake.__esp__call(v,{
+                            esptext = '..';
+                            ['removedcallback'] = function()
+                                __assigned.object:Remove()
+                            end; -- ojbecy
+                            ['inloopfunction'] = function()
+                                --
+                            end;
 
-
-
-    local DIR = game:GetService("Workspace").Folder
-    for _,v in next, DIR:GetChildren() do 
-        if getgenv().fightlocalgame['trinketesp'] == true then 
-            getgenv().CreateTrinketEsp(v)
+                            maxdistance = getgenv().fightlocalgame['maxviewmobdistance'];
+                        })
+                        __assigned.inloopfunction = function()
+                            __assigned.object.Text = v.Name
+                            __assigned.maxdistance = getgenv().fightlocalgame['maxviewmobdistance']
+                        end
+                        __assigned.removedcallback = function()
+                            pcall(function()
+                                __assigned.object:Remove()
+                            end)
+                        end
+                        __assigned.checkingvalue = getgenv().fightlocalgame['mobesp']
+                        __assigned.waitingvalue = false;
+                    end)
+                end
+            end)
+            task.spawn(function()
+                repeat task.wait(.3) until getgenv().loopsUnload == true ;
+                DirectoryAdded:Disconnect()
+            end)
         end
-    end
-    
+    end)
+    mobespsector:AddSlider('Mob Esp Distance',0,100,10000,1,function(xstate)
+        getgenv().fightlocalgame['maxviewmobdistance'] = xstate
+    end)
+    local playerespsector = esptab:CreateSector('Player Esp','left')
+    playerespsector:AddToggle("Player ESP", false, function(xstate)
+        getgenv().fightlocalgame['playeresp'] = xstate
+        if getgenv().fightlocalgame['playeresp'] == true then 
+            local Directory = workspace.Live 
+            for _,loop_player in next, game.Players:GetChildren() do 
+                --if not table.find(game.Players:GetPlayers())
+                local v = loop_player.Character
+                local loop_character = loop_player.Character
+                task.spawn(function()
+                    local __assigned = azfake.__esp__call(loop_player,{
+                        esptext = '..';
+                        ['removedcallback'] = function()
+                            --__assigned.object:Remove()
+                        end; -- ojbecy
+                        ['inloopfunction'] = function()
+                            --
+                        end;
+                        playersettings = true;
+                        maxdistance = getgenv().fightlocalgame['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+                    })
+                    __assigned.inloopfunction = function()-- whati f no max health
+                        if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
+                            __assigned.object.Text = loop_character.Name..' - '..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                        end
+                        __assigned.maxdistance = getgenv().fightlocalgame['maxviewplayerdistance']
+                        __assigned.checkingvalue = getgenv().fightlocalgame['playeresp']
+                    end
+                    __assigned.removedcallback = function()
+                        pcall(function()
+                            __assigned.object:Remove()
+                        end)
+                    end
+                    __assigned.waitingvalue = false;
+                end)
+            end
+            local DirectoryAdded = game.Players.ChildAdded:Connect(function(loop_player)
 
-    workspace.Folder.ChildAdded:Connect(function(xchild)
-        getgenv().CreateTrinketEsp(xchild)
+                local v = loop_player.Character
+                local loop_character = loop_player.Character
+                task.spawn(function()
+                    local __assigned = azfake.__esp__call(loop_player,{
+                        esptext = '..';
+                        ['removedcallback'] = function()
+                            --__assigned.object:Remove()
+                        end; -- ojbecy
+                        ['inloopfunction'] = function()
+                            --
+                        end;
+                        playersettings = true;
+                        maxdistance = getgenv().fightlocalgame['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+                    })
+                    __assigned.inloopfunction = function()-- whati f no max health
+                        if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
+                            __assigned.object.Text = loop_character.Name..' - '..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                        end
+                        __assigned.maxdistance = getgenv().fightlocalgame['maxviewplayerdistance']
+                        __assigned.checkingvalue = getgenv().fightlocalgame['playeresp']
+                    end
+                    __assigned.removedcallback = function()
+                        pcall(function()
+                            __assigned.object:Remove()
+                        end)
+                    end
+                    __assigned.waitingvalue = false;
+                end)
+                -- if not game.Players:FindFirstChild(v.Name) then 
+                --     task.spawn(function()
+                --         local __assigned = azfake.__esp__call(v,{
+                --             esptext = '..';
+                --             ['removedcallback'] = function()
+                --                 __assigned.object:Remove()
+                --             end; -- ojbecy
+                --             ['inloopfunction'] = function()
+                --                 --
+                --             end;
+                --             charactersettings = true;
+                --             maxdistance = getgenv().fightlocalgame['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+                --         })
+                --         __assigned.inloopfunction = function()-- whati f no max health
+                --             __assigned.object.Text = v.Name..' - '..math.floor(v:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(v:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(v:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(v:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                --             __assigned.maxdistance = getgenv().fightlocalgame['maxviewplayerdistance']
+                --         end
+                --         __assigned.removedcallback = function()
+                --             pcall(function()
+                --                 __assigned.object:Remove()
+                --             end)
+                --         end
+                --         __assigned.checkingvalue = getgenv().fightlocalgame['playeresp']
+                --         __assigned.waitingvalue = false;
+                --     end)
+                -- end
+            end)
+            task.spawn(function()
+                repeat task.wait(.3) until getgenv().loopsUnload == true ;
+                DirectoryAdded:Disconnect()
+            end)
+        end
+    end)
+    playerespsector:AddSlider('Player Esp Distance',0,100,10000,1,function(xstate)
+        getgenv().fightlocalgame['maxviewplayerdistance'] = xstate -- maxplayermobdistance
+    end)
+    local npcespsector = esptab:CreateSector('Npcs','right')
+    npcespsector:AddToggle("Npc ESP", false, function(xstate)
+        getgenv().fightlocalgame['npcesp'] = xstate
+        if getgenv().fightlocalgame['npcesp'] == true then -- only allow certain esp name
+            local Directory = workspace.NPCs 
+            for _,v in next, Directory:GetChildren() do 
+                --if not table.find(game.Players:GetPlayers())
+                task.spawn(function()
+                    local __assigned = azfake.__esp__call(v,{
+                        esptext = '..';
+                        ['removedcallback'] = function()
+                            __assigned.object:Remove()
+                        end; -- ojbecy
+                        ['inloopfunction'] = function()
+                            --
+                        end;
+
+                        maxdistance = getgenv().fightlocalgame['maxviewnpcdistance'];
+                        charactersettings = true;
+                    })
+                    __assigned.inloopfunction = function()-- whati f no max health
+                        __assigned.object.Text = v.Name
+                        __assigned.maxdistance = getgenv().fightlocalgame['maxviewnpcdistance']
+                    end
+                    __assigned.removedcallback = function()
+                        pcall(function()
+                            __assigned.object:Remove()
+                        end)
+                    end
+                    __assigned.checkingvalue = getgenv().fightlocalgame['npcesp']
+                    __assigned.waitingvalue = false;
+                end)
+            end
+            local DirectoryAdded = Directory.ChildAdded:Connect(function(v)
+                task.spawn(function()
+                    local __assigned = azfake.__esp__call(v,{
+                        esptext = '..';
+                        ['removedcallback'] = function()
+                            __assigned.object:Remove()
+                        end; -- ojbecy
+                        ['inloopfunction'] = function()
+                            --
+                        end;
+
+                        maxdistance = getgenv().fightlocalgame['maxviewnpcdistance'];
+                    })
+                    __assigned.inloopfunction = function()-- whati f no max health
+                        __assigned.object.Text = v.Name
+                        __assigned.maxdistance = getgenv().fightlocalgame['maxviewnpcdistance']
+                    end
+                    __assigned.removedcallback = function()
+                        pcall(function()
+                            __assigned.object:Remove()
+                        end)
+                    end
+                    __assigned.checkingvalue = getgenv().fightlocalgame['npcesp']
+                    __assigned.waitingvalue = false;
+                end)
+            end)
+            task.spawn(function()
+                repeat task.wait(.3) until getgenv().loopsUnload == true ;
+                DirectoryAdded:Disconnect()
+            end)
+        end
+    end)
+    npcespsector:AddSlider('Npc Esp Distance',0,100,10000,1,function(xstate)
+        getgenv().fightlocalgame['maxviewnpcdistance'] = xstate
+    end)
+
+    local metahook;
+    metahook = hookmetamethod(game,'__namecall',function(self,...)
+        local args = {...}
+        local call_type = getnamecallmethod();
+        if call_type == 'FireServer'  and self.Name == 'Communicate' and getgenv().fightlocalgame['nopackets'] == true then 
+            return metahook(self,'__azfake__')
+        elseif call_type == 'Kick' then 
+            warn('Attempted to kick')
+            return task.wait(math.huge)
+        else
+            return metahook(self,...)
+        end
+        return metahook(self,...)
     end)
 
 
-    local lp = game.Players.LocalPlayer
-    local cam = workspace.CurrentCamera
-    local worldToViewportPoint = cam.worldToViewportPoint
-    
-    local head_offset =  Vector3.new(0,1.5,0)
-    local leg_offset = Vector3.new(0,10,0)
-    getgenv().DefaultEsp = function(v)
-        -- print(v.Name)
-        task.wait(0.1)
-        local esp = Drawing.new('Text')
-        esp.Visible = false
-        esp.Center = true 
-        esp.Outline = true 
-        esp.Font = 2 
-        esp.Size = 13
-        esp.Color = Color3.new(5,0,0)
-        esp.Text = 'SEXY'
-    
-        -- local function upd()
-        --     local c 
-        --     c = game:GetService('RunService').RenderStepped:Connect(function()
-        --         task.wait()
-        --         if v.Character and v~= game.Players.LocalPlayer  and v.Character:FindFirstChild('HumanoidRootPart') then 
-        --             local espv,onscreen = workspace.CurrentCamera:worldToViewportPoint(v.Character.HumanoidRootPart.Position)
-    
-        --             if onscreen and getgenv().playeresp == true then 
-        --                 esp.Position = Vector2.new(espv.X,espv.Y ) + Vector2.new(0,1)
-        --                 if getgenv().streamermode == false then 
-        --                     esp.Text = v.Name
-        --                 else
-        --                     esp.Text = v.Name:sub(1,2)..'cummybuttermilk'
-        --                 end
-    
-        --                 if getgenv().playeresp == true then esp.Visible = true end
-                     
-    
-        --             else
-        --                 esp.Visible = false
-        --             end
-    
-        --         else
-        --             if game.Players:FindFirstChild(v.Name) == nil then c:Disconnect() end
-        --             esp.Visible = false
-        --         end
-        --     end)
-        -- end
-    
-    
-        local tracer = Drawing.new('Line')
-        tracer.Visible = false
-        tracer.Color = Color3.new(1,0,0)
-        tracer.Thickness = 1 
-        tracer.Transparency = 1 
+    -- assign esp 
+        
+        local DIR = game:GetService("Workspace").Folder
+        for _,v in next, DIR:GetChildren() do 
+            if getgenv().fightlocalgame['trinketesp'] == true then 
+                getgenv().CreateTrinketEsp(v)
+            end
+        end
+        
+
+        workspace.Folder.ChildAdded:Connect(function(xchild)
+            getgenv().CreateTrinketEsp(xchild)
+        end)
+
+
+        local lp = game.Players.LocalPlayer
+        local cam = workspace.CurrentCamera
+        local worldToViewportPoint = cam.worldToViewportPoint
+        
+        local head_offset =  Vector3.new(0,1.5,0)
+        local leg_offset = Vector3.new(0,10,0)
+        getgenv().DefaultEsp = function(v)
+            -- print(v.Name)
+            task.wait(0.1)
+            local esp = Drawing.new('Text')
+            esp.Visible = false
+            esp.Center = true 
+            esp.Outline = true 
+            esp.Font = 2 
+            esp.Size = 13
+            esp.Color = Color3.new(5,0,0)
+            esp.Text = 'SEXY'
+        
+            -- local function upd()
+            --     local c 
+            --     c = game:GetService('RunService').RenderStepped:Connect(function()
+            --         task.wait()
+            --         if v.Character and v~= game.Players.LocalPlayer  and v.Character:FindFirstChild('HumanoidRootPart') then 
+            --             local espv,onscreen = workspace.CurrentCamera:worldToViewportPoint(v.Character.HumanoidRootPart.Position)
+        
+            --             if onscreen and getgenv().playeresp == true then 
+            --                 esp.Position = Vector2.new(espv.X,espv.Y ) + Vector2.new(0,1)
+            --                 if getgenv().streamermode == false then 
+            --                     esp.Text = v.Name
+            --                 else
+            --                     esp.Text = v.Name:sub(1,2)..'cummybuttermilk'
+            --                 end
+        
+            --                 if getgenv().playeresp == true then esp.Visible = true end
+                        
+        
+            --             else
+            --                 esp.Visible = false
+            --             end
+        
+            --         else
+            --             if game.Players:FindFirstChild(v.Name) == nil then c:Disconnect() end
+            --             esp.Visible = false
+            --         end
+            --     end)
+            -- end
         
         
-        local box_o = Drawing.new('Square')
-        box_o.Visible = false
-        box_o.Color = Color3.new(0,0,0)
-        box_o.Thickness = 2
-        box_o.Transparency =1 
-        box_o.Filled = false
-        
-        local box = Drawing.new('Square')
-        box.Visible = false
-        box.Color = Color3.new(1,0,0)
-        box.Thickness = 1.5
-        box.Transparency =1 
-        box.Filled = false
-        
-        local hb_o = Drawing.new('Square')
-        hb_o.Visible = false
-        hb_o.Color = Color3.new(0,0,0)
-        hb_o.Thickness = 1
-        hb_o.Transparency =1 
-        hb_o.Filled = false
-        
-        local hb = Drawing.new('Square')
-        hb.Visible = false
-        hb.Color = Color3.new(1,0,0)
-        hb.Thickness = 1
-        hb.Transparency =1 
-        hb.Filled = true
-        local health = Drawing.new('Text')
-        health.Visible = false
-        local distancex = Drawing.new('Text')
-        distancex.Visible = false
-        local function rootesp()
-            local xkeeptracer
-            local plsstoptracer = false
-            cam = workspace.CurrentCamera
-            xkeeptracer = game:GetService('RunService').RenderStepped:Connect(function()
-                task.wait(0.2)
-                if v and v and v:FindFirstChild('Humanoid') and v:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer.Character and v.Character.Humanoid.Health >0 then 
-                    local vect,onscreen = cam:worldToViewportPoint(v.HumanoidRootPart.Position)
-                    
-                    if onscreen and getgenv().playeresp and getgenv().tracers and tracer then 
-                        tracer.From = Vector2.new(cam.ViewportSize.X/2,cam.ViewportSize.Y/1)
-                        tracer.To = Vector2.new(vect.X,vect.Y)
-                        tracer.Visible = true
+            local tracer = Drawing.new('Line')
+            tracer.Visible = false
+            tracer.Color = Color3.new(1,0,0)
+            tracer.Thickness = 1 
+            tracer.Transparency = 1 
+            
+            
+            local box_o = Drawing.new('Square')
+            box_o.Visible = false
+            box_o.Color = Color3.new(0,0,0)
+            box_o.Thickness = 2
+            box_o.Transparency =1 
+            box_o.Filled = false
+            
+            local box = Drawing.new('Square')
+            box.Visible = false
+            box.Color = Color3.new(1,0,0)
+            box.Thickness = 1.5
+            box.Transparency =1 
+            box.Filled = false
+            
+            local hb_o = Drawing.new('Square')
+            hb_o.Visible = false
+            hb_o.Color = Color3.new(0,0,0)
+            hb_o.Thickness = 1
+            hb_o.Transparency =1 
+            hb_o.Filled = false
+            
+            local hb = Drawing.new('Square')
+            hb.Visible = false
+            hb.Color = Color3.new(1,0,0)
+            hb.Thickness = 1
+            hb.Transparency =1 
+            hb.Filled = true
+            local health = Drawing.new('Text')
+            health.Visible = false
+            local distancex = Drawing.new('Text')
+            distancex.Visible = false
+            local function rootesp()
+                local xkeeptracer
+                local plsstoptracer = false
+                cam = workspace.CurrentCamera
+                xkeeptracer = game:GetService('RunService').RenderStepped:Connect(function()
+                    task.wait(0.2)
+                    if v and v and v:FindFirstChild('Humanoid') and v:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer.Character and v.Character.Humanoid.Health >0 then 
+                        local vect,onscreen = cam:worldToViewportPoint(v.HumanoidRootPart.Position)
+                        
+                        if onscreen and getgenv().playeresp and getgenv().tracers and tracer then 
+                            tracer.From = Vector2.new(cam.ViewportSize.X/2,cam.ViewportSize.Y/1)
+                            tracer.To = Vector2.new(vect.X,vect.Y)
+                            tracer.Visible = true
+                        else
+                            tracer.Visible = false
+                        end
+                        if not v or getgenv().loopsUnload == true then 
+                            plsstoptracer = true
+                        end
+                    elseif not v or getgenv().loopsUnload == true or plsstoptracer then 
+                        xkeeptracer:Disconnect()
+                        if tracer then 
+                            pcall(function()
+                                tracer:Remove()
+                            end)
+                        end
                     else
                         tracer.Visible = false
                     end
-                    if not v or getgenv().loopsUnload == true then 
-                        plsstoptracer = true
+                end) 
+            end
+            local function boxroot()
+                local xkeeprunning 
+                xkeeprunning = game:GetService('RunService').RenderStepped:Connect(function()
+                    task.wait(0.1)
+                    if v and v:FindFirstChild('Head') and v:FindFirstChild('Humanoid') and v:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer.Character  then  -- and v.Character.Humanoid.Health >0
+                        local vect,onscreen = cam:worldToViewportPoint(v.HumanoidRootPart.Position)
+                        
+                        local vroot = v.HumanoidRootPart
+                        local head = v.Head
+                        
+                        local rootpos,rootvis = worldToViewportPoint(cam,vroot.Position)
+                        local distance = (v.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart').Position).Magnitude
+                        if distance < 30 and distance > 5 then head_offset = Vector3.new(0,1.2,0); leg_offset = Vector3.new(0,5,0) 
+                        elseif distance < 100 and distance > 30 then head_offset = Vector3.new(0,1,0); leg_offset = Vector3.new(0,8,0)  end
+                        local headpos = worldToViewportPoint(cam,vroot.Position + head_offset)
+                        local legpos = worldToViewportPoint(cam,vroot.Position - leg_offset)
+                        
+                        if onscreen and getgenv().playeresp and box then 
+                            cam = workspace.CurrentCamera
+                            --print('e: '..cam.ViewportSize.X..' '..tostring(rootpos)..' '..tostring(headpos)..' '..tostring(box_o))
+        
+        
+                            if box_o and cam.ViewportSize and rootpos and headpos then 
+                                box_o.Size = Vector2.new(cam.ViewportSize.X/2/rootpos.Z,headpos.Y - legpos.Y)
+                                box_o.Position = Vector2.new(rootpos.X - box_o.Size.X / 1.5, rootpos.Y - box_o.Size.Y / 2)
+                                box_o.Visible = true 
+                            end
+                            if box then 
+                                box.Size = Vector2.new(cam.ViewportSize.X/2/rootpos.Z,headpos.Y - legpos.Y)
+                                box.Position = Vector2.new(rootpos.X - box.Size.X / 2, rootpos.Y - box.Size.Y / 2)
+                                box.Visible = true
+                            end
+        
+                            hb_o.Size = Vector2.new(2,headpos.Y - legpos.Y)
+                            hb_o.Position = box_o.Position - Vector2.new(6,0)
+                            hb_o.Visible = true
+                            hb.Size = Vector2.new(2,(headpos.Y - legpos.Y) / (v.Character.Humanoid.MaxHealth / math.clamp(v.Character.Humanoid.Health, 0 , v.Character.Humanoid.MaxHealth) ))
+                            hb.Position = Vector2.new(box.Position.X - 6,box.Position.Y + (1/hb.Size.Y))
+                            hb.Color = Color3.fromRGB(255-255/(v.Character.Humanoid.MaxHealth /v.Character.Humanoid.Health ),255/(v.Character.Humanoid.MaxHealth /v.Character.Humanoid.Health ),0)
+                            hb.Visible = true
+        
+                            esp.Position = Vector2.new(vect.X,vect.Y ) + Vector2.new(0,1)
+                            esp.Text = '['..v.Character.Humanoid.Health..'/'..v.Character.Humanoid.MaxHealth..']'..v.Name
+                            if getgenv().playeresp == true then esp.Visible = true end
+                        
+                        else
+                            pcall(function()
+                                box.Visible = false
+                            end)
+                            pcall(function()
+                                box_o.Visible = false
+                            end)
+                            pcall(function()
+                                hb.Visible = false
+                            end)
+                            pcall(function()
+                                hb_o.Visible = false
+                            end)
+                            pcall(function()
+                                esp.Visible = false
+                            end)
+                            pcall(function()
+                                distancex.Visible = false 
+                            end)
+                            pcall(function()
+                                health.Visible = false
+                            end)
+                        
+                            
+                            
+                        end
                     end
-                elseif not v or getgenv().loopsUnload == true or plsstoptracer then 
-                    xkeeptracer:Disconnect()
-                    if tracer then 
+                    if not game.Players:FindFirstChild(v.Name) or getgenv().loopsUnload == true  then 
+                        xkeeprunning:Disconnect()
+                        task.wait(1)
                         pcall(function()
-                            tracer:Remove()
+                            box:Remove()
+                        end)
+                        pcall(function()
+                            box_o:Remove()
+                        end)
+                        pcall(function()
+                            hb:Remove()
+                        end)
+                        pcall(function()
+                            hb_o:Remove()
+                        end)
+                        pcall(function()
+                            esp:Remove()
+                        end)
+                        pcall(function()
+                            distancex:Remove()
+                        end)
+                        pcall(function()
+                            health:Remove()
                         end)
                     end
-                else
-                    tracer.Visible = false
-                end
-            end) 
+                end) 
+            end
+            task.spawn(function()
+                coroutine.wrap(rootesp)()
+                coroutine.wrap(boxroot)()
+            end)
+        
         end
-        local function boxroot()
-            local xkeeprunning 
-            xkeeprunning = game:GetService('RunService').RenderStepped:Connect(function()
-                task.wait(0.1)
-                if v and v:FindFirstChild('Head') and v:FindFirstChild('Humanoid') and v:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer.Character  then  -- and v.Character.Humanoid.Health >0
-                    local vect,onscreen = cam:worldToViewportPoint(v.HumanoidRootPart.Position)
-                    
-                    local vroot = v.HumanoidRootPart
-                    local head = v.Head
-                    
-                    local rootpos,rootvis = worldToViewportPoint(cam,vroot.Position)
-                    local distance = (v.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart').Position).Magnitude
-                    if distance < 30 and distance > 5 then head_offset = Vector3.new(0,1.2,0); leg_offset = Vector3.new(0,5,0) 
-                    elseif distance < 100 and distance > 30 then head_offset = Vector3.new(0,1,0); leg_offset = Vector3.new(0,8,0)  end
-                    local headpos = worldToViewportPoint(cam,vroot.Position + head_offset)
-                    local legpos = worldToViewportPoint(cam,vroot.Position - leg_offset)
-                    
-                    if onscreen and getgenv().playeresp and box then 
-                        cam = workspace.CurrentCamera
-                        --print('e: '..cam.ViewportSize.X..' '..tostring(rootpos)..' '..tostring(headpos)..' '..tostring(box_o))
+        -- for _,v in next, workspace.Live:GetChildren() do 
+        --     if not game.Players:FindFirstChild(v.Name) then 
+        --         getgenv().DefaultEsp(v)
+        --     end
+        -- end
+        -- workspace.Live.ChildAdded:Connect(function(xchild)
+        --     if not game.Players:FindFirstChild(xchild.Name) then 
+        --         getgenv().DefaultEsp(xchild)
+        --     end
+        -- end)
+
+
+
+    --
+
+
     
-    
-                        if box_o and cam.ViewportSize and rootpos and headpos then 
-                            box_o.Size = Vector2.new(cam.ViewportSize.X/2/rootpos.Z,headpos.Y - legpos.Y)
-                            box_o.Position = Vector2.new(rootpos.X - box_o.Size.X / 1.5, rootpos.Y - box_o.Size.Y / 2)
-                            box_o.Visible = true 
+    local function getstatus()
+        return getgenv().fightlocalgame['action']
+    end
+
+    local function setstatus(x)
+        getgenv().fightlocalgame['action'] = x
+    end
+    local function oteleporto(x)
+        if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+            game.Players.LocalPlayer.Character:FindFirstChild('Movement').Disabled = true;
+            game.Players.LocalPlayer.Character:FindFirstChild('_CharacterClient').Disabled = true;
+            local Root = game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
+            
+            Root.Parent = nil;
+            Root.CFrame = x;
+            Root.Parent = game.Players.LocalPlayer.Character
+            game.Players.LocalPlayer.Character:FindFirstChild('Movement').Disabled = false;
+            game.Players.LocalPlayer.Character:FindFirstChild('_CharacterClient').Disabled = false;
+        end
+    end
+    local TrinketDirectory = nil;
+
+    for _,v in next, workspace:GetChildren() do 
+        if v:IsA('Folder') and v:FindFirstChildWhichIsA('Part') and v:FindFirstChildWhichIsA('Part'):FindFirstChild('ClickDetector') then 
+            TrinketDirectory =v;
+        end
+    end
+    task.spawn(function()
+        while task.wait(0.1) do 
+            if getgenv().fightlocalgame['nocooldown'] == true then 
+                if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored == true then 
+                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') .Anchored = false;
+                end
+                for _,child in next, game.Players.LocalPlayer.Character:GetChildren() do 
+                    if child and child.Name:find('rollcooldown') and getgenv().fightlocalgame['nocooldownsettings']['rollcooldown'] == true then 
+                        child:Destroy()
+                    end
+                    if child and child.Name:find('RunCooldown') and getgenv().fightlocalgame['nocooldownsettings']['runcooldown'] == true then 
+                        child:Destroy()
+                    end
+                    if child and child.Name:find('BlockCooldown') and getgenv().fightlocalgame['nocooldownsettings']['blockcooldown'] == true then 
+                        child:Destroy()
+                    end
+                    if child and child.Name:find('DashCooldown') and getgenv().fightlocalgame['nocooldownsettings']['dashcooldown'] == true then 
+                        child:Destroy()
+                    end
+                    if child and child.Name:find('NoJump') and getgenv().fightlocalgame['nocooldownsettings']['nojump'] == true then 
+                        child:Destroy()
+                    end
+                    if child and child.Name:find('Freeze') and getgenv().fightlocalgame['nocooldownsettings']['freezecooldown'] == true then  -- freezejump
+                        child:Destroy()
+                    end
+                end
+                for _,child in next, game.Players.LocalPlayer:GetChildren() do 
+                    if child and child.Name:find('dagm1') then 
+                        child:Destroy()
+                    end
+                    if child and child.Name:find('M1')then 
+                        child:Destroy()
+                    end
+                    if child and child.Name:find('ComboStun')then 
+                        child:Destroy()
+                    end
+                end
+
+                -- if getgenv().fightlocalgame['nocooldownsettings']['rollcooldown']  == true then --the N
+
+                -- end 
+            end
+            if getgenv().fightlocalgame['fullbright'] == true then 
+                getgenv().fightlocalgame['fullbright'] = nil;
+                local __gameconnections = {}
+                local clocktimeconnection = game:GetService('Lighting'):GetPropertyChangedSignal('ClockTime'):Connect(function()
+                    game:GetService('Lighting').ClockTime = 12;
+                end)
+                local globalshadowsconnection = game:GetService('Lighting'):GetPropertyChangedSignal('GlobalShadows'):Connect(function()
+                    game:GetService('Lighting').GlobalShadows = false;
+                end)
+                local brightnessconnection = game:GetService('Lighting'):GetPropertyChangedSignal('Brightness'):Connect(function()
+                    game:GetService('Lighting').Brightness = 6
+                end)
+                local ambientconnection = game:GetService('Lighting'):GetPropertyChangedSignal('Ambient'):Connect(function()
+                    game:GetService('Lighting').Ambient = Color3.fromRGB(100,100,100)
+                end)
+                local outdoorambientconnection = game:GetService('Lighting'):GetPropertyChangedSignal('OutdoorAmbient'):Connect(function()
+                    game:GetService('Lighting').OutdoorAmbient = Color3.fromRGB(175,175,175)
+                end)
+                game:GetService('Lighting').ClockTime = 12;
+                game:GetService('Lighting').GlobalShadows = false;
+                game:GetService('Lighting').Ambient = Color3.fromRGB(100,100,100)
+                game:GetService('Lighting').OutdoorAmbient = Color3.fromRGB(175,175,175)
+                task.spawn(function()
+                    repeat task.wait(0.1) until getgenv().fightlocalgame['fullbright'] == false or getgenv().loopsUnload == true 
+                    print('Disconnecting Fullbright')
+                    clocktimeconnection:Disconnect()
+                    globalshadowsconnection:Disconnect()
+                    brightnessconnection:Disconnect()
+                    ambientconnection:Disconnect()
+                    outdoorambientconnection:Disconnect()
+                end)
+            end
+            if getgenv().fightlocalgame['autopickuptrinkets'] == true and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                getgenv().fightlocalgame['autopickuptrinkets'] = nil;
+                task.spawn(function()
+                    for i, v in pairs(TrinketDirectory:GetChildren()) do
+                        if v then 
+                            if not v:FindFirstChild('Blacklist'):FindFirstChild(game.Players.LocalPlayer.Name) and (v.Position-game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude <= 9 then
+                                pcall(function()
+                                    local stackfuncs = {}
+                                    local Mouse = game.Players.LocalPlayer:GetMouse()
+                                    for i,v in pairs(getconnections(Mouse.Button1Down)) do
+                                        if tostring(rawget(getfenv(v.Function), "script")) == "mainclient "  then -- funny cheser
+                                            for i2,v2 in pairs(debug.getupvalues(v.Function)) do
+                                                if type(v2) == "function" and islclosure(v2) then
+                                                elseif type(v2) == "table" and getrawmetatable(v2) and getrawmetatable(v2).__index then
+                                                    local mt = getrawmetatable(v2)
+                                                    for i,v in pairs(mt) do
+                                                        if type(v) == "function" then
+                                                            for i2,v2 in pairs(getupvalues(v)) do
+                                                                 if type(v2) == "table" then
+                                                                    if v2[1][1][0] == game.Players.LocalPlayer then
+                                                                        stackfuncs = v2[1][1]
+                                                                        break
+                                                                    end
+                                                                end
+                                                            end
+                                                        end
+                                                    end
+                                                end
+                                            end
+                                        end
+                                    end
+                                    local TrinketRemote
+                                    
+                                    if stackfuncs[13]["ClickTrinket"] then
+                                        TrinketRemote = stackfuncs[13]["ClickTrinket"]
+                                    else
+                                        TrinketRemote = game:GetService("ReplicatedStorage"):FindFirstChild("ClickTrinket")
+                                    end
+                                    local RemoteArgs = stackfuncs[26]
+                                    local function shuffle(tabl)
+                                        local tbl = {table.unpack(tabl)}
+                                        
+                                        local args = {}
+                                        repeat -- shuffle the arguments everytime remote is fired because thats exactly what the main scirpt does presumably?
+                                            if #tbl ~= 0 then
+                                                local completed = false
+                                                local index = math.random(1, #tbl)
+                                                local val = tbl[index]
+                                                table.remove(tbl, index)
+                                                table.insert(args, val)
+                                            end
+                                        until #tbl == 0
+                                        return args
+                                    end
+                                    local lasttbl  
+                                    local tbl = {table.unpack(RemoteArgs)}
+                                    local args = {}
+                                    args = shuffle(tbl)
+                                    if lasttbl and lasttbl[1] == args[1] and lasttbl[#lasttbl] == args[#args] then
+                                        repeat
+                                            task.wait(0.1)
+                                            args = shuffle(tbl)
+                                        until not lasttbl[1] == args[1] and not lasttbl[#lasttbl] == args[#args]
+                                    end
+                                    lasttbl = args
+                                    if args then
+                                        TrinketRemote:FireServer(v, table.unpack(args))
+                                    end
+                                end)
+                            end
                         end
-                        if box then 
-                            box.Size = Vector2.new(cam.ViewportSize.X/2/rootpos.Z,headpos.Y - legpos.Y)
-                            box.Position = Vector2.new(rootpos.X - box.Size.X / 2, rootpos.Y - box.Size.Y / 2)
-                            box.Visible = true
+                    end
+                end)
+                if getgenv().fightlocalgame['autopickuptrinkets'] == nil then 
+                    getgenv().fightlocalgame['autopickuptrinkets'] = true;
+                end
+            end
+            task.spawn(function()
+                if getgenv().fightlocalgame['trinketbot']  == true and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health > 0 and getstatus() == 'idle' then 
+                    setstatus('trinketbotting')
+                    for _n ,v in next, game.Players.LocalPlayer.Character:GetChildren() do 
+                        if v:IsA('ForceField') then 
+                            v:Destroy() 
                         end
-    
-                        hb_o.Size = Vector2.new(2,headpos.Y - legpos.Y)
-                        hb_o.Position = box_o.Position - Vector2.new(6,0)
-                        hb_o.Visible = true
-                        hb.Size = Vector2.new(2,(headpos.Y - legpos.Y) / (v.Character.Humanoid.MaxHealth / math.clamp(v.Character.Humanoid.Health, 0 , v.Character.Humanoid.MaxHealth) ))
-                        hb.Position = Vector2.new(box.Position.X - 6,box.Position.Y + (1/hb.Size.Y))
-                        hb.Color = Color3.fromRGB(255-255/(v.Character.Humanoid.MaxHealth /v.Character.Humanoid.Health ),255/(v.Character.Humanoid.MaxHealth /v.Character.Humanoid.Health ),0)
-                        hb.Visible = true
-    
-                        esp.Position = Vector2.new(vect.X,vect.Y ) + Vector2.new(0,1)
-                        esp.Text = '['..v.Character.Humanoid.Health..'/'..v.Character.Humanoid.MaxHealth..']'..v.Name
-                        if getgenv().playeresp == true then esp.Visible = true end
-                     
+                    end
+                    local CFrames = {
+                        CFrame.new(-6054.18066, 2.27398372, -135.101578, -0.999047399, -5.06135329e-08, 0.0436385907, -5.07546574e-08, 1, -2.12598406e-09, -0.0436385907, -4.33882041e-09, -0.999047399);
+                        CFrame.new(-6053.74658, 2.27398372, -92.8063126, -0.99996382, -1.26687176e-08, 0.00850769039, -1.26689343e-08, 1, 2.83358944e-11, -0.00850769039, -7.94485033e-11, -0.99996382);
+                        CFrame.new(-6054.14258, 2.27398276, -50.3356857, -0.999971807, 8.19603274e-11, 0.00750595424, -6.51893331e-11, 1, -1.96041459e-08, -0.00750595424, -1.96040819e-08, -0.999971807);
+                        CFrame.new(-6054.48926, 2.27398276, -12.8302641, -0.999961555, -4.42722259e-09, 0.00877184607, -3.53818153e-09, 1, 1.01367149e-07, -0.00877184607, 1.01332212e-07, -0.999961555);
+                        CFrame.new(-6093.29297, 2.27398372, 11.1860628, -0.988999426, 1.07544565e-07, 0.147919282, 1.13998503e-07, 1, 3.51535547e-08, -0.147919282, 5.16294243e-08, -0.988999426);
+                        CFrame.new(-6099.86328, 2.27398372, 36.3683968, -0.971956968, 3.78150631e-08, 0.235158786, 3.92646307e-08, 1, 1.48183332e-09, -0.235158786, 1.0673701e-08, -0.971956968);
+                        CFrame.new(-6112.18994, -3.8968823, 44.3294754, -0.547811091, 1.50652149e-08, 0.836602032, 3.44883944e-08, 1, 4.57554661e-09, -0.836602032, 3.13595976e-08, -0.547811091);
+                        CFrame.new(-6104.69629, -9.36521053, 60.019207, -0.902641952, 8.77953852e-08, -0.430392265, 6.83005155e-08, 1, 6.07456982e-08, 0.430392265, 2.54356038e-08, -0.902641952);
+                        CFrame.new(-6103.31396, -9.36521053, 82.7222366, -0.998140991, -9.07304383e-08, -0.0609470457, -9.06495643e-08, 1, -4.09192324e-09, 0.0609470457, 1.44050694e-09, -0.998140991);
+                        CFrame.new(-6102.55371, 1.79798853, 100.86116, -0.999830306, -1.17441814e-07, -0.018422313, -1.17275782e-07, 1, -1.00929158e-08, 0.018422313, -7.9307112e-09, -0.999830306);
+                        CFrame.new(-6092.79688, 1.79798901, 140.395828, -0.694900811, 2.03418935e-08, 0.719105601, 1.80458848e-08, 1, -1.08493028e-08, -0.719105601, 5.43770762e-09, -0.694900811);
+                        CFrame.new(-6101.38428, 10.797986, 167.502304, -0.902532816, -2.6619194e-08, 0.430621088, -2.47076439e-08, 1, 1.00314042e-08, -0.430621088, -1.58596125e-09, -0.902532816);
+                        CFrame.new(-6115.03662, 18.7979832, 199.506332, -0.696431756, -2.62565738e-08, 0.717623055, -2.44123921e-08, 1, 1.28967548e-08, -0.717623055, -8.53718518e-09, -0.696431756);
+                        CFrame.new(-6164.00146, 28.7979832, 199.812546, 0.18001394, -4.04100717e-08, 0.983664036, 3.99775359e-08, 1, 3.37651436e-08, -0.983664036, 3.32462697e-08, 0.18001394);
+                        CFrame.new(-6131.51562, 38.1031075, 139.88652, 0.741211951, -2.1904393e-08, 0.671271086, 4.9716693e-08, 1, -2.22655405e-08, -0.671271086, 4.98768635e-08, 0.741211951);
+                        CFrame.new(-6148.63184, 51.978447, 92.9895859, 0.997371018, 7.67961694e-08, 0.0724639148, -7.57767893e-08, 1, -1.68166103e-08, -0.0724639148, 1.12813181e-08, 0.997371018);
+                        CFrame.new(-6167.56738, 65.6422195, 91.0595398, 0.0918649212, -1.48568553e-08, 0.995771468, -2.70665925e-08, 1, 1.74169745e-08, -0.995771468, -2.85521509e-08, 0.0918649212);
+                        CFrame.new(-6207.42725, 65.6422195, 84.5167236, 0.190014973, -2.08618598e-08, 0.981781185, -1.02893189e-07, 1, 4.11630481e-08, -0.981781185, -1.08840197e-07, 0.190014973);
+                        CFrame.new(-6246.62109, 66.1355515, 65.0832214, 0.596370697, 1.52681268e-09, 0.802709162, -6.15787954e-09, 1, 2.67290612e-09, -0.802709162, -6.53702914e-09, 0.596370697);
+                        CFrame.new(-6267.49609, 65.6422195, 26.6577625, 0.912987888, -7.30340588e-08, 0.407986611, 9.77074635e-08, 1, -3.96377544e-08, -0.407986611, 7.60521317e-08, 0.912987888);
+                        CFrame.new(-6284.90283, 65.6422195, -14.1689129, 0.920590818, -7.27329876e-08, 0.3905285, 9.67028129e-08, 1, -4.17145856e-08, -0.3905285, 7.6167268e-08, 0.920590818);
+                        CFrame.new(-6299.66797, 65.6422195, -49.0981712, 0.920590818, 5.74923611e-08, 0.3905285, -7.64392212e-08, 1, 3.29729737e-08, -0.3905285, -6.0206311e-08, 0.920590818);
+                        CFrame.new(-6296.07959, 65.6422195, -66.7753448, 0.968938112, 9.93521994e-08, -0.247303307, -9.3468806e-08, 1, 3.55301033e-08, 0.247303307, -1.13113252e-08, 0.968938112);
+                        CFrame.new(-6293.3252, 74.410141, -80.6203918, 0.984896243, 9.20966414e-08, -0.173145428, -9.34849282e-08, 1, 1.36763975e-10, 0.173145428, 1.6051791e-08, 0.984896243);
+                        CFrame.new(-6304.65039, 82.1980591, -83.600174, 0.25522542, 1.08795071e-08, 0.966881573, 5.55018573e-08, 1, -2.59028532e-08, -0.966881573, 6.02747932e-08, 0.25522542);
+                        CFrame.new(-6307.0376, 89.5133667, -94.103775, 0.987457871, -5.67066252e-08, 0.157882735, 6.03982855e-08, 1, -1.85842541e-08, -0.157882735, 2.78870154e-08, 0.987457871);
+                        CFrame.new(-6315.94873, 91.8544006, -127.421631, 0.999992669, -6.15121536e-08, -0.00383405806, 6.13787705e-08, 1, -3.49065274e-08, 0.00383405806, 3.46709434e-08, 0.999992669);
+                        CFrame.new(-6311.69434, 93.5072479, -132.083099, 0.729058027, -2.32382664e-08, -0.684451878, 2.31170176e-08, 1, -9.3280752e-09, 0.684451878, -9.0217771e-09, 0.729058027);
+                        CFrame.new(-6311.81299, 93.4673615, -146.382721, 0.975219846, 2.44874565e-09, 0.221238077, 6.28207975e-09, 1, -3.87598504e-08, -0.221238077, 3.91892101e-08, 0.975219846);
+                        CFrame.new(-6311.86279, 90.8623962, -153.318375, 0.999981463, -8.80382919e-11, -0.00608728081, 7.85831608e-11, 1, -1.55350022e-09, 0.00608728081, 1.55299307e-09, 0.999981463);
+                        CFrame.new(-6311.7666, 96.4725952, -155.699112, 0.999767721, -0.000161597636, 0.021552261, 9.06262372e-08, 0.999971926, 0.007493529, -0.0215528682, -0.0074917865, 0.999739647);
+                        CFrame.new(-6311.8291, 90.9849854, -154.279999, 0.988791466, -0.00621914957, 0.149173707, 0.00554395188, 0.999972403, 0.00494166045, -0.149200335, -0.00405925978, 0.988798678);
+                        CFrame.new(-6328.34717, 93.4673615, -145.894501, -0.188755974, -5.56819701e-09, 0.982024014, -1.07429141e-08, 1, 3.60521524e-09, -0.982024014, -9.86929383e-09, -0.188755974);
+                        CFrame.new(-6328.31934, 93.4673615, -130.121902, -0.860186279, 1.12990861e-07, 0.509979963, 1.03589642e-07, 1, -4.68341419e-08, -0.509979963, 1.25425528e-08, -0.860186279);
+                        CFrame.new(-6325.4458, 93.4673615, -131.65097, 0.567680597, -1.67656395e-08, -0.823248863, -1.19379777e-08, 1, -2.85971815e-08, 0.823248863, 2.60619917e-08, 0.567680597);
+                        CFrame.new(-6332.49756, 93.4673615, -131.354691, 0.14413999, -1.32536915e-08, 0.989557326, 5.0619775e-09, 1, 1.26562227e-08, -0.989557326, 3.18484883e-09, 0.14413999);
+                        CFrame.new(-6327.62305, 93.4673615, -129.930145, -0.30945152, -4.69060808e-08, -0.950915217, -1.11183125e-08, 1, -4.57091254e-08, 0.950915217, -3.57218588e-09, -0.30945152);
+                        CFrame.new(-6341.83203, 93.7573624, -130.444183, 0.074581176, 5.59410687e-08, 0.997214973, -6.77144101e-08, 1, -5.1032977e-08, -0.997214973, -6.37197175e-08, 0.074581176);
+                        CFrame.new(-6347.41309, 93.4673615, -131.346985, 0.0287679676, 3.13221404e-09, 0.999586105, 1.16793268e-08, 1, -3.46964057e-09, -0.999586105, 1.17743078e-08, 0.0287679676);
+                        CFrame.new(-6345.02783, 93.5673599, -131.655655, 0.772909284, 1.16574936e-08, -0.634516537, 1.45251059e-11, 1, 1.83899385e-08, 0.634516537, -1.42229712e-08, 0.772909284);
+                        CFrame.new(-6353.46191, 99.1743851, -127.998947, -0.988634169, -7.69489645e-08, -0.150341198, -6.87360497e-08, 1, -5.98249841e-08, 0.150341198, -4.88111667e-08, -0.988634169);
+                        CFrame.new(-6344.6543, 94.0473633, -145.729095, 0.867998362, 3.37320571e-08, -0.496567041, -3.23845626e-08, 1, 1.13223591e-08, 0.496567041, 6.25331742e-09, 0.867998362);
+                        CFrame.new(-6328.97852, 93.4673615, -146.879166, -0.209434196, 1.43750989e-09, -0.977822721, -2.57441677e-08, 1, 6.98410707e-09, 0.977822721, 2.66359432e-08, -0.209434196);
+                        CFrame.new(-6325.521, 93.4673615, -146.969193, -0.025233699, -1.60038311e-08, -0.999681592, -7.65335173e-08, 1, -1.40770888e-08, 0.999681592, 7.61539312e-08, -0.025233699);
+                        CFrame.new(-6301.08691, 93.4175415, -137.41629, 0.983188629, 7.91682311e-08, -0.18259272, -6.959187e-08, 1, 5.88539173e-08, 0.18259272, -4.51575346e-08, 0.983188629);
+                        CFrame.new(-6301.37402, 93.7609177, -132.189957, -0.998491168, -8.59383817e-08, -0.0549120679, -8.49626005e-08, 1, -2.01044141e-08, 0.0549120679, -1.54086095e-08, -0.998491168);
+                        CFrame.new(-6300.64697, 93.4175415, -128.449097, -0.995558619, -7.42244808e-08, -0.0941439047, -7.36159436e-08, 1, -9.93687088e-09, 0.0941439047, -2.96224534e-09, -0.995558619);
+                        CFrame.new(-6298.64404, 93.5275497, -127.955734, -0.57298243, 5.52730697e-08, -0.81956768, 1.18408963e-08, 1, 5.91634439e-08, 0.81956768, 2.4195197e-08, -0.57298243);
+                        CFrame.new(-6292.31104, 92.9353485, -125.83136, 0.376125574, -0.617892563, -0.690462351, -0.230882138, 0.659176826, -0.715667069, 0.897342205, 0.428596109, 0.105272904);
+                        CFrame.new(-6292.36719, 91.00177, -136.70755, 0.0931198001, -0.000810413563, -0.995654583, 3.60772378e-06, 0.999999642, -0.000813612831, 0.995654941, 7.21714241e-05, 0.0931197777);
+                        CFrame.new(-6291.55908, 93.9975433, -128.38945, 0.493966132, 3.77605218e-08, -0.869481146, -1.14549927e-07, 1, -2.16488445e-08, 0.869481146, 1.10292795e-07, 0.493966132);
+                        CFrame.new(-6291.73682, 90.9674835, -136.805237, 0.0292471126, 0.00405625906, -0.999563992, 0.00334338401, 0.999985754, 0.00415579788, 0.999566615, -0.00346347131, 0.0292331353);
+                        CFrame.new(-6292.20166, 90.9689102, -140.0625, 0.937014461, 0.000827495998, -0.349289566, 9.86225423e-05, 0.999996543, 0.00263364264, 0.34929052, -0.00250220904, 0.937011123);
+                        CFrame.new(-6292.24268, 90.996048, -132.293091, -0.0534723438, 0.0138838869, -0.99847281, 0.00677608652, 0.99988538, 0.0135406405, 0.998546362, -0.00604168838, -0.0535602905);
+                        CFrame.new(-6291.61328, 96.4621506, -133.859543, 0.00935303792, 1.54163336e-05, -0.99995625, 8.84482517e-07, 1, 1.54252812e-05, 0.99995625, -1.02871707e-06, 0.00935303792);
+
+                    }
+                    local QuickTP = {
+                        CFrame.new(-6319.50586, 90.46241, -130.516724, -0.635000944, -1.81895121e-08, -0.772511363, -2.94831737e-09, 1, -2.11224425e-08, 0.772511363, -1.11351621e-08, -0.635000944);
+                        CFrame.new(-6310.63916, 93.4673615, -131.236557, 0.0569403842, 7.71808928e-08, -0.998377562, 6.74416114e-08, 1, 8.1152713e-08, 0.998377562, -7.19530604e-08, 0.0569403842);
+                        CFrame.new(-6327.63037, 93.4673615, -131.118912, 0.0661676154, -5.23584331e-09, 0.997808516, -7.49460725e-08, 1, 1.02172368e-08, -0.997808516, -7.54578835e-08, 0.0661676154);
+                        CFrame.new(-6344.47559, 93.7573624, -130.886795, -0.996796608, 1.08348971e-07, -0.0799780637, 1.07111831e-07, 1, 1.97586143e-08, 0.0799780637, 1.11287228e-08, -0.996796608);
+                        CFrame.new(-6354.28564, 99.1743851, -127.957794, -0.360755682, 7.26729432e-09, 0.932660341, -5.85977666e-09, 1, -1.00585833e-08, -0.932660341, -9.09387232e-09, -0.360755682);
+                        CFrame.new(-6352.81689, 90.4623947, -133.244537, -0.589750588, 1.33894273e-08, 0.807585418, 2.17423199e-08, 1, -7.01945668e-10, -0.807585418, 1.71448082e-08, -0.589750588);
+                        CFrame.new(-6354.02344, 90.4623947, -147.439316, 0.551747561, 9.17955347e-08, 0.834011197, -6.55688694e-08, 1, -6.66874413e-08, -0.834011197, -1.78905371e-08, 0.551747561);
+                        CFrame.new(-6353.57227, 99.3743896, -153.164291, 0.995718598, 9.80770309e-09, -0.0924365819, -6.46977671e-09, 1, 3.64101069e-08, 0.0924365819, -3.56561749e-08, 0.995718598);
+                        CFrame.new(-6342.30566, 93.4673615, -147.682434, -0.780204356, 1.1772692e-07, -0.6255247, 1.08812046e-07, 1, 5.24860049e-08, 0.6255247, -2.71148117e-08, -0.780204356);
+                        CFrame.new(-6312.19092, 93.4673615, -145.853699, -0.601001382, 3.04623704e-08, -0.79924798, -1.99775724e-10, 1, 3.8264016e-08, 0.79924798, 2.31563959e-08, -0.601001382);
+                        CFrame.new(-6311.8584, 90.8623962, -153.281021, 0.999899566, -7.21012317e-09, -0.0141722849, 6.85823132e-09, 1, -2.48781813e-08, 0.0141722849, 2.47784868e-08, 0.999899566);
+                        CFrame.new(-6311.89062, 96.4621506, -155.459488, 0.999999702, -4.52967555e-07, -0.000767040357, 4.68462389e-07, 1, 2.02006067e-05, 0.000767040299, -2.02009596e-05, 0.999999702);
+                        CFrame.new(-6301.33154, 93.4175415, -136.632187, -0.741271555, -6.65022597e-08, -0.671205223, -5.38789351e-08, 1, -3.95755819e-08, 0.671205223, 6.82757184e-09, -0.741271555);
+                        CFrame.new(-6299.61572, 93.4175491, -128.422241, 0.304461747, -7.6568325e-09, 0.952524543, -9.15597553e-09, 1, 1.09650466e-08, -0.952524543, -1.20597283e-08, 0.304461747);
+                        CFrame.new(-6292.33643, 93.4175415, -127.225334, 0.178886741, 1.40286305e-09, -0.983869672, 2.40745823e-08, 1, 5.80309267e-09, 0.983869672, -2.47243488e-08, 0.178886741);
+                        CFrame.new(-6292.39941, 90.9861603, -136.810349, 0.213206366, -0.00861396827, -0.976969242, 0.00169154699, 0.999962866, -0.00844755396, 0.97700572, 0.000148482941, 0.213213027);
+                        CFrame.new(-6292.41602, 90.9742966, -131.708191, -0.903273582, 0.000874987047, -0.429064155, 0.000255656516, 0.999998868, 0.00150107685, 0.429064959, 0.00124619005, -0.903272748);
+                        CFrame.new(-6292.40625, 96.4888611, -132.677063, 0.159756497, -0.0238406435, -0.986868501, -0.000105997606, 0.999707878, -0.0241679754, 0.987156451, 0.00396559667, 0.159707308);
+                        CFrame.new(-6725.05762, 0.0668363422, 139.633987, -0.877031803, -4.6078581e-09, 0.480432302, -3.9080037e-09, 1, 2.45698417e-09, -0.480432302, 2.77321943e-10, -0.877031803);
+                        CFrame.new(-6737.82227, -0.132863611, 139.544235, -0.0882133245, 3.50930129e-08, 0.996101618, -6.82354369e-08, 1, -4.12731858e-08, -0.996101618, -7.16102733e-08, -0.0882133245);
+                        CFrame.new(-6738.54053, -0.132863849, 145.967087, -0.999464095, -1.69953296e-08, -0.0327340104, -1.38310732e-08, 1, -9.68921512e-08, 0.0327340104, -9.63874811e-08, -0.999464095);
+                        CFrame.new(-6761.68652, 0.447135836, 134.262924, -0.701203287, 4.29007372e-08, 0.712961376, -1.59527449e-08, 1, -7.58622463e-08, -0.712961376, -6.45685532e-08, -0.701203287);
+                        CFrame.new(-6769.6167, 0.339587569, 127.32103, 0.475053281, 4.13696704e-08, 0.87995702, -1.39750878e-08, 1, -3.94686985e-08, -0.87995702, 6.45225784e-09, 0.475053281);
+                        CFrame.new(-6764.61865, -3.15335202, 126.933456, -0.905283153, 5.82361821e-08, -0.424808651, 3.28858611e-08, 1, 6.70070293e-08, 0.424808651, 4.66901326e-08, -0.905283153);
+                        CFrame.new(-6791.96094, -0.132863611, 123.814888, -0.768690288, -5.29037827e-08, 0.639621139, -2.25600374e-08, 1, 5.55986936e-08, -0.639621139, 2.83082997e-08, -0.768690288);
+                        CFrame.new(-6782.24561, -0.132863611, 131.896652, -0.817673802, 8.3388958e-09, -0.575681806, 1.19164829e-08, 1, -2.44041032e-09, 0.575681806, -8.85556162e-09, -0.817673802);
+                        CFrame.new(-6803.12939, 0.508317947, 118.098625, -0.694109976, -5.91359672e-09, 0.719868958, 2.05326067e-08, 1, 2.80127157e-08, -0.719868958, 3.42246906e-08, -0.694109976);
+                        CFrame.new(-6799.63916, -0.132863849, 123.596588, -0.827931702, -2.50492516e-08, -0.560828984, -6.11083237e-08, 1, 4.55473312e-08, 0.560828984, 7.19813968e-08, -0.827931702);
+                        CFrame.new(-6813.4873, 0.592135668, 120.091415, -0.773970485, -5.65725422e-08, 0.633221686, -4.61325342e-08, 1, 3.29542118e-08, -0.633221686, -3.70653574e-09, -0.773970485);
+                        CFrame.new(-6836.56396, 1.02713537, 113.3433, 0.793661594, -6.62170905e-08, 0.608359516, 8.24870483e-08, 1, 1.23330191e-09, -0.608359516, 4.92029564e-08, 0.793661594);
+                        CFrame.new(-6850.2666, 0.737135708, 111.229347, -0.761852682, 3.78004872e-09, 0.647750318, 1.43613454e-09, 1, -4.14654489e-09, -0.647750318, -2.22879959e-09, -0.761852682);
+                        CFrame.new(-6650.57764, -2.5999825, -85.9234238, 0.99252671, 6.02518497e-08, 0.122027792, -5.13665732e-08, 1, -7.59593703e-08, -0.122027792, 6.91235513e-08, 0.99252671);
+                        CFrame.new(-6653.58691, -2.59998274, -72.5496368, -0.415639222, -2.90183149e-08, 0.909529567, 7.91147414e-08, 1, 6.80588172e-08, -0.909529567, 1.0024511e-07, -0.415639222);
+                        CFrame.new(-6656.60254, -2.73477888, -54.0077324, -0.914466083, 5.82768394e-08, 0.404662579, 8.67270131e-08, 1, 5.19743502e-08, -0.404662579, 8.26239557e-08, -0.914466083);
+                        CFrame.new(-6661.21094, -2.73477864, -42.456459, -0.953854978, -4.18788826e-09, 0.300267667, 2.10478408e-08, 1, 8.08094853e-08, -0.300267667, 8.3400522e-08, -0.953854978);
+                        CFrame.new(-6682.30029, -2.73477864, -46.9657631, -0.945861101, 2.27927388e-09, 0.324571699, -1.40712038e-08, 1, -4.80284577e-08, -0.324571699, -4.99953643e-08, -0.945861101);
+                        CFrame.new(-6679.73828, -2.14085889, -58.2100906, 0.956680954, 1.3854331e-09, -0.291138351, -3.16457616e-08, 1, -9.92293394e-08, 0.291138351, 1.04144114e-07, 0.956680954);
+                        CFrame.new(-6678.5166, -2.14085937, -63.033123, 0.969644845, -8.48560555e-10, -0.244517699, 7.01088254e-09, 1, 2.43315963e-08, 0.244517699, -2.53072905e-08, 0.969644845);
+                        CFrame.new(-6673.16943, -2.57086158, -83.2965622, 0.961379349, 4.94441044e-10, -0.275226712, -8.1012228e-09, 1, -2.65014535e-08, 0.275226712, 2.77076229e-08, 0.961379349);
+                        CFrame.new(-6674.25439, -1.87390494, -79.5018234, -0.868305504, -1.98005567e-09, 0.496029794, -5.38990408e-09, 1, -5.44327694e-09, -0.496029794, -7.39998018e-09, -0.868305504);
+                        CFrame.new(-6670.66895, -2.68478274, -91.9223557, 0.961531103, 6.17722817e-10, -0.274696052, -1.57646678e-08, 1, -5.29330357e-08, 0.274696052, 5.52272503e-08, 0.961531103);
+                        CFrame.new(-6669.46436, -2.68478274, -96.088028, 0.961364031, -3.21317889e-10, -0.275280207, 8.52147775e-09, 1, 2.85924084e-08, 0.275280207, -2.98335081e-08, 0.961364031);
+                        CFrame.new(-6699.68066, -0.762369037, -87.9490509, -0.86286813, 5.82769601e-08, 0.505429089, 6.15520932e-08, 1, -1.02202682e-08, -0.505429089, 2.22914753e-08, -0.86286813);
+                        CFrame.new(-6699.11768, -0.762307763, -94.8599777, 0.997695744, 2.33297452e-08, -0.0678466186, -2.8204056e-08, 1, -7.08851928e-08, 0.0678466186, 7.26354088e-08, 0.997695744);
+                        CFrame.new(-6703.36963, -0.762368917, -71.8531189, -0.978277087, -2.16822258e-08, 0.207301497, -5.78413095e-09, 1, 7.72967965e-08, -0.207301497, 7.44186295e-08, -0.978277087);
+                        CFrame.new(-6705.18115, -0.182347149, -65.5093994, -0.955388367, -2.43241516e-08, 0.295352459, -6.19338048e-09, 1, 6.23223784e-08, -0.295352459, 5.77128425e-08, -0.955388367);
+
+                    }
+                    local function getTrinketInPosition(x)
+                        local getpart = nil
+                        for _,v in next, workspace.Thrown:GetChildren() do
+                            if v.Name == 'Part' and v:FindFirstChild('Mesh') and v:IsA('Part') and v.CFrame == x.CFrame then 
+                                getpart = v
+                                break
+                            end
+                        end
+                        return getpart
+                    end
+                    -- for _,v in next, TrinketDirectory:GetChildren() do 
+                    --     if getTrinketInPosition(v) then 
+                    --         --if v:FindFirstChild('Blacklist'):FindFirstChild(game.Players.LocalPlayer.Name) then return end
+                    --         local Root = game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
+                    --        -- Root.Anchored = true
+                    --         Root.Parent = nil
+                    --         Root.CFrame = v.CFrame;
+                    --         Root.Parent = game.Players.LocalPlayer.Character
+                    --         __Waiting = 0;
+                    --         repeat 
+                    --             __Waiting +=1
+                    --             task.wait(.1)
+                    --             Root.CFrame = v.CFrame;
+                    --             local stackfuncs = {}
+                    --             local Mouse = game.Players.LocalPlayer:GetMouse()
+                    --             for i,v in pairs(getconnections(Mouse.Button1Down)) do
+                    --                 if tostring(rawget(getfenv(v.Function), "script")) == "mainclient "  then -- funny cheser
+                    --                     for i2,v2 in pairs(debug.getupvalues(v.Function)) do
+                    --                         if type(v2) == "function" and islclosure(v2) then
+                    --                         elseif type(v2) == "table" and getrawmetatable(v2) and getrawmetatable(v2).__index then
+                    --                             local mt = getrawmetatable(v2)
+                    --                             for i,v in pairs(mt) do
+                    --                                 if type(v) == "function" then
+                    --                                     for i2,v2 in pairs(getupvalues(v)) do
+                    --                                             if type(v2) == "table" then
+                    --                                             if v2[1][1][0] == game.Players.LocalPlayer then
+                    --                                                 stackfuncs = v2[1][1]
+                    --                                                 break
+                    --                                             end
+                    --                                         end
+                    --                                     end
+                    --                                 end
+                    --                             end
+                    --                         end
+                    --                     end
+                    --                 end
+                    --             end
+                    --             local TrinketRemote
+                                
+                    --             if stackfuncs[13]["ClickTrinket"] then
+                    --                 TrinketRemote = stackfuncs[13]["ClickTrinket"]
+                    --             else
+                    --                 TrinketRemote = game:GetService("ReplicatedStorage"):FindFirstChild("ClickTrinket")
+                    --             end
+                    --             local RemoteArgs = stackfuncs[26]
+                    --             local function shuffle(tabl)
+                    --                 local tbl = {table.unpack(tabl)}
+                                    
+                    --                 local args = {}
+                    --                 repeat -- shuffle the arguments everytime remote is fired because thats exactly what the main scirpt does presumably?
+                    --                     if #tbl ~= 0 then
+                    --                         local completed = false
+                    --                         local index = math.random(1, #tbl)
+                    --                         local val = tbl[index]
+                    --                         table.remove(tbl, index)
+                    --                         table.insert(args, val)
+                    --                     end
+                    --                 until #tbl == 0
+                    --                 return args
+                    --             end
+                    --             local lasttbl  
+                    --             local tbl = {table.unpack(RemoteArgs)}
+                    --             local args = {}
+                    --             args = shuffle(tbl)
+                    --             if lasttbl and lasttbl[1] == args[1] and lasttbl[#lasttbl] == args[#args] then
+                    --                 repeat
+                    --                     task.wait(0.1)
+                    --                     args = shuffle(tbl)
+                    --                 until not lasttbl[1] == args[1] and not lasttbl[#lasttbl] == args[#args]
+                    --             end
+                    --             lasttbl = args
+                    --             if args then
+                    --                 -- print('Fire '..v.Name)
+                    --                 TrinketRemote:FireServer(v, table.unpack(args))
+                    --             end
+                    --         until __Waiting >= 3
+
+                            
+                    --         task.wait(.5)
+                    --         task.wait(.1)
+                    --     end
+                    -- end
+
+                    for _,v in next, CFrames do 
+                        if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                            game.Players.LocalPlayer.Character:FindFirstChild('Movement').Disabled = true;
+                            game.Players.LocalPlayer.Character:FindFirstChild('_CharacterClient').Disabled = true;
+                            local Root = game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
+                            --Root.Parent = nil
+                            Root.CFrame = v;
+                            Root.Parent = game.Players.LocalPlayer.Character 
+                            game.Players.LocalPlayer.Character:FindFirstChild('Movement').Disabled = false;
+                            game.Players.LocalPlayer.Character:FindFirstChild('_CharacterClient').Disabled = false;
+                            task.wait(0.3)
+                        end
+                    end
+
+                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = false;
+                    if getgenv().fightlocalgame['trinketbotserverhop'] == true then 
+                        getgenv().serverhop()
                     else
-                        pcall(function()
-                            box.Visible = false
-                        end)
-                        pcall(function()
-                            box_o.Visible = false
-                        end)
-                        pcall(function()
-                            hb.Visible = false
-                        end)
-                        pcall(function()
-                            hb_o.Visible = false
-                        end)
-                        pcall(function()
-                            esp.Visible = false
-                        end)
-                        pcall(function()
-                            distancex.Visible = false 
-                        end)
-                        pcall(function()
-                            health.Visible = false
-                        end)
-                       
-                        
-                        
+                        game.Players.LocalPlayer.Character:FindFirstChild('Head'):Destroy()
+                        repeat task.wait(); until game.Players.LocalPlayer.Character:FindFirstChild('Head')-- and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health > 0
                     end
+                    getgenv().fightlocalgame['action'] = 'idle'
                 end
-                if not game.Players:FindFirstChild(v.Name) or getgenv().loopsUnload == true  then 
-                    xkeeprunning:Disconnect()
-                    task.wait(1)
-                    pcall(function()
-                        box:Remove()
-                    end)
-                    pcall(function()
-                        box_o:Remove()
-                    end)
-                    pcall(function()
-                        hb:Remove()
-                    end)
-                    pcall(function()
-                        hb_o:Remove()
-                    end)
-                    pcall(function()
-                        esp:Remove()
-                    end)
-                    pcall(function()
-                        distancex:Remove()
-                    end)
-                    pcall(function()
-                        health:Remove()
-                    end)
-                end
-            end) 
-        end
-        task.spawn(function()
-            coroutine.wrap(rootesp)()
-            coroutine.wrap(boxroot)()
-        end)
-    
-    end
-    for _,v in next, workspace.Live:GetChildren() do 
-        if not game.Players:FindFirstChild(v.Name) then 
-            getgenv().DefaultEsp(v)
-        end
-    end
-    workspace.Live.ChildAdded:Connect(function(xchild)
-        if not game.Players:FindFirstChild(xchild.Name) then 
-            getgenv().DefaultEsp(xchild)
+            end)
         end
     end)
-
-
 
 
 
@@ -13881,6 +15147,7 @@ elseif game.PlaceId == 7162704734 then -- fighting game
 elseif game.PlaceId == 6678877691 then -- zo
     local tab = window:CreateTab(gameName)
     local sector = tab:CreateSector('Cheats','left')
+
 
     getgenv().zo1zo = {
         autoparry = true;
@@ -14220,6 +15487,21 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         safegykatsu = false;
         highgykatsu = false;
         safedistance = false;
+        serverhopifnotfound = false;
+        serverhopifnotfoundmobs = {
+            ['Eto'] = false;
+            ['Amon'] = false;
+            ['Nishiki'] = false;
+        };
+        serverhopmobs = {
+            'Eto';
+            'Amon';
+            'Nishiki';
+        };
+        serverhopifnotfoundstr = '';
+        serverhopformobs = false;
+        safemovement = false;
+        ontopofcells = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -14298,9 +15580,31 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     sector:AddToggle('Farm Amon',false,function(xstate)
         getgenv()['roghoulsettings']['amonfarm'] = xstate
     end)
+
+    sector:AddToggle('Server Hop For Mobs',false,function(xtstae)
+        getgenv().roghoulsettings['serverhopformobs'] = xtstae
+    end)
+    local HopForEnemy = sector:AddDropdown('Server Hop If No Mob',getgenv().roghoulsettings['serverhopmobs'],"",true,function(dropdownv)
+        local EnemiesFound = table.concat(dropdownv,',')
+        for _,v in next, string.split(EnemiesFound,',') do 
+            for i,__value in next, getgenv().roghoulsettings['serverhopmobs'] do 
+                if i == v then 
+                    getgenv().roghoulsettings['serverhopmobs'][i] = true; -- could use in while loop to see if there is a mob in the string - serverhopifnotfoundstr
+                end
+            end -- remove gykatsu server hop and replace with this
+        end
+        getgenv().roghoulsettings['serverhopifnotfoundstr'] = EnemiesFound 
+    end)
+
+
     sector:AddToggle('Farm Gyakusatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['gykatfarm'] = xstate
     end)
+
+
+
+
+    sector:AddSeperator('Gykatsu Farming Options')
     sector:AddToggle('Server Hop For Gyakusatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['serverhopgykatsu'] = xstate
     end)
@@ -14312,6 +15616,12 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     end)
     sector:AddSlider("Safe Distance", 0, 75, 125, 1, function(State)
         getgenv().roghoulsettings['safedistance'] = State
+    end)
+    sector:AddToggle('Safe Movement',false,function(xtstae)
+        getgenv().roghoulsettings['safemovement'] = xtstae
+    end)
+    sector:AddToggle('Ontop of Cells',false,function(xtstae)
+        getgenv().roghoulsettings['ontopofcells'] = xtstae -- hover on cells
     end)
     sector:AddToggle('End Gykatsu High',false,function(xstate) 
         getgenv()['roghoulsettings']['highgykatsu'] = xstate
@@ -15506,7 +16816,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                             end
                                         end)
     
-                                    until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
+                                    until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().roghoulsettings['farming'] == false or getgenv().roghoulsettings['gykatfarm'] == false or getgenv().loopsUnload == true
                                 end
                             end -- v:FindFirstChildWhichIsA('Humanoid').Health == 0
                         elseif getgenv()['roghoulsettings']['safegykatsu'] == true then 
@@ -15520,16 +16830,92 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             local gyk = enemymodel:FindFirstChild('Gyakusatsu')
                             for _,v in next, xfarmablemobs do 
                                 -- print(v.Name)
+                                local delaying = false;
+                                local oldValue = nil;
+                                local oldValueText = ';'
+                                local canResetValueText = true;
+                                local MovementX = 0;
+                                local WaitingToChangeMovementX = false;
+                                local function findwithx(x)
+                                    pcall(function()
+                                        local xfound = nil;
+                                        for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
+                                            if v.Name:find(x) then 
+                                                xfound = v
+                                                break
+                                            end
+                                        end
+                                        return xfound
+                                    end)
+                                end
                                 repeat 
                                     task.wait(0.01)
                                     pcall(function()
-                                        local CFrameMultiplication = CFrame.new(0,getgenv().roghoulsettings['safedistance'],-3.4) 
+                                        local CFrameMultiplication = CFrame.new(MovementX,getgenv().roghoulsettings['safedistance'],-3.4) 
+                                        if getgenv().roghoulsettings['safemovement'] == true and WaitingToChangeMovementX == false then 
+                                            WaitingToChangeMovementX = true;
+                                            task.delay(2,function()
+                                                MovementX = math.random(1,20)
+                                                WaitingToChangeMovementX = false;
+                                            end)
+                                        end
+                                        if getgenv().roghoulsettings['ontopofcells'] == true then 
+                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
+                                        end
                                         game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame =  gyk:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
-                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame =CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,v:FindFirstChild('HumanoidRootPart').Position) 
+                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,v:FindFirstChild('HumanoidRootPart').Position) 
                                         usemoves()
-                                    end)
-                                until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().loopsUnload == true or getgenv().roghoulsettings['farming'] == false
+                                        if canResetValueText == true  and delaying == false then 
+                                            pcall(function()
+                                                oldValue = findwithx(game.Players.LocalPlayer.Name);
+                                                if oldValue ~= '' then 
+                                                    oldValueText = oldValue:FindFirstChild('GyaPerc').Text
+                                                    oldValueText = string.split(oldValueText,'%')[1]
+                                                    canResetValueText = false;
+                                                    print('Set percent to '..oldValueText)
+                                                end
+                                            end)
+                                        end
+                                        if delaying == false then 
+                                            delaying = true;
+                                            task.delay(2,function()
+                                                local ValueGyasec = nil
+                                                task.spawn(function()
+                                                    repeat task.wait(0.001) ValueGyasec = findwithx(game.Players.LocalPlayer.Name); until Value ~= nil
+                                                    ValueGyasec = Value:FindFirstChild('GyaPerc').Text
+                                                    ValueGyasec = string.split(ValueGyasec,'%')[1]
+                                                    print('got value = '..ValueGyasec)
+                                                    if ValueGyasec == oldValueText then 
+                                                        print('Equal to')
+                                                        if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                                                            game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0
+                                                        end
+                                                        -- pcall(function()
+                                                            
+                                                        -- end)
+                                                    end
+                                                end)
+                                                -- If Value ~= nil then delaying = true; (it keeps running the delay until value is true)
+                                                -- Value = Value:FindFirstChild('GyaPerc').Text
+                                                -- Value = string.split(Value,'%')[1]
+
+                                                -- if Value == oldValueText then 
+                                                --     if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                                                --         game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0
+                                                --     end
+                                                --     -- pcall(function()
+                                                        
+                                                --     -- end)
+                                                -- end
+                                                --GyaPerc
+                                            end)
+                                            canResetValueText = true;
+                                            delaying = false;
+                                        end
+                                    end) -- workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name)  v:FindFirstChildWhichIsA('Humanoid').Health <= 0
+                                until not workspace:FindFirstChild(v.Name)   or getgenv().loopsUnload == true or getgenv().roghoulsettings['farming'] == false or getgenv().roghoulsettings['gykatfarm'] == false
                             end
+                            -- print(v.Name)
                         end
                         -- for _,v in next, enemymodel:GetChildren() do 
                         --     if v.Name ~= 'Gyakusatsu' and v.Name ~= 'Mob' then 
@@ -15561,7 +16947,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         --         until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
                         --     end
                         -- end -- v:FindFirstChildWhichIsA('Humanoid').Health == 0
-                        if getgenv().loopsUnload == false and getgenv().roghoulsettings['farming'] == true then 
+                        if getgenv().loopsUnload == false and getgenv().roghoulsettings['farming'] == true and getgenv().roghoulsettings['gykatfarm'] == true then 
                             for _,v in next, enemymodel:GetChildren() do 
                                 if v.Name == 'Gyakusatsu' then 
                                     local delaying = false;
@@ -15569,22 +16955,28 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                     local oldValueText = ';'
                                     local canResetValueText = true;
                                     local function findwithx(x)
-                                        local xfound = nil;
-                                        for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
-                                            if v.Name:find(x) then 
-                                                xfound = v
-                                                break
+                                        pcall(function()
+                                            local xfound = nil;
+                                            for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
+                                                if v.Name:find(x) then 
+                                                    xfound = v
+                                                    break
+                                                end
                                             end
-                                        end
-                                        return xfound
+                                            return xfound
+                                        end)
                                     end
                                     repeat 
                                         task.wait(0.01)
                                         if canResetValueText == true  and delaying == false then 
-                                            oldValue = findwithx(game.Players.LocalPlayer.Name);
-                                            oldValueText = oldValue:FindFirstChild('GyaPerc').Text
-                                            oldValueText = string.split(oldValueText,'%')[1]
-                                            canResetValueText = false;
+                                            pcall(function()
+                                                if oldValue ~= '' then 
+                                                    oldValueText = oldValue:FindFirstChild('GyaPerc').Text
+                                                    oldValueText = string.split(oldValueText,'%')[1]
+                                                    canResetValueText = false;
+                                                end
+                                            end)
+                                            print('Set percent to '..oldValueText)
                                         end
                                         if delaying == false then 
                                             delaying = true;
@@ -15592,18 +16984,30 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 local Value = nil
                                                 task.spawn(function()
                                                     repeat task.wait() Value = findwithx(game.Players.LocalPlayer.Name); until Value ~= nil
-                                                end)
-                                                Value = Value:FindFirstChild('GyaPerc').Text
-                                                Value = string.split(Value,'%')[1]
-
-                                                if Value == oldValueText then 
-                                                    if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
-                                                        game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0
+                                                    Value = Value:FindFirstChild('GyaPerc').Text
+                                                    Value = string.split(Value,'%')[1]
+                                                    print('got value = '..Value)
+                                                    if Value == oldValueText then 
+                                                        if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                                                            game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0
+                                                        end
+                                                        -- pcall(function()
+                                                            
+                                                        -- end)
                                                     end
-                                                    -- pcall(function()
+                                                end)
+                                                -- If Value ~= nil then delaying = true; (it keeps running the delay until value is true)
+                                                -- Value = Value:FindFirstChild('GyaPerc').Text
+                                                -- Value = string.split(Value,'%')[1]
+
+                                                -- if Value == oldValueText then 
+                                                --     if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                                                --         game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0
+                                                --     end
+                                                --     -- pcall(function()
                                                         
-                                                    -- end)
-                                                end
+                                                --     -- end)
+                                                -- end
                                                 --GyaPerc
                                             end)
                                             canResetValueText = true;
@@ -15758,6 +17162,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                 end)
             end
             if getgenv()['roghoulsettings']['serverhopgykatsu'] == true and not workspace:FindFirstChild('Gyakusatsu') then 
+                print('Serverhopping')
                 getgenv().serverhop()
             end
             if getgenv()['roghoulsettings']['gykustatsumobskill'] then 
@@ -15776,6 +17181,28 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         end
                     end
                 end
+            end
+            if getgenv().roghoulsettings['serverhopformobs'] == true then 
+                local FoundMobs = {
+                    ['Eto'] = false;
+                    ['Amon'] = false;
+                    ['Nishiki'] = false;
+                }
+
+                for _,InstanceHolder in next, workspace.NPCSpawns:GetChildren() do 
+                    local __Mob = InstanceHolder:FindFirstChildWhichIsA('Model');
+                    for MobIndex,Mob in next, InstanceHolder:GetChildren() do 
+                        if Mob.Name:find('Eto') then FoundMobs['Eto'] = true; end
+                        if Mob.Name:find('Amon') then FoundMobs['Amon'] = true; end
+                        if Mob.Name:find('Nishiki') then FoundMobs['Nishiki'] = true; end
+                    end
+                end
+                for _,ReadingProperty in next, getgenv().roghoulsettings['serverhopifnotfoundmobs'] do 
+                    if ReadingProperty == true and FoundMobs[_] == false then 
+                        getgenv().serverhop()
+                        break
+                    end
+                end 
             end
         end
     end)
@@ -19510,6 +20937,174 @@ elseif game.PlaceId == 11320933137 then
     end)
 
     betsector:AddLabel('Uses luck to predict')
+elseif game.PlaceId == 6008108575 then 
+    local tab = window:CreateTab(gameName)
+    local esptab = window:CreateTab('ESP')
+    local sector = tab:CreateSector('Cheats','left')
+
+
+    getgenv().nst1settings = {
+        nocooldown = false;
+        playeresp =false;
+        maxviewplayerdistance = 100;
+        nocooldownrejections = {};
+        nocooldowndetections = {
+            'Ragdolled';
+            --'Blocking';
+            --'ShieldBlocking';
+            'SoftStun';
+            'Attacking';
+            'Stun';
+            'NoRun';
+        };
+        attackspeed = 1;
+        useattackspeed = false;
+        usewalkspeed = false;
+        walkseped = 16;
+    }
+
+
+
+
+
+    sector:AddToggle('No Delay',false,function(xstate)
+        getgenv().nst1settings['nocooldown']  = xstate
+    end)
+    sector:AddToggle('Attack Speed',false,function(xstate)
+        getgenv().nst1settings['useattackspeed']  = xstate
+    end)
+    sector:AddSlider('Attack Speed',0,1,100,1,function(xstate)
+        getgenv().nst1settings['attackspeed'] = xstate
+    end)
+    sector:AddToggle('WalkSpeed',false,function(xstate)
+        getgenv().nst1settings['usewalkspeed']  = xstate
+    end)
+    sector:AddSlider('WalkSpeed',0,1,40,1,function(xstate)
+        getgenv().nst1settings['walkseped'] = xstate
+    end)
+
+    local playerespsector = esptab:CreateSector('Player Esp','left')
+    playerespsector:AddToggle("Player ESP", false, function(xstate)
+        getgenv().nst1settings['playeresp'] = xstate
+        if getgenv().nst1settings['playeresp'] == true then 
+            for _,loop_player in next, game.Players:GetChildren() do 
+                --if not table.find(game.Players:GetPlayers())
+                local v = loop_player.Character
+                local loop_character = loop_player.Character
+                task.spawn(function()
+                    local __assigned = azfake.__esp__call(loop_player,{
+                        esptext = '..';
+                        ['removedcallback'] = function()
+                            --__assigned.object:Remove()
+                        end; -- ojbecy
+                        ['inloopfunction'] = function()
+                            --
+                        end;
+                        playersettings = true;
+                        maxdistance = getgenv().nst1settings['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+                    })
+                    __assigned.inloopfunction = function()-- whati f no max health
+                        if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
+                            __assigned.object.Text = loop_character.Name..' - '..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                        end
+                        __assigned.maxdistance = getgenv().nst1settings['maxviewplayerdistance']
+                        __assigned.checkingvalue = getgenv().nst1settings['playeresp']
+                    end
+                    __assigned.removedcallback = function()
+                        pcall(function()
+                            __assigned.object:Remove()
+                        end)
+                    end
+                    __assigned.waitingvalue = false;
+                end)
+            end
+            local DirectoryAdded = game.Players.ChildAdded:Connect(function(loop_player)
+
+                local v = loop_player.Character
+                local loop_character = loop_player.Character
+                task.spawn(function()
+                    local __assigned = azfake.__esp__call(loop_player,{
+                        esptext = '..';
+                        ['removedcallback'] = function()
+                            --__assigned.object:Remove()
+                        end; -- ojbecy
+                        ['inloopfunction'] = function()
+                            --
+                        end;
+                        playersettings = true;
+                        maxdistance = getgenv().nst1settings['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+                    })
+                    __assigned.inloopfunction = function()-- whati f no max health
+                        if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
+                            __assigned.object.Text = loop_character.Name..' - '..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                        end
+                        __assigned.maxdistance = getgenv().nst1settings['maxviewplayerdistance']
+                        __assigned.checkingvalue = getgenv().nst1settings['playeresp']
+                    end
+                    __assigned.removedcallback = function()
+                        pcall(function()
+                            __assigned.object:Remove()
+                        end)
+                    end
+                    __assigned.waitingvalue = false;
+                end)
+                -- if not game.Players:FindFirstChild(v.Name) then 
+                --     task.spawn(function()
+                --         local __assigned = azfake.__esp__call(v,{
+                --             esptext = '..';
+                --             ['removedcallback'] = function()
+                --                 __assigned.object:Remove()
+                --             end; -- ojbecy
+                --             ['inloopfunction'] = function()
+                --                 --
+                --             end;
+                --             charactersettings = true;
+                --             maxdistance = getgenv().fightlocalgame['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+                --         })
+                --         __assigned.inloopfunction = function()-- whati f no max health
+                --             __assigned.object.Text = v.Name..' - '..math.floor(v:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(v:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(v:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(v:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                --             __assigned.maxdistance = getgenv().fightlocalgame['maxviewplayerdistance']
+                --         end
+                --         __assigned.removedcallback = function()
+                --             pcall(function()
+                --                 __assigned.object:Remove()
+                --             end)
+                --         end
+                --         __assigned.checkingvalue = getgenv().fightlocalgame['playeresp']
+                --         __assigned.waitingvalue = false;
+                --     end)
+                -- end
+            end)
+            task.spawn(function()
+                repeat task.wait(.3) until getgenv().loopsUnload == true ;
+                DirectoryAdded:Disconnect()
+            end)
+        end
+    end)
+    playerespsector:AddSlider('Player Esp Distance',0,100,10000,1,function(xstate)
+        getgenv().fightlocalgame['maxviewplayerdistance'] = xstate -- maxplayermobdistance
+    end)
+
+    task.spawn(function()
+        while task.wait(0.1) do 
+            if getgenv().loopsUnload == true then print('nst loop break') break end
+            if getgenv().nst1settings['nocooldown'] == true and game.Players.LocalPlayer.Character then 
+                for _,v in next, game.Players.LocalPlayer.Character:GetChildren() do -- table.find(getgenv().nst1settings['nocooldowndetections',v.Name]) 
+                    if table.find(getgenv().nst1settings['nocooldowndetections'],v.Name) then -- getgenv().nst1settings['nocooldowndetections',v.Name]
+                        v:Destroy()
+                    end
+                end
+            end
+            if getgenv().nst1settings['useattackspeed'] == true and game.Players.LocalPlayer.Character:FindFirstChild('Values') then 
+                game.Players.LocalPlayer.Character:FindFirstChild('Values'):FindFirstChild('AttackSpeed').Value = getgenv().nst1settings['attackspeed'] 
+            end
+            if getgenv().nst1settings['usewalkspeed'] == true and game.Players.LocalPlayer.Character:FindFirstChild('Values') then 
+                game.Players.LocalPlayer.Character:FindFirstChild('Values'):FindFirstChild('WalkSpeed').Value = getgenv().nst1settings['walkseped'] 
+            end
+            --game.Players.LocalPlayer.Character.Values.
+        end
+    end)
+
 else
 
     -- PlayerExperience
@@ -19523,6 +21118,7 @@ else
 end
 
 
+-- percentage of a number  CURRENT VALUE INSIDE THE WHOLE DIVIDED BY WHOLE  * 100
 -- humanoid.AnimationPlayed
 
 -- bottom
@@ -19580,7 +21176,7 @@ Notify('','Running | Version | '..getgenv().azfake_version,'untilClick')
 
 -- print(typeofazfake)
 
-window.NameLabel.Text = 'Azfake V3 - '..typeofazfake
+window.NameLabel.Text = 'M1xup V3 - '..typeofazfake
 --[[
     local BillboardGui = Instance.new('BillboardGui')
 BillboardGui.LightInfluence = 1
