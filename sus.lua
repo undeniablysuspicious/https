@@ -878,8 +878,8 @@ end
 
 
 local library =loadstring(game:HttpGet("https://raw.githubusercontent.com/hairlinebrockeb/-back-ups-for-libs/main/cat", true))()
--- 492, 598 "Azfake V3{"..vs..','..game.PlaceId..'}' --Azfake V3
-local window = library:CreateWindow("M1xup V3{"..game.PlaceId..'}', Vector2.new(492, 598), Enum.KeyCode.LeftAlt) -- 2nd argument is the size, 3rd is the show/hide ofc
+-- 492, 598 "Azfake V3{"..vs..','..game.PlaceId..'}' -- M1xup
+local window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(492, 598), Enum.KeyCode.LeftAlt) -- 2nd argument is the size, 3rd is the show/hide ofc
 local wtm = library:CreateWatermark('AZFAKE HUB V3',Vector3.new(100,100,50))
 
 
@@ -16861,8 +16861,10 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         end
                                         if getgenv().roghoulsettings['ontopofcells'] == true then 
                                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
+                                        else
+                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame =  gyk:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
                                         end
-                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame =  gyk:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
+                                        
                                         game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,v:FindFirstChild('HumanoidRootPart').Position) 
                                         usemoves()
                                         if canResetValueText == true  and delaying == false then 
@@ -21176,7 +21178,7 @@ Notify('','Running | Version | '..getgenv().azfake_version,'untilClick')
 
 -- print(typeofazfake)
 
-window.NameLabel.Text = 'M1xup V3 - '..typeofazfake
+window.NameLabel.Text = 'Azfake V3 - '..typeofazfake
 --[[
     local BillboardGui = Instance.new('BillboardGui')
 BillboardGui.LightInfluence = 1
