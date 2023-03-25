@@ -16638,12 +16638,14 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         print(string.lower('arata')..' active')
                                         -- print('quinque active')
                                     end
-                                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = getgenv()['roghoulsettings']['FinalChoice']:FindFirstChild('HumanoidRootPart').CFrame * 
-                                    CFrame.new(
-                                        getgenv()['roghoulsettings']['playerx'],
-                                        getgenv()['roghoulsettings']['playery'],
-                                        getgenv()['roghoulsettings']['playerz']
-                                    )
+                                    if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and getgenv()['roghoulsettings']['FinalChoice'] and getgenv()['roghoulsettings']['FinalChoice']:FindFirstChild('HumanoidRootPart') then 
+                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = getgenv()['roghoulsettings']['FinalChoice']:FindFirstChild('HumanoidRootPart').CFrame * 
+                                        CFrame.new(
+                                            getgenv()['roghoulsettings']['playerx'],
+                                            getgenv()['roghoulsettings']['playery'],
+                                            getgenv()['roghoulsettings']['playerz']
+                                        )
+                                    end
                                     if getgenv().roghoulsettings['click'] then 
                                         task.delay(.1,function()
                                             pressKey('Mouse1')
