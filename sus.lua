@@ -16256,6 +16256,36 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             local typeweapon = game.Players.LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value
             if typeweapon == 'CCG' then typeweapon='Quinque' end 
             if typeweapon == 'Ghoul' then typeweapon='Kagune' end 
+            if getgenv().roghoulsettings['serverhopformobs'] == true then 
+                local FoundMobs = {
+                    ['Eto'] = false;
+                    ['Amon'] = false;
+                    ['Nishiki'] = false;
+                }
+                local AmountFound = 0;
+                local ActiveFound = 0;
+                for _,InstanceHolder in next, workspace.NPCSpawns:GetChildren() do 
+                    local __Mob = InstanceHolder:FindFirstChildWhichIsA('Model');
+                    for MobIndex,Mob in next, InstanceHolder:GetChildren() do 
+                        if Mob.Name:find('Eto') and getgenv().roghoulsettings['serverhopifnotfoundmobs']['Eto'] == true then FoundMobs['Eto'] = true; AmountFound +=1 end
+                        if Mob.Name:find('Amon') and getgenv().roghoulsettings['serverhopifnotfoundmobs']['Amon'] == true then FoundMobs['Amon'] = true; AmountFound +=1 end
+                        if Mob.Name:find('Nishiki') and getgenv().roghoulsettings['serverhopifnotfoundmobs']['Nishiki'] == true then FoundMobs['Nishiki'] = true; AmountFound +=1 end
+                    end
+                end
+                for _,ReadingProperty in next, getgenv().roghoulsettings['serverhopifnotfoundmobs'] do 
+                    if ReadingProperty == true then --and FoundMobs[_] == false then 
+                        ActiveFound += 1
+                        --getgenv().serverhop()
+                        --break
+                    end
+                end 
+                -- if Nishiki is found but amon isnt ; Farm Nishiki and then serverhop
+                if AmountFound == 0 and getgenv().roghoulsettings['serverhopformobs'] == true then 
+                    print('No mobs so serverhop')
+                
+                    getgenv().serverhop()
+                end
+            end
             if getgenv().roghoulsettings['farming'] == true then 
                 if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 then 
                     -- print('waiting for quinque')
@@ -17289,36 +17319,6 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             end
                         end
                     end
-                end
-            end
-            if getgenv().roghoulsettings['serverhopformobs'] == true then 
-                local FoundMobs = {
-                    ['Eto'] = false;
-                    ['Amon'] = false;
-                    ['Nishiki'] = false;
-                }
-                local AmountFound = 0;
-                local ActiveFound = 0;
-                for _,InstanceHolder in next, workspace.NPCSpawns:GetChildren() do 
-                    local __Mob = InstanceHolder:FindFirstChildWhichIsA('Model');
-                    for MobIndex,Mob in next, InstanceHolder:GetChildren() do 
-                        if Mob.Name:find('Eto') then FoundMobs['Eto'] = true; AmountFound +=1 end
-                        if Mob.Name:find('Amon') then FoundMobs['Amon'] = true; AmountFound +=1 end
-                        if Mob.Name:find('Nishiki') then FoundMobs['Nishiki'] = true; AmountFound +=1 end
-                    end
-                end
-                for _,ReadingProperty in next, getgenv().roghoulsettings['serverhopifnotfoundmobs'] do 
-                    if ReadingProperty == true then --and FoundMobs[_] == false then 
-                        ActiveFound += 1
-                        --getgenv().serverhop()
-                        --break
-                    end
-                end 
-                -- if Nishiki is found but amon isnt ; Farm Nishiki and then serverhop
-                if AmountFound == 0 and getgenv().roghoulsettings['serverhopformobs'] == true then 
-                    
-                
-                    getgenv().serverhop()
                 end
             end
         end
