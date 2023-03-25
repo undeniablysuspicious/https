@@ -16915,7 +16915,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                             delaying = false;
                                         end
                                     end) -- workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name)  v:FindFirstChildWhichIsA('Humanoid').Health <= 0
-                                until not workspace:FindFirstChild(v.Name)   or getgenv().loopsUnload == true or getgenv().roghoulsettings['farming'] == false or getgenv().roghoulsettings['gykatfarm'] == false
+                                until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) not v  or getgenv().loopsUnload == true or getgenv().roghoulsettings['farming'] == false or getgenv().roghoulsettings['gykatfarm'] == false
                             end
                             -- print(v.Name)
                         end
