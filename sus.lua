@@ -788,7 +788,7 @@ getgenv().AzfakeGlobalTables = {
         voidwalk = true;
         modnotifier = true;
         checkforcombat = false;
-        serverhopwhenmod = false;
+        serverhopwhenmod = true;
     };
     shonen = {
         no_fall = true
@@ -3103,6 +3103,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                     c:Disconnect()
                     esp.Visible = false
                     esp:Remove()
+                    print('removed esp') -- spastic
                 end
             end)
         end
@@ -3487,6 +3488,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             while task.wait(4) do 
                 if getgenv().loopsUnload == true or getgenv().CSense == false then print('true break') break end
                 for i,human in pairs(game.ReplicatedStorage.Cooldowns:GetChildren()) do 
+                    task.wait(1)
                     if human:FindFirstChild('Chakra Sense') and not table.find(getgenv().sensers,human.Name) and game.Players:FindFirstChild(human.Name) then 
                         Notify('Chakra Sense','brudda chakra found > '..human.Name..' <','untilClick')
                         --getgenv().message('brudda chakra found > '..human.Name..' <')
@@ -3512,7 +3514,78 @@ elseif game.PlaceId == 10266164381 then --// shitlines
 
     getgenv().modsfound = {}
     getgenv().modalert = function()
+        local GroupService = game:GetService("GroupService")
+        local Players = game:GetService("Players")
+        local GROUP_ID = 7450839
         task.spawn(function()
+            local ismod = false;
+            for _,player in next,game.Players:GetPlayers() do 
+                task.wait(1)
+                if player and player:IsInGroup(GROUP_ID) and not table.find(getgenv().modsfound,player.Name) then 
+                    ismod = true;
+                    table.insert(getgenv().modsfound,player.Name)
+                    pcall(function()
+                        moderatorjoined = Instance.new('Sound')
+                        moderatorjoined.SoundId = getsynasset('Azfake Hub V3/new layer 2 bell.mp3')
+                        moderatorjoined.Parent = game:GetService('Workspace');
+                        moderatorjoined:Play()
+                        task.spawn(function()
+                            repeat task.wait(1) until moderatorjoined.Playing == false; 
+                            moderatorjoined:Destroy()
+                        end)
+                    end)
+                end
+            end
+            game.Players.PlayerAdded:Connect(function(player)
+                if player and player:IsInGroup(GROUP_ID) and not table.find(getgenv().modsfound,player.Name) then 
+                    ismod = true;
+                    table.insert(getgenv().modsfound,player.Name)
+                    pcall(function()
+                        moderatorjoined = Instance.new('Sound')
+                        moderatorjoined.SoundId = getsynasset('Azfake Hub V3/new layer 2 bell.mp3')
+                        moderatorjoined.Parent = game:GetService('Workspace');
+                        moderatorjoined:Play()
+                        task.spawn(function()
+                            repeat task.wait(1) until moderatorjoined.Playing == false; 
+                            moderatorjoined:Destroy()
+                        end)
+                    end)
+                end
+            end)
+            
+            if ismod == true and getgenv().AzfakeGlobalTables['bloodlines']['modnotifer'] == true and getgenv().AzfakeGlobalTables['bloodlines']['serverhopwhenmod'] and getgenv().AzfakeGlobalTables['bloodlines']['checkforcombat'] == false then 
+                repeat 
+                    task.wait()
+                    local teleportId = ''
+                    for _,server in pairs(game.ReplicatedStorage.Servers:GetChildren()) do 
+                        if not server:FindFirstChild('Current') then 
+                            local tp = math.random(1,2)
+                            if tp == 2 then 
+                                teleportId = string.split(server.Value,' ')[1]
+                            end
+                        end
+                    end
+                    game.ReplicatedStorage.Events.DataEvent:FireServer('ServerTeleport',teleportId)
+                until game.JobId ~= game.JobId
+            elseif ismod == true and getgenv().AzfakeGlobalTables['bloodlines']['checkforcombat'] == true and getgenv().AzfakeGlobalTables['bloodlines']['serverhopwhenmod'] then 
+                repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.ClientGui.Mainframe.Danger.Visible == false
+
+                repeat 
+                    task.wait()
+                    local teleportId = ''
+                    for _,server in pairs(game.ReplicatedStorage.Servers:GetChildren()) do 
+                        if not server:FindFirstChild('Current') then 
+                            local tp = math.random(1,2)
+                            if tp == 2 then 
+                                teleportId = string.split(server.Value,' ')[1]
+                            end
+                        end
+                    end
+                    game.ReplicatedStorage.Events.DataEvent:FireServer('ServerTeleport',teleportId)
+                until game.JobId ~= game.JobId
+            else 
+                ismod = false;
+            end
             while task.wait(3) do 
                 if getgenv().loopsUnload == true then print('true mod break') break end
                 local ismod = false
@@ -3535,57 +3608,56 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                 --         end
                 --     end
                 -- end
-                local GroupService = game:GetService("GroupService")
-                local Players = game:GetService("Players")
-                local GROUP_ID = 7450839
-                for _,player in next,game.Players:GetPlayers() do 
-                    if player:IsInGroup(GROUP_ID) and not table.find(getgenv().modsfound,player.Name) then 
-                        ismod = true;
-                        table.insert(getgenv().modsfound,player.Name)
-                        pcall(function()
-                            moderatorjoined = Instance.new('Sound')
-                            moderatorjoined.SoundId = getsynasset('Azfake Hub V3/new layer 2 bell.mp3')
-                            moderatorjoined.Parent = game:GetService('Workspace');
-                            moderatorjoined:Play()
-                            task.spawn(function()
-                                repeat task.wait(1) until moderatorjoined.Playing == false; 
-                                moderatorjoined:Destroy()
-                            end)
-                        end)
-                    end
-                end
 
-                if ismod == true and getgenv().AzfakeGlobalTables['bloodlines']['modnotifer'] == true and getgenv().AzfakeGlobalTables['bloodlines']['serverhopwhenmod'] and getgenv().AzfakeGlobalTables['bloodlines']['checkforcombat'] == false then 
-                    repeat 
-                        task.wait()
-                        local teleportId = ''
-                        for _,server in pairs(game.ReplicatedStorage.Servers:GetChildren()) do 
-                            if not server:FindFirstChild('Current') then 
-                                local tp = math.random(1,2)
-                                if tp == 2 then 
-                                    teleportId = string.split(server.Value,' ')[1]
-                                end
-                            end
-                        end
-                        game.ReplicatedStorage.Events.DataEvent:FireServer('ServerTeleport',teleportId)
-                    until game.JobId ~= game.JobId
-                elseif ismod == true and getgenv().AzfakeGlobalTables['bloodlines']['checkforcombat'] == true and getgenv().AzfakeGlobalTables['bloodlines']['serverhopwhenmod'] then 
-                    repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.ClientGui.Mainframe.Danger.Visible == false
+                -- for _,player in next,game.Players:GetPlayers() do 
+                --     task.wait(1)
+                --     if player and player:IsInGroup(GROUP_ID) and not table.find(getgenv().modsfound,player.Name) then 
+                --         ismod = true;
+                --         table.insert(getgenv().modsfound,player.Name)
+                --         pcall(function()
+                --             moderatorjoined = Instance.new('Sound')
+                --             moderatorjoined.SoundId = getsynasset('Azfake Hub V3/new layer 2 bell.mp3')
+                --             moderatorjoined.Parent = game:GetService('Workspace');
+                --             moderatorjoined:Play()
+                --             task.spawn(function()
+                --                 repeat task.wait(1) until moderatorjoined.Playing == false; 
+                --                 moderatorjoined:Destroy()
+                --             end)
+                --         end)
+                --     end
+                -- end
 
-                    repeat 
-                        task.wait()
-                        local teleportId = ''
-                        for _,server in pairs(game.ReplicatedStorage.Servers:GetChildren()) do 
-                            if not server:FindFirstChild('Current') then 
-                                local tp = math.random(1,2)
-                                if tp == 2 then 
-                                    teleportId = string.split(server.Value,' ')[1]
-                                end
-                            end
-                        end
-                        game.ReplicatedStorage.Events.DataEvent:FireServer('ServerTeleport',teleportId)
-                    until game.JobId ~= game.JobId
-                end
+                -- if ismod == true and getgenv().AzfakeGlobalTables['bloodlines']['modnotifer'] == true and getgenv().AzfakeGlobalTables['bloodlines']['serverhopwhenmod'] and getgenv().AzfakeGlobalTables['bloodlines']['checkforcombat'] == false then 
+                --     repeat 
+                --         task.wait()
+                --         local teleportId = ''
+                --         for _,server in pairs(game.ReplicatedStorage.Servers:GetChildren()) do 
+                --             if not server:FindFirstChild('Current') then 
+                --                 local tp = math.random(1,2)
+                --                 if tp == 2 then 
+                --                     teleportId = string.split(server.Value,' ')[1]
+                --                 end
+                --             end
+                --         end
+                --         game.ReplicatedStorage.Events.DataEvent:FireServer('ServerTeleport',teleportId)
+                --     until game.JobId ~= game.JobId
+                -- elseif ismod == true and getgenv().AzfakeGlobalTables['bloodlines']['checkforcombat'] == true and getgenv().AzfakeGlobalTables['bloodlines']['serverhopwhenmod'] then 
+                --     repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.ClientGui.Mainframe.Danger.Visible == false
+
+                --     repeat 
+                --         task.wait()
+                --         local teleportId = ''
+                --         for _,server in pairs(game.ReplicatedStorage.Servers:GetChildren()) do 
+                --             if not server:FindFirstChild('Current') then 
+                --                 local tp = math.random(1,2)
+                --                 if tp == 2 then 
+                --                     teleportId = string.split(server.Value,' ')[1]
+                --                 end
+                --             end
+                --         end
+                --         game.ReplicatedStorage.Events.DataEvent:FireServer('ServerTeleport',teleportId)
+                --     until game.JobId ~= game.JobId
+                -- end
                 for i,v in pairs(getgenv().modsfound) do 
                     if not game.Players:FindFirstChild(v) then 
                         table.remove(getgenv().modsfound,i)
@@ -4435,10 +4507,10 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     sector:AddToggle('Mod Notifier',function(xstate)
         getgenv().AzfakeGlobalTables['bloodlines']['modnotifer'] = xstate
     end)
-    sector:AddToggle('Serverhop when Mod',function(xstate)
+    sector:AddToggle('Serverhop when Mod',true,function(xstate)
         getgenv().AzfakeGlobalTables['bloodlines']['serverhopwhenmod'] = xstate
     end)
-    sector:AddToggle('Check if Combat',function(xstate)
+    sector:AddToggle('Check if Combat',false,function(xstate)
         getgenv().AzfakeGlobalTables['bloodlines']['checkforcombat'] = xstate
     end)
 
@@ -6203,17 +6275,17 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             end
         end
     end
-    task.spawn(function()
-        while task.wait(6) do 
-            for _,v in next, c do
-                if _ == 'Save' and type(v) == 'table' then 
-                    for new, vn in next,v do 
-                        if type(vn) == 'function' then vn() end
-                    end
-                end
-            end
-        end
-    end)
+    -- task.spawn(function()
+    --     while task.wait(6) do 
+    --         for _,v in next, c do
+    --             if _ == 'Save' and type(v) == 'table' then 
+    --                 for new, vn in next,v do 
+    --                     if type(vn) == 'function' then vn() end
+    --                 end
+    --             end
+    --         end
+    --     end
+    -- end)
     if getgenv().adminCheck == true then 
         local AdminTab = window:CreateTab("Admin");
         local AdminSector = AdminTab:CreateSector('Moves','left')
