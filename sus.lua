@@ -15685,10 +15685,14 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     end)
     local HopForEnemy = sector:AddDropdown('Server Hop If No Mob',getgenv().roghoulsettings['serverhopmobs'],"",true,function(dropdownv)
         local EnemiesFound = table.concat(dropdownv,',')
+        -- if table.find()
+        for i,__value in next, getgenv().roghoulsettings['serverhopifnotfoundmobs'] do 
+            getgenv().roghoulsettings['serverhopifnotfoundmobs'][i] = false;
+        end -- remove gykatsu server hop and replace with this
         for _,v in next, string.split(EnemiesFound,',') do 
-            for i,__value in next, getgenv().roghoulsettings['serverhopmobs'] do 
+            for i,__value in next, getgenv().roghoulsettings['serverhopifnotfoundmobs'] do 
                 if i == v then 
-                    getgenv().roghoulsettings['serverhopmobs'][i] = true; -- could use in while loop to see if there is a mob in the string - serverhopifnotfoundstr
+                    getgenv().roghoulsettings['serverhopifnotfoundmobs'][i] = true; -- could use in while loop to see if there is a mob in the string - serverhopifnotfoundstr
                 end
             end -- remove gykatsu server hop and replace with this
         end
@@ -17293,21 +17297,29 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                     ['Amon'] = false;
                     ['Nishiki'] = false;
                 }
-
+                local AmountFound = 0;
+                local ActiveFound = 0;
                 for _,InstanceHolder in next, workspace.NPCSpawns:GetChildren() do 
                     local __Mob = InstanceHolder:FindFirstChildWhichIsA('Model');
                     for MobIndex,Mob in next, InstanceHolder:GetChildren() do 
-                        if Mob.Name:find('Eto') then FoundMobs['Eto'] = true; end
-                        if Mob.Name:find('Amon') then FoundMobs['Amon'] = true; end
-                        if Mob.Name:find('Nishiki') then FoundMobs['Nishiki'] = true; end
+                        if Mob.Name:find('Eto') then FoundMobs['Eto'] = true; AmountFound +=1 end
+                        if Mob.Name:find('Amon') then FoundMobs['Amon'] = true; AmountFound +=1 end
+                        if Mob.Name:find('Nishiki') then FoundMobs['Nishiki'] = true; AmountFound +=1 end
                     end
                 end
                 for _,ReadingProperty in next, getgenv().roghoulsettings['serverhopifnotfoundmobs'] do 
-                    if ReadingProperty == true and FoundMobs[_] == false then 
-                        getgenv().serverhop()
-                        break
+                    if ReadingProperty == true then --and FoundMobs[_] == false then 
+                        ActiveFound += 1
+                        --getgenv().serverhop()
+                        --break
                     end
                 end 
+                -- if Nishiki is found but amon isnt ; Farm Nishiki and then serverhop
+                if AmountFound == 0 and getgenv().roghoulsettings['serverhopformobs'] == true then 
+                    
+                
+                    getgenv().serverhop()
+                end
             end
         end
     end)
