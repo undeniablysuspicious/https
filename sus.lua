@@ -4677,7 +4677,34 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     sector:AddSeperator('.')
     --     sector:AddButton('Heal',getgenv().Injury<{txt='areyousureyouwannaheal?',y='yes',n='no'})
     sector:AddToggle('No Void',true,function(statex)
-        getgenv().AzfakeGlobalTables['bloodlines']['voidwalk']= statex
+        getgenv().AzfakeGlobalTables['bloodlines']['voidwalk'] = statex
+        if getgenv().AzfakeGlobalTables['bloodlines']['voidwalk'] == true then 
+            for i,v in pairs(workspace:GetChildren()) do 
+                if v.Name:find('Void') and v:IsA('Part') then 
+                    v.CanCollide = false;
+                    v.CanTouch = false;
+                    for k,c in next, v:GetChildren() do 
+                        if c.Name:find('Void') and c:IsA('Part') then 
+                            c.CanCollide = false;
+                            c.CanTouch = false; -- not voidwalk
+                        end
+                    end
+                end
+            end
+        else
+            for i,v in pairs(workspace:GetChildren()) do 
+                if v.Name:find('Void') and v:IsA('Part') then 
+                    v.CanCollide = true;
+                    v.CanTouch = true;
+                    for k,c in next, v:GetChildren() do 
+                        if c.Name:find('Void') and c:IsA('Part') then 
+                            c.CanCollide = true;
+                            c.CanTouch = true; -- not voidwalk
+                        end
+                    end
+                end
+            end
+        end
     end)
     sector:AddButton('Notify All Hyuga',function()
         for i,v in pairs(game.ReplicatedStorage.Settings:GetChildren()) do 
@@ -5536,25 +5563,25 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     getgenv().storepos = nil
 
 
-    task.spawn(function()
-        while task.wait(30) do 
-            if game:GetService("Workspace"):FindFirstChild('RainParts') then 
-                for _,v in pairs(game:GetService("Workspace"):FindFirstChild('RainParts'):GetChildren()) do 
-                    v:FindFirstChildWhichIsA('ParticleEmitter').Enabled = false
-                    game:GetService("Players").LocalPlayer.SoundPlaylist.RainSound.Playing = false
-                end
-            end
-            -- for i,v in pairs(workspace:GetChildren()) do 
-            --     if v:FindFirstChild('Void')  then v:Destroy() end 
-            --     for _,e in pairs(v:GetChildren()) do 
-            --         if e:FindFirstChild('Void')  then e:Destroy() end 
-            --         for __,x in pairs(e:GetChildren()) do 
-            --             if x:FindFirstChild('Void') then x:Destroy() end 
-            --         end
-            --     end
-            -- end
-        end
-    end)
+    -- task.spawn(function()
+    --     while task.wait(30) do 
+    --         if game:GetService("Workspace"):FindFirstChild('RainParts') then 
+    --             for _,v in pairs(game:GetService("Workspace"):FindFirstChild('RainParts'):GetChildren()) do 
+    --                 v:FindFirstChildWhichIsA('ParticleEmitter').Enabled = false
+    --                 game:GetService("Players").LocalPlayer.SoundPlaylist.RainSound.Playing = false
+    --             end
+    --         end
+    --         -- for i,v in pairs(workspace:GetChildren()) do 
+    --         --     if v:FindFirstChild('Void')  then v:Destroy() end 
+    --         --     for _,e in pairs(v:GetChildren()) do 
+    --         --         if e:FindFirstChild('Void')  then e:Destroy() end 
+    --         --         for __,x in pairs(e:GetChildren()) do 
+    --         --             if x:FindFirstChild('Void') then x:Destroy() end 
+    --         --         end
+    --         --     end
+    --         -- end
+    --     end
+    -- end)
 
     -- if getgenv().premiumWhitelist == true then 
         
@@ -5699,40 +5726,40 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         while task.wait() do 
             game:GetService("Players").LocalPlayer.SoundPlaylist.RainSound.Playing = false
             if getgenv().loopsUnload == true then if getgenv().connectiontochakra then  getgenv().connectiontochakra:Disconnect() end  print('true break') break end
-            if getgenv().AzfakeGlobalTables['bloodlines']['voidwalk'] == true then 
-                for i,v in pairs(workspace:GetChildren()) do 
-                    -- if v:FindFirstChild('Void')  then  v:FindFirstChild('Void').CanCollide = true; v:FindFirstChild('Void').CanTouch = true end 
-                    -- for _,e in pairs(v:GetChildren()) do 
-                    --     if e:FindFirstChild('Void')  then e:FindFirstChild('Void').CanCollide = true; e:FindFirstChild('Void').CanTouch = true  end 
-                    --     for __,x in pairs(e:GetChildren()) do 
-                    --         if x:FindFirstChild('Void') then x:FindFirstChild('Void').CanCollide = true; x:FindFirstChild('Void').CanTouch = true end 
-                    --     end
-                    -- end
-                    if v.Name:find('Void') and v:IsA('Part') then 
-                        v.CanCollide = false;
-                        v.CanTouch = false;
-                        for k,c in next, v:GetChildren() do 
-                            if c.Name:find('Void') and c:IsA('Part') then 
-                                c.CanCollide = false;
-                                c.CanTouch = false; -- not voidwalk
-                            end
-                        end
-                    end
-                end
-            else
-                for i,v in pairs(workspace:GetChildren()) do 
-                    if v.Name:find('Void') and v:IsA('Part') then 
-                        v.CanCollide = true;
-                        v.CanTouch = true;
-                        for k,c in next, v:GetChildren() do 
-                            if c.Name:find('Void') and c:IsA('Part') then 
-                                c.CanCollide = true;
-                                c.CanTouch = true; -- not voidwalk
-                            end
-                        end
-                    end
-                end
-            end
+            -- if getgenv().AzfakeGlobalTables['bloodlines']['voidwalk'] == true then 
+            --     for i,v in pairs(workspace:GetChildren()) do 
+            --         -- if v:FindFirstChild('Void')  then  v:FindFirstChild('Void').CanCollide = true; v:FindFirstChild('Void').CanTouch = true end 
+            --         -- for _,e in pairs(v:GetChildren()) do 
+            --         --     if e:FindFirstChild('Void')  then e:FindFirstChild('Void').CanCollide = true; e:FindFirstChild('Void').CanTouch = true  end 
+            --         --     for __,x in pairs(e:GetChildren()) do 
+            --         --         if x:FindFirstChild('Void') then x:FindFirstChild('Void').CanCollide = true; x:FindFirstChild('Void').CanTouch = true end 
+            --         --     end
+            --         -- end
+            --         if v.Name:find('Void') and v:IsA('Part') then 
+            --             v.CanCollide = false;
+            --             v.CanTouch = false;
+            --             for k,c in next, v:GetChildren() do 
+            --                 if c.Name:find('Void') and c:IsA('Part') then 
+            --                     c.CanCollide = false;
+            --                     c.CanTouch = false; -- not voidwalk
+            --                 end
+            --             end
+            --         end
+            --     end
+            -- else
+            --     for i,v in pairs(workspace:GetChildren()) do 
+            --         if v.Name:find('Void') and v:IsA('Part') then 
+            --             v.CanCollide = true;
+            --             v.CanTouch = true;
+            --             for k,c in next, v:GetChildren() do 
+            --                 if c.Name:find('Void') and c:IsA('Part') then 
+            --                     c.CanCollide = true;
+            --                     c.CanTouch = true; -- not voidwalk
+            --                 end
+            --             end
+            --         end
+            --     end
+            -- end
             local state1 = getgenv().DynamicPicker
             local state2 = getgenv().LionPicker
             if getgenv().Speeding == true and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = getgenv().Speed end
