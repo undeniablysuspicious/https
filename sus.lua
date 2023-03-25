@@ -16603,6 +16603,15 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         task.spawn(function()
                             repeat task.wait(0.01) 
                                 if getgenv()['roghoulsettings']['FinalChoice'] and getgenv()['roghoulsettings']['FinalChoice']:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0  then 
+
+                                    if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and getgenv()['roghoulsettings']['FinalChoice'] and getgenv()['roghoulsettings']['FinalChoice']:FindFirstChild('HumanoidRootPart') then 
+                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = getgenv()['roghoulsettings']['FinalChoice']:FindFirstChild('HumanoidRootPart').CFrame * 
+                                        CFrame.new(
+                                            getgenv()['roghoulsettings']['playerx'],
+                                            getgenv()['roghoulsettings']['playery'],
+                                            getgenv()['roghoulsettings']['playerz']
+                                        )
+                                    end
                                     if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 then 
                                         -- print('waiting for quinque')
                                         print('waiting for '..string.lower(typeweapon))
@@ -16638,19 +16647,12 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         print(string.lower('arata')..' active')
                                         -- print('quinque active')
                                     end
-                                    if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and getgenv()['roghoulsettings']['FinalChoice'] and getgenv()['roghoulsettings']['FinalChoice']:FindFirstChild('HumanoidRootPart') then 
-                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = getgenv()['roghoulsettings']['FinalChoice']:FindFirstChild('HumanoidRootPart').CFrame * 
-                                        CFrame.new(
-                                            getgenv()['roghoulsettings']['playerx'],
-                                            getgenv()['roghoulsettings']['playery'],
-                                            getgenv()['roghoulsettings']['playerz']
-                                        )
-                                    end
                                     if getgenv().roghoulsettings['click'] then 
                                         task.delay(.1,function()
                                             pressKey('Mouse1')
                                         end)
                                     end
+                                    
                                     -- CFrame.Angles(math.rad(90),0,0) upside down for gykatsu
                                     -- task.spawn(function()
                                     --     if getgenv().roghoulsettings['usee'] == true then 
