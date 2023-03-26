@@ -1,3 +1,9 @@
+
+local old_gc = getgc();
+local oldgc;
+oldgc = hookfunction(getgc, function(...)
+  return old_gc
+end)
 -- New example script written by wally
 -- You can suggest changes with a pull request or something
 
@@ -8148,7 +8154,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     end
     getgenv().ParryObjects = {}
     getgenv().ParryAct = function(v)--,hiting value;
-
+        -- aztup detects the maximum range you can get hit in
+        -- function to print distance on how far you are from the enemy to check the maximum range that you wont get hit in
         print('using parryct')
         
         if getgenv().WhitelistMode ~= 'All' and getgenv().WhitelistMode~='Mobs' and getgenv().WhitelistMode ~= v.Name then print('whitelist mode return '..v.Name) return end
@@ -8960,7 +8967,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         end
 
 
-        if detect(v,'rbxassetid://8698443433') and cancelAll == false then 
+
+        if detect(v,'rbxassetid://8698443433') and cancelAll == false then -- and distance < 15 
             task.wait( getWaitTime() )
             getgenv().parry()
             cancelAll = true
@@ -9077,6 +9085,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         if detect(v,'rbxassetid://11946556384') then -- golem slash
             task.wait(.2)
             getgenv().parry()
+            cancelAll = true
         end  
         
         if detect(v,'rbxassetid://11946771956') then -- golem slash 2
@@ -19335,6 +19344,11 @@ elseif game.PlaceId == 5561268850 or game.PlaceId == 6312903733 then -- randomly
 
     getgenv().randomdroidsettings = {
         instakill = false;
+        autopressbuttons = false;
+        autocollectciruits = false;
+        teleporttoeveryroom = false;
+        roomtp = false;
+        autoroompuzzle = false;
     }
     sector:AddButton('Teleport to dungeon',function()
         game:GetService('TeleportService'):teleport(6312903733)
@@ -19343,7 +19357,20 @@ elseif game.PlaceId == 5561268850 or game.PlaceId == 6312903733 then -- randomly
         sector:AddToggle('Insta Kill',false,function(xstate)
             getgenv().randomdroidsettings['instakill'] = xstate
         end)
+        sector:AddToggle('Auto Press Buttons',false,function(xstate)
+            getgenv().randomdroidsettings['autopressbuttons'] = xstate
+        end)
+        sector:AddToggle('Auto Collect Circuits',false,function(xstate)
+            getgenv().randomdroidsettings['autocollectcircuits'] = xstate
+        end)
+        sector:AddToggle('Teleport to Rooms',false,function(xstate)
+            getgenv().randomdroidsettings['roomtp'] = xstate
+        end)
+        sector:AddToggle('Auto Room Puzzle',false,function(xstate)
+            getgenv().randomdroidsettings['autoroompuzzle'] = xstate
+        end)
     end
+    -- game:GetService("Workspace").Circuit.TouchInterest
     task.spawn(function()
         while task.wait() do 
             if getgenv().loopsUnload == true then print('droids break end') break end 
@@ -19354,10 +19381,57 @@ elseif game.PlaceId == 5561268850 or game.PlaceId == 6312903733 then -- randomly
                     if v:FindFirstChild('HumanoidRootPart') then 
                         if isnetworkowner(v.PrimaryPart) then 
                             v:FindFirstChildWhichIsA('Humanoid').Health = 0
+                            if v:FindFirstChild('ForceField') and v:FindFirstChild('Head') then 
+                                v:FindFirstChild('Head'):Destroy()
+                            end
                             print('was owner')
                         end
+                    elseif v.Name:find('Spawner') then 
+                        if isnetworkowner(v.PrimaryPart) then 
+                            v:FindFirstChildWhichIsA('Humanoid').Health = 0
+                            print('was owner')
+                        end
+                    elseif v.Name:find('Puzzle') and isnetworkowner(v.PrimaryPart) then 
+                        local Find = string.split(v.Name,' ')[2]
+                        -- print(Find)
+                        task.delay(1,function()
+                            local Pressure = game:GetService("Workspace"):FindFirstChild('Room'):FindFirstChild('Enemies'):FindFirstChild('PressurePlate '..Find)
+                            v:SetPrimaryPartCFrame(Pressure.PrimaryPart.CFrame)
+                        end)
                     end
                 end  
+                for _,v in next, game:GetService("Workspace"):FindFirstChild('Room'):GetChildren() do 
+                    if v.Name == 'Crystal' and isnetworkowner(v.PrimaryPart) then 
+                        if v:FindFirstChildWhichIsA('Humanoid') then 
+                            v:FindFirstChildWhichIsA('Humanoid').Health = 0
+                        end
+                    end
+                end 
+            end
+            if getgenv().randomdroidsettings['autopressbuttons'] == true then 
+                local dir = game:GetService("Workspace"):FindFirstChild('Room').Enemies
+    
+                for _,v in next, dir:GetChildren() do 
+                    if v:FindFirstChild('ClickDetector') then 
+                        task.delay(1.2,function()
+                            fireclickdetector(v:FindFirstChild('ClickDetector'))
+                        end)
+                    end
+                end  
+            end
+            if getgenv().randomdroidsettings['autocollectcircuits'] == true then 
+                for _,v in next, workspace:GetChildren() do 
+                    if v.Name == 'Circuit' then 
+                        firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChild('Left Leg'),v,0)
+                        firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChild('Left Leg'),v,1)
+                    end
+                end
+            end 
+            if getgenv().randomdroidsettings['roomtp'] == true and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                if workspace:FindFirstChild('Room') then 
+                    local Room = workspace:FindFirstChild('Room')
+                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Room:FindFirstChild('Floor').CFrame * CFrame.new(0,15,0)
+                end
             end
         end
     end)
