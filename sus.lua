@@ -15820,7 +15820,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddSlider("When To Release E", 0, 0, 100, 5, function(State)
         getgenv().roghoulsettings['reletime'] = State
     end) -- press Key certain times to use others
-    othercheats:AddToggle('Use When Targetted',false,function(xtstae)
+    othercheats:AddToggle('Use E When Targetted',false,function(xtstae)
         getgenv().roghoulsettings['useetarget'] = xtstae
     end)
     othercheats:AddSlider("Target Distance", 0, 0, 50, 5, function(State) -- releuseetargettime useetargetrange
@@ -15840,7 +15840,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddSlider("When To Release R", 0, 0, 100, 5, function(State)
         getgenv().roghoulsettings['relrtime'] = State
     end)
-    othercheats:AddToggle('Use When Targetted',false,function(xtstae)
+    othercheats:AddToggle('Use R When Targetted',false,function(xtstae)
         getgenv().roghoulsettings['usertarget'] = xtstae
     end)
     othercheats:AddSlider("Target Distance", 0, 0, 50, 5, function(State)
@@ -15861,7 +15861,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddSlider("When To Release F", 0, 0, 100, 5, function(State)
         getgenv().roghoulsettings['relftime'] = State
     end)
-    othercheats:AddToggle('Use When Targetted',false,function(xtstae)
+    othercheats:AddToggle('Use F When Targetted',false,function(xtstae)
         getgenv().roghoulsettings['useftarget'] = xtstae
     end)
     othercheats:AddSlider("Target Distance", 0, 0, 50, 5, function(State)
