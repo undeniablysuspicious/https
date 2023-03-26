@@ -16982,9 +16982,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             for _,v in next, __farmable do 
                                 if not v:FindFirstChild('HumanoidRootPart') then return end
                                 local Sides = {
-                                    ['Left'] = CFrame.new(-974.045593, 64.7473831, 210.030594);
-                                    ['Middle'] = CFrame.new(-972.654175, 64.7473831, 291.62735);
-                                    ['Right'] = CFrame.new(-979.371826, 64.7473831, 335.382141);
+                                    ['Left'] = CFrame.new(-997.681641, 64.747406, 210.257309);
+                                    ['Middle'] = CFrame.new(-998.055847, 64.7473831, 283.880157);
+                                    ['Right'] = CFrame.new(-995.961548, 64.7473831, 335.631134);
                                 }-- sides
 
                                 local blobroot = v:FindFirstChild('HumanoidRootPart')
@@ -17181,9 +17181,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         if getgenv().loopsUnload == false and getgenv().roghoulsettings['farming'] == true and getgenv().roghoulsettings['gykatfarm'] == true then 
                             for _,v in next, enemymodel:GetChildren() do 
                                 local Sides = {
-                                    ['Left'] = CFrame.new(-974.045593, 64.7473831, 210.030594);
-                                    ['Middle'] = CFrame.new(-972.654175, 64.7473831, 291.62735);
-                                    ['Right'] = CFrame.new(-979.371826, 64.7473831, 335.382141);
+                                    ['Left'] = CFrame.new(-997.681641, 64.747406, 210.257309);
+                                    ['Middle'] = CFrame.new(-998.055847, 64.7473831, 283.880157);
+                                    ['Right'] = CFrame.new(-995.961548, 64.7473831, 335.631134);
                                 }-- sides
                                 if v.Name == 'Gyakusatsu' then 
                                     local delaying = false;
