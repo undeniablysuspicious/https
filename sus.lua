@@ -16299,6 +16299,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             if typeweapon == 'CCG' then typeweapon='Quinque' end 
             if typeweapon == 'Ghoul' then typeweapon='Kagune' end 
             if getgenv().roghoulsettings['serverhopformobs'] == true then 
+                local MobsPrev = true;
                 getgenv().roghoulsettings['serverhopformobs'] = nil;
                 local FoundMobs = {
                     ['Eto'] = false;
@@ -16323,7 +16324,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                     end
                 end 
                 -- if Nishiki is found but amon isnt ; Farm Nishiki and then serverhop
-                if AmountFound == 0 and getgenv().roghoulsettings['serverhopformobs'] == true then 
+                if AmountFound == 0 and MobsPrev == true then 
                     print('No mobs so serverhop')
                 
                     getgenv().serverhop()
