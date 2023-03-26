@@ -17145,6 +17145,40 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,v:FindFirstChild('HumanoidRootPart').Position)
                                             -- 
                                             usemoves()
+                                            if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 then 
+                                                -- print('waiting for quinque')
+                                                print('waiting for '..string.lower(typeweapon))
+                                                pressKey(getgenv().roghoulsettings['activestage'])
+                                                repeat task.wait() 
+                                                    task.delay(2.5,function()
+                                                        if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon)  then 
+                                                            pressKey(getgenv().roghoulsettings['activestage'])
+                                                        end
+                                                    end)
+                                                until game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) 
+                                                if getgenv().roghoulsettings['usec'] == true then 
+                                                    pressKey('C')
+                                                end 
+                                                -- task.wait(3)
+                                                print(string.lower(typeweapon)..' active')
+                                                -- print('quinque active')
+                                            end
+                                            if not game.Players.LocalPlayer.Character:FindFirstChild('Arata') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 and getgenv().roghoulsettings['equiparata'] == true then 
+                                                -- print('waiting for quinque')
+                                                print('waiting for '..string.lower('arata'))
+                                                pressKey('Zero')
+                                                -- repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                                                repeat task.wait() 
+                                                    task.delay(2.5,function()
+                                                        if not game.Players.LocalPlayer.Character:FindFirstChild('Arata')  then 
+                                                            pressKey('Zero')
+                                                        end
+                                                    end)
+                                                until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                                                -- task.wait(3)
+                                                print(string.lower('arata')..' active')
+                                                -- print('quinque active')
+                                            end
                                         end
                                     end)
                                 until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().loopsUnload == true or getgenv().roghoulsettings['farming'] == false or getgenv().roghoulsettings['gykatfarm'] == false
