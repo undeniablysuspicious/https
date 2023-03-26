@@ -16993,8 +16993,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                 local PosX = v:FindFirstChild('HumanoidRootPart').CFrame.X 
                                 local LeftAdjustment = (PosX-Sides['Left'].X)
                                 local RightAdjustment = (PosX-Sides['Right'].X)
-                                if v.Name:find('R') then LoopCFrameSide = Sides['Right'] end
-                                if v.Name:find('L') then LoopCFrameSide = Sides['Left'] end
+                                if v.Name:sub(2,2) == ('R') then LoopCFrameSide = Sides['Left'] end
+                                if v.Name:sub(2,2) == ('L') then LoopCFrameSide = Sides['Right'] end
                                 -- if LeftAdjustment > RightAdjustment then closestside = 'right'; LoopCFrameSide = Sides['Right'] end 
                                 -- if RightAdjustment < LeftAdjustment then closestside = 'left'; LoopCFrameSide = Sides['Left'] end 
 
@@ -17180,6 +17180,11 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         -- end -- v:FindFirstChildWhichIsA('Humanoid').Health == 0
                         if getgenv().loopsUnload == false and getgenv().roghoulsettings['farming'] == true and getgenv().roghoulsettings['gykatfarm'] == true then 
                             for _,v in next, enemymodel:GetChildren() do 
+                                local Sides = {
+                                    ['Left'] = CFrame.new(-974.045593, 64.7473831, 210.030594);
+                                    ['Middle'] = CFrame.new(-972.654175, 64.7473831, 291.62735);
+                                    ['Right'] = CFrame.new(-979.371826, 64.7473831, 335.382141);
+                                }-- sides
                                 if v.Name == 'Gyakusatsu' then 
                                     local delaying = false;
                                     local oldValue = nil;
@@ -17249,6 +17254,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                             if getgenv()['roghoulsettings']['highgykatsu'] == true then 
                                                 CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],getgenv().roghoulsettings['safedistance'],-3.4) * CFrame.Angles(math.rad(-90),0,0)
                                             end
+                                            if getgenv()['roghoulsettings']['classicfarm'] == true then 
+                                                CFrameMultiplication = Sides['Middle']
+                                            end
                                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
                                             usemoves()
                                             if getgenv()['roghoulsettings']['gykustatsumobskill'] then 
@@ -17261,7 +17269,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 if enemymodel ~= nil then 
                                                     for i,child in next, enemymodel:GetChildren() do 
                                                         if child.PrimaryPart then 
-                                                            if isnetworkowner(child.HumanoidRootPart) then 
+                                                            if isnetworkowner(child.PrimaryPart) or isnetworkowner(child.Head) then 
                                                                 child:FindFirstChildWhichIsA('Humanoid').Health = 0
                                                             end
                                                         end
