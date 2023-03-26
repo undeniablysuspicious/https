@@ -15616,6 +15616,15 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         shifttotheleft = false;
         notontopdistance = 5;
         classicfarm = false;
+        useetarget = false;
+        usertarget = false;
+        useftarget = false;
+        useetargetdistance = 0;
+        usertargetdistance = 0;
+        useftargetdistance = 0;
+        ereleasekeysbeforeusee = false;
+        rreleasekeysbeforeuser = false; 
+        freleasekeysbeforeusef = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -15811,6 +15820,16 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddSlider("When To Release E", 0, 0, 100, 5, function(State)
         getgenv().roghoulsettings['reletime'] = State
     end) -- press Key certain times to use others
+    othercheats:AddToggle('Use When Targetted',false,function(xtstae)
+        getgenv().roghoulsettings['useetarget'] = xtstae
+    end)
+    othercheats:AddSlider("Target Distance", 0, 0, 50, 5, function(State) -- releuseetargettime useetargetrange
+        getgenv().roghoulsettings['useetargetdistance'] = State -- 
+    end) -- press Key certain times to use others
+    othercheats:AddToggle('Release Keys Before Use',false,function(xtstae)
+        getgenv().roghoulsettings['ereleasekeysbeforeusee'] = xtstae
+    end)
+
 
     othercheats:AddToggle('Use R',false,function(xtstae)
         getgenv().roghoulsettings['user'] = xtstae 
@@ -15821,6 +15840,17 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddSlider("When To Release R", 0, 0, 100, 5, function(State)
         getgenv().roghoulsettings['relrtime'] = State
     end)
+    othercheats:AddToggle('Use When Targetted',false,function(xtstae)
+        getgenv().roghoulsettings['usertarget'] = xtstae
+    end)
+    othercheats:AddSlider("Target Distance", 0, 0, 50, 5, function(State)
+        getgenv().roghoulsettings['usertargetrange'] = State 
+    end)
+    othercheats:AddToggle('Release Keys Before Use',false,function(xtstae)
+        getgenv().roghoulsettings['rreleasekeysbeforeuser'] = xtstae
+    end)
+
+
 
     othercheats:AddToggle('Use F',false,function(xtstae)
         getgenv().roghoulsettings['usef'] = xtstae
@@ -15831,6 +15861,16 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddSlider("When To Release F", 0, 0, 100, 5, function(State)
         getgenv().roghoulsettings['relftime'] = State
     end)
+    othercheats:AddToggle('Use When Targetted',false,function(xtstae)
+        getgenv().roghoulsettings['useftarget'] = xtstae
+    end)
+    othercheats:AddSlider("Target Distance", 0, 0, 50, 5, function(State)
+        getgenv().roghoulsettings['useftargetrange'] = State 
+    end)
+    othercheats:AddToggle('Release Keys Before Use',false,function(xtstae)
+        getgenv().roghoulsettings['freleasekeysbeforeusef'] = xtstae
+    end)
+
 
     othercheats:AddToggle('Use C',false,function(xtstae)
         getgenv().roghoulsettings['usec'] = xtstae
@@ -16928,39 +16968,134 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         -- CFrame.Angles(math.rad(90),0,0) upside down for gykatsu
                         task.spawn(function()
                             if getgenv().roghoulsettings['usee'] == true then 
-                                pressKey('E')
-                                task.wait(1)
-                                if getgenv().roghoulsettings['rele'] == true and getgenv().roghoulsettings['erelease'] == false then 
-                                    getgenv().roghoulsettings['erelease']  = true;
-                                    task.spawn(function()
-                                        task.wait(getgenv().roghoulsettings['reletime'])
-                                        releaseKey('E')
-                                        getgenv().roghoulsettings['erelease']  = false;
-                                    end)
+                                if getgenv().roghoulsettings['useetarget'] == true then 
+                                    local LittlestDistance = nil; -- if this is smaller than target distance
+                                    if enemymodel then 
+                                        for i,child in next, enemymodel:GetChildren() do 
+                                            if child.PrimaryPart and child.Name == 'Mob' then 
+                                                local Magnitude = (child.PrimaryPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                                                if Magnitude <= getgenv().roghoulsettings['useetargetdistance'] then 
+                                                    if getgenv().roghoulsettings['ereleasekeysbeforeusee'] == true then 
+                                                        releaseKey('R')
+                                                        releaseKey('F')
+                                                    end
+                                                    pressKey('E')
+                                                    task.wait(1)
+                                                    if getgenv().roghoulsettings['rele'] == true and getgenv().roghoulsettings['erelease'] == false then 
+                                                        getgenv().roghoulsettings['erelease']  = true;
+                                                        task.spawn(function()
+                                                            task.wait(getgenv().roghoulsettings['reletime'])
+                                                            releaseKey('E')
+                                                            getgenv().roghoulsettings['erelease']  = false;
+                                                        end)
+                                                    end 
+                                                end
+                                            end
+                                        end
+                                    end
+                                else
+                                    if getgenv().roghoulsettings['ereleasekeysbeforeusee'] == true then 
+                                        releaseKey('R')
+                                        releaseKey('F')
+                                    end
+                                    pressKey('E')
+                                    task.wait(1)
+                                    if getgenv().roghoulsettings['rele'] == true and getgenv().roghoulsettings['erelease'] == false then 
+                                        getgenv().roghoulsettings['erelease']  = true;
+                                        task.spawn(function()
+                                            task.wait(getgenv().roghoulsettings['reletime'])
+                                            releaseKey('E')
+                                            getgenv().roghoulsettings['erelease']  = false;
+                                        end)
+                                    end     
                                 end
+
                             end
                             if getgenv().roghoulsettings['user'] == true then 
-                                pressKey('R')
-                                task.wait(1)
-                                if getgenv().roghoulsettings['relr'] == true and getgenv().roghoulsettings['rrelease'] == false then 
-                                    getgenv().roghoulsettings['rrelease'] = true;
-                                    task.spawn(function()
-                                        task.wait(getgenv().roghoulsettings['relrtime'])
-                                        releaseKey('R')
-                                        getgenv().roghoulsettings['rrelease'] = false;
-                                    end)
+                                if getgenv().roghoulsettings['usertarget'] == true then 
+                                    local LittlestDistance = nil;
+                                    if enemymodel then 
+                                        for i,child in next, enemymodel:GetChildren() do 
+                                            if child.PrimaryPart and child.Name == 'Mob' then 
+                                                local Magnitude = (child.PrimaryPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                                                if Magnitude <= getgenv().roghoulsettings['usertargetdistance'] then 
+                                                    if getgenv().roghoulsettings['rreleasekeysbeforeuser'] == true then 
+                                                        releaseKey('E')
+                                                        releaseKey('F')
+                                                    end
+                                                    pressKey('R')
+                                                    task.wait(1)
+                                                    if getgenv().roghoulsettings['relr'] == true and getgenv().roghoulsettings['rrelease'] == false then 
+                                                        getgenv().roghoulsettings['rrelease'] = true;
+                                                        task.spawn(function()
+                                                            task.wait(getgenv().roghoulsettings['relrtime'])
+                                                            releaseKey('R')
+                                                            getgenv().roghoulsettings['rrelease'] = false;
+                                                        end)
+                                                    end
+                                                end
+                                            end
+                                        end
+                                    end
+                                else
+                                    if getgenv().roghoulsettings['rreleasekeysbeforeuser'] == true then 
+                                        releaseKey('E')
+                                        releaseKey('F')
+                                    end
+                                    pressKey('R')
+                                    task.wait(1)
+                                    if getgenv().roghoulsettings['relr'] == true and getgenv().roghoulsettings['rrelease'] == false then 
+                                        getgenv().roghoulsettings['rrelease'] = true;
+                                        task.spawn(function()
+                                            task.wait(getgenv().roghoulsettings['relrtime'])
+                                            releaseKey('R')
+                                            getgenv().roghoulsettings['rrelease'] = false;
+                                        end)
+                                    end
                                 end
+
                             end
                             if getgenv().roghoulsettings['usef'] == true then 
-                                pressKey('F')
-                                task.wait(1)
-                                if getgenv().roghoulsettings['relf'] == true and getgenv().roghoulsettings['frelease'] == false then 
-                                    getgenv().roghoulsettings['frelease'] = true;
-                                    task.spawn(function()
-                                        task.wait(getgenv().roghoulsettings['relftime'])
-                                        releaseKey('F')
-                                        getgenv().roghoulsettings['frelease'] = false;
-                                    end)
+                                if getgenv().roghoulsettings['useftarget'] == true then 
+                                    local LittlestDistance = nil;
+                                    if enemymodel then 
+                                        for i,child in next, enemymodel:GetChildren() do 
+                                            if child.PrimaryPart and child.Name == 'Mob' then 
+                                                local Magnitude = (child.PrimaryPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                                                if Magnitude <= getgenv().roghoulsettings['useftargetdistance'] then 
+                                                    if getgenv().roghoulsettings['freleasekeysbeforeusef'] == true then 
+                                                        releaseKey('E')
+                                                        releaseKey('R')
+                                                    end
+                                                    pressKey('F')
+                                                    task.wait(1)
+                                                    if getgenv().roghoulsettings['relf'] == true and getgenv().roghoulsettings['frelease'] == false then 
+                                                        getgenv().roghoulsettings['frelease'] = true;
+                                                        task.spawn(function()
+                                                            task.wait(getgenv().roghoulsettings['relftime'])
+                                                            releaseKey('F')
+                                                            getgenv().roghoulsettings['frelease'] = false;
+                                                        end)
+                                                    end 
+                                                end
+                                            end
+                                        end
+                                    end
+                                else
+                                    if getgenv().roghoulsettings['freleasekeysbeforeusef'] == true then 
+                                        releaseKey('E')
+                                        releaseKey('R')
+                                    end
+                                    pressKey('F')
+                                    task.wait(1)
+                                    if getgenv().roghoulsettings['relf'] == true and getgenv().roghoulsettings['frelease'] == false then 
+                                        getgenv().roghoulsettings['frelease'] = true;
+                                        task.spawn(function()
+                                            task.wait(getgenv().roghoulsettings['relftime'])
+                                            releaseKey('F')
+                                            getgenv().roghoulsettings['frelease'] = false;
+                                        end)
+                                    end 
                                 end
                             end
                             if getgenv().roghoulsettings['cfarm'] == true then 
@@ -17011,7 +17146,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                             usemoves()
                                         end
                                     end)
-                                until not v or not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().loopsUnload == true or getgenv().roghoulsettings['farming'] == false or getgenv().roghoulsettings['gykatfarm'] == false
+                                until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().loopsUnload == true or getgenv().roghoulsettings['farming'] == false or getgenv().roghoulsettings['gykatfarm'] == false
 
 
                                 -- for k,c in next, Sides do 
