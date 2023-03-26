@@ -15611,6 +15611,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         safemovement = false;
         ontopofcells = false;
         shifttotheleft = false;
+        notontopdistance = 5;
+        classicfarm = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -15713,7 +15715,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     sector:AddToggle('Farm Gyakusatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['gykatfarm'] = xstate
     end)
-
+    sector:AddToggle('Classic Gykatsu Farm',false,function(xstate) 
+        getgenv()['roghoulsettings']['classicfarm'] = xstate
+    end)
 
 
 
@@ -15738,6 +15742,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     end)
     sector:AddToggle('Not ontop of gykat',false,function(xtstae)
         getgenv().roghoulsettings['shifttotheleft'] = xtstae -- hover on cells
+    end)
+    sector:AddSlider("Not ontop slider", 0, 5, 20, 1, function(State)
+        getgenv().roghoulsettings['notontopdistance'] = State
     end)
     sector:AddToggle('End Gykatsu High',false,function(xstate) 
         getgenv()['roghoulsettings']['highgykatsu'] = xstate
@@ -15870,6 +15877,28 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             end
 
         end  
+    end)
+    othercheats:AddButton('Teleport To Gya Mobs',function(xstate) -- try to get ownership
+        local enemymodel = nil
+        for u,c in next, game:GetService("Workspace").NPCSpawns:GetChildren() do 
+            if c.Name == 'GyakusatsuSpawn' and c:FindFirstChildWhichIsA('Model') then 
+                enemymodel = c
+            end
+        end
+        if enemymodel ~= nil then 
+            local PrevCFrame = game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame
+            for i,child in next, enemymodel:GetChildren() do 
+                if child.PrimaryPart and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and child.Name == 'Mob' then -- remove child.Name == 'mob' and it teleports to the main blobs
+                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = child.PrimaryPart.CFrame
+                    if isnetworkowner(child.PrimaryPart) or isnetworkowner(child.Head) then 
+                        child:FindFirstChildWhichIsA('Humanoid').Health = 0
+                        print('isowner')
+                    end
+                end
+                task.wait(.2)
+            end
+            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = PrevCFrame
+        end
     end)
     game.Players.LocalPlayer.Idled:Connect(function()
         game:GetService("VirtualUser"):ClickButton2(Vector2.new())
@@ -16270,6 +16299,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             if typeweapon == 'CCG' then typeweapon='Quinque' end 
             if typeweapon == 'Ghoul' then typeweapon='Kagune' end 
             if getgenv().roghoulsettings['serverhopformobs'] == true then 
+                getgenv().roghoulsettings['serverhopformobs'] = nil;
                 local FoundMobs = {
                     ['Eto'] = false;
                     ['Amon'] = false;
@@ -16297,6 +16327,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                     print('No mobs so serverhop')
                 
                     getgenv().serverhop()
+                end
+                if getgenv().roghoulsettings['serverhopformobs'] == nil then 
+                    getgenv().roghoulsettings['serverhopformobs'] = true -- false
                 end
             end
             if getgenv().roghoulsettings['farming'] == true then 
@@ -16938,7 +16971,48 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         end)
                     end
                     if enemymodel then 
-                        if getgenv()['roghoulsettings']['safegykatsu'] == false then 
+                        if getgenv()['roghoulsettings']['classicfarm']  == true then 
+                            local __farmable = {}
+                            for _,v in next, enemymodel:GetChildren() do  
+                                if v.Name ~= 'Mob' and v.Name ~= 'Gyakusatsu' then 
+                                    table.insert(__farmable,v)
+                                end
+                            end
+                            local gykat = enemymodel:FindFirstChild('Gyakusatsu')
+                            for _,v in next, __farmable do 
+                                if not v:FindFirstChild('HumanoidRootPart') then return end
+                                local Sides = {
+                                    ['Left'] = CFrame.new(-974.045593, 64.7473831, 210.030594);
+                                    ['Middle'] = CFrame.new(-972.654175, 64.7473831, 291.62735);
+                                    ['Right'] = CFrame.new(-979.371826, 64.7473831, 335.382141);
+                                }-- sides
+
+                                local blobroot = v:FindFirstChild('HumanoidRootPart')
+                                local closestside = 'left' -- SideClosest
+                                local LoopCFrameSide = Sides['Right']
+                                local PosX = v:FindFirstChild('HumanoidRootPart').CFrame.X 
+                                local LeftAdjustment = (PosX-Sides['Left'].X)
+                                local RightAdjustment = (PosX-Sides['Right'].X)
+                                if LeftAdjustment > RightAdjustment then closestside = 'right'; LoopCFrameSide = Sides['Right'] end 
+                                if RightAdjustment < LeftAdjustment then closestside = 'left'; LoopCFrameSide = Sides['Left'] end 
+
+                                repeat 
+                                    task.wait(0.01)
+                                    pcall(function()
+                                        if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide
+                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,v:FindFirstChild('HumanoidRootPart').Position)
+                                            usemoves()
+                                        end
+                                    end)
+                                until not v or not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().loopsUnload == true or getgenv().roghoulsettings['farming'] == false or getgenv().roghoulsettings['gykatfarm'] == false
+
+
+                                -- for k,c in next, Sides do 
+
+                                -- end
+                            end
+                        elseif getgenv()['roghoulsettings']['safegykatsu'] == false then 
                             for _,v in next, enemymodel:GetChildren() do 
                                 if v.Name ~= 'Gyakusatsu' and v.Name ~= 'Mob' then 
                                     repeat 
@@ -16957,7 +17031,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 if enemymodel ~= nil then 
                                                     for i,child in next, enemymodel:GetChildren() do 
                                                         if child.PrimaryPart then 
-                                                            if isnetworkowner(child.HumanoidRootPart) then 
+                                                            if isnetworkowner(child.PrimaryPart) or isnetworkowner(child.Head) then 
                                                                 child:FindFirstChildWhichIsA('Humanoid').Health = 0
                                                             end
                                                         end
@@ -16986,7 +17060,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                 local canResetValueText = true;
                                 local MovementX = 0;
                                 if getgenv().roghoulsettings['shifttotheleft'] == true then 
-                                    MovementX = 20
+                                    MovementX = getgenv().roghoulsettings['notontopdistance'] 
                                 end
                                 local WaitingToChangeMovementX = false;
                                 local function findwithx(x)
@@ -17330,8 +17404,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                 if enemymodel ~= nil then 
                     for i,child in next, enemymodel:GetChildren() do 
                         if child.PrimaryPart then 
-                            if isnetworkowner(child.HumanoidRootPart) then 
+                            if isnetworkowner(child.PrimaryPart) or isnetworkowner(child.Head) then 
                                 child:FindFirstChildWhichIsA('Humanoid').Health = 0
+                                print('isowner')
                             end
                         end
                     end
