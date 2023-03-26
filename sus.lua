@@ -16993,8 +16993,10 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                 local PosX = v:FindFirstChild('HumanoidRootPart').CFrame.X 
                                 local LeftAdjustment = (PosX-Sides['Left'].X)
                                 local RightAdjustment = (PosX-Sides['Right'].X)
-                                if LeftAdjustment > RightAdjustment then closestside = 'right'; LoopCFrameSide = Sides['Right'] end 
-                                if RightAdjustment < LeftAdjustment then closestside = 'left'; LoopCFrameSide = Sides['Left'] end 
+                                if v.Name:find('R') then LoopCFrameSide = Sides['Right'] end
+                                if v.Name:find('L') then LoopCFrameSide = Sides['Left'] end
+                                -- if LeftAdjustment > RightAdjustment then closestside = 'right'; LoopCFrameSide = Sides['Right'] end 
+                                -- if RightAdjustment < LeftAdjustment then closestside = 'left'; LoopCFrameSide = Sides['Left'] end 
 
                                 repeat 
                                     task.wait(0.01)
