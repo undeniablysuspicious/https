@@ -15610,6 +15610,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         serverhopformobs = false;
         safemovement = false;
         ontopofcells = false;
+        shifttotheleft = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -15734,6 +15735,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     end)
     sector:AddToggle('Ontop of Cells',false,function(xtstae)
         getgenv().roghoulsettings['ontopofcells'] = xtstae -- hover on cells
+    end)
+    sector:AddToggle('Not ontop of gykat',false,function(xtstae)
+        getgenv().roghoulsettings['shifttotheleft'] = xtstae -- hover on cells
     end)
     sector:AddToggle('End Gykatsu High',false,function(xstate) 
         getgenv()['roghoulsettings']['highgykatsu'] = xstate
@@ -16981,6 +16985,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                 local oldValueText = ';'
                                 local canResetValueText = true;
                                 local MovementX = 0;
+                                if getgenv().roghoulsettings['shifttotheleft'] == true then 
+                                    MovementX = 20
+                                end
                                 local WaitingToChangeMovementX = false;
                                 local function findwithx(x)
                                     pcall(function()
