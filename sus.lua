@@ -15829,7 +15829,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddToggle('Release Keys Before Use',false,function(xtstae)
         getgenv().roghoulsettings['ereleasekeysbeforeusee'] = xtstae
     end)
-
+    othercheats:AddSeperator('')
 
     othercheats:AddToggle('Use R',false,function(xtstae)
         getgenv().roghoulsettings['user'] = xtstae 
@@ -15849,7 +15849,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddToggle('Release Keys Before Use',false,function(xtstae)
         getgenv().roghoulsettings['rreleasekeysbeforeuser'] = xtstae
     end)
-
+    othercheats:AddSeperator('')
 
 
     othercheats:AddToggle('Use F',false,function(xtstae)
@@ -15870,7 +15870,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddToggle('Release Keys Before Use',false,function(xtstae)
         getgenv().roghoulsettings['freleasekeysbeforeusef'] = xtstae
     end)
-
+    othercheats:AddSeperator('')
 
     othercheats:AddToggle('Use C',false,function(xtstae)
         getgenv().roghoulsettings['usec'] = xtstae
@@ -17143,6 +17143,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide
                                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,v:FindFirstChild('HumanoidRootPart').Position)
+                                            -- 
                                             usemoves()
                                         end
                                     end)
