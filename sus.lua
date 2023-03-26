@@ -386,7 +386,7 @@ function azfakenotify(text, time)
         bunda:Destroy()
     end)
 end
-
+getgenv().__getnotify = azfakenotify
 
 function Notify(titletxt, text, time)
     azfakenotify(text,time)
