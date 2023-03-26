@@ -9,6 +9,9 @@ end)
 
 --1
 
+-- could make getgenv return a different getgenv() or getgenv().azfake
+
+
 getgenv().versioncode = '#5b'
 getgenv().azfake_version = 'v3 '..getgenv().versioncode
 
@@ -17255,10 +17258,14 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                             if getgenv()['roghoulsettings']['highgykatsu'] == true then 
                                                 CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],getgenv().roghoulsettings['safedistance'],-3.4) * CFrame.Angles(math.rad(-90),0,0)
                                             end
+                                            -- HumanoiD
                                             if getgenv()['roghoulsettings']['classicfarm'] == true then 
-                                                CFrameMultiplication = Sides['Middle']
+                                                CFrameMultiplication = Sides['Middle'] 
+                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrameMultiplication
+                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,v:FindFirstChild('HumanoidRootPart').Position)
+                                            else
+                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
                                             end
-                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v:FindFirstChild('HumanoidRootPart').CFrame * CFrameMultiplication
                                             usemoves()
                                             if getgenv()['roghoulsettings']['gykustatsumobskill'] then 
                                                 local enemymodel = nil
