@@ -16972,7 +16972,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                     local LittlestDistance = nil; -- if this is smaller than target distance
                                     if enemymodel then 
                                         for i,child in next, enemymodel:GetChildren() do 
-                                            if child.PrimaryPart and child.Name == 'Mob' then 
+                                            if child.PrimaryPart and child.Name == 'Mob' and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                                                 local Magnitude = (child.PrimaryPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
                                                 if Magnitude <= getgenv().roghoulsettings['useetargetdistance'] then 
                                                     if getgenv().roghoulsettings['ereleasekeysbeforeusee'] == true then 
@@ -17016,7 +17016,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                     local LittlestDistance = nil;
                                     if enemymodel then 
                                         for i,child in next, enemymodel:GetChildren() do 
-                                            if child.PrimaryPart and child.Name == 'Mob' then 
+                                            if child.PrimaryPart and child.Name == 'Mob' and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                                                 local Magnitude = (child.PrimaryPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
                                                 if Magnitude <= getgenv().roghoulsettings['usertargetdistance'] then 
                                                     if getgenv().roghoulsettings['rreleasekeysbeforeuser'] == true then 
@@ -17060,7 +17060,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                     local LittlestDistance = nil;
                                     if enemymodel then 
                                         for i,child in next, enemymodel:GetChildren() do 
-                                            if child.PrimaryPart and child.Name == 'Mob' then 
+                                            if child.PrimaryPart and child.Name == 'Mob' and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                                                 local Magnitude = (child.PrimaryPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
                                                 if Magnitude <= getgenv().roghoulsettings['useftargetdistance'] then 
                                                     if getgenv().roghoulsettings['freleasekeysbeforeusef'] == true then 
@@ -17119,70 +17119,110 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             end
                             local gykat = enemymodel:FindFirstChild('Gyakusatsu')
                             for _,v in next, __farmable do 
-                                if not v:FindFirstChild('HumanoidRootPart') then return end
-                                local Sides = {
-                                    ['Left'] = CFrame.new(-997.681641, 64.747406, 210.257309);
-                                    ['Middle'] = CFrame.new(-998.055847, 64.7473831, 283.880157);
-                                    ['Right'] = CFrame.new(-995.961548, 64.7473831, 335.631134);
-                                }-- sides
-
-                                local blobroot = v:FindFirstChild('HumanoidRootPart')
-                                local closestside = 'left' -- SideClosest
-                                local LoopCFrameSide = Sides['Right']
-                                local PosX = v:FindFirstChild('HumanoidRootPart').CFrame.X 
-                                local LeftAdjustment = (PosX-Sides['Left'].X)
-                                local RightAdjustment = (PosX-Sides['Right'].X)
-                                if v.Name:sub(2,2) == ('R') then LoopCFrameSide = Sides['Left'] end
-                                if v.Name:sub(2,2) == ('L') then LoopCFrameSide = Sides['Right'] end
-                                -- if LeftAdjustment > RightAdjustment then closestside = 'right'; LoopCFrameSide = Sides['Right'] end 
-                                -- if RightAdjustment < LeftAdjustment then closestside = 'left'; LoopCFrameSide = Sides['Left'] end 
-
-                                repeat 
-                                    task.wait(0.01)
-                                    pcall(function()
-                                        if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
-                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide
-                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,v:FindFirstChild('HumanoidRootPart').Position)
-                                            -- 
-                                            usemoves()
-                                            if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 then 
-                                                -- print('waiting for quinque')
-                                                print('waiting for '..string.lower(typeweapon))
-                                                pressKey(getgenv().roghoulsettings['activestage'])
-                                                repeat task.wait() 
-                                                    task.delay(2.5,function()
-                                                        if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon)  then 
-                                                            pressKey(getgenv().roghoulsettings['activestage'])
+                                if v:FindFirstChild('HumanoidRootPart') then 
+                                
+                                    local Sides = {
+                                        ['Left'] = CFrame.new(-997.681641, 64.747406, 210.257309);
+                                        ['Middle'] = CFrame.new(-998.055847, 64.7473831, 283.880157);
+                                        ['Right'] = CFrame.new(-995.961548, 64.7473831, 335.631134);
+                                    }-- sides
+    
+                                    local blobroot = v:FindFirstChild('HumanoidRootPart')
+                                    local closestside = 'left' -- SideClosest
+                                    local LoopCFrameSide = Sides['Right']
+                                    local PosX = v:FindFirstChild('HumanoidRootPart').CFrame.X 
+                                    local LeftAdjustment = (PosX-Sides['Left'].X)
+                                    local RightAdjustment = (PosX-Sides['Right'].X)
+                                    if v.Name:sub(2,2) == ('R') then LoopCFrameSide = Sides['Left'] end
+                                    if v.Name:sub(2,2) == ('L') then LoopCFrameSide = Sides['Right'] end
+                                    -- if LeftAdjustment > RightAdjustment then closestside = 'right'; LoopCFrameSide = Sides['Right'] end 
+                                    -- if RightAdjustment < LeftAdjustment then closestside = 'left'; LoopCFrameSide = Sides['Left'] end 
+                                    local delaying = false;
+                                    local oldValue = nil;
+                                    local oldValueText = ';'
+                                    local canResetValueText = true;
+    
+    
+                                    repeat 
+                                        task.wait(0.01)
+                                        pcall(function()
+                                            if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide
+                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,v:FindFirstChild('HumanoidRootPart').Position)
+                                                -- 
+                                                usemoves()
+                                                if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 then 
+                                                    -- print('waiting for quinque')
+                                                    print('waiting for '..string.lower(typeweapon))
+                                                    pressKey(getgenv().roghoulsettings['activestage'])
+                                                    repeat task.wait() 
+                                                        task.delay(2.5,function()
+                                                            if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon)  then 
+                                                                pressKey(getgenv().roghoulsettings['activestage'])
+                                                            end
+                                                        end)
+                                                    until game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) 
+                                                    if getgenv().roghoulsettings['usec'] == true then 
+                                                        pressKey('C')
+                                                    end 
+                                                    -- task.wait(3)
+                                                    print(string.lower(typeweapon)..' active')
+                                                    -- print('quinque active')
+                                                end
+                                                if not game.Players.LocalPlayer.Character:FindFirstChild('Arata') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 and getgenv().roghoulsettings['equiparata'] == true then 
+                                                    -- print('waiting for quinque')
+                                                    print('waiting for '..string.lower('arata'))
+                                                    pressKey('Zero')
+                                                    -- repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                                                    repeat task.wait() 
+                                                        task.delay(2.5,function()
+                                                            if not game.Players.LocalPlayer.Character:FindFirstChild('Arata')  then 
+                                                                pressKey('Zero')
+                                                            end
+                                                        end)
+                                                    until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
+                                                    -- task.wait(3)
+                                                    print(string.lower('arata')..' active')
+                                                    -- print('quinque active')
+                                                end
+    
+    
+                                                -- HANDLE THE POINTS NOT BEING GIVEN
+                                                local function findwithx(x)
+                                                    local xfound = nil;
+                                                    for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
+                                                        if v and v.Name == x then 
+                                                            xfound = v
+                                                            break
                                                         end
+                                                    end
+                                                    return xfound
+                                                end
+                                                if delaying == false then 
+                                                    delaying = true;
+                                                    task.delay(2,function()
+                                                        local GyaSacsEarned = nil
+                                                        task.spawn(function()
+                                                            repeat task.wait() GyaSacsEarned = findwithx(game.Players.LocalPlayer.Name); until GyaSacsEarned ~= nil
+                                                            GyaSacsEarned = GyaSacsEarned:FindFirstChild('GyaPerc').Text
+                                                            GyaSacsEarned = string.split(Value,'%')[1]
+                                                            if GyaSacsEarned == oldValueText then 
+                                                                if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                                                                    game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0
+                                                                end
+                                                            else 
+                                                                oldValueText = GyaSacsEarned
+                                                            end
+                                                        end)
                                                     end)
-                                                until game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) 
-                                                if getgenv().roghoulsettings['usec'] == true then 
-                                                    pressKey('C')
-                                                end 
-                                                -- task.wait(3)
-                                                print(string.lower(typeweapon)..' active')
-                                                -- print('quinque active')
+                                                    canResetValueText = true;
+                                                    delaying = false;
+                                                end
                                             end
-                                            if not game.Players.LocalPlayer.Character:FindFirstChild('Arata') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 and getgenv().roghoulsettings['equiparata'] == true then 
-                                                -- print('waiting for quinque')
-                                                print('waiting for '..string.lower('arata'))
-                                                pressKey('Zero')
-                                                -- repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
-                                                repeat task.wait() 
-                                                    task.delay(2.5,function()
-                                                        if not game.Players.LocalPlayer.Character:FindFirstChild('Arata')  then 
-                                                            pressKey('Zero')
-                                                        end
-                                                    end)
-                                                until game.Players.LocalPlayer.Character:FindFirstChild('Arata') 
-                                                -- task.wait(3)
-                                                print(string.lower('arata')..' active')
-                                                -- print('quinque active')
-                                            end
-                                        end
-                                    end)
-                                until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().loopsUnload == true or getgenv().roghoulsettings['farming'] == false or getgenv().roghoulsettings['gykatfarm'] == false
-
+                                        end)
+                                    until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().loopsUnload == true or getgenv().roghoulsettings['farming'] == false or getgenv().roghoulsettings['gykatfarm'] == false
+    
+                                end
 
                                 -- for k,c in next, Sides do 
 
@@ -17378,47 +17418,77 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                     end
                                     repeat 
                                         task.wait(0.01)
-                                        if canResetValueText == true  and delaying == false then 
-                                            pcall(function()
-                                                if oldValue ~= '' then 
-                                                    oldValueText = oldValue:FindFirstChild('GyaPerc').Text
-                                                    oldValueText = string.split(oldValueText,'%')[1]
-                                                    canResetValueText = false;
+                                        -- if canResetValueText == true  and delaying == false then 
+                                        --     pcall(function()
+                                        --         if oldValue ~= '' then 
+                                        --             oldValueText = oldValue:FindFirstChild('GyaPerc').Text
+                                        --             oldValueText = string.split(oldValueText,'%')[1]
+                                        --             canResetValueText = false;
+                                        --         end
+                                        --     end)
+                                        --     print('Set percent to '..oldValueText)
+                                        -- end
+                                        -- if delaying == false then 
+                                        --     delaying = true;
+                                        --     task.delay(2,function()
+                                        --         local Value = nil
+                                        --         task.spawn(function()
+                                        --             repeat task.wait() Value = findwithx(game.Players.LocalPlayer.Name); until Value ~= nil
+                                        --             Value = Value:FindFirstChild('GyaPerc').Text
+                                        --             Value = string.split(Value,'%')[1]
+                                        --             print('got value = '..Value)
+                                        --             if Value == oldValueText then 
+                                        --                 if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                                        --                     game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0
+                                        --                 end
+                                        --                 -- pcall(function()
+                                                            
+                                        --                 -- end)
+                                        --             end
+                                        --         end)
+                                        --         -- If Value ~= nil then delaying = true; (it keeps running the delay until value is true)
+                                        --         -- Value = Value:FindFirstChild('GyaPerc').Text
+                                        --         -- Value = string.split(Value,'%')[1]
+
+                                        --         -- if Value == oldValueText then 
+                                        --         --     if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                                        --         --         game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0
+                                        --         --     end
+                                        --         --     -- pcall(function()
+                                                        
+                                        --         --     -- end)
+                                        --         -- end
+                                        --         --GyaPerc
+                                        --     end)
+                                        --     canResetValueText = true;
+                                        --     delaying = false;
+                                        -- end
+                                        local function findwithx(x)
+                                            local xfound = nil;
+                                            for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
+                                                if v and v.Name == x then 
+                                                    xfound = v
+                                                    break
                                                 end
-                                            end)
-                                            print('Set percent to '..oldValueText)
+                                            end
+                                            return xfound
                                         end
                                         if delaying == false then 
                                             delaying = true;
                                             task.delay(2,function()
-                                                local Value = nil
+                                                local GyaSacsEarned = nil
                                                 task.spawn(function()
-                                                    repeat task.wait() Value = findwithx(game.Players.LocalPlayer.Name); until Value ~= nil
-                                                    Value = Value:FindFirstChild('GyaPerc').Text
-                                                    Value = string.split(Value,'%')[1]
-                                                    print('got value = '..Value)
-                                                    if Value == oldValueText then 
+                                                    repeat task.wait() GyaSacsEarned = findwithx(game.Players.LocalPlayer.Name); until GyaSacsEarned ~= nil
+                                                    GyaSacsEarned = GyaSacsEarned:FindFirstChild('GyaPerc').Text
+                                                    GyaSacsEarned = string.split(Value,'%')[1]
+                                                    if GyaSacsEarned == oldValueText then 
                                                         if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
                                                             game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0
                                                         end
-                                                        -- pcall(function()
-                                                            
-                                                        -- end)
+                                                    else 
+                                                        oldValueText = GyaSacsEarned
                                                     end
                                                 end)
-                                                -- If Value ~= nil then delaying = true; (it keeps running the delay until value is true)
-                                                -- Value = Value:FindFirstChild('GyaPerc').Text
-                                                -- Value = string.split(Value,'%')[1]
-
-                                                -- if Value == oldValueText then 
-                                                --     if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
-                                                --         game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0
-                                                --     end
-                                                --     -- pcall(function()
-                                                        
-                                                --     -- end)
-                                                -- end
-                                                --GyaPerc
                                             end)
                                             canResetValueText = true;
                                             delaying = false;
