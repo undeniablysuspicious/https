@@ -16013,6 +16013,12 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         othercheats:AddDropdown('Roll Method',getgenv().roghoulsettings['rollmode'],"",false,function(xstate) -- multiple dropdown mode uses math.random to choose inside the table which one it will spin each time it runs in th spin function
             getgenv().roghoulsettings['chosenroll'] = xstate
         end)
+        othercheats:AddTextbox('Primary Colour','',function(xstate)
+            getgenv().roghoulsettings['primaryspincolour'] = xstate
+        end)
+        othercheats:AddTextbox('Secondary Colour','',function(xstate)
+            getgenv().roghoulsettings['primaryspincolour'] = xstate
+        end)
         othercheats:AddToggle('Roll Colours',false,function(xstate)
 
             if getgenv().roghoulsettings['autorollbackonspin'] == true then 
@@ -17406,10 +17412,12 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 -- HANDLE THE POINTS NOT BEING GIVEN
                                                 local function findwithx(x)
                                                     local xfound = nil;
-                                                    for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
-                                                        if v and v.Name == x then 
-                                                            xfound = v
-                                                            break
+                                                    if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList') and game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List') then 
+                                                        for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
+                                                            if v and v.Name == x then 
+                                                                xfound = v
+                                                                break
+                                                            end
                                                         end
                                                     end
                                                     return xfound
