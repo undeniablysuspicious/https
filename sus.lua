@@ -15988,7 +15988,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                 end
             end)    
         end)
-        othercheats:AddToggle('Rollback Data',function(xstate)
+        othercheats:AddToggle('Rollback Data',false,function(xstate)
             getgenv().roghoulsettings['rollingbackdata'] = xstate
             task.spawn(function()
                 azfakenotify('Loading...')
