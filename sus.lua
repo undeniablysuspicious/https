@@ -6299,61 +6299,81 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         local AdminTab = window:CreateTab("Admin");
         local AdminSector = AdminTab:CreateSector('Moves','left')
         local AdminRb = AdminTab:CreateSector('Rollback Features','right')
-        AdminRb:AddButton('Rollback (Testing)', function()
-            pcall(function()
-                settings().Network.IncomingReplicationLag = 10000000
-                settings().Network.HttpProxyEnabled = false;
-                settings().Network.HttpProxyURL = ''
-                -- settings().Network.TrackDataTypes = false;
-                -- settings().Network.TrackPhysicsDetails = false;
-                local random = Random.new()
-                local letters = {'a','b','c','d','e','f','g','h','i','j','k4','l','m','n','o','p4','q','r','s','t','u','v4','w','x','y','z','gej0h','hrhw1','ewh2','gew3','ffs4','gh5','w6','f7r','ff8','e9r','h','br'}
-                function getRandomLetter()
-                    return letters[random:NextInteger(1,#letters)]
+
+        AdminRb:AddButton('Rollback',function()
+            task.spawn(function()
+                while task.wait() do 
+                    local ohString1 = "UpdateSettings"
+                    local ohString2 = "On\255"
+                    local ohString3 = "On"
+                    local ohString4 = "On"
+                    local ohString5 = "On"
+                    local ohString6 = "Off"
+                    local ohString7 = "On"
+                    local ohString8 = "On"
+                    
+                    game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2, ohString3, ohString4, ohString5, ohString6, ohString7, ohString8)    
                 end
-                function getRandomString(length, includeCapitals)
-                    local length = length or 10
-                    local str = ''
-                    for i=1,length do
-                        local randomLetter = getRandomLetter()
-                        if includeCapitals and random:NextNumber() > .5 then
-                            randomLetter = string.upper(randomLetter)
-                        end
-                        str = str .. randomLetter
-                    end
-                    return str
-                end
-                mt.__namecall = newcclosure(function(self,...) -- self ( the instance )  and args 
-                    if getnamecallmethod() == 'FireServer'  then -- checking if we're firing a remote
-                        local args = {...}  
-                        -- for i,v in pairs(args) do print(tostring(v)) end
-                        -- -- if type(args[1]) == 'table' and args[1][1] == 'AC' then
-                        -- --     return
-                        -- -- end
-                        return
-                    elseif getnamecallmethod() == 'InvokeServer'then 
-                        return
-                    elseif getnamecallmethod() == 'Fire' then 
-                        return
-                    elseif getnamecallmethod() == 'GetDataStore' then 
-                        return
-                    elseif getnamecallmethod() == 'GetGlobalDataStore' then 
-                        return
-                    elseif getnamecallmethod() == 'GetService' then
-                        return
-                    elseif getnamecallmethod() == 'Connect' then 
-                        return
-                    elseif getnamecallmethod() == 'RemoveAsync' then 
-                        return
-                    elseif getnamecallmethod() == 'SetAsync' then 
-                        return getRandomString(10000000000000000000000000,true)
-                    end
-                    return namecall(self,...)
-                end) 
             end)
+        end)
+
+
+
+        -- AdminRb:AddButton('Rollback (Testing)', function()
+        --     pcall(function()
+        --         settings().Network.IncomingReplicationLag = 10000000
+        --         settings().Network.HttpProxyEnabled = false;
+        --         settings().Network.HttpProxyURL = ''
+        --         -- settings().Network.TrackDataTypes = false;
+        --         -- settings().Network.TrackPhysicsDetails = false;
+        --         local random = Random.new()
+        --         local letters = {'a','b','c','d','e','f','g','h','i','j','k4','l','m','n','o','p4','q','r','s','t','u','v4','w','x','y','z','gej0h','hrhw1','ewh2','gew3','ffs4','gh5','w6','f7r','ff8','e9r','h','br'}
+        --         function getRandomLetter()
+        --             return letters[random:NextInteger(1,#letters)]
+        --         end
+        --         function getRandomString(length, includeCapitals)
+        --             local length = length or 10
+        --             local str = ''
+        --             for i=1,length do
+        --                 local randomLetter = getRandomLetter()
+        --                 if includeCapitals and random:NextNumber() > .5 then
+        --                     randomLetter = string.upper(randomLetter)
+        --                 end
+        --                 str = str .. randomLetter
+        --             end
+        --             return str
+        --         end
+        --         mt.__namecall = newcclosure(function(self,...) -- self ( the instance )  and args 
+        --             if getnamecallmethod() == 'FireServer'  then -- checking if we're firing a remote
+        --                 local args = {...}  
+        --                 -- for i,v in pairs(args) do print(tostring(v)) end
+        --                 -- -- if type(args[1]) == 'table' and args[1][1] == 'AC' then
+        --                 -- --     return
+        --                 -- -- end
+        --                 return
+        --             elseif getnamecallmethod() == 'InvokeServer'then 
+        --                 return
+        --             elseif getnamecallmethod() == 'Fire' then 
+        --                 return
+        --             elseif getnamecallmethod() == 'GetDataStore' then 
+        --                 return
+        --             elseif getnamecallmethod() == 'GetGlobalDataStore' then 
+        --                 return
+        --             elseif getnamecallmethod() == 'GetService' then
+        --                 return
+        --             elseif getnamecallmethod() == 'Connect' then 
+        --                 return
+        --             elseif getnamecallmethod() == 'RemoveAsync' then 
+        --                 return
+        --             elseif getnamecallmethod() == 'SetAsync' then 
+        --                 return getRandomString(10000000000000000000000000,true)
+        --             end
+        --             return namecall(self,...)
+        --         end) 
+        --     end)
 
             
-        end)
+        -- end)
 
 
         --- hook function a function in module script to manipulate it
@@ -15625,6 +15645,13 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         ereleasekeysbeforeusee = false;
         rreleasekeysbeforeuser = false; 
         freleasekeysbeforeusef = false;
+        primaryspincolour = ''; -- primaryspin
+        secondaryspincolour = '';
+        rollmode = {'Standard','Choice','Choice x4','Choice x8'};
+        chosenroll = '';
+        rollbackafterspin = false;
+        stopamount = 50;
+        rollingbackdata = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -15761,6 +15788,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     sector:AddToggle('End Gykatsu High',false,function(xstate) 
         getgenv()['roghoulsettings']['highgykatsu'] = xstate
     end)
+    -- DCDCAA = get service
+    --4EC9B0
     getgenv().serverhop = function()
         local Http = game:GetService("HttpService")
         local Api = "https://games.roblox.com/v1/games/"
@@ -15774,7 +15803,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
            local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
            return Http:JSONDecode(Raw)
         end
-        
+        -- function = C586C0 ff0055
         local listed = 0
         local reg = {}
         for _,server in next, ListServers(nil).data do 
@@ -15943,6 +15972,135 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = PrevCFrame
         end
     end)
+    if getgenv().adminCheck == true then 
+        othercheats:AddSeperator('Risky Cheats')
+        othercheats:AddButton('Rollback',function()
+            task.spawn(function()
+                task.delay(5,function()
+                    print('Rolledback');
+                    game.Players.LocalPlayer:Kick('[AZFAKE]: Rollback')
+                end)
+                while task.wait(0.001) do 
+                    -- local ohString1 = 
+                    game:GetService("ReplicatedStorage").Remotes.Settings.FactionChoose:InvokeServer("Chidori [Ro-Ghoul]\255")
+                    -- local ohString1 = 
+                    game:GetService("ReplicatedStorage").Remotes.Settings.SpawnSelection:FireServer("CCGBuilding\255")
+                end
+            end)    
+        end)
+        othercheats:AddToggle('Rollback Data',function(xstate)
+            getgenv().roghoulsettings['rollingbackdata'] = xstate
+            task.spawn(function()
+                azfakenotify('Loading...')
+                task.wait(1)
+                azfakenotify('Rolledback! This wont kick.')
+                while task.wait(0.001) do 
+                    if getgenv().loopsUnload == true then print('restarted data') break end 
+                    if getgenv().roghoulsettings['rollingbackdata']  == false then print('stopped') 
+                        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                            game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') .Health = 0
+                        end
+                    break end
+                    -- local ohString1 = 
+                    game:GetService("ReplicatedStorage").Remotes.Settings.FactionChoose:InvokeServer("Chidori [Ro-Ghoul]\255")
+                    -- local ohString1 = 
+                    game:GetService("ReplicatedStorage").Remotes.Settings.SpawnSelection:FireServer("CCGBuilding\255")
+                end
+            end)    
+        end)
+        othercheats:AddDropdown('Roll Method',getgenv().roghoulsettings['rollmode'],"",false,function(xstate) -- multiple dropdown mode uses math.random to choose inside the table which one it will spin each time it runs in th spin function
+            getgenv().roghoulsettings['chosenroll'] = xstate
+        end)
+        othercheats:AddToggle('Roll Colours',false,function(xstate)
+            local function getcolour(x) -- function to check if they match
+                local Colour = Color3.fromRGB(0,0,0)
+                local NameOfColour = ''
+                local colourvalues = {}
+                for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('ColorFrame'):FindFirstChild('Colors'):FindFirstChild('ColorFrame'):GetChildren() do 
+                    if v.BackgroundColor3 == x then 
+                        Colour = v.BackgroundColor3
+                        NameOfColour = v.Name
+                    end
+                end
+                return Colour,NameOfColour
+            end
+            -- getcolour()[1] how to get the first value it returns without setting a variable
+            -- Loops inside the colours we got from spinning
+
+
+            local FoundWantedColour = false
+
+            local function Spin()
+                azfakenotify('Spinning Colours',3)
+                local Method = getgenv().roghoulsettings['chosenroll']
+                -- local FilteredMethod = ''
+                -- if Method == 'Choice 2' then FilteredMethod = 'Choice' end
+                -- game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors').Visible = true;
+
+                local useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.CCGLab.RandomizeColor(Method)
+                local FoundColour = false;
+                for _,v in next, colours do 
+                    local PrimaryColour = v.PColor
+                    local SecondaryColour = v.SColour 
+                    if PrimaryColour == getgenv().roghoulsettings['primaryspincolour'] and SecondaryColour == getgenv().roghoulsettings['secondaryspincolour'] then 
+                        FoundWantedColour = true;
+                        uselessagain:InvokeServer(tostring(_))
+                        azfakenotify('Found Colour',3)
+                        FoundWantedColour = true;
+                        FoundColour = true;
+                        break
+                        
+                    end
+                end
+                if FoundColour == false then 
+                    uselessagain:InvokeServer('0');
+                end
+                
+            end
+
+
+
+
+            local StopAmount = getgenv().roghoulsettings['stopamount'];
+
+
+            repeat 
+                task.wait(.5)
+                if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value >= StopAmount then 
+                    Spin()
+                end
+            until game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value <= StopAmount
+            -- for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('Colors'):GetChildren() do 
+            --     local PNameC,PCColour = getcolour()
+            --     local SNameC,SCColour = getcolour()
+            --     if v:FindFirstChild('PColour') and v:FindFirstChild('SColour') and NameC == getgenv().roghoulsettings['primaryspincolour'] and SNameC == getgenv().roghoulsettings['secondaryspincolour'] then 
+            --         firepromt(v:FindFirstChild('B'))
+            --         FoundWantedColour = true ;
+            --         break;
+            --     end
+            -- end
+            if FoundWantedColour == false then 
+                if getgenv().roghoulsettings['rollbackafterspin'] == true then 
+                    task.spawn(function()
+                        task.delay(5,function()
+                            print('Rolledback');
+                            game.Players.LocalPlayer:Kick('[AZFAKE]: Rollback')
+                        end)
+                        while task.wait(0.001) do 
+                            -- local ohString1 = 
+                            game:GetService("ReplicatedStorage").Remotes.Settings.FactionChoose:InvokeServer("Chidori [Ro-Ghoul]\255")
+                            -- local ohString1 = 
+                            game:GetService("ReplicatedStorage").Remotes.Settings.SpawnSelection:FireServer("CCGBuilding\255")
+                        end
+                    end)   
+                end
+            end
+        end)
+        othercheats:AddToggle('Auto Rollback Colour After Spin',false,function(xstate)
+            getgenv().roghoulsettings['rollbackafterspin'] = xstate
+        end)
+        -- othercheats:AddLabel()
+    end
     game.Players.LocalPlayer.Idled:Connect(function()
         game:GetService("VirtualUser"):ClickButton2(Vector2.new())
     end)
@@ -16327,6 +16485,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     local function equiparara()
 
     end
+    -- game:Enypass
     --print(game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value)
     -- get closest npc spawn instead of humanoidrootpart
     Configuration:CreateConfigSystem()
@@ -16662,7 +16821,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         end
     
                         
-                        if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 then 
+                        if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 and getgenv().roghoulsettings['equiparata'] == true then 
                             -- print('waiting for quinque')
                             print('waiting for '..string.lower(typeweapon))
                             pressKey(getgenv().roghoulsettings['activestage'])
@@ -16697,6 +16856,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             print(string.lower('arata')..' active')
                             -- print('quinque active')
                         end
+
+                        --open after teleport but this opens after tween
+
                         -- if results == true then 
                         --     getgenv()['roghoulsettings']['action'] = 'canquest'
                         --     getgenv()['roghoulsettings']['hasntstarted'] = true
@@ -16736,7 +16898,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                             getgenv()['roghoulsettings']['playerz']
                                         )
                                     end
-                                    if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 then 
+                                    if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 and getgenv().roghoulsettings['equiparata'] == true then 
                                         -- print('waiting for quinque')
                                         print('waiting for '..string.lower(typeweapon))
                                         pressKey(getgenv().roghoulsettings['activestage'])
