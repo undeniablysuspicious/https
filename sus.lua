@@ -15652,6 +15652,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         rollbackafterspin = false;
         stopamount = 50;
         rollingbackdata = false;
+        spindelay = 0.5;
+        autorollbackonspin = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -15990,28 +15992,34 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         end)
         othercheats:AddToggle('Rollback Data',false,function(xstate)
             getgenv().roghoulsettings['rollingbackdata'] = xstate
-            task.spawn(function()
-                azfakenotify('Loading...')
-                task.wait(1)
-                azfakenotify('Rolledback! This wont kick.')
-                while task.wait(0.001) do 
-                    if getgenv().loopsUnload == true then print('restarted data') break end 
-                    if getgenv().roghoulsettings['rollingbackdata']  == false then print('stopped') 
-                        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
-                            game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') .Health = 0
-                        end
-                    break end
-                    -- local ohString1 = 
-                    game:GetService("ReplicatedStorage").Remotes.Settings.FactionChoose:InvokeServer("Chidori [Ro-Ghoul]\255")
-                    -- local ohString1 = 
-                    game:GetService("ReplicatedStorage").Remotes.Settings.SpawnSelection:FireServer("CCGBuilding\255")
-                end
-            end)    
+            -- task.spawn(function()
+            --     azfakenotify('Loading...')
+            --     task.wait(1)
+            --     azfakenotify('Rolledback! This wont kick.')
+            --     while task.wait(0.001) do -- put this in the global while loop so i can set rollingback data from anywhere without this toggle going on so if they save the toggle wont be on true
+            --         if getgenv().loopsUnload == true then print('restarted data') break end 
+            --         if getgenv().roghoulsettings['rollingbackdata']  == false then print('stopped') 
+            --             if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+            --                 game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') .Health = 0
+            --             end
+            --         break end
+            --         -- local ohString1 = 
+            --         game:GetService("ReplicatedStorage").Remotes.Settings.FactionChoose:InvokeServer("Chidori [Ro-Ghoul]\255")
+            --         -- local ohString1 = 
+            --         game:GetService("ReplicatedStorage").Remotes.Settings.SpawnSelection:FireServer("CCGBuilding\255")
+            --     end
+            -- end)    
         end)
         othercheats:AddDropdown('Roll Method',getgenv().roghoulsettings['rollmode'],"",false,function(xstate) -- multiple dropdown mode uses math.random to choose inside the table which one it will spin each time it runs in th spin function
             getgenv().roghoulsettings['chosenroll'] = xstate
         end)
         othercheats:AddToggle('Roll Colours',false,function(xstate)
+
+            if getgenv().roghoulsettings['autorollbackonspin'] == true then 
+                azfakenotify('Auto Rolling Back','untilClick')
+                getgenv().roghoulsettings['rollingbackdata'] = true -- if it was already true dont set to false when we find the colour
+            end
+
             local function getcolour(x) -- function to check if they match
                 local Colour = Color3.fromRGB(0,0,0)
                 local NameOfColour = ''
@@ -16037,25 +16045,40 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                 -- if Method == 'Choice 2' then FilteredMethod = 'Choice' end
                 -- game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors').Visible = true;
 
-                local useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.CCGLab.RandomizeColor(Method)
+                local useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.CCGLab.RandomizeColor:InvokeServer(Method)
                 local FoundColour = false;
-                for _,v in next, colours do 
-                    local PrimaryColour = v.PColor
-                    local SecondaryColour = v.SColour 
-                    if PrimaryColour == getgenv().roghoulsettings['primaryspincolour'] and SecondaryColour == getgenv().roghoulsettings['secondaryspincolour'] then 
-                        FoundWantedColour = true;
-                        uselessagain:InvokeServer(tostring(_))
-                        azfakenotify('Found Colour',3)
-                        FoundWantedColour = true;
-                        FoundColour = true;
-                        break
-                        
+                if type(colours) == 'table' then 
+
+                    for _,v in next, colours do 
+                        local PrimaryColour = v.PColor
+                        local SecondaryColour = v.SColour 
+                        if PrimaryColour == getgenv().roghoulsettings['primaryspincolour'] and SecondaryColour == getgenv().roghoulsettings['secondaryspincolour'] then 
+                            FoundWantedColour = true;
+                            uselessagain:InvokeServer(tostring(_))
+                            azfakenotify('Found Colour',3)
+                            azfakenotify('Removing Rollback')
+                            getgenv().roghoulsettings['rollingbackdata'] = false;
+                            FoundWantedColour = true;
+                            FoundColour = true;
+                            break
+                            
+                        end
                     end
                 end
                 if FoundColour == false then 
                     uselessagain:InvokeServer('0');
                 end
-                
+                if game.Players.LocalPlayer:FindFirstChild('PlayerFolder') then 
+                    pcall(function()
+                        local CurrentColours = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors')
+                        CurrentColours.PColor.BackgroundColor3 = BrickColor.new(l__Value__72).Color;
+                        CurrentColours.SColor.BackgroundColor3 = BrickColor.new(l__Value__73).Color;
+                        local l__Value__72 = game.Players.LocalPlayer:FindFirstChild('PlayerFolder').Customization.WeaponPrimaryColor.Value;
+                        local l__Value__73 = game.Players.LocalPlayer:FindFirstChild('PlayerFolder').Customization.WeaponSecondaryColor.Value;
+                        CurrentColours.PColor.Text = l__Value__72;
+                        CurrentColours.SColor.Text = l__Value__73;
+                    end)
+                end
             end
 
 
@@ -16066,10 +16089,10 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
 
             repeat 
                 task.wait(.5)
-                if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value >= StopAmount then 
+                if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value >= StopAmount and FoundColour == false then 
                     Spin()
                 end
-            until game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value <= StopAmount
+            until game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value <= StopAmount or FoundColour == true
             -- for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('Colors'):GetChildren() do 
             --     local PNameC,PCColour = getcolour()
             --     local SNameC,SCColour = getcolour()
@@ -16096,8 +16119,17 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                 end
             end
         end)
+        sector:AddSlider("Stop Spinning At", 0, 0.5, 300, 5, function(State)
+            getgenv().roghoulsettings['stopamount'] = State
+        end)
+        sector:AddSlider("Spin Speed", 0, 0.5, 300, 5, function(State)
+            getgenv().roghoulsettings['spinspeed'] = State
+        end)
         othercheats:AddToggle('Auto Rollback Colour After Spin',false,function(xstate)
             getgenv().roghoulsettings['rollbackafterspin'] = xstate
+        end)
+        othercheats:AddToggle('Auto Rollback Colour Before Spin',false,function(xstate)
+            getgenv().roghoulsettings['autorollbackonspin'] = xstate -- set rollback data to true (the toggle)
         end)
         -- othercheats:AddLabel()
     end
@@ -16500,6 +16532,28 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             local typeweapon = game.Players.LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value
             if typeweapon == 'CCG' then typeweapon='Quinque' end 
             if typeweapon == 'Ghoul' then typeweapon='Kagune' end 
+            if getgenv().roghoulsettings['rollingbackdata'] == true then 
+                getgenv().roghoulsettings['rollingbackdata'] = nil;
+                task.spawn(function()
+                    azfakenotify('Loading...')
+                    task.wait(1)
+                    azfakenotify('Rolledback! This wont kick.')
+                    while task.wait(0.001) do -- put this in the global while loop so i can set rollingback data from anywhere without this toggle going on so if they save the toggle wont be on true
+                        if getgenv().loopsUnload == true then print('restarted data') break end 
+                        if getgenv().roghoulsettings['rollingbackdata']  == false then print('stopped') 
+                            if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                                game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') .Health = 0
+                            end
+                            game:GetService("ReplicatedStorage").Remotes.Settings.SpawnSelection:FireServer("Anteiku")
+                        break end
+                        -- local ohString1 = 
+                        game:GetService("ReplicatedStorage").Remotes.Settings.FactionChoose:InvokeServer("Chidori [Ro-Ghoul]\255")
+                        -- local ohString1 = 
+                        game:GetService("ReplicatedStorage").Remotes.Settings.SpawnSelection:FireServer("CCGBuilding\255")
+                    end
+                end) 
+            end
+
             if getgenv().roghoulsettings['serverhopformobs'] == true then 
                 local MobsPrev = true;
                 getgenv().roghoulsettings['serverhopformobs'] = nil;
