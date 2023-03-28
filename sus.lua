@@ -15654,6 +15654,10 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         rollingbackdata = false;
         spindelay = 0.5;
         autorollbackonspin = false;
+        acceptifprimaryis = false;
+        acceptprimarycolour = '';
+        acceptifsecondaryis = false;
+        acceptsecondarycolour = '';
     }
     getgenv().divious_teleport = function(info)
 
@@ -16020,121 +16024,160 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             getgenv().roghoulsettings['primaryspincolour'] = xstate
         end)
         othercheats:AddToggle('Roll Colours',false,function(xstate)
-
-            if getgenv().roghoulsettings['autorollbackonspin'] == true then 
-                azfakenotify('Auto Rolling Back','untilClick')
-                getgenv().roghoulsettings['rollingbackdata'] = true -- if it was already true dont set to false when we find the colour
-            end
-
-            local function getcolour(x) -- function to check if they match
-                local Colour = Color3.fromRGB(0,0,0)
-                local NameOfColour = ''
-                local colourvalues = {}
-                for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('ColorFrame'):FindFirstChild('Colors'):FindFirstChild('ColorFrame'):GetChildren() do 
-                    if v.BackgroundColor3 == x then 
-                        Colour = v.BackgroundColor3
-                        NameOfColour = v.Name
-                    end
+            if xstate == true then 
+                if getgenv().roghoulsettings['autorollbackonspin'] == true then 
+                    azfakenotify('Auto Rolling Back','untilClick')
+                    getgenv().roghoulsettings['rollingbackdata'] = true -- if it was already true dont set to false when we find the colour
                 end
-                return Colour,NameOfColour
-            end
-            -- getcolour()[1] how to get the first value it returns without setting a variable
-            -- Loops inside the colours we got from spinning
-
-
-            local FoundWantedColour = false
-
-            local function Spin()
-                azfakenotify('Spinning Colours',3)
-                local Method = getgenv().roghoulsettings['chosenroll']
-                -- local FilteredMethod = ''
-                -- if Method == 'Choice 2' then FilteredMethod = 'Choice' end
-                -- game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors').Visible = true;
-
-                local useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.CCGLab.RandomizeColor:InvokeServer(Method)
+    
+                local function getcolour(x) -- function to check if they match
+                    local Colour = Color3.fromRGB(0,0,0)
+                    local NameOfColour = ''
+                    local colourvalues = {}
+                    for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('ColorFrame'):FindFirstChild('Colors'):FindFirstChild('ColorFrame'):GetChildren() do 
+                        if v.BackgroundColor3 == x then 
+                            Colour = v.BackgroundColor3
+                            NameOfColour = v.Name
+                        end
+                    end
+                    return Colour,NameOfColour
+                end
+                -- getcolour()[1] how to get the first value it returns without setting a variable
+                -- Loops inside the colours we got from spinning
+    
+    
+                local FoundWantedColour = false
                 local FoundColour = false;
-                if type(colours) == 'table' then 
-
-                    for _,v in next, colours do 
-                        local PrimaryColour = v.PColor
-                        local SecondaryColour = v.SColour 
-                        if PrimaryColour == getgenv().roghoulsettings['primaryspincolour'] and SecondaryColour == getgenv().roghoulsettings['secondaryspincolour'] then 
-                            FoundWantedColour = true;
-                            uselessagain:InvokeServer(tostring(_))
-                            azfakenotify('Found Colour',3)
-                            azfakenotify('Removing Rollback')
-                            getgenv().roghoulsettings['rollingbackdata'] = false;
-                            FoundWantedColour = true;
-                            FoundColour = true;
-                            break
-                            
+                local function Spin()
+                    azfakenotify('Spinning Colours',3)
+                    local Method = getgenv().roghoulsettings['chosenroll']
+                    -- local FilteredMethod = ''
+                    -- if Method == 'Choice 2' then FilteredMethod = 'Choice' end
+                    -- game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors').Visible = true;
+                    local RemPath = ''
+                    local useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.CCGLab.RandomizeColor:InvokeServer(Method)
+                    if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value == 'Ghoul' then 
+                        useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.KakuhouSurgeon.RandomizeColor:InvokeServer(Method)
+                    end 
+                    -- local FoundColour = false;
+                    if type(colours) == 'table' then 
+    
+                        for _,v in next, colours do 
+                            local PrimaryColour = v.PColor
+                            local SecondaryColour = v.SColour 
+                            print('Spun on primary: '..PrimaryColour..' Secondary: '..SecondaryColour)
+                            if PrimaryColour == getgenv().roghoulsettings['primaryspincolour'] and SecondaryColour == getgenv().roghoulsettings['secondaryspincolour'] then 
+                                FoundWantedColour = true;
+                                uselessagain:InvokeServer(tostring(_))
+                                azfakenotify('Found Colour',3)
+                                azfakenotify('Removing Rollback')
+                                getgenv().roghoulsettings['rollingbackdata'] = false;
+                                FoundWantedColour = true;
+                                FoundColour = true;
+                                break
+                            elseif getgenv().roghoulsettings['acceptifprimaryis'] == true and getgenv().roghoulsettings['acceptprimarycolour'] ~= '' and getgenv().roghoulsettings['acceptprimarycolour'] == PrimaryColour then 
+                                if getgenv().roghoulsettings['acceptifsecondaryis'] == true and getgenv().roghoulsettings['acceptsecondarycolour'] ~= '' and SecondaryColour == getgenv().roghoulsettings['acceptsecondarycolour'] then 
+                                    uselessagain:InvokeServer(tostring(_))
+                                elseif getgenv().roghoulsettings['acceptifsecondaryis'] == false then 
+                                    uselessagain:InvokeServer(tostring(_))
+                                end
+                            elseif getgenv().roghoulsettings['acceptifsecondaryis'] == true and getgenv().roghoulsettings['acceptsecondarycolour'] ~= '' and getgenv().roghoulsettings['acceptprimarycolour'] == PrimaryColour then 
+                                if getgenv().roghoulsettings['acceptifprimaryis'] == true and getgenv().roghoulsettings['acceptprimarycolour'] ~= '' and SecondaryColour == getgenv().roghoulsettings['acceptprimarycolour'] then 
+                                    uselessagain:InvokeServer(tostring(_))
+                                elseif getgenv().roghoulsettings['acceptifprimaryis'] == false then 
+                                    uselessagain:InvokeServer(tostring(_))
+                                end
+                            end
                         end
                     end
-                end
-                if FoundColour == false then 
-                    uselessagain:InvokeServer('0');
-                end
-                if game.Players.LocalPlayer:FindFirstChild('PlayerFolder') then 
-                    pcall(function()
-                        local CurrentColours = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors')
-                        CurrentColours.PColor.BackgroundColor3 = BrickColor.new(l__Value__72).Color;
-                        CurrentColours.SColor.BackgroundColor3 = BrickColor.new(l__Value__73).Color;
-                        local l__Value__72 = game.Players.LocalPlayer:FindFirstChild('PlayerFolder').Customization.WeaponPrimaryColor.Value;
-                        local l__Value__73 = game.Players.LocalPlayer:FindFirstChild('PlayerFolder').Customization.WeaponSecondaryColor.Value;
-                        CurrentColours.PColor.Text = l__Value__72;
-                        CurrentColours.SColor.Text = l__Value__73;
-                    end)
-                end
-            end
-
-
-
-
-            local StopAmount = getgenv().roghoulsettings['stopamount'];
-
-
-            repeat 
-                task.wait(.5)
-                if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value >= StopAmount and FoundColour == false then 
-                    Spin()
-                end
-            until game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value <= StopAmount or FoundColour == true
-            -- for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('Colors'):GetChildren() do 
-            --     local PNameC,PCColour = getcolour()
-            --     local SNameC,SCColour = getcolour()
-            --     if v:FindFirstChild('PColour') and v:FindFirstChild('SColour') and NameC == getgenv().roghoulsettings['primaryspincolour'] and SNameC == getgenv().roghoulsettings['secondaryspincolour'] then 
-            --         firepromt(v:FindFirstChild('B'))
-            --         FoundWantedColour = true ;
-            --         break;
-            --     end
-            -- end
-            if FoundWantedColour == false then 
-                if getgenv().roghoulsettings['rollbackafterspin'] == true then 
-                    task.spawn(function()
-                        task.delay(5,function()
-                            print('Rolledback');
-                            game.Players.LocalPlayer:Kick('[AZFAKE]: Rollback')
+                    if FoundColour == false then 
+                        uselessagain:InvokeServer('0');
+                    end
+                    if game.Players.LocalPlayer:FindFirstChild('PlayerFolder') then 
+                        pcall(function()
+                            local ColourPath = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors');
+                            if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value == 'Ghoul' then 
+                                ColourPath = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewSurgeonGui'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors')
+                            end
+                            local CurrentColours = ColourPath 
+                            CurrentColours.PColor.BackgroundColor3 = BrickColor.new(l__Value__72).Color;
+                            CurrentColours.SColor.BackgroundColor3 = BrickColor.new(l__Value__73).Color;
+                            local l__Value__72 = game.Players.LocalPlayer:FindFirstChild('PlayerFolder').Customization.WeaponPrimaryColor.Value;
+                            local l__Value__73 = game.Players.LocalPlayer:FindFirstChild('PlayerFolder').Customization.WeaponSecondaryColor.Value;
+                            CurrentColours.PColor.Text = l__Value__72;
+                            CurrentColours.SColor.Text = l__Value__73;
                         end)
-                        while task.wait(0.001) do 
-                            -- local ohString1 = 
-                            game:GetService("ReplicatedStorage").Remotes.Settings.FactionChoose:InvokeServer("Chidori [Ro-Ghoul]\255")
-                            -- local ohString1 = 
-                            game:GetService("ReplicatedStorage").Remotes.Settings.SpawnSelection:FireServer("CCGBuilding\255")
-                        end
-                    end)   
+                    end
+                end
+    
+    
+    
+    
+                local StopAmount = getgenv().roghoulsettings['stopamount'];
+    
+    
+                repeat 
+                    task.wait(getgenv().roghoulsettings['spindelay']) -- spinspeed
+                    if tonumber(game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value) >= StopAmount and FoundColour == false then 
+                        Spin()
+                    elseif tonumber(game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value) <= StopAmount then 
+                        azfakenotify('Not enough credits',3)
+                    elseif FoundColour == true then 
+                    end
+                until tonumber(game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value) < StopAmount or FoundColour == true or getgenv().loopsUnload == true
+                -- for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('Colors'):GetChildren() do 
+                --     local PNameC,PCColour = getcolour()
+                --     local SNameC,SCColour = getcolour()
+                --     if v:FindFirstChild('PColour') and v:FindFirstChild('SColour') and NameC == getgenv().roghoulsettings['primaryspincolour'] and SNameC == getgenv().roghoulsettings['secondaryspincolour'] then 
+                --         firepromt(v:FindFirstChild('B'))
+                --         FoundWantedColour = true ;
+                --         break;
+                --     end
+                -- end
+                -- azfakenotify('Finished spinning',3)
+                if FoundWantedColour == false then 
+                    if getgenv().roghoulsettings['rollbackafterspin'] == true then 
+                        task.spawn(function()
+                            task.delay(5,function()
+                                print('Rolledback');
+                                game.Players.LocalPlayer:Kick('[AZFAKE]: Rollback')
+                            end)
+                            while task.wait(0.001) do 
+                                -- local ohString1 = 
+                                game:GetService("ReplicatedStorage").Remotes.Settings.FactionChoose:InvokeServer("Chidori [Ro-Ghoul]\255")
+                                -- local ohString1 = 
+                                game:GetService("ReplicatedStorage").Remotes.Settings.SpawnSelection:FireServer("CCGBuilding\255")
+                            end
+                        end)   
+                    end
                 end
             end
         end)
-        sector:AddSlider("Stop Spinning At", 0, 0.5, 300, 5, function(State)
+        othercheats:AddSlider("Stop Spinning At", 0, 50, 300, 5, function(State)
             getgenv().roghoulsettings['stopamount'] = State
         end)
-        sector:AddSlider("Spin Speed", 0, 0.5, 300, 5, function(State)
-            getgenv().roghoulsettings['spinspeed'] = State
+        othercheats:AddSlider("Spin Speed", 0, 0.5, 5, 5, function(State)
+            getgenv().roghoulsettings['spindelay'] = State -- spinspeed
         end)
-        othercheats:AddToggle('Auto Rollback Colour After Spin',false,function(xstate)
+        othercheats:AddToggle('Accept Spin If Primary Is',false,function(xstate)
+            getgenv().roghoulsettings['acceptifprimaryis'] = xstate
+        end)
+        othercheats:AddTextbox('If Primary Is','',function(xstate)
+            getgenv().roghoulsettings['acceptprimarycolour'] = xstate
+        end)
+
+        othercheats:AddToggle('Accept Spin If Secondary Is',false,function(xstate)
+            getgenv().roghoulsettings['acceptifsecondaryis'] = xstate
+        end)
+        othercheats:AddTextbox('If Secondary Is','',function(xstate)
+            getgenv().roghoulsettings['acceptsecondarycolour'] = xstate
+        end)
+
+        othercheats:AddSeperator()
+        othercheats:AddToggle('Rollback Colour After Spin',false,function(xstate)
             getgenv().roghoulsettings['rollbackafterspin'] = xstate
         end)
-        othercheats:AddToggle('Auto Rollback Colour Before Spin',false,function(xstate)
+        othercheats:AddToggle('Rollback Colour Before Spin',false,function(xstate) -- Auto 
             getgenv().roghoulsettings['autorollbackonspin'] = xstate -- set rollback data to true (the toggle)
         end)
         -- othercheats:AddLabel()
