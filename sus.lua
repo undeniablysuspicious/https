@@ -15661,8 +15661,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         loadto = {
             'CCG';
             'Ghoul';
-        }
-        loadingto = ''
+        };
+        loadingto = '';
     }
     getgenv().divious_teleport = function(info)
 
