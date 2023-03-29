@@ -887,9 +887,9 @@ end
 
 
 local library =loadstring(game:HttpGet("https://raw.githubusercontent.com/hairlinebrockeb/-back-ups-for-libs/main/cat", true))()
--- 492, 598 "Azfake V3{"..vs..','..game.PlaceId..'}' -- M1xup
+-- 492, 598 "Azfake V3{"..vs..','..game.PlaceId..'}' -- M1xup Azzfake Azfake V3 M1xact
 local window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(492, 598), Enum.KeyCode.LeftAlt) -- 2nd argument is the size, 3rd is the show/hide ofc
-local wtm = library:CreateWatermark('AZFAKE HUB V3',Vector3.new(100,100,50))
+local wtm = library:CreateWatermark('Azfake HUB V3',Vector3.new(100,100,50))
 
 
 getgenv().AddBasicESP = function(sectAdd)
@@ -15658,6 +15658,11 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         acceptprimarycolour = '';
         acceptifsecondaryis = false;
         acceptsecondarycolour = '';
+        loadto = {
+            'CCG';
+            'Ghoul';
+        }
+        loadingto = ''
     }
     getgenv().divious_teleport = function(info)
 
@@ -15846,6 +15851,12 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddDropdown("Stages", getgenv().roghoulsettings['stages'], "", false, function(dropdownv)
         getgenv().roghoulsettings['activestage'] = dropdownv
     end)
+    othercheats:AddDropdown('Load To',getgenv().roghoulsettings['loadto'],'',false,function(xstate)
+        getgenv().roghoulsettings['loadingto'] = xstate
+        if getgenv().roghoulsettings['loadingto'] ~= '' then 
+            game:GetService("ReplicatedStorage").Remotes.Race.Chose:InvokeServer(('%s'):format(getgenv().roghoulsettings['loadingto']))
+        end
+    end)
     othercheats:AddToggle('Use E',false,function(xtstae)
         getgenv().roghoulsettings['usee'] = xtstae
     end)
@@ -15922,6 +15933,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddToggle('Auto Equip Arata',false,function(xstate)
         getgenv().roghoulsettings['equiparata'] = xstate
     end)
+
+
     othercheats:AddToggle('No Kajiri Velocity',false,function(xstate)
         getgenv().roghoulsettings['nokajirivelocity'] = xstate
         if getgenv().roghoulsettings['nokajirivelocity'] == true then 
@@ -16028,6 +16041,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                 if getgenv().roghoulsettings['autorollbackonspin'] == true then 
                     azfakenotify('Auto Rolling Back','untilClick')
                     getgenv().roghoulsettings['rollingbackdata'] = true -- if it was already true dont set to false when we find the colour
+                    task.wait(.3)
                 end
     
                 local function getcolour(x) -- function to check if they match
@@ -16049,7 +16063,6 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                 local FoundWantedColour = false
                 local FoundColour = false;
                 local function Spin()
-                    azfakenotify('Spinning Colours',3)
                     local Method = getgenv().roghoulsettings['chosenroll']
                     -- local FilteredMethod = ''
                     -- if Method == 'Choice 2' then FilteredMethod = 'Choice' end
@@ -16060,7 +16073,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.KakuhouSurgeon.RandomizeColor:InvokeServer(Method)
                     end 
                     -- local FoundColour = false;
-                    if type(colours) == 'table' then 
+                    if colours and type(colours) == 'table' then 
     
                         for _,v in next, colours do 
                             local PrimaryColour = v.PColor
@@ -16090,8 +16103,10 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             end
                         end
                     end
-                    if FoundColour == false then 
-                        uselessagain:InvokeServer('0');
+                    if FoundColour == false and colours and type(colours) == 'table' then 
+                        pcall(function() -- theres no need for pcall if its a table tho
+                            uselessagain:InvokeServer('0');
+                        end)
                     end
                     if game.Players.LocalPlayer:FindFirstChild('PlayerFolder') then 
                         pcall(function()
@@ -16100,12 +16115,14 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                 ColourPath = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewSurgeonGui'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors')
                             end
                             local CurrentColours = ColourPath 
-                            CurrentColours.PColor.BackgroundColor3 = BrickColor.new(l__Value__72).Color;
-                            CurrentColours.SColor.BackgroundColor3 = BrickColor.new(l__Value__73).Color;
                             local l__Value__72 = game.Players.LocalPlayer:FindFirstChild('PlayerFolder').Customization.WeaponPrimaryColor.Value;
                             local l__Value__73 = game.Players.LocalPlayer:FindFirstChild('PlayerFolder').Customization.WeaponSecondaryColor.Value;
+                            CurrentColours.PColor.BackgroundColor3 = BrickColor.new(l__Value__72).Color;
+                            CurrentColours.SColor.BackgroundColor3 = BrickColor.new(l__Value__73).Color;
                             CurrentColours.PColor.Text = l__Value__72;
                             CurrentColours.SColor.Text = l__Value__73;
+                            print('Primary Colour: '..l__Value__72)
+                            print('Secondary Colour: '..l__Value__73)
                         end)
                     end
                 end
@@ -16115,7 +16132,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     
                 local StopAmount = getgenv().roghoulsettings['stopamount'];
     
-    
+                azfakenotify('Spinning Colours',3)
                 repeat 
                     task.wait(getgenv().roghoulsettings['spindelay']) -- spinspeed
                     if tonumber(game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value) >= StopAmount and FoundColour == false then 
