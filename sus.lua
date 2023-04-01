@@ -2,7 +2,7 @@
 local old_gc = getgc();
 local oldgc;
 oldgc = hookfunction(getgc, function(...)
-  return old_gc
+    return old_gc
 end)
 -- New example script written by wally
 -- You can suggest changes with a pull request or something
@@ -12,9 +12,9 @@ end)
 -- could make getgenv return a different getgenv() or getgenv().azfake
 
 
-getgenv().versioncode = '#5b'
+getgenv().versioncode = '#5c'
 getgenv().azfake_version = 'v3 '..getgenv().versioncode
-
+-- print(('V4 %s'):format('4a prolly when syn v3 comes out'))
 -- 1234
 
 
@@ -273,6 +273,8 @@ azfake.__screen = function(info)
     AZFAKEFRAME:Destroy();
     CoverScreen:Destroy()
 end
+
+
 
 -- azfake.repstring = {}
 -- local function oncall(_,v)
