@@ -15874,7 +15874,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddSlider("Target Distance", 0, 0, 50, 5, function(State) -- releuseetargettime useetargetrange
         getgenv().roghoulsettings['useetargetdistance'] = State -- 
     end) -- press Key certain times to use others
-    othercheats:AddToggle('Release Keys Before Use',false,function(xtstae)
+    othercheats:AddToggle('E Release Keys Before Use',false,function(xtstae)
         getgenv().roghoulsettings['ereleasekeysbeforeusee'] = xtstae
     end)
     othercheats:AddSeperator('')
@@ -15894,7 +15894,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddSlider("Target Distance", 0, 0, 50, 5, function(State)
         getgenv().roghoulsettings['usertargetrange'] = State 
     end)
-    othercheats:AddToggle('Release Keys Before Use',false,function(xtstae)
+    othercheats:AddToggle('R Release Keys Before Use',false,function(xtstae)
         getgenv().roghoulsettings['rreleasekeysbeforeuser'] = xtstae
     end)
     othercheats:AddSeperator('')
@@ -15915,7 +15915,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddSlider("Target Distance", 0, 0, 50, 5, function(State)
         getgenv().roghoulsettings['useftargetrange'] = State 
     end)
-    othercheats:AddToggle('Release Keys Before Use',false,function(xtstae)
+    othercheats:AddToggle('F Release Keys Before Use',false,function(xtstae) -- before use of f
         getgenv().roghoulsettings['freleasekeysbeforeusef'] = xtstae
     end)
     othercheats:AddSeperator('')
