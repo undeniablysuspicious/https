@@ -17433,6 +17433,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                     end
                 elseif getgenv().roghoulsettings['farming'] == true and game:GetService("Workspace"):FindFirstChild('Gyakusatsu') and typeofnpc == 'gykat' and  getaction() == 'canquest' and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                     getgenv()['roghoulsettings']['action'] = 'fighting';
+                    getgenv()['roghoulsettings']['hasntstarted'] = false;
                     if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 then 
                         -- print('waiting for quinque')
                         print('waiting for '..string.lower(typeweapon))
@@ -18352,6 +18353,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         
                     end
                     getgenv()['roghoulsettings']['action'] = 'canquest'
+                    getgenv()['roghoulsettings']['hasntstarted'] = true;
                     -- local gykatcurrently = nil
                     -- local PlacesWithBlobs = {
                     --     'BL';
