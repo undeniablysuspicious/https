@@ -17734,6 +17734,12 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         end)
                     end
                     if enemymodel then 
+                        local TimeElasped = 0;
+                        local StopElasped = false;
+                        local PlayersParticipated = 0;
+                        task.spawn(function()
+                            repeat task.wait(1); TimeElasped += 1 until StopElasped == true --not workspace:FindFirstChild('Gyakusatsu')
+                        end)
                         if getgenv()['roghoulsettings']['cashoutrepbeforegykatsufarm'] == true then 
                             local obj = game:GetService("Workspace"):FindFirstChild('TrainerModel'):FindFirstChild('ClickIndicator')
                             if game.Players.LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization'):FindFirstChild('Team').Value == 'CCG' then --type
@@ -17759,7 +17765,6 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         end
 
                         
-
 
                         if getgenv()['roghoulsettings']['classicfarm']  == true then 
                             local __farmable = {}
@@ -18332,9 +18337,12 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 pcall(function()
                                                     if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List') then 
                                                         for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
-                                                            if string.find(v.Name,game.Players.LocalPlayer.Name) then 
+                                                            if string.find(v.Name,game.Players.LocalPlayer.Name) and v:FindFirstChild('GyaPerc') and v:FindFirstChild('GyaPerc').Visible == true then 
                                                                 OURCONTRIBUTION = v:FindFirstChild('GyaPerc').Text;
                                                                 break
+                                                            end
+                                                            if v:FindFirstChild('GyaPerc') and v:FindFirstChild('GyaPerc').Visible == true then 
+                                                                PlayersParticipated += 1
                                                             end
                                                         end
                                                     end
@@ -18343,8 +18351,19 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         end)
                                     until not workspace:FindFirstChild('Gyakusatsu') or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
                                     if not workspace:FindFirstChild('Gyakusatsu') then 
+                                        StopElasped = true;
                                         if getgenv().roghoulsettings['postgykatsu'] == true then 
-                                            postwebhook('gykatsu',{title = 'AZFAKE WEBHOOK',content = '```\nGyakusatsu with '..OURCONTRIBUTION..'\nContribution at '..os.date()..'```'})
+                                            postwebhook('gykatsu',
+                                                {
+                                                    title = 'AZFAKE WEBHOOK',
+                                                    content = 
+                                                    '```\nGyakusatsu with '..OURCONTRIBUTION..
+                                                    '\nContribution at '..os.date()..
+                                                    '\nPlayers Participated: '..tostring(PlayersParticipated)..
+                                                    '\nTime Elasped: '..TimeElasped
+                                                    '```'
+                                                }
+                                            )
                                         end 
                                     end
                                 end
