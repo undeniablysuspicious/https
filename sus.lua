@@ -18336,6 +18336,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 task.wait(.2)
                                                 pcall(function()
                                                     if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List') then 
+                                                        PlayersParticipated = 0;
                                                         for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
                                                             if string.find(v.Name,game.Players.LocalPlayer.Name) and v:FindFirstChild('GyaPerc') and v:FindFirstChild('GyaPerc').Visible == true then 
                                                                 OURCONTRIBUTION = v:FindFirstChild('GyaPerc').Text;
