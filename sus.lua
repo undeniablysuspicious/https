@@ -18296,7 +18296,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 pcall(function()
                                                     if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List') then 
                                                         for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
-                                                            if v.Name == game.Players.LocalPlayer.Name then 
+                                                            if string.find(game.Players.LocalPlayer.Name) then 
                                                                 OURCONTRIBUTION = v:FindFirstChild('GyaPerc').Text;
                                                                 break
                                                             end
@@ -18304,12 +18304,13 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                     end
                                                 end)
                                             until not workspace:FindFirstChild('Gyakusatsu')
-                                            if getgenv().roghoulsettings['postgykatsu'] == true then 
-                                                postwebhook('gykatsu',{title = 'AZFAKE WEBHOOK',content = 'Gykatsu with '..OURCONTRIBUTION..' Contribution at '..os.date()})
-                                            end 
                                         end)
                                     until not workspace:FindFirstChild('Gyakusatsu') or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
-                                    
+                                    if not workspace:FindFirstChild('Gyakusatsu') then 
+                                        if getgenv().roghoulsettings['postgykatsu'] == true then 
+                                            postwebhook('gykatsu',{title = 'AZFAKE WEBHOOK',content = '```\nGyakusatsu with '..OURCONTRIBUTION..'\nContribution at '..os.date()..'```'})
+                                        end 
+                                    end
                                 end
                             end
                         end
