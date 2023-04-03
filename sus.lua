@@ -15710,7 +15710,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         serverhopformobwebhook = '';
         postserverhopwebhook = false;
         cashoutrepbeforegykatsufarm = false;
-        ourallied = {}
+        ourallied = {};
+        isup = false;
+        dontaimatcoilerwhenup = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -15852,6 +15854,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     end)
     sector:AddSlider("High Distance", 0, 0, 65, 1, function(State)
         getgenv().roghoulsettings['hightargety'] = State
+    end)
+    sector:AddToggle('Dont Aim At Coiler When Up',false,function(xstate) 
+        getgenv()['roghoulsettings']['dontaimatcoilerwhenup'] = xstate
     end)
     sector:AddSeperator()
 
@@ -17816,6 +17821,16 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                         if ShouldGoHighDueToFilteredMob == true then break end;
                                                     end
                                                 end
+                                                
+
+
+                                                if ShouldGoHighDueToFilteredMob == true then 
+                                                    getgenv().roghoulsettings['isup'] = true;
+                                                elseif ShouldGoHighDueToFilteredMob == false then 
+                                                    getgenv().roghoulsettings['isup'] = false;
+                                                end
+
+
                                                 if getgenv().roghoulsettings['targettingvictim'] and getgenv().roghoulsettings['targettingvictim']:FindFirstChild('HumanoidRootPart') then 
                                                     local Distance = (getgenv().roghoulsettings['targettingvictim']:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
                                                     if Distance.Magnitude > getgenv().roghoulsettings['targettingdistance'] then 
@@ -17897,34 +17912,38 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                         end
                                                         --game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,getgenv().roghoulsettings['targettingvictim']:FindFirstChild('HumanoidRootPart').Position)
                                                     end
-                                                elseif getgenv()['roghoulsettings']['aimatcoilers'] == true then 
-                                                    local ClosestCoiler = nil;
-                                                    local ClosestCoilerDistance = nil;
-                                                    if getgenv().roghoulsettings['closestcoiler'] == nil then 
-                                                        for _,mob in next, enemymodel:GetChildren() do 
-                                                            if mob.Name == 'Mob' and mob:FindFirstChild('CoilerNPC') and mob:FindFirstChildWhichIsA('Humanoid') and mob:FindFirstChildWhichIsA('Humanoid').Health > 0 and mob:FindFirstChild('HumanoidRootPart') then 
-                                                                local CoilerDistance = (mob:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
-                                                                if CoilerDistance.Magnitude <= getgenv().roghoulsettings['coilersdistance'] and ClosestCoilerDistance == nil then 
-                                                                    ClosestCoiler = mob ; 
-                                                                    ClosestCoilerDistance = CoilerDistance.Magnitude ;
-                                                                elseif CoilerDistance.Magnitude <= getgenv().roghoulsettings['coilersdistance'] and ClosestCoilerDistance ~= nil and ClosestCoilerDistance > CoilerDistance.Magnitude then 
-                                                                    ClosestCoiler = mob ; 
-                                                                    ClosestCoilerDistance = CoilerDistance.Magnitude ;
+                                                end
+                                                if getgenv()['roghoulsettings']['aimatcoilers'] == true then  -- and getgenv().roghoulsettings['dontaimatcoilerwhenup'] == false or getgenv()['roghoulsettings']['aimatcoilers'] == true and getgenv().roghoulsettings['dontaimatcoilerwhenup']== true and getgenv().roghoulsettings['isup'] == false
+                                                    --if getgenv().roghoulsettings['dontaimatcoilerwhenup'] == true and getgenv().roghoulsettings['isup'] == true then return end
+                                                    if getgenv().roghoulsettings['dontaimatcoilerwhenup'] == false and getgenv().roghoulsettings['isup'] == false then
+                                                        local ClosestCoiler = nil;
+                                                        local ClosestCoilerDistance = nil;
+                                                        if getgenv().roghoulsettings['closestcoiler'] == nil then 
+                                                            for _,mob in next, enemymodel:GetChildren() do 
+                                                                if mob.Name == 'Mob' and mob:FindFirstChild('CoilerNPC') and mob:FindFirstChildWhichIsA('Humanoid') and mob:FindFirstChildWhichIsA('Humanoid').Health > 0 and mob:FindFirstChild('HumanoidRootPart') then 
+                                                                    local CoilerDistance = (mob:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                                                                    if CoilerDistance.Magnitude <= getgenv().roghoulsettings['coilersdistance'] and ClosestCoilerDistance == nil then 
+                                                                        ClosestCoiler = mob ; 
+                                                                        ClosestCoilerDistance = CoilerDistance.Magnitude ;
+                                                                    elseif CoilerDistance.Magnitude <= getgenv().roghoulsettings['coilersdistance'] and ClosestCoilerDistance ~= nil and ClosestCoilerDistance > CoilerDistance.Magnitude then 
+                                                                        ClosestCoiler = mob ; 
+                                                                        ClosestCoilerDistance = CoilerDistance.Magnitude ;
+                                                                    end
                                                                 end
                                                             end
+                                                            --if ClosestCoiler ~= nil then 
+                                                            getgenv().roghoulsettings['closestcoiler'] = ClosestCoiler
+                                                            --end
                                                         end
-                                                        --if ClosestCoiler ~= nil then 
-                                                        getgenv().roghoulsettings['closestcoiler'] = ClosestCoiler
-                                                        --end
-                                                    end
-                                                    if not getgenv().roghoulsettings['closestcoiler'] or not getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid') or getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid') and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid').Health == 0 or not getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart') then 
-                                                        getgenv().roghoulsettings['closestcoiler'] = nil;
-                                                    end
-                                                    if getgenv().roghoulsettings['closestcoiler'] ~= nil then 
                                                         if not getgenv().roghoulsettings['closestcoiler'] or not getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid') or getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid') and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid').Health == 0 or not getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart') then 
                                                             getgenv().roghoulsettings['closestcoiler'] = nil;
-                                                        else
-                                                            --game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart').Position)
+                                                        end
+                                                        if getgenv().roghoulsettings['closestcoiler'] ~= nil then 
+                                                            if not getgenv().roghoulsettings['closestcoiler'] or not getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid') or getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid') and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid').Health == 0 or not getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart') then 
+                                                                getgenv().roghoulsettings['closestcoiler'] = nil;
+                                                            else
+                                                                --game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart').Position)
+                                                            end
                                                         end
                                                     end
                                                 end
