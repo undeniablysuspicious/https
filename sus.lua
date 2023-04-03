@@ -18360,7 +18360,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                     '```\nGyakusatsu with '..OURCONTRIBUTION..
                                                     '\nContribution at '..os.date()..
                                                     '\nPlayers Participated: '..tostring(PlayersParticipated)..
-                                                    '\nTime Elasped: '..TimeElasped
+                                                    '\nTime Elasped: '..TimeElasped..
                                                     '```'
                                                 }
                                             )
