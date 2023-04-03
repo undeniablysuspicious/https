@@ -18340,7 +18340,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                         for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
                                                             if string.find(v.Name,game.Players.LocalPlayer.Name) and v:FindFirstChild('GyaPerc') and v:FindFirstChild('GyaPerc').Visible == true then 
                                                                 OURCONTRIBUTION = v:FindFirstChild('GyaPerc').Text;
-                                                                break
+                                                                --break -- remove break so we can check how many players participated
+                                                                -- since we are the first one on the list the first check for the name will be us and the check for playersparticipated might not run and if it does it will be added by one but since the loop breaks as it finds us first, playersparticipated will be 1 cuz it only runs one time because we are the first name in the list of players and it stops finding our contribution after it finds out name and the loop for finding contribution is the same loop to find how many players participated
                                                             end
                                                             if v:FindFirstChild('GyaPerc') and v:FindFirstChild('GyaPerc').Visible == true then 
                                                                 PlayersParticipated += 1
@@ -18361,7 +18362,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                     '```\nGyakusatsu with '..OURCONTRIBUTION..
                                                     '\nContribution at '..os.date()..
                                                     '\nPlayers Participated: '..tostring(PlayersParticipated)..
-                                                    '\nTime Elasped: '..TimeElasped..
+                                                    '\nTime Elasped: '..TimeElasped.. -- total contribution taken away from other players
                                                     '```'
                                                 }
                                             )
