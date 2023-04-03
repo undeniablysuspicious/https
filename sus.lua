@@ -15713,6 +15713,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         ourallied = {};
         isup = false;
         dontaimatcoilerwhenup = false;
+        rejoinafterrollback = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -16173,6 +16174,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                 task.delay(5,function()
                     print('Rolledback');
                     game.Players.LocalPlayer:Kick('[AZFAKE]: Rollback')
+                    if getgenv().roghoulsettings['rejoinafterrollback'] == true then 
+                        game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId,game.JobId)
+                    end
                 end)
                 while task.wait(0.001) do 
                     -- local ohString1 = 
@@ -16243,6 +16247,54 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                     -- if Method == 'Choice 2' then FilteredMethod = 'Choice' end
                     -- game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors').Visible = true;
                     local RemPath = ''
+
+                    local obj = game:GetService("Workspace").KakuhouSurgeonWarehouse["Kakuhou Surgeon"].SurgeonIndicator
+                    if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value == 'CCG' then 
+                        obj = game:GetService("Workspace").CCGLab.Chigyou.Indicator
+                    end
+                    -- if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                    --     game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0;
+                    -- end
+                    local Distance = (obj.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                    if Distance.Magnitude > 15 then 
+                        if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                            game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0;
+                        end
+                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health > 0 and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
+                        local waited = 0;
+                        repeat task.wait(0.1); waited +=0.1 game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = obj.CFrame until waited >= 0.2
+                    end
+                    
+                    fireclickdetector(obj:FindFirstChildWhichIsA('ClickDetector'))
+                    local FoundFrame = false;
+                    local FrameFound = nil;
+                    repeat 
+                        task.wait(0.1)
+                        for i,c in next, game.Players.LocalPlayer.PlayerGui:GetChildren() do 
+                            if c.Name == 'NewSurgeonGui' or c.Name == 'NewQuinqueGui' then  -- string.find(c.Name,'Kagune') or string.find(c.Name,'Quinque')
+                                FoundFrame = true;
+                                FrameFound = c;
+                                break;
+                            end
+                        end
+                    until FoundFrame == true 
+                    for i,c in next, FrameFound:GetChildren() do 
+                        for k,frame in next, frame:GetChildren() do 
+                            if frame:IsA('Frame') or frame:IsA('ScrollingFrame') and frame.Name ~= 'Divider' and frame.Visible == true then 
+                                frame.Visible = false
+                            end
+                        end
+                    end
+                    if FrameFound ~= nil then 
+                        if FrameFound:FindFirstChild('ColorFrame') then 
+                            FrameFound:FindFirstChild('ColorFrame').Visible = true;
+                        end
+                        if FrameFound:FindFirstChild('ShopFrame') and FrameFound:FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame') then 
+                            FrameFound:FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame').Visible = true;
+                        end
+                    end
+                    --game.Players.LocalPlayer.PlayerGui:WaitForChild('')
+
                     local useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.CCGLab.RandomizeColor:InvokeServer(Method)
                     if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value == 'Ghoul' then 
                         useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.KakuhouSurgeon.RandomizeColor:InvokeServer(Method)
@@ -16333,6 +16385,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             task.delay(5,function()
                                 print('Rolledback');
                                 game.Players.LocalPlayer:Kick('[AZFAKE]: Rollback')
+                                if getgenv().roghoulsettings['rejoinafterrollback'] == true then 
+                                    game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId,game.JobId)
+                                end
                             end)
                             while task.wait(0.001) do 
                                 -- local ohString1 = 
@@ -16341,6 +16396,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                 game:GetService("ReplicatedStorage").Remotes.Settings.SpawnSelection:FireServer("CCGBuilding\255")
                             end
                         end)   
+                    end
+                    if getgenv().roghoulsettings['rejoinafterrollback'] == true and getgenv().roghoulsettings['autorollbackonspin'] == true then 
+                        game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId,game.JobId)
                     end
                 end
             end
@@ -16371,6 +16429,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         end)
         othercheats:AddToggle('Rollback Colour Before Spin',false,function(xstate) -- Auto 
             getgenv().roghoulsettings['autorollbackonspin'] = xstate -- set rollback data to true (the toggle)
+        end)
+        othercheats:AddToggle('Rejoin After Rollback',false,function(xstate) -- Auto 
+            getgenv().roghoulsettings['rejoinafterrollback'] = xstate -- set rollback data to true (the toggle)
         end)
         -- othercheats:AddLabel()
     end
@@ -16821,9 +16882,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             if getgenv().roghoulsettings['rollingbackdata'] == true then 
                 getgenv().roghoulsettings['rollingbackdata'] = nil;
                 task.spawn(function()
-                    azfakenotify('Loading...')
+                    azfakenotify('Loading...','untilClick')
                     task.wait(1)
-                    azfakenotify('Rolledback! This wont kick.')
+                    azfakenotify('Rolledback! This wont kick.','untilClick')
                     while task.wait(0.001) do -- put this in the global while loop so i can set rollingback data from anywhere without this toggle going on so if they save the toggle wont be on true
                         if getgenv().loopsUnload == true then print('restarted data') break end 
                         if getgenv().roghoulsettings['rollingbackdata']  == false then print('stopped') 
@@ -16831,6 +16892,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                 game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') .Health = 0
                             end
                             game:GetService("ReplicatedStorage").Remotes.Settings.SpawnSelection:FireServer("Anteiku")
+                            azfakenotify('Removed Rollback Sequence','untilClick')
                         break end
                         -- local ohString1 = 
                         game:GetService("ReplicatedStorage").Remotes.Settings.FactionChoose:InvokeServer("Chidori [Ro-Ghoul]\255")
