@@ -15551,6 +15551,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     local Configuration = window:CreateTab('Configuration')
     local sector = tab:CreateSector('Cheats','left')
     local othercheats = tab:CreateSector('Cheats','right')
+    local webhookcheats = tab:CreateSector('Cheats','right')
     game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
     getgenv().roghoulsettings = {
         farmables = {
@@ -15665,6 +15666,50 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             'Ghoul';
         };
         loadingto = '';
+        autoallyall = false;
+        targetting = false;
+        targettingvictim = nil;
+        targettingdistance = 0;
+        aimatcoilers = false;
+        coilersdistance = 0;
+        closestcoiler = nil;
+        mobsusage = { -- mobusage
+            'All';
+            'Coiler';
+            'Rapid';
+            'Jug';
+            'Rumble';
+        };
+        useeoncertainmobs = 'All';
+        useroncertainmobs = 'All';
+        usefoncertainmobs = 'All';
+        eactivatewhenclose = false;
+        ractivatewhenclose = false;
+        factivatewhenclose = false;
+        eclosedistance = 0;
+        rclosedistance = 0;
+        fclosedistance = 0;
+        goaboveofclosepeople = false;
+        goontopofcoilers = false;
+        mobstogohighon = {
+            ['All'] = false;
+            ['Coiler'] = false;
+            ['Rapid'] = false;
+            ['Jug'] = false;
+            ['Rumble'] = false;
+        };
+        mobstogohighonstr = ''; -- ,pb
+        gohightargetdistance = 0;
+        hightargety = 0;
+        highplayertargety = 0;
+        highercoilery = 0;
+        webhook = '';
+        postwebhook = false;
+        gyaktsuwebhook = '';
+        postgykatsu = false;
+        serverhopformobwebhook = '';
+        postserverhopwebhook = false;
+        cashoutrepbeforegykatsufarm = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -15767,13 +15812,79 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     sector:AddToggle('Farm Gyakusatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['gykatfarm'] = xstate
     end)
+    sector:AddToggle('Cashout Rep Before Gyakusatsu',false,function(xstate) 
+        getgenv()['roghoulsettings']['cashoutrepbeforegykatsufarm'] = xstate
+    end)
+    sector:AddSeperator('Classic Gykatsu')
     sector:AddToggle('Classic Gykatsu Farm',false,function(xstate) 
         getgenv()['roghoulsettings']['classicfarm'] = xstate
     end)
+    sector:AddDropdown("Go High Mobs", getgenv().roghoulsettings['mobsusage'], "", true, function(dropdownv) --  if multi dropdown it instantly puts inside a table
+        local MobsHigh = table.concat(dropdownv,',')
+        --print('clicked')
+        --print('first chosen: '..dropdownv)
+        -- if type(dropdownv) == 'table' then 
+        --     MobsHigh = '';
+        --     for u,v in next, table.concat(dropdownv,',') do 
+        --         MobsHigh = MobsHigh..v..':'
+        --     end
+        -- end
+        for i,v in next, getgenv().roghoulsettings['mobstogohighon'] do 
+            getgenv().roghoulsettings['mobstogohighon'][i] = false;
+        end
+        for _,v in next, string.split(MobsHigh,',') do 
+            for i,__value in next, getgenv().roghoulsettings['mobstogohighon'] do 
+                if i == v then 
+                    getgenv().roghoulsettings['mobstogohighon'][i] = true;
+                end
+            end
+        end
+
+        getgenv().roghoulsettings['mobstogohighonstr'] = MobsHigh
+    end)
+    sector:AddSeperator()
+    sector:AddToggle('Go High When Targetted',false,function(xstate) 
+        getgenv()['roghoulsettings']['gohighwhentargetted'] = xstate
+    end)
+    sector:AddSlider("Go High Target Distance", 0, 0, 125, 1, function(State)
+        getgenv().roghoulsettings['gohightargetdistance'] = State
+    end)
+    sector:AddSlider("High Distance", 0, 0, 65, 1, function(State)
+        getgenv().roghoulsettings['hightargety'] = State
+    end)
+    sector:AddSeperator()
 
 
+    sector:AddToggle('Target Close People',false,function(xstate) 
+        getgenv()['roghoulsettings']['targetting'] = xstate
+    end)
+    sector:AddToggle('Go Above Of Close Target',false,function(xstate) -- People - Target
+        getgenv()['roghoulsettings']['goaboveofclosepeople'] = xstate
+    end)
+    sector:AddSlider("Above Distance", 0, 0, 65, 1, function(State)
+        getgenv().roghoulsettings['highplayertargety'] = State
+    end)
+    sector:AddSlider("Targetting Distance", 0, 0, 125, 1, function(State)
+        getgenv().roghoulsettings['targettingdistance'] = State
+    end)
+    sector:AddSeperator()
+    sector:AddToggle('Aim at Coilers',false,function(xstate) 
+        getgenv()['roghoulsettings']['aimatcoilers'] = xstate
+    end)
+    sector:AddToggle('Go Ontop Of Coiler',false,function(xstate) -- People - Target
+        getgenv()['roghoulsettings']['goontopofcoilers'] = xstate
+    end)
+    sector:AddSlider("Ontop of Coiler Height", 0, 0, 65, 1, function(State)
+        getgenv().roghoulsettings['highcoilery'] = State
+    end)
 
-    sector:AddSeperator('Gykatsu Farming Options')
+    sector:AddSlider("Coilers Distance", 0, 0, 125, 1, function(State)
+        getgenv().roghoulsettings['coilersdistance'] = State
+    end)
+    sector:AddSeperator('')
+
+
+    sector:AddSeperator('Gykatsu Farming Options') -- POST WEBHOOK
     sector:AddToggle('Server Hop For Gyakusatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['serverhopgykatsu'] = xstate
     end)
@@ -15859,6 +15970,11 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             game:GetService("ReplicatedStorage").Remotes.Race.Chose:InvokeServer(('%s'):format(getgenv().roghoulsettings['loadingto']))
         end
     end)
+
+    othercheats:AddToggle('Auto Ally All',false,function(xstate) -- ally whitelist 
+        getgenv().roghoulsettings['autoallyall'] = xstate
+    end)
+
     othercheats:AddToggle('Use E',false,function(xtstae)
         getgenv().roghoulsettings['usee'] = xtstae
     end)
@@ -15877,6 +15993,24 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddToggle('E Release Keys Before Use',false,function(xtstae)
         getgenv().roghoulsettings['ereleasekeysbeforeusee'] = xtstae
     end)
+    -- othercheats:AddToggle('Activate E When Close',false,function(xtstae)
+    --     getgenv().roghoulsettings['eactivatewhenclose'] = xtstae
+    -- end)
+    othercheats:AddToggle('Use E When Certain Mob Close',false,function(xtstae)
+        getgenv().roghoulsettings['useewhencertainmobclose'] = xtstae
+    end)
+    othercheats:AddDropdown('E Mobs Close',getgenv().roghoulsettings['mobsusage'],'All',true,function(xstate)
+        local MobsActivated = ''--table.concat(xstate)
+        for _k,v in next, table.concat(xstate) do 
+            MobsActivated = MobsActivated..v..':' -- coiler:
+        end
+        getgenv().roghoulsettings['useeoncertainmobs'] = MobsActivated
+    end)
+    othercheats:AddSlider("E Close Distance", 0, 0, 50, 5, function(State) -- releuseetargettime useetargetrange
+        getgenv().roghoulsettings['eclosedistance'] = State  
+    end)
+
+
     othercheats:AddSeperator('')
 
     othercheats:AddToggle('Use R',false,function(xtstae)
@@ -15897,6 +16031,23 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddToggle('R Release Keys Before Use',false,function(xtstae)
         getgenv().roghoulsettings['rreleasekeysbeforeuser'] = xtstae
     end)
+    -- othercheats:AddToggle('Activate R When Close',false,function(xtstae)
+    --     getgenv().roghoulsettings['ractivatewhenclose'] = xtstae
+    -- end)
+    othercheats:AddToggle('Use R When Certain Mob Close',false,function(xtstae)
+        getgenv().roghoulsettings['userwhencertainmobclose'] = xtstae
+    end)
+    othercheats:AddDropdown('R Mobs Close',getgenv().roghoulsettings['mobsusage'],'All',true,function(xstate)
+        local MobsActivated = ''
+        for _k,v in next, table.concat(xstate) do 
+            MobsActivated = MobsActivated..v..':' 
+        end
+        getgenv().roghoulsettings['useroncertainmobs'] = MobsActivated
+    end)
+    othercheats:AddSlider("R Close Distance", 0, 0, 50, 5, function(State) 
+        getgenv().roghoulsettings['rclosedistance'] = State  
+    end)
+
     othercheats:AddSeperator('')
 
 
@@ -15915,8 +16066,24 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     othercheats:AddSlider("Target Distance", 0, 0, 50, 5, function(State)
         getgenv().roghoulsettings['useftargetrange'] = State 
     end)
-    othercheats:AddToggle('F Release Keys Before Use',false,function(xtstae) -- before use of f
-        getgenv().roghoulsettings['freleasekeysbeforeusef'] = xtstae
+    -- othercheats:AddToggle('F Release Keys Before Use',false,function(xtstae) -- before use of f
+    --     getgenv().roghoulsettings['freleasekeysbeforeusef'] = xtstae
+    -- end)
+    othercheats:AddToggle('Activate F When Close',false,function(xtstae)
+        getgenv().roghoulsettings['factivatewhenclose'] = xtstae
+    end)
+    othercheats:AddToggle('Use F When Certain Mob Close',false,function(xtstae)
+        getgenv().roghoulsettings['usefwhencertainmobclose'] = xtstae
+    end)
+    othercheats:AddDropdown('F Mobs Close',getgenv().roghoulsettings['mobsusage'],'All',true,function(xstate)
+        local MobsActivated = ''
+        for _k,v in next, table.concat(xstate) do 
+            MobsActivated = MobsActivated..v..':' 
+        end
+        getgenv().roghoulsettings['usefoncertainmobs'] = MobsActivated
+    end)
+    othercheats:AddSlider("F Close Distance", 0, 0, 50, 5, function(State)
+        getgenv().roghoulsettings['fclosedistance'] = State  
     end)
     othercheats:AddSeperator('')
 
@@ -16201,9 +16368,54 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         end)
         -- othercheats:AddLabel()
     end
+    webhookcheats:AddToggle('POST WEBHOOK GYKATSU',false,function(xstate)
+        getgenv().roghoulsettings['postgykatsu'] = xstate
+    end)
+    webhookcheats:AddTextbox('Gykatsu Webhook','',function(xtstae)
+        getgenv().roghoulsettings['gyaktsuwebhook'] = xtstae
+    end)
+    webhookcheats:AddToggle('POST WEBHOOK',false,function(xstate)
+        getgenv().roghoulsettings['postwebhook'] = xstate
+    end)
+    webhookcheats:AddTextbox('Webhook','',function(xtstae)
+        getgenv().roghoulsettings['webhook'] = xtstae
+    end)
+    webhookcheats:AddToggle('POST SERVERHOP WEBHOOK',false,function(xstate)
+        getgenv().roghoulsettings['postserverhopwebhook'] = xstate  
+    end)
+    webhookcheats:AddTextbox('Serverhop Webhook','',function(xtstae)
+        getgenv().roghoulsettings['serverhopforgykatsuwebhook'] = xtstae -- post
+    end)
     game.Players.LocalPlayer.Idled:Connect(function()
         game:GetService("VirtualUser"):ClickButton2(Vector2.new())
     end)
+
+    local function postwebhook(xtype,data)
+        if syn then 
+            local WEBHOOKPOSTING = '';
+            if xtype == 'normal' then 
+                WEBHOOKPOSTING = getgenv().roghoulsettings['webhook']
+            elseif xtype =='gykatsu' then 
+                WEBHOOKPOSTING = getgenv().roghoulsettings['gyaktsuwebhook']
+            elseif xtype == 'serverhop' then
+                WEBHOOKPOSTING = getgenv().roghoulsettings['postserverhopwebhook'] --wpst
+            end
+            local receiveddata = {}
+            for i,v in next, data do 
+                table.insert(receiveddata,i)
+            end
+            syn.request(
+                {
+                    Url = WEBHOOKPOSTING,
+                    Method = 'POST',
+                    Headers = {
+                        ['Content-Type'] = 'application/json'
+                    }, -- AZFAKE WEBHOOK
+                    Body = game:GetService('HttpService'):JSONEncode(data) -- {data.title; content = data.content}
+                }
+            );
+        end
+    end
 
     -- foolio
 
@@ -16635,9 +16847,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                 for _,InstanceHolder in next, workspace.NPCSpawns:GetChildren() do 
                     local __Mob = InstanceHolder:FindFirstChildWhichIsA('Model');
                     for MobIndex,Mob in next, InstanceHolder:GetChildren() do 
-                        if Mob.Name:find('Eto') and getgenv().roghoulsettings['serverhopifnotfoundmobs']['Eto'] == true then FoundMobs['Eto'] = true; AmountFound +=1 end
-                        if Mob.Name:find('Amon') and getgenv().roghoulsettings['serverhopifnotfoundmobs']['Amon'] == true then FoundMobs['Amon'] = true; AmountFound +=1 end
-                        if Mob.Name:find('Nishiki') and getgenv().roghoulsettings['serverhopifnotfoundmobs']['Nishiki'] == true then FoundMobs['Nishiki'] = true; AmountFound +=1 end
+                        if Mob.Name:find('Eto') and getgenv().roghoulsettings['serverhopifnotfoundmobs']['Eto'] == true then FoundMobs['Eto'] = true; AmountFound +=1 if getgenv().roghoulsettings['postserverhopwebhook'] == true and Level > 1250 then postwebhook('serverhop',{title = 'AZFAKE WEBHOOK',content = 'Farming Eto'})  end end
+                        if Mob.Name:find('Amon') and getgenv().roghoulsettings['serverhopifnotfoundmobs']['Amon'] == true then FoundMobs['Amon'] = true; AmountFound +=1 if getgenv().roghoulsettings['postserverhopwebhook'] == true and Level > 750 then postwebhook('serverhop',{title = 'AZFAKE WEBHOOK',content = 'Farming Amon'})  end end
+                        if Mob.Name:find('Nishiki') and getgenv().roghoulsettings['serverhopifnotfoundmobs']['Nishiki'] == true then FoundMobs['Nishiki'] = true; AmountFound +=1 if getgenv().roghoulsettings['postserverhopwebhook'] == true and Level > 250 then postwebhook('serverhop',{title = 'AZFAKE WEBHOOK',content = 'Farming Nishiki'})  end end
                     end
                 end
                 for _,ReadingProperty in next, getgenv().roghoulsettings['serverhopifnotfoundmobs'] do 
@@ -16687,6 +16899,18 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                     -- print('quinque active')
                 end
             end
+
+            if getgenv().roghoulsettings['autoallyall'] == true then 
+                task.spawn(function()
+                    task.delay(1,function()
+                        for _,v in next, game.Players:GetPlayers() do 
+                            task.wait(0.01)
+                            game:GetService("ReplicatedStorage").Remotes.Ally.ToggleAlly:InvokeServer(v.Name)
+                        end
+                    end)
+                end)
+            end
+
             if getaction() == 'canquest' or getaction() == 'usequest' and getgenv()['roghoulsettings']['hasntstarted'] == true  then 
 
                 if getgenv().roghoulsettings['farmingtarget'] ~= '' then 
@@ -17243,6 +17467,20 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
 
                     local Sacs = game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value
                     azfakenotify('You Have: '..Sacs..' Gykatsu Sacs','untilClick')
+                    local function returnmobsindistance(x)
+                        local mobsindistance = {}
+                        if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                            for k,c in next, enemymodel:GetChildren() do 
+                                if c.Name == 'Mob' and c:FindFirstChild('HumanoidRootPart') and c:FindFirstChild('Humanoid') and c:FindFirstChild('Humanoid').Health > 0 then 
+                                    local Distance = (c:FindFirstChild('HumanoidRootPart').Position-game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                                    if Distance <= x then 
+                                        table.insert(mobsindistance,string.split(v:FindFirstChildWhichIsA('Script').Name,'NPC')[1]) -- Script
+                                    end
+                                end
+                            end
+                        end
+                        return mobsindistance
+                    end
                     local function usemoves()
                         if getgenv().roghoulsettings['click'] then 
                             task.delay(.1,function()
@@ -17252,7 +17490,38 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         -- CFrame.Angles(math.rad(90),0,0) upside down for gykatsu
                         task.spawn(function()
                             if getgenv().roghoulsettings['usee'] == true then 
-                                if getgenv().roghoulsettings['useetarget'] == true then 
+                                local JustUseMove = false;
+                                if getgenv().roghoulsettings['useewhencertainmobclose'] == true then 
+                                    local mobstodetect = getgenv().roghoulsettings['useeoncertainmobs']
+                                    if getgenv().roghoulsettings['useeoncertainmobs'] == 'All' then JustUseMove = true end;
+                                    for i,t in next, string.split(mobstodetect,':') do 
+                                        if table.find(returnmobsindistance(getgenv().roghoulsettings['eclosedistance']),t) then 
+                                            JustUseMove = true;
+                                            break -- add a loop index so each time we loop inside the for it adds one
+                                            -- if the loop index isnt equal to the total indexs inside string.split then it means we broke it early.
+                                        end
+                                    end
+
+                                    if JustUseMove == true then 
+                                        if getgenv().roghoulsettings['ereleasekeysbeforeusee'] == true then 
+                                            releaseKey('R')
+                                            releaseKey('F')
+                                        end
+                                        pressKey('E')
+                                        task.wait(1)
+                                        if getgenv().roghoulsettings['rele'] == true and getgenv().roghoulsettings['erelease'] == false then 
+                                            getgenv().roghoulsettings['erelease']  = true;
+                                            task.spawn(function()
+                                                task.wait(getgenv().roghoulsettings['reletime'])
+                                                releaseKey('E')
+                                                getgenv().roghoulsettings['erelease']  = false;
+                                            end)
+                                        end 
+                                    else 
+                                        JustUseMove = nil;
+                                    end
+                                end
+                                if getgenv().roghoulsettings['useetarget'] == true and JustUseMove == false then 
                                     local LittlestDistance = nil; -- if this is smaller than target distance
                                     if enemymodel then 
                                         for i,child in next, enemymodel:GetChildren() do 
@@ -17277,7 +17546,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                             end
                                         end
                                     end
-                                else
+                                elseif JustUseMove == false then
                                     if getgenv().roghoulsettings['ereleasekeysbeforeusee'] == true then 
                                         releaseKey('R')
                                         releaseKey('F')
@@ -17296,7 +17565,38 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
 
                             end
                             if getgenv().roghoulsettings['user'] == true then 
-                                if getgenv().roghoulsettings['usertarget'] == true then 
+                                local JustUseMove = false;
+                                if getgenv().roghoulsettings['userwhencertainmobclose'] == true then 
+                                    local mobstodetect = getgenv().roghoulsettings['useroncertainmobs']
+                                    if getgenv().roghoulsettings['useroncertainmobs'] == 'All' then JustUseMove = true end;
+                                    for i,t in next, string.split(mobstodetect,':') do 
+                                        if table.find(returnmobsindistance(getgenv().roghoulsettings['rclosedistance']),t) then 
+                                            JustUseMove = true;
+                                            break -- add a loop index so each time we loop inside the for it adds one
+                                            -- if the loop index isnt equal to the total indexs inside string.split then it means we broke it early.
+                                        end
+                                    end
+                                    if JustUseMove == true then 
+                                        if getgenv().roghoulsettings['rreleasekeysbeforeuser'] == true then 
+                                            releaseKey('E')
+                                            releaseKey('F')
+                                        end
+                                        pressKey('R')
+                                        task.wait(1)
+                                        if getgenv().roghoulsettings['relr'] == true and getgenv().roghoulsettings['rrelease'] == false then 
+                                            getgenv().roghoulsettings['rrelease'] = true;
+                                            task.spawn(function()
+                                                task.wait(getgenv().roghoulsettings['relrtime'])
+                                                releaseKey('R')
+                                                getgenv().roghoulsettings['rrelease'] = false;
+                                            end)
+                                        end
+                                    else 
+                                        JustUseMove = nil;
+                                    end
+                                end
+
+                                if getgenv().roghoulsettings['usertarget'] == true and JustUseMove == false then 
                                     local LittlestDistance = nil;
                                     if enemymodel then 
                                         for i,child in next, enemymodel:GetChildren() do 
@@ -17321,7 +17621,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                             end
                                         end
                                     end
-                                else
+                                elseif JustUseMove == false then
                                     if getgenv().roghoulsettings['rreleasekeysbeforeuser'] == true then 
                                         releaseKey('E')
                                         releaseKey('F')
@@ -17340,7 +17640,37 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
 
                             end
                             if getgenv().roghoulsettings['usef'] == true then 
-                                if getgenv().roghoulsettings['useftarget'] == true then 
+                                local JustUseMove = false;
+                                if getgenv().roghoulsettings['usefwhencertainmobclose'] == true then 
+                                    local mobstodetect = getgenv().roghoulsettings['usefoncertainmobs']
+                                    if getgenv().roghoulsettings['usefoncertainmobs'] == 'All' then JustUseMove = true end;
+                                    for i,t in next, string.split(mobstodetect,':') do 
+                                        if table.find(returnmobsindistance(getgenv().roghoulsettings['fclosedistance']),t) then 
+                                            JustUseMove = true;
+                                            break -- add a loop index so each time we loop inside the for it adds one
+                                            -- if the loop index isnt equal to the total indexs inside string.split then it means we broke it early.
+                                        end
+                                    end
+                                    if JustUseMove == true then 
+                                        if getgenv().roghoulsettings['freleasekeysbeforeusef'] == true then 
+                                            releaseKey('E')
+                                            releaseKey('R')
+                                        end
+                                        pressKey('F')
+                                        task.wait(1)
+                                        if getgenv().roghoulsettings['relf'] == true and getgenv().roghoulsettings['frelease'] == false then 
+                                            getgenv().roghoulsettings['frelease'] = true;
+                                            task.spawn(function()
+                                                task.wait(getgenv().roghoulsettings['relftime'])
+                                                releaseKey('F')
+                                                getgenv().roghoulsettings['frelease'] = false;
+                                            end)
+                                        end 
+                                    else
+                                        JustUseMove = nil;
+                                    end
+                                end
+                                if getgenv().roghoulsettings['useftarget'] == true and JustUseMove == false then 
                                     local LittlestDistance = nil;
                                     if enemymodel then 
                                         for i,child in next, enemymodel:GetChildren() do 
@@ -17365,7 +17695,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                             end
                                         end
                                     end
-                                else
+                                elseif JustUseMove == false then
                                     if getgenv().roghoulsettings['freleasekeysbeforeusef'] == true then 
                                         releaseKey('E')
                                         releaseKey('R')
@@ -17394,6 +17724,33 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         end)
                     end
                     if enemymodel then 
+                        if getgenv()['roghoulsettings']['cashoutrepbeforegykatsufarm'] == true then 
+                            local obj = game:GetService("Workspace"):FindFirstChild('TrainerModel'):FindFirstChild('ClickIndicator')
+                            if game.Players.LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization'):FindFirstChild('Team').Value == 'CCG' then --type
+                                obj = game:GetService("Workspace").CCGBuilding:FindFirstChild('Yoshitoki'):FindFirstChild('TaskIndicator')
+                            elseif game.Players.LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization'):FindFirstChild('Team').Value == 'Ghoul' then
+                                obj = game:GetService("Workspace").Anteiku:FindFirstChild('Yoshimura'):FindFirstChild('TaskIndicator')
+                            end
+                            if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                                game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0;
+                            end
+                            repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
+    
+                            repeat 
+                                task.wait(0.001)
+                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = obj.CFrame
+                            until game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame == obj.CFrame
+                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = obj.CFrame
+                            if game.Players.LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization'):FindFirstChild('Team').Value == 'CCG' then --type
+                                game:GetService("ReplicatedStorage").Remotes.Yoshitoki.Task:InvokeServer()
+                            elseif game.Players.LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization'):FindFirstChild('Team').Value == 'Ghoul' then
+                                game:GetService("ReplicatedStorage").Remotes.Yoshimura.Task:InvokeServer()
+                            end
+                        end
+
+                        
+
+
                         if getgenv()['roghoulsettings']['classicfarm']  == true then 
                             local __farmable = {}
                             for _,v in next, enemymodel:GetChildren() do  
@@ -17429,10 +17786,137 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     
                                     repeat 
                                         task.wait(0.01)
-                                        pcall(function()
+                                        --pcall(function()
                                             if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
-                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide
-                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,v:FindFirstChild('HumanoidRootPart').Position)
+                                                -- local mob = getgenv().roghoulsettings['closestcoiler']
+                                                local ShouldGoHighDueToFilteredMob = false;
+                                                if getgenv()['roghoulsettings']['gohighwhentargetted'] == true then 
+                                                    for i,mob in next, enemymodel:GetChildren() do 
+                                                        if mob.Name == 'Mob' and mob:FindFirstChildWhichIsA('Humanoid') and mob:FindFirstChildWhichIsA('Humanoid').Health >0 and mob:FindFirstChild('HumanoidRootPart') then 
+                                                            local Distance = (mob:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                                                            if Distance.Magnitude <= getgenv().roghoulsettings['gohightargetdistance'] and mob:FindFirstChildWhichIsA('Script') then 
+                                                                local MobName = string.split(mob:FindFirstChildWhichIsA('Script').Name,'NPC')[1]
+                                                                --print(MobName)
+                                                                for _a,activated in next, getgenv().roghoulsettings['mobstogohighon'] do 
+                                                                    --print(_a, MobName,activated)
+                                                                    if _a == MobName and activated == true then 
+                                                                        ShouldGoHighDueToFilteredMob = true;
+                                                                        break; -- save fps
+                                                                    elseif _a == 'All' and activated == true then 
+                                                                        ShouldGoHighDueToFilteredMob = true;
+                                                                        break;
+                                                                    end
+                                                                end
+                                                            end
+                                                        end
+                                                        if ShouldGoHighDueToFilteredMob == true then break end;
+                                                    end
+                                                end
+                                                if getgenv().roghoulsettings['targettingvictim'] and getgenv().roghoulsettings['targettingvictim']:FindFirstChild('HumanoidRootPart') then 
+                                                    local Distance = (getgenv().roghoulsettings['targettingvictim']:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                                                    if Distance.Magnitude > getgenv().roghoulsettings['targettingdistance'] then 
+                                                        getgenv().roghoulsettings['targettingvictim'] = nil;
+                                                    end
+                                                end
+                                                if getgenv().roghoulsettings['targettingvictim'] and getgenv().roghoulsettings['targettingvictim']:FindFirstChild('Humanoid') then 
+                                                    if getgenv().roghoulsettings['targettingvictim']:FindFirstChild('Humanoid').Health == 0 then 
+                                                        getgenv().roghoulsettings['targettingvictim'] = nil;
+                                                    end
+                                                end
+
+                                                if getgenv()['roghoulsettings']['goaboveofclosepeople'] == true and getgenv()['roghoulsettings']['targettingvictim'] ~= nil and getgenv()['roghoulsettings']['targettingvictim'] ~= nil and getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('Humanoid') and getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('Humanoid').Health > 0 and getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('HumanoidRootPart') then 
+                                                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,getgenv().roghoulsettings['highplayertargety'],0)
+                                                elseif getgenv()['roghoulsettings']['goontopofcoilers'] == true and getgenv().roghoulsettings['closestcoiler'] ~= nil and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid') and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid').Health > 0 and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart') then 
+                                                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = getgenv().roghoulsettings['closestcoiler'].Character:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,getgenv().roghoulsettings['highcoilery'],0) -- closte
+                                                else
+                                                    if ShouldGoHighDueToFilteredMob == true then 
+                                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)
+                                                    else
+                                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide
+                                                    end
+                                                end
+                                                local Topic = nil ;
+                                                if getgenv()['roghoulsettings']['targetting'] == true then 
+                                                    local ClosestVictim = nil;
+                                                    local ClosestDistance = nil;
+                                                    if getgenv()['roghoulsettings']['targettingvictim'] == nil then 
+                                                        for _,getp in next, game.Players:GetPlayers() do 
+                                                            if getp.Name ~= game.Players.LocalPlayer.Name and getp.Character and getp.Character:FindFirstChild('Humanoid') and getp.Character:FindFirstChild('Humanoid').Health > 0 and getp.Character:FindFirstChild('HumanoidRootPart') then 
+                                                                -- can use DistanceFromCharacter()
+                                                                local Distance = (getp.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude -- game.P;ayer
+                                                                -- if Distance <= getgenv().roghoulsettings['targettingdistance'] then 
+                                                                --     if ClosestDistance == nil then 
+                                                                --         ClosestVictim = getp.Character;
+                                                                --         ClosestDistance = Distance;
+                                                                --     else
+                                                                --         if ClosestDistance > Distance then 
+                                                                --             ClosestVictim = getp.Character;
+                                                                --             ClosestDistance = Distance;
+                                                                --         end
+                                                                --     end
+                                                                -- end
+                                                                if Distance <= getgenv().roghoulsettings['targettingdistance'] and ClosestDistance == nil then 
+                                                                    ClosestVictim = getp.Character;
+                                                                    ClosestDistance = Distance;
+                                                                elseif Distance <= getgenv().roghoulsettings['targettingdistance'] and ClosestDistance ~= nil and ClosestDistance > Distance then 
+                                                                    ClosestVictim = getp.Character;
+                                                                    ClosestDistance = Distance;
+                                                                end
+                                                            end
+                                                        end
+                                                        -- if ClosestVictim ~= nil then 
+                                                        -- end
+                                                        getgenv().roghoulsettings['targettingvictim'] = ClosestVictim
+                                                    end
+                                                    if not getgenv().roghoulsettings['targettingvictim'] or not getgenv().roghoulsettings['targettingvictim']:FindFirstChild('Humanoid') or getgenv().roghoulsettings['targettingvictim']:FindFirstChild('Humanoid').Health == 0 or not getgenv().roghoulsettings['targettingvictim']:FindFirstChild('HumanoidRootPart') then 
+                                                        getgenv().roghoulsettings['targettingvictim'] = nil;
+                                                    end
+                                                    if getgenv().roghoulsettings['targettingvictim'] ~= nil then 
+                                                        if not getgenv().roghoulsettings['targettingvictim'] or not getgenv().roghoulsettings['targettingvictim']:FindFirstChild('Humanoid') or getgenv().roghoulsettings['targettingvictim']:FindFirstChild('Humanoid').Health == 0 or not getgenv().roghoulsettings['targettingvictim']:FindFirstChild('HumanoidRootPart') then 
+                                                            getgenv().roghoulsettings['targettingvictim'] = nil;
+                                                        end
+                                                        --game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,getgenv().roghoulsettings['targettingvictim']:FindFirstChild('HumanoidRootPart').Position)
+                                                    end
+                                                elseif getgenv()['roghoulsettings']['aimatcoilers'] == true then 
+                                                    local ClosestCoiler = nil;
+                                                    local ClosestCoilerDistance = nil;
+                                                    if getgenv().roghoulsettings['closestcoiler'] == nil then 
+                                                        for _,mob in next, enemymodel:GetChildren() do 
+                                                            if mob.Name == 'Mob' and mob:FindFirstChild('CoilerNPC') and mob:FindFirstChildWhichIsA('Humanoid') and mob:FindFirstChildWhichIsA('Humanoid').Health > 0 and mob:FindFirstChild('HumanoidRootPart') then 
+                                                                local CoilerDistance = (mob:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                                                                if CoilerDistance.Magnitude <= getgenv().roghoulsettings['coilersdistance'] and ClosestCoilerDistance == nil then 
+                                                                    ClosestCoiler = mob ; 
+                                                                    ClosestCoilerDistance = CoilerDistance.Magnitude ;
+                                                                elseif CoilerDistance.Magnitude <= getgenv().roghoulsettings['coilersdistance'] and ClosestCoilerDistance ~= nil and ClosestCoilerDistance > CoilerDistance.Magnitude then 
+                                                                    ClosestCoiler = mob ; 
+                                                                    ClosestCoilerDistance = CoilerDistance.Magnitude ;
+                                                                end
+                                                            end
+                                                        end
+                                                        --if ClosestCoiler ~= nil then 
+                                                        getgenv().roghoulsettings['closestcoiler'] = ClosestCoiler
+                                                        --end
+                                                    end
+                                                    if not getgenv().roghoulsettings['closestcoiler'] or not getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid') or getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid') and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid').Health == 0 or not getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart') then 
+                                                        getgenv().roghoulsettings['closestcoiler'] = nil;
+                                                    end
+                                                    if getgenv().roghoulsettings['closestcoiler'] ~= nil then 
+                                                        if not getgenv().roghoulsettings['closestcoiler'] or not getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid') or getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid') and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid').Health == 0 or not getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart') then 
+                                                            getgenv().roghoulsettings['closestcoiler'] = nil;
+                                                        else
+                                                            --game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart').Position)
+                                                        end
+                                                    end
+                                                end
+                                                if getgenv()['roghoulsettings']['targettingvictim'] ~= nil and getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('HumanoidRootPart') then 
+                                                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,getgenv().roghoulsettings['targettingvictim']:FindFirstChild('HumanoidRootPart').Position)  
+                                                elseif getgenv().roghoulsettings['closestcoiler'] ~= nil then 
+                                                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart').Position)
+                                                else
+                                                    if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v and v:FindFirstChild('HumanoidRootPart') then 
+                                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,v:FindFirstChild('HumanoidRootPart').Position)
+                                                    end
+                                                end
                                                 -- 
                                                 usemoves()
                                                 if not game.Players.LocalPlayer.Character:FindFirstChild(typeweapon) and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 then 
@@ -17505,7 +17989,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                     delaying = false;
                                                 end
                                             end
-                                        end)
+                                        --end)
                                     until not workspace:FindFirstChild('Gyakusatsu'):FindFirstChild(v.Name) or getgenv().loopsUnload == true or getgenv().roghoulsettings['farming'] == false or getgenv().roghoulsettings['gykatfarm'] == false
     
                                 end
@@ -17685,22 +18169,23 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                     ['Middle'] = CFrame.new(-998.055847, 64.7473831, 283.880157);
                                     ['Right'] = CFrame.new(-995.961548, 64.7473831, 335.631134);
                                 }-- sides
+                                local OURCONTRIBUTION = 0;
                                 if v.Name == 'Gyakusatsu' then 
                                     local delaying = false;
                                     local oldValue = nil;
                                     local oldValueText = ';'
                                     local canResetValueText = true;
                                     local function findwithx(x)
-                                        pcall(function()
-                                            local xfound = nil;
+                                        local xfound = nil;
+                                        if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList') and game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List') then 
                                             for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
-                                                if v.Name:find(x) then 
+                                                if v and v.Name == x then 
                                                     xfound = v
                                                     break
                                                 end
                                             end
-                                            return xfound
-                                        end)
+                                        end
+                                        return xfound
                                     end
                                     repeat 
                                         task.wait(0.01)
@@ -17749,16 +18234,6 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         --     canResetValueText = true;
                                         --     delaying = false;
                                         -- end
-                                        local function findwithx(x)
-                                            local xfound = nil;
-                                            for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
-                                                if v and v.Name == x then 
-                                                    xfound = v
-                                                    break
-                                                end
-                                            end
-                                            return xfound
-                                        end
                                         if delaying == false then 
                                             delaying = true;
                                             task.delay(2,function()
@@ -17811,10 +18286,30 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 end
                                             end
                                         end)
+                                        task.spawn(function()
+                                            repeat 
+                                                task.wait(.2)
+                                                pcall(function()
+                                                    if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List') then 
+                                                        for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
+                                                            if v.Name == game.Players.LocalPlayer.Name then 
+                                                                OURCONTRIBUTION = v:FindFirstChild('GyaPerc').Text;
+                                                                break
+                                                            end
+                                                        end
+                                                    end
+                                                end)
+                                            until not workspace:FindFirstChild('Gyakusatsu')
+                                            if getgenv().roghoulsettings['postgykatsu'] == true then 
+                                                postwebhook('gykatsu',{title = 'AZFAKE WEBHOOK',content = 'Gykatsu with '..OURCONTRIBUTION..' Contribution at '..os.date()})
+                                            end 
+                                        end)
                                     until not workspace:FindFirstChild('Gyakusatsu') or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
+                                    
                                 end
                             end
                         end
+                        
                     end
                     getgenv()['roghoulsettings']['action'] = 'canquest'
                     -- local gykatcurrently = nil
