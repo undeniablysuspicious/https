@@ -17828,6 +17828,22 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                     end
                                                 end
 
+                                                if getgenv().roghoulsettings['closestcoiler'] ~= nil and getgenv().roghoulsettings['closestcoiler']:FindFirstChildWhichIsA('Humanoid') and getgenv().roghoulsettings['closestcoiler']:FindFirstChildWhichIsA('Humanoid').Health > 0 then
+                                                else
+                                                    getgenv().roghoulsettings['closestcoiler'] = nil;
+                                                end
+                                                if getgenv().roghoulsettings['closestcoiler'] ~= nil and getgenv().roghoulsettings['closestcoiler']:FindFirstChildWhichIsA('Humanoid') then 
+                                                    if getgenv().roghoulsettings['closestcoiler']:FindFirstChildWhichIsA('Humanoid').Health == 0 then 
+                                                        getgenv().roghoulsettings['closestcoiler'] = nil 
+                                                    end
+                                                end
+                                                if getgenv().roghoulsettings['closestcoiler'] ~= nil and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart') then 
+                                                    local Distance = (getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                                                    if Distance.Magnitude > getgenv().roghoulsettings['coilersdistance'] then 
+                                                        getgenv().roghoulsettings['closestcoiler'] = nil
+                                                    end
+                                                end
+
                                                 if getgenv()['roghoulsettings']['goaboveofclosepeople'] == true and getgenv()['roghoulsettings']['targettingvictim'] ~= nil and getgenv()['roghoulsettings']['targettingvictim'] ~= nil and getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('Humanoid') and getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('Humanoid').Health > 0 and getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('HumanoidRootPart') then 
                                                     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,getgenv().roghoulsettings['highplayertargety'],0)
                                                 elseif getgenv()['roghoulsettings']['goontopofcoilers'] == true and getgenv().roghoulsettings['closestcoiler'] ~= nil and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid') and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid').Health > 0 and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart') then 
@@ -17914,7 +17930,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 end
                                                 if getgenv()['roghoulsettings']['targettingvictim'] ~= nil and getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('HumanoidRootPart') then 
                                                     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,getgenv().roghoulsettings['targettingvictim']:FindFirstChild('HumanoidRootPart').Position)  
-                                                elseif getgenv().roghoulsettings['closestcoiler'] ~= nil then 
+                                                elseif getgenv().roghoulsettings['closestcoiler'] ~= nil and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart') then 
                                                     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart').Position)
                                                 else
                                                     if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v and v:FindFirstChild('HumanoidRootPart') then 
@@ -18296,7 +18312,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 pcall(function()
                                                     if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List') then 
                                                         for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
-                                                            if string.find(game.Players.LocalPlayer.Name) then 
+                                                            if string.find(v.Name,game.Players.LocalPlayer.Name) then 
                                                                 OURCONTRIBUTION = v:FindFirstChild('GyaPerc').Text;
                                                                 break
                                                             end
