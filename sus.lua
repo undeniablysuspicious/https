@@ -15710,6 +15710,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         serverhopformobwebhook = '';
         postserverhopwebhook = false;
         cashoutrepbeforegykatsufarm = false;
+        ourallied = {}
     }
     getgenv().divious_teleport = function(info)
 
@@ -16904,8 +16905,11 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                 task.spawn(function()
                     task.delay(1,function()
                         for _,v in next, game.Players:GetPlayers() do 
-                            task.wait(0.01)
-                            game:GetService("ReplicatedStorage").Remotes.Ally.ToggleAlly:InvokeServer(v.Name)
+                            if not table.find(getgenv().roghoulsettings['ourallied'],v.Name) then 
+                                table.insert(getgenv().roghoulsettings['ourallied'],v.Name)
+                                task.wait(0.01)
+                                game:GetService("ReplicatedStorage").Remotes.Ally.ToggleAlly:InvokeServer(v.Name) 
+                            end
                         end
                     end)
                 end)
@@ -17737,14 +17741,14 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >0 and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
     
                             repeat 
-                                task.wait(0.001)
+                                task.wait(0.1)
                                 game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = obj.CFrame
                             until game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame == obj.CFrame
                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = obj.CFrame
                             if game.Players.LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization'):FindFirstChild('Team').Value == 'CCG' then --type
-                                game:GetService("ReplicatedStorage").Remotes.Yoshitoki.Task:InvokeServer()
+                                game:GetService("ReplicatedStorage").Remotes.ReputationCashOut:InvokeServer()
                             elseif game.Players.LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization'):FindFirstChild('Team').Value == 'Ghoul' then
-                                game:GetService("ReplicatedStorage").Remotes.Yoshimura.Task:InvokeServer()
+                                game:GetService("ReplicatedStorage").Remotes.ReputationCashOut:InvokeServer()
                             end
                         end
 
