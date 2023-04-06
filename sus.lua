@@ -15547,7 +15547,7 @@ elseif game.PlaceId == 6679968919 then -- fly race
         end
     end
 elseif game.PlaceId == 914010731 then --  ro ghoul
-    game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
+    --game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
     local tab = window:CreateTab('Ro Ghoul')
     local Configuration = window:CreateTab('Configuration')
     local sector = tab:CreateSector('Cheats','left')
@@ -17983,7 +17983,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
 
 
 
-                                                if getgenv()['roghoulsettings']['avoidjug'] == true then 
+                                                if getgenv()['roghoulsettings']['avoidjug'] == true and ShouldGoHighDueToFilteredMob == false then 
                                                     for i,mob in next, enemymodel:GetChildren() do 
                                                         if mob.Name == 'Mob' and mob:FindFirstChildWhichIsA('Humanoid') and mob:FindFirstChildWhichIsA('Humanoid').Health >0 and mob:FindFirstChild('HumanoidRootPart') and mob:FindFirstChildWhichIsA('Script') then 
                                                             local MobName = string.split(mob:FindFirstChildWhichIsA('Script').Name,'NPC')[1]
@@ -18512,6 +18512,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                     '\nContribution at '..os.date()..
                                                     '\nPlayers Participated: '..tostring(PlayersParticipated)..
                                                     '\nTime Elasped: '..TimeElasped.. -- total contribution taken away from other players
+                                                    '\nGyakusatsu Sacs: '..game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value..
+                                                    '\npowered by azfake'
                                                     '```'
                                                 }
                                             )
