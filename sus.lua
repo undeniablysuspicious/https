@@ -18382,7 +18382,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         end
                                         return xfound
                                     end
-                                    local function findplayervalue(x) 
+                                    local function findplayervalue(x) -- 
                                         local playervalue = nil
                                         for _,v in next, OtherPlayers do 
                                             if v['name'] == x then -- v.Name:find() so if the first digit changes it will still find
@@ -18391,7 +18391,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         end
                                         return playervalue
                                     end
-                                    local AllPlayerValues = ''
+                                    local AllPlayerValues = '\n    '
                                     repeat 
                                         task.wait(0.01)
                                         -- if canResetValueText == true  and delaying == false then 
@@ -18514,8 +18514,10 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                                         }
                                                                     )
                                                                     PlayersParticipated += 1
+                                                                    --print('created')
                                                                 else
                                                                     findplayervalue(v.Name:sub(2,string.len(v.Name)))['contribution'] = v:FindFirstChild('GyaPerc').Text
+                                                                    --print('set contrib')
                                                                 end
                                                             end
                                                         end
@@ -18533,19 +18535,62 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                     if not workspace:FindFirstChild('Gyakusatsu') then 
                                         StopElasped = true;
                                         if getgenv().roghoulsettings['postgykatsu'] == true then 
-                                            postwebhook('gykatsu',
-                                                {
-                                                    title = 'AZFAKE WEBHOOK',
-                                                    content = 
-                                                    '```\nGyakusatsu with '..OURCONTRIBUTION..
-                                                    '\nContribution at '..os.date()..
-                                                    '\nPlayers Participated: '..tostring(PlayersParticipated)..'\n'..AllPlayerValues..
-                                                    '\nTime Elasped: '..TimeElasped.. -- total contribution taken away from other players
-                                                    '\nGyakusatsu Sacs: '..game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value..
-                                                    '\npowered by azfake'..
-                                                    '```'
-                                                }
-                                            )
+                                            local GyakusatsuData = {
+                                                ['content'] = '';
+                                                ['embeds'] = {{
+                                                    ['title'] = 'AZFAKE WEBHOOK';
+                                                    ['description'] = 'powered by azfake';
+                                                    ['type'] = 'rich';
+                                                    ['color'] = tonumber(0xffffff);
+                                                    ['fields'] = {
+                                                        {
+                                                            ['name'] = 'Date';
+                                                            ['value'] = os.date();
+                                                            ['inline'] = true;
+                                                        };
+                                                        {
+                                                            ['name'] = 'Contribution';
+                                                            ['value'] = OURCONTRIBUTION;
+                                                            ['inline'] = true;
+                                                        };
+                                                        {
+                                                            ['name'] = 'Players Participated In Gyakusatsu';
+                                                            ['value'] = tostring(PlayersParticipated);
+                                                            ['inline'] = true;
+                                                        };
+                                                        {
+                                                            ['name'] = 'List Of Players Contribution';
+                                                            ['value'] = AllPlayerValues;
+                                                            ['inline'] = true;
+                                                        };
+                                                        {
+                                                            ['name'] = 'Time Elasped';
+                                                            ['value'] = tostring(TimeElasped);
+                                                            ['inline'] = true;
+                                                        };
+                                                        {
+                                                            ['name'] = 'Current Gyakusatsu Sacs';
+                                                            ['value'] = game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value;
+                                                            ['inline'] = true;
+                                                        };
+                                                    }
+                                                }}
+                                            }
+                                            postwebhook('gykatsu',GyakusatsuData)
+                                                -- {
+                                                --     ['title'] = 'AZFAKE WEBHOOK',
+                                                --     embeds = {
+                                                --         title = 'AZFAKE WEBHOOK'; --['AZFAKE WEBHOOK']
+                                                --         description = 
+                                                --         'Gyakusatsu with '..OURCONTRIBUTION..
+                                                --         '\nContribution at '..os.date()..
+                                                --         '\nPlayers Participated: '..tostring(PlayersParticipated)..
+                                                --         '\nList of Players Participating: '..AllPlayerValues..
+                                                --         '\nTime Elasped: '..TimeElasped.. -- total contribution taken away from other players
+                                                --         '\nGyakusatsu Sacs: '..game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value..
+                                                --         '\npowered by azfake'
+                                                --     } 
+                                                -- }
                                         end 
                                     end
                                 end
