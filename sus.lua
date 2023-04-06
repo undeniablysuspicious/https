@@ -18509,7 +18509,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
 
                                                                     table.insert(OtherPlayers,
                                                                         {
-                                                                            ['name'] = v.Name:sub(2,string.len(v.Name))
+                                                                            ['name'] = v.Name:sub(2,string.len(v.Name)),
                                                                             ['contribution'] = v:FindFirstChild('GyaPerc').Text
                                                                         }
                                                                     )
