@@ -23622,6 +23622,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                     end
                                                 end)
                                                 -- local gotplayer = {}
+                                                AllPlayerValues = ''
                                                 for i,gyakusatsuuser in next, OtherPlayers do 
                                                     --if not table.find(gotplayer,gyakusatsuuser['name']) then 
                                                     --table.insert(gotplayer,gyakusatsuuser['name']) was this here before or what
@@ -23639,6 +23640,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                     if not workspace:FindFirstChild('Gyakusatsu') then 
                                         StopElasped = true;
                                         if getgenv().roghoulsettings['postgykatsu'] == true then 
+                                            print(AllPlayerValues)
                                             local GyakusatsuData = {
                                                 ['content'] = '';
                                                 ['embeds'] = {{
