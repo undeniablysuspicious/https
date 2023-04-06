@@ -23310,17 +23310,48 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                             print('num rec '..numreceiving)
                                             local olddivision = tostring(division)
                                             divisbleminute = tonumber(numreceiving)/(0.60) --* tonumber(   '1' ..  string.rep('0',string.len(tostring(TimeElasped))-1)              )
-                                            division = divisbleminute
-                                            if fulllength:sub(lengthafter,lengthafter) ~= nil then 
-                                                print(fulllength:sub(lengthafter,lengthafter).. 'l')
-                                                division = division..'.'..olddivision:sub(lengthafter,string.len(olddivision))
+                                            local fnumbers = {}
+                                            for i=1, string.len(tostring(divisbleminute)) do 
+                                                table.insert(fnumbers,tostring(divisbleminute):sub(i,i))
                                             end
+                                            local foundmorethanthreetimes = {}
+                                            for i,v in next, fnumbers do 
+                                                local NumberGot = tostring(v)
+                                                local FoundThree = false
+                                                for x,t in next, fnumbers do 
+                                                    local NumberGot2 = tostring(v)
+                                                    for e,g in next, fnumbers do 
+                                                        local NumberGot3 = tostring(v)
+                                                        if NumberGot == NumberGot2 and NumberGot2 == NumberGot3 then 
+                                                            FoundThree = true
+                                                            break
+                                                        end
+                                                    end
+                                                    if FoundThree == true then break end
+                                                end
+                                                if FoundThree == true then 
+                                                    table.insert(foundmorethanthreetimes,NumberGot)
+                                                end
+                                            end
+                                            if #foundmorethanthreetimes == 0 then 
+                                                division = divisbleminute 
+                                            else
+                                                local howmanytimes_60_into = math.floor(division/0.60)
+                                                print('Divides into 60: '..math.floor(howmanytimes_60_into))
+                                                local remainder = (TimeElasped - (howmanytimes_60_into*60))
+                                                print('Seconds remaining: '..remainder)
+                                                division = tonumber( tostring(howmanytimes_60_into) .. '.'..tostring(remainder) )
+                                            end
+                                            -- if fulllength:sub(lengthafter,lengthafter) ~= nil then 
+                                            --     --print(fulllength:sub(lengthafter,lengthafter).. 'l')
+                                            --     division = division..'.'..olddivision:sub(lengthafter,string.len(olddivision))
+                                            -- end
                                         else
                                             division = division / 100
                                         end
                                         division = division..'0'
                                         print('div minute '..divisbleminute)
-                                        print(division)
+                                        print('DIVISION '..division)
                                         local holdlapsed = tonumber(TimeElasped);
                                         local preview = holdlapsed - 60
                                         -- repeat 
@@ -23394,44 +23425,45 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         for i,v in next, TimePrefixes do 
                                             if timeconverted:find(v) then 
                                                 
-                                                -- if amountofotherwords == 0 then 
-                                                --     local f_found = 0
-                                                --     for subbed = 1, string.len(timeconverted) do 
-                                                --         if timeconverted:sub(subbed,subbed) == v:sub(1,1) then 
-                                                --             f_found = subbed
-                                                --             break
-                                                --         end 
-                                                --     end
-                                                --     local h_prev = timeconverted
-                                                --     timeconverted = timeconverted:sub(1,f_found-1);
-                                                --     timeconverted = timeconverted..'{'..h_prev:sub(f_found,string.len(h_prev))
-                                                --     bracketplacement = '{'..h_prev:sub(f_found,string.len(h_prev))
-                                                --     timeconverted = timeconverted..'}'
-                                                --     bracketplacement = bracketplacement..'}'
-                                                -- end
+                                                if amountofotherwords == 0 then 
+                                                    local f_found = 0
+                                                    for subbed = 1, string.len(timeconverted) do 
+                                                        if timeconverted:sub(subbed,subbed) == v:sub(1,1) then 
+                                                            f_found = subbed
+                                                            break
+                                                        end 
+                                                    end
+                                                    local h_prev = timeconverted
+                                                    timeconverted = timeconverted:sub(1,f_found-1);
+                                                    timeconverted = timeconverted..'{'..h_prev:sub(f_found,string.len(h_prev))
+                                                    bracketplacement = '{'..h_prev:sub(f_found,string.len(h_prev))
+                                                    timeconverted = timeconverted..'}'
+                                                    bracketplacement = bracketplacement..'}'
+                                                end
                                                 amountofotherwords += 1
+                                                -- timeconverted = string.gsub(timeconverted)
                                                 print('found '..v)
                                             end
                                         end
                                         local PhrasesFound = {}
-                                        if amountofotherwords >= 2 then 
+                                        if amountofotherwords >= 1 then 
                                             for i,v in next, TimePrefixes do 
                                                 if timeconverted:find(v) then 
                                                     -- get when it starts
                                                     -- local f_found = 0
-                                                    -- for subbed = 1, string.len(timeconverted) do 
-                                                    --     if timeconverted:sub(subbed,subbed) == v:sub(1,1) then 
-                                                    --         f_found = subbed
-                                                    --         break
-                                                    --     end 
-                                                    -- end
+                                                    for subbed = 1, string.len(timeconverted) do 
+                                                        if timeconverted:sub(subbed,subbed) == v:sub(1,1) then 
+                                                            f_found = subbed
+                                                            break
+                                                        end 
+                                                    end
                                                     --timeconverted = string.gsub(timeconverted,v)
-                                                    -- if amountofotherwords == 0 then 
-                                                    --     local h_prev = timeconverted
-                                                    --     timeconverted = timeconverted:sub(1,f_found-1);
-                                                    --     timeconverted = timeconverted..'{'..h_prev:sub(f_found,string.len(h_prev))
-                                                    --     timeconverted = timeconverted..'}'
-                                                    -- end
+                                                    if amountofotherwords == 0 then 
+                                                        local h_prev = timeconverted
+                                                        timeconverted = timeconverted:sub(1,f_found-1);
+                                                        timeconverted = timeconverted..'{'..h_prev:sub(f_found,string.len(h_prev))
+                                                        timeconverted = timeconverted..'}'
+                                                    end
                                                     table.insert(PhrasesFound,v)
                                                     -- if first then start it with {
                                                     -- end it in } 
@@ -23440,10 +23472,32 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                             end
                                     
                                     
-                                    
+                                            local Sum = 0
+                                            local WordEquivalent = ''
                                             for i,v in next, PhrasesFound do 
-                                                print(v)
+                                                --print(v)
+                                                --timeconverted = string.gsub(timeconverted,v,reversec(v))
+                                                if i == 1 then 
+                                                    Sum = Sum +  tonumber( reversec(v):sub(1,1) .. 0)
+                                                    WordEquivalent = tonumber( reversec(v):sub(1,1) .. 0)
+                                                    WordEquivalent = getc(tostring(WordEquivalent))
+                                                    print('NEew Equiv: '..WordEquivalent)
+                                                else
+                                                    Sum = Sum +  tonumber( reversec(v):sub(1,1))
+                                                end
                                             end
+                                            print('Current Sum: '..Sum)
+                                            -- for _,v in next, PhrasesFound do 
+                                            --     if _ == 1 then 
+                                            --         print(Sum)
+                                            --         print(tonumber(reversec(v)))
+                                            --         Sum = Sum +  tonumber( reversec(v):sub(1,1) .. 0) -- tonumber(reversec(v)) +
+                                            --         print(Sum)
+                                            --     else
+                                            --         print(Sum)
+                                            --         Sum = Sum + tonumber(reversec(v))
+                                            --     end
+                                            -- end
                                     
                                             for _,v in next, TimePrefixes do 
                                                 timeconverted = string.gsub(timeconverted,_,v)
@@ -23466,22 +23520,31 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                             -- else
                                             --     timeconverted = string.gsub(timeconverted,bracketplacement,Sum..' Seconds')
                                             -- end
-                                            -- local StartingNumber = ''
-                                            -- local StartedConversion = false
-                                            -- for i=1, string.len(timeconverted) do 
-                                            --     if timeconverted:sub(1,1) == '{' and timeconverted:sub(i,i) == '{' and i == 1 then 
-                                            --         StartedConversion = true
-                                            --         --StartingNumber = timeconverted:sub(2,2)
-                                            --     elseif timeconverted:sub(i,i) == '}' and StartedConversion == true then 
-                                            --         StartedConversion = false 
-                                            --     elseif StartedConversion == true then 
-                                            --         StartingNumber = StartingNumber..timeconverted:sub(i,i)
-                                            --     end
-                                            -- end
-                                    
-                                    
-                                    
-                                    
+                                            local StartingNumber = ''
+                                            local StartedConversion = false
+                                            local PrevStartingNumber = ''
+                                            for i=1, string.len(timeconverted) do 
+                                                if timeconverted:sub(i,i) == '{'  then  -- timeconverted:sub(1,1) == '{' and and i == 1
+                                                    StartedConversion = true
+                                                    --StartingNumber = timeconverted:sub(2,2)
+                                                elseif timeconverted:sub(i,i) == '}' and StartedConversion == true then 
+                                                    StartedConversion = false 
+                                                elseif StartedConversion == true then 
+                                                    StartingNumber = StartingNumber..timeconverted:sub(i,i)
+                                                end
+                                            end
+                                            local ConvertedNumber = ''
+                                            PrevStartingNumber = StartingNumber
+                                            for _,v in next, TimePrefixes do 
+                                                if string.find(StartingNumber,v) then 
+                                                    StartingNumber = string.gsub(StartingNumber,v,WordEquivalent..' ')
+                                                    break
+                                                end
+                                            end
+                                            print(StartingNumber)
+                                            ConvertedNumber = StartingNumber
+                                            print(timeconverted)
+                                            timeconverted = string.gsub(timeconverted,'{'..PrevStartingNumber..'}',ConvertedNumber)
                                             --local endnumber = tonumber(StartingNumber) * 60 + Sum --/ tonumber(   '1' ..  string.rep('0',string.len(tostring(TimeElasped))-1)              )
                                             --print(StartingNumber.. 's num')
                                             --print(Sum..' sum')
