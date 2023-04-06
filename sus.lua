@@ -17888,21 +17888,21 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                     local oldValueText = ';'
                                     local canResetValueText = true;
                                     
-                                    if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
-                                        local DistanceFromStartingPosition = (LoopCFrameSide.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position) -- v.Position?
-                                        -- print(DistanceFromStartingPosition.Magnitude)
-                                        if DistanceFromStartingPosition.Magnitude > 100 then 
-                                            -- getgenv().divious_teleport(
-                                            --     {
-                                            --         distance = LoopCFrameSide;
-                                            --         delay = 0.3;
-                                            --         tween = true;
-                                            --         division = 3
-                                            --     }
-                                            -- )
-                                            -- task.wait(4)
-                                        end
-                                    end
+                                    -- if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                    --     local DistanceFromStartingPosition = (LoopCFrameSide.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position) -- v.Position?
+                                    --     -- print(DistanceFromStartingPosition.Magnitude)
+                                    --     if DistanceFromStartingPosition.Magnitude > 100 then 
+                                    --         -- getgenv().divious_teleport(
+                                    --         --     {
+                                    --         --         distance = LoopCFrameSide;
+                                    --         --         delay = 0.3;
+                                    --         --         tween = true;
+                                    --         --         division = 3
+                                    --         --     }
+                                    --         -- )
+                                    --         -- task.wait(4)
+                                    --     end
+                                    -- end
                                     
 
 
