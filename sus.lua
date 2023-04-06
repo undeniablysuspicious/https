@@ -18009,10 +18009,10 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                         if HighAvoidedJug == false then 
                                                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)
                                                         else
-                                                            if LoopCFrameSide == Sides['Right'] then 
-                                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide * CFrame.new(-(getgenv().roghoulsettings['gohightargetdistance']/10),getgenv().roghoulsettings['hightargety'],0)
+                                                            if LoopCFrameSide == Sides['Right'] then -- (getgenv().roghoulsettings['gohightargetdistance']/10)
+                                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Left'] * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)--CFrame.new(-10,getgenv().roghoulsettings['hightargety'],0)
                                                             elseif LoopCFrameSide == Sides['Left'] then 
-                                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide * CFrame.new((getgenv().roghoulsettings['gohightargetdistance']/10),getgenv().roghoulsettings['hightargety'],0)
+                                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Right'] * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)  --CFrame.new(10,getgenv().roghoulsettings['hightargety'],0)
                                                             end
                                                         end
                                                     elseif ShouldGoHighDueToFilteredMob == nil then 
