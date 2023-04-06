@@ -18523,10 +18523,15 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                         end
                                                     end
                                                 end)
+                                                -- local gotplayer = {}
+                                                for i,gyakusatsuuser in next, OtherPlayers do 
+                                                    --if not table.find(gotplayer,gyakusatsuuser['name']) then 
+                                                    table.insert(gotplayer,gyakusatsuuser['name'])
+                                                    AllPlayerValues = AllPlayerValues..'Player '..gyakusatsuuser['name']..' with '..gyakusatsuuser['contribution']..' contribution\n    '
+                                                    --end
+                                                end
                                             until not workspace:FindFirstChild('Gyakusatsu')
-                                            for i,gyakusatsuuser in next, OtherPlayers do 
-                                                AllPlayerValues = AllPlayerValues..'Player '..gyakusatsuuser['name']..' with '..gyakusatsuuser['contribution']..' contribution\n    '
-                                            end
+                                            -- print(AllPlayerValues)
                                             --[[
                                                     Dumbass with 9 contribution
                                             ]]
