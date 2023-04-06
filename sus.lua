@@ -17988,7 +17988,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                         if mob.Name == 'Mob' and mob:FindFirstChildWhichIsA('Humanoid') and mob:FindFirstChildWhichIsA('Humanoid').Health >0 and mob:FindFirstChild('HumanoidRootPart') and mob:FindFirstChildWhichIsA('Script') then 
                                                             local MobName = string.split(mob:FindFirstChildWhichIsA('Script').Name,'NPC')[1]
                                                             local Distance = (mob:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
-                                                            if Distance.Magnitude <= getgenv().roghoulsettings['jugtargetdistance'] and MobName == 'Jug' then 
+                                                            if Distance.Magnitude <= getgenv().roghoulsettings['jugtargetdistance'] and MobName == 'Jug' and ShouldGoHighDueToFilteredMob == false then 
                                                                 --ShouldntTeleportToOriginalSpace = mob:FindFirstChild('HumanoidRootPart')
                                                                 ShouldGoHighDueToFilteredMob = nil
                                                             end
