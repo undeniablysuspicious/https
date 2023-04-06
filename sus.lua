@@ -23622,14 +23622,6 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                     end
                                                 end)
                                                 -- local gotplayer = {}
-                                                AllPlayerValues = ''
-                                                for i,gyakusatsuuser in next, OtherPlayers do 
-                                                    --if not table.find(gotplayer,gyakusatsuuser['name']) then 
-                                                    --table.insert(gotplayer,gyakusatsuuser['name']) was this here before or what
-                                                    -- that was probably the reason why i couldnt put it on the discord message and the reason for the error
-                                                    AllPlayerValues = AllPlayerValues..'Player '..gyakusatsuuser['name']..' with '..gyakusatsuuser['contribution']..' contribution\n    '
-                                                    --end
-                                                end
                                             until not workspace:FindFirstChild('Gyakusatsu')
                                             -- print(AllPlayerValues)
                                             --[[
@@ -23640,6 +23632,14 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                     if not workspace:FindFirstChild('Gyakusatsu') then 
                                         StopElasped = true;
                                         if getgenv().roghoulsettings['postgykatsu'] == true then 
+                                            for i,gyakusatsuuser in next, OtherPlayers do 
+                                                print(gyakusatsuuser)
+                                                --if not table.find(gotplayer,gyakusatsuuser['name']) then 
+                                                --table.insert(gotplayer,gyakusatsuuser['name']) was this here before or what
+                                                -- that was probably the reason why i couldnt put it on the discord message and the reason for the error
+                                                AllPlayerValues = AllPlayerValues..'Player '..gyakusatsuuser['name']..' with '..gyakusatsuuser['contribution']..' contribution\n    '
+                                                --end
+                                            end
                                             print(AllPlayerValues)
                                             local GyakusatsuData = {
                                                 ['content'] = '';
@@ -27879,7 +27879,7 @@ desktop by buying them with robux or just being able to do it by default it it i
 ]]
 
 Notify('','Running | Version | '..getgenv().azfake_version,'untilClick')
-azfakenotify('AZFAKE','A real scripter has the power for code to come to life;','untilClick')
+azfakenotify('A real scripter has the power for code to come to life;','untilClick') -- 'AZFAKE',
 -- print(typeofazfake)
 
 window.NameLabel.Text = 'Azfake V3 - '..typeofazfake
