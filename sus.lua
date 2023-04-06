@@ -18010,16 +18010,16 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)
                                                         else
                                                             if LoopCFrameSide == Sides['Right'] then -- (getgenv().roghoulsettings['gohightargetdistance']/10)
-                                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Left'] * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)--CFrame.new(-10,getgenv().roghoulsettings['hightargety'],0)
+                                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Left']  * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)--CFrame.new(-10,getgenv().roghoulsettings['hightargety'],0)
                                                             elseif LoopCFrameSide == Sides['Left'] then 
                                                                 game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Right'] * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)  --CFrame.new(10,getgenv().roghoulsettings['hightargety'],0)
                                                             end
                                                         end
                                                     elseif ShouldGoHighDueToFilteredMob == nil then 
                                                         if LoopCFrameSide == Sides['Right'] then 
-                                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Left'] * CFrame.new((getgenv().roghoulsettings['jugtargetdistance']-1),0,0)
+                                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Left'] --* CFrame.new((getgenv().roghoulsettings['jugtargetdistance']-1),0,0)
                                                         elseif LoopCFrameSide == Sides['Left'] then 
-                                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Right'] * CFrame.new(-(getgenv().roghoulsettings['jugtargetdistance']-1),0,0)
+                                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Right'] --* CFrame.new(-(getgenv().roghoulsettings['jugtargetdistance']-1),0,0)
                                                         end
                                                     else
                                                         game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide
@@ -18369,6 +18369,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                     local oldValue = nil;
                                     local oldValueText = ';'
                                     local canResetValueText = true;
+                                    local OtherPlayers = {}
                                     local function findwithx(x)
                                         local xfound = nil;
                                         if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList') and game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List') then 
@@ -18381,6 +18382,16 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         end
                                         return xfound
                                     end
+                                    local function findplayervalue(x) 
+                                        local playervalue = nil
+                                        for _,v in next, OtherPlayers do 
+                                            if v['name'] == x then -- v.Name:find() so if the first digit changes it will still find
+                                                playervalue = v
+                                            end
+                                        end
+                                        return playervalue
+                                    end
+                                    local AllPlayerValues = ''
                                     repeat 
                                         task.wait(0.01)
                                         -- if canResetValueText == true  and delaying == false then 
@@ -18485,7 +18496,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 task.wait(.2)
                                                 pcall(function()
                                                     if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List') then 
-                                                        PlayersParticipated = 0;
+                                                        -- PlayersParticipated = 0;
                                                         for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
                                                             if string.find(v.Name,game.Players.LocalPlayer.Name) and v:FindFirstChild('GyaPerc') and v:FindFirstChild('GyaPerc').Visible == true then 
                                                                 OURCONTRIBUTION = v:FindFirstChild('GyaPerc').Text;
@@ -18493,12 +18504,30 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                                 -- since we are the first one on the list the first check for the name will be us and the check for playersparticipated might not run and if it does it will be added by one but since the loop breaks as it finds us first, playersparticipated will be 1 cuz it only runs one time because we are the first name in the list of players and it stops finding our contribution after it finds out name and the loop for finding contribution is the same loop to find how many players participated
                                                             end
                                                             if v:FindFirstChild('GyaPerc') and v:FindFirstChild('GyaPerc').Visible == true then 
-                                                                PlayersParticipated += 1
+                                                                --if not table.find(OtherPlayers,v.Name:sub(2,string.len(v.Name))) then 
+                                                                if findplayervalue(v.Name:sub(2,string.len(v.Name))) == nil then 
+
+                                                                    table.insert(OtherPlayers,
+                                                                        {
+                                                                            ['name'] = v.Name:sub(2,string.len(v.Name))
+                                                                            ['contribution'] = v:FindFirstChild('GyaPerc').Text
+                                                                        }
+                                                                    )
+                                                                    PlayersParticipated += 1
+                                                                else
+                                                                    findplayervalue(v.Name:sub(2,string.len(v.Name)))['contribution'] = v:FindFirstChild('GyaPerc').Text
+                                                                end
                                                             end
                                                         end
                                                     end
                                                 end)
                                             until not workspace:FindFirstChild('Gyakusatsu')
+                                            for i,gyakusatsuuser in next, OtherPlayers do 
+                                                AllPlayerValues = AllPlayerValues..'Player '..gyakusatsuuser['name']..' with '..gyakusatsuuser['contribution']..' contribution\n    '
+                                            end
+                                            --[[
+                                                    Dumbass with 9 contribution
+                                            ]]
                                         end)
                                     until not workspace:FindFirstChild('Gyakusatsu') or getgenv().roghoulsettings['farming'] == false or getgenv().loopsUnload == true
                                     if not workspace:FindFirstChild('Gyakusatsu') then 
@@ -18510,7 +18539,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                     content = 
                                                     '```\nGyakusatsu with '..OURCONTRIBUTION..
                                                     '\nContribution at '..os.date()..
-                                                    '\nPlayers Participated: '..tostring(PlayersParticipated)..
+                                                    '\nPlayers Participated: '..tostring(PlayersParticipated)..'\n'..AllPlayerValues..
                                                     '\nTime Elasped: '..TimeElasped.. -- total contribution taken away from other players
                                                     '\nGyakusatsu Sacs: '..game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value..
                                                     '\npowered by azfake'..
