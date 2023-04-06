@@ -22785,13 +22785,13 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                                             HighAvoidedJug = true
                                                                         end
                                                                         ShouldGoHighDueToFilteredMob = true;
-                                                                        break; -- save fps
+                                                                        --break; -- save fps
                                                                     elseif _a == 'All' and activated == true then 
                                                                         if MobName == 'Jug' and getgenv()['roghoulsettings']['avoidjughigh'] == true then 
                                                                             HighAvoidedJug = true
                                                                         end
                                                                         ShouldGoHighDueToFilteredMob = true;
-                                                                        break;
+                                                                        --break;
                                                                     end
                                                                 end
                                                             end
@@ -27879,7 +27879,9 @@ desktop by buying them with robux or just being able to do it by default it it i
 ]]
 
 Notify('','Running | Version | '..getgenv().azfake_version,'untilClick')
-azfakenotify('A real scripter has the power for code to come to life;','untilClick') -- 'AZFAKE',
+if vs == 'debug' then 
+    azfakenotify('A real scripter has the power for code to come to life;','untilClick') -- 'AZFAKE',
+end
 -- print(typeofazfake)
 
 window.NameLabel.Text = 'Azfake V3 - '..typeofazfake
