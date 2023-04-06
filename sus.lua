@@ -18513,7 +18513,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                     '\nPlayers Participated: '..tostring(PlayersParticipated)..
                                                     '\nTime Elasped: '..TimeElasped.. -- total contribution taken away from other players
                                                     '\nGyakusatsu Sacs: '..game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value..
-                                                    '\npowered by azfake'
+                                                    '\npowered by azfake'..
                                                     '```'
                                                 }
                                             )
