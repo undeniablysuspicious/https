@@ -18010,7 +18010,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)
                                                         else
                                                             if LoopCFrameSide == Sides['Right'] then 
-                                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide * CFrame.new(-(math.clamp(1,getgenv().roghoulsettings['gohightargetdistance'],10),getgenv().roghoulsettings['hightargety'],0)
+                                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide * CFrame.new(-(math.clamp(1,getgenv().roghoulsettings['gohightargetdistance'],10)),getgenv().roghoulsettings['hightargety'],0)
                                                             elseif LoopCFrameSide == Sides['Left'] then 
                                                                 game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide * CFrame.new((math.clamp(1,getgenv().roghoulsettings['gohightargetdistance'],10)),getgenv().roghoulsettings['hightargety'],0)
                                                             end
