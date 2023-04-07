@@ -20575,6 +20575,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         avoidjug = false;
         jugheight = 0;
         jugtargetdistance = 0;
+        serverhopforgyakusatsuafter = 300;
+        serverhopafterseconds = false
     }
     getgenv().divious_teleport = function(info)
 
@@ -20777,6 +20779,14 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     sector:AddToggle('Server Hop For Gyakusatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['serverhopgykatsu'] = xstate
     end)
+    othercheats:AddTextbox('Serverhop Seconds',500,function(xstate)
+        getgenv().roghoulsettings['serverhopgyakusatsuafter'] = xstate -- slider
+    end)
+    othercheats:AddToggle('Serverhop After Seconds For Gyakusatsu',false,function(xstate) 
+        getgenv()['roghoulsettings']['serverhopafterseconds'] = xstate
+    end)
+
+    
     sector:AddToggle('Attempt Kill Gyakusatsu Mobs',false,function(xstate) 
         getgenv()['roghoulsettings']['gykustatsumobskill'] = xstate
     end)
@@ -22680,6 +22690,11 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         end)
                     end
                     if enemymodel then 
+                        if getgenv()['roghoulsettings']['serverhopafterseconds'] == true then 
+                            task.delay(tonumber(getgenv().roghoulsettings['serverhopforgyakusatsuafter']),function()
+                                getgenv().serverhop() -- sevrrh
+                            end)
+                        end
                         local TimeElasped = 0;
                         local StopElasped = false;
                         local PlayersParticipated = 0;
