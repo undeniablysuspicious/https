@@ -20779,10 +20779,10 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     sector:AddToggle('Server Hop For Gyakusatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['serverhopgykatsu'] = xstate
     end)
-    othercheats:AddTextbox('Serverhop Seconds',500,function(xstate)
+    sector:AddTextbox('Serverhop Seconds',500,function(xstate)
         getgenv().roghoulsettings['serverhopgyakusatsuafter'] = xstate -- slider
     end)
-    othercheats:AddToggle('Serverhop After Seconds For Gyakusatsu',false,function(xstate) 
+    sector:AddToggle('Serverhop After Seconds For Gyakusatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['serverhopafterseconds'] = xstate
     end)
 
