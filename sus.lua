@@ -21930,6 +21930,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             if getgenv().roghoulsettings['antireport'] == true then 
                 if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') then 
                     game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 = nil
+                    -- game.Players.LocalPlayer.Character.UpperTorso.CFrame = CFrame.new(1,1,1)
                 end
             end
             if getgenv().roghoulsettings['streamermode'] == true then 
@@ -23014,6 +23015,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 pcall(function()
                                                     if getgenv().roghoulsettings['antireport'] == true and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 ~= nil then -- go under then set part0 to nil but put a layer under it so it doesn't fall off
                                                         repeat task.wait(0.0001) until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil
+                                                        game.Players.LocalPlayer.Character.UpperTorso.CFrame = CFrame.new(1,1,1)
                                                         task.wait(1)
                                                     end 
                                                 end)
@@ -23943,6 +23945,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         pcall(function()
                                             if getgenv().roghoulsettings['antireport'] == true and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 ~= nil then -- go under then set part0 to nil but put a layer under it so it doesn't fall off
                                                 repeat task.wait(0.0001) until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil
+                                                game.Players.LocalPlayer.Character.UpperTorso.CFrame = CFrame.new(1,1,1)
                                                 task.wait(1)
                                             end 
                                             local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],13.2,-3.4) * CFrame.Angles(math.rad(90),0,0)
