@@ -23005,8 +23005,11 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 if getgenv()['roghoulsettings']['gohighwhentargetted'] == true then 
                                                     for i,mob in next, enemymodel:GetChildren() do 
                                                         if mob.Name == 'Mob' and mob:FindFirstChildWhichIsA('Humanoid') and mob:FindFirstChildWhichIsA('Humanoid').Health >0 and mob:FindFirstChild('HumanoidRootPart') then 
-                                                            local Distance = (mob:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
-                                                            if Distance.Magnitude <= getgenv().roghoulsettings['gohightargetdistance'] and mob:FindFirstChildWhichIsA('Script') then 
+                                                            local Distance = nil
+                                                            pcall(function()
+                                                                Distance = (mob:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                                                            end
+                                                            if Distance ~= nil and Distance.Magnitude <= getgenv().roghoulsettings['gohightargetdistance'] and mob:FindFirstChildWhichIsA('Script') then 
                                                                 local MobName = string.split(mob:FindFirstChildWhichIsA('Script').Name,'NPC')[1]
                                                                 --print(MobName)
                                                                 for _a,activated in next, getgenv().roghoulsettings['mobstogohighon'] do 
