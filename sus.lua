@@ -5765,7 +5765,7 @@ local LengthOf_G = 0
 local FinishedLoadingAllVariables = false
 local LoadedLibrary = false
 
-local ExpectedGlobalsOnLoad = 206 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
+local ExpectedGlobalsOnLoad = 201 --206 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
 local ExpectedUnderscoreGsOnLoad = 4 --1 -- _G.wl_key
 
 local ExpectedGlobalRun = 0
