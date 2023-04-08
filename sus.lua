@@ -21000,6 +21000,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         getgenv().roghoulsettings['antireport'] = xstate -- stramer
     end)
 
+    othercheats:AddSeperator()
+
     othercheats:AddToggle('Use E',false,function(xtstae)
         getgenv().roghoulsettings['usee'] = xtstae
     end)
