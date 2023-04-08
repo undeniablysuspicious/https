@@ -5763,6 +5763,7 @@ end
 local LengthOfGlobals = 0
 local LengthOf_G = 0
 local FinishedLoadingAllVariables = false
+local LoadedLibrary = false
 
 local ExpectedGlobalsOnLoad = 201 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
 local ExpectedUnderscoreGsOnLoad = 4 --1 -- _G.wl_key
@@ -28161,12 +28162,17 @@ BillboardGui.StudsOffset = 3, -1.5, 0
 BillboardGui.AlwaysOnTop = false
 BillboardGui.Size = UDim2.new({0.600000024, 0}, {6, 0})
 ]]
-
-
-for _,v in next, getgenv() do 
-    LengthOfGlobals += 1
-end
-for _,v in next, _G do 
-    LengthOf_G += 1
-end
-FinishedLoadingAllVariables = true
+task.spawn(function()
+    task.wait(3)
+    for _,v in next, getgenv() do 
+        LengthOfGlobals += 1
+    end
+    for _,v in next, _G do 
+        LengthOf_G += 1
+    end
+    task.spawn(function()
+        task.wait(3)
+        FinishedLoadingAllVariables = true
+    end)
+    
+end)
