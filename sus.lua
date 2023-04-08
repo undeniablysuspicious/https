@@ -5806,9 +5806,18 @@ task.delay(0.2,function()
     getgenv().loopsUnload = false
 end)
 
-local gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+local gameName = nil; --'';
+pcall(function() 
+    gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+end)
 
-
+if gameName == nil then 
+    repeat task.wait()
+        pcall(function()
+            gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+        end)
+    until gameName ~= nil
+end
 --[[
     data; could add a player and set their character to ours. or add a player, rename to us and we leave
 ]]
@@ -20780,7 +20789,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         getgenv()['roghoulsettings']['serverhopgykatsu'] = xstate
     end)
     sector:AddTextbox('Serverhop Seconds',500,function(xstate)
-        getgenv().roghoulsettings['serverhopgyakusatsuafter'] = xstate -- slider
+        getgenv().roghoulsettings['serverhopgyakusatsuafter'] = tonumber(xstate) -- slider
     end)
     sector:AddToggle('Serverhop After Seconds For Gyakusatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['serverhopafterseconds'] = xstate
