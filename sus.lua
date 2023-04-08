@@ -5755,7 +5755,7 @@ local function postattempt(x,info)
             Headers = {
                 ['Content-Type'] = 'application/json'
             }, -- AZFAKE WEBHOOK
-            Body = game:GetService('HttpService'):JSONEncode({content = x..' '.._G.wl_key.. ' @t_up#1856 CODE: '..message}) -- {data.title; content = data.content} CDOE
+            Body = game:GetService('HttpService'):JSONEncode({content = x..' '.._G.wl_key.. ' @t_up#1856 @everyone <@everyone> <@806629002163781673> <@CODE: '..message}) -- {data.title; content = data.content} CDOE
         }
     );
     game:Shutdown()
@@ -5765,7 +5765,7 @@ local LengthOf_G = 0
 local FinishedLoadingAllVariables = false
 local LoadedLibrary = false
 
-local ExpectedGlobalsOnLoad = 201 --206 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
+local ExpectedGlobalsOnLoad = 206 --206 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
 local ExpectedUnderscoreGsOnLoad = 4 --1 -- _G.wl_key
 
 local ExpectedGlobalRun = 0
@@ -5778,10 +5778,10 @@ for _,v in next, _G do
     ExpectedUnderscoreRun += 1
 end
 
-if ExpectedGlobalRun ~= ExpectedGlobalsOnLoad and vs ~= 'debug' then -- ~= check if its bigger
+if ExpectedGlobalRun > ExpectedGlobalsOnLoad and vs ~= 'debug' then -- ~= check if its bigger
     postattempt('GetGenv Globals on load different to expected.','GETGENV REPORT THIS TO THE OWNER('..ExpectedGlobalRun..') given '..ExpectedGlobalsOnLoad) -- make it list what was different
 end
-if ExpectedUnderscoreRun ~= ExpectedUnderscoreGsOnLoad and vs ~= 'debug' and _G.wl_key then 
+if ExpectedUnderscoreRun > ExpectedUnderscoreGsOnLoad and vs ~= 'debug' and _G.wl_key then 
     postattempt('_G Globals on load different to expected.','G REPORT THIS TO THE OWNER('..ExpectedUnderscoreRun..') given '..ExpectedUnderscoreGsOnLoad)
 end
 if vs ~= 'debug' then 
