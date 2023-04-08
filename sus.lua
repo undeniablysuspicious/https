@@ -20669,6 +20669,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         teleporttosafewhenmobinrange = false;
         waitingtoteleportfromsafe = false;
         delayfromsafebacktoclassic = 0;
+        safespot = false;
+        safespotdistance = 0;
     }
     getgenv().divious_teleport = function(info)
 
@@ -20919,6 +20921,12 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     end)
     sector:AddToggle('Safe Gykatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['safegykatsu'] = xstate
+    end)
+    -- sector:AddToggle('Safe Gyakusatsu Spot',false,function(xtstae)
+    --     getgenv().roghoulsettings['safespot'] = xtstae
+    -- end)
+    sector:AddSlider("Safe Spot Distance", -100, -3.4, 125, 1, function(State)
+        getgenv().roghoulsettings['safespotdistance'] = State
     end)
     sector:AddSlider("Safe Distance", 0, 75, 125, 1, function(State)
         getgenv().roghoulsettings['safedistance'] = State
@@ -23406,7 +23414,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                 repeat 
                                     task.wait(0.01)
                                     pcall(function()
-                                        local CFrameMultiplication = CFrame.new(MovementX,getgenv().roghoulsettings['safedistance'],-3.4) 
+                                        local CFrameMultiplication = CFrame.new(MovementX,getgenv().roghoulsettings['safedistance'],getgenv().roghoulsettings['safespotdistance']) ---3.4) 
                                         if getgenv().roghoulsettings['safemovement'] == true and WaitingToChangeMovementX == false then 
                                             WaitingToChangeMovementX = true;
                                             task.delay(2,function()
