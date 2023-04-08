@@ -20816,7 +20816,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     sector:AddToggle('Teleport To Safe When Targetted',false,function(xstate)
         getgenv().roghoulsettings['teleporttosafewheninrange'] = xstate
     end)
-    sector:AddSlider('Delay From Safe To Classic',0,5,100,function(xstate)
+    sector:AddSlider('Delay From Safe To Classic',0,5,100,1,function(xstate)
         getgenv().roghoulsettings['delayfromsafebacktoclassic'] = xstate
     end)
     sector:AddToggle('Avoid Jug High',false,function(xstate) 
@@ -23129,7 +23129,15 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                     -- if type(ShouldntTeleportToOriginalSpace) ~= 'boolean' and ShouldGoHighDueToFilteredMob == false then 
                                                     --     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame * LoopCFrameSide * ShouldntTeleportToOriginalSpace.CFrame
                                                     if ShouldTeleportToSafeMode == true then 
-                                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = enemymodel:FindFirstChild('Gyakusatsu'):FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,getgenv().roghoulsettings['safedistance'],-3.4)
+                                                        local DistanceFromGyka = (enemymodel:FindFirstChild('Gyakusatsu'):FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                                                        if DistanceFromGyka.Magnitude > 10 then 
+                                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = true
+                                                            game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'),TweenInfo.new(.5,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {CFrame = enemymodel:FindFirstChild('Gyakusatsu'):FindFirstChild('HumanoidRootPart').CFrame}):Play()
+                                                            task.wait(.5)
+                                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = false
+                                                        else
+                                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = enemymodel:FindFirstChild('Gyakusatsu'):FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,getgenv().roghoulsettings['safedistance'],-3.4)
+                                                        end
                                                         if getgenv().roghoulsettings['waitingtoteleportfromsafe'] == false then 
                                                             getgenv().roghoulsettings['waitingtoteleportfromsafe'] = true 
                                                             task.delay(getgenv().roghoulsettings['delayfromsafebacktoclassic'],function()
