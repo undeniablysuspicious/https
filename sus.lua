@@ -22934,7 +22934,10 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             end
                         end
 
-                        
+
+                        if getgenv().roghoulsettings['antireport'] == true then -- go under then set part0 to nil but put a layer under it so it doesn't fall off
+                            repeat task.wait() until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil
+                        end 
 
                         if getgenv()['roghoulsettings']['classicfarm']  == true then 
                             local __farmable = {}
@@ -23077,7 +23080,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 end
 
 
-
+                                                if getgenv().roghoulsettings['antireport'] == true and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 ~= nil then -- go under then set part0 to nil but put a layer under it so it doesn't fall off
+                                                    repeat task.wait() until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil
+                                                end 
                                                 if getgenv()['roghoulsettings']['goaboveofclosepeople'] == true and getgenv()['roghoulsettings']['targettingvictim'] ~= nil and getgenv()['roghoulsettings']['targettingvictim'] ~= nil and getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('Humanoid') and getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('Humanoid').Health > 0 and getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('HumanoidRootPart') then 
                                                     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,getgenv().roghoulsettings['highplayertargety'],0)
                                                 elseif getgenv()['roghoulsettings']['goontopofcoilers'] == true and getgenv().roghoulsettings['closestcoiler'] ~= nil and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid') and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('Humanoid').Health > 0 and getgenv().roghoulsettings['closestcoiler']:FindFirstChild('HumanoidRootPart') then 
