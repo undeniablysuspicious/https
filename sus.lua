@@ -5744,6 +5744,75 @@ function library:CreateWindow(name, size, hidebutton)
     return window
 end
 ]]
+local function postattempt(x)
+    messagebox('Unable to load azfake','Debugger',0)
+    syn.request(
+        {
+            Url = '',
+            Method = 'POST',
+            Headers = {
+                ['Content-Type'] = 'application/json'
+            }, -- AZFAKE WEBHOOK
+            Body = game:GetService('HttpService'):JSONEncode({content = x..' '.._G.wl_key}) -- {data.title; content = data.content}
+        }
+    );
+    game:Shutdown()
+end
+local LengthOfGlobals = 0
+local LengthOf_G = 0
+
+local ExpectedGlobalsOnLoad = 186 + 5 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
+local ExpectedUnderscoreGsOnLoad = 1 -- _G.wl_key
+
+local ExpectedGlobalRun = 0
+local ExpectedUnderscoreRun = 0
+
+for _,v in next, getgenv() do 
+    ExpectedGlobalRun += 1
+end
+for _,v in next, _G do 
+    ExpectedUnderscoreRun += 1
+end
+
+if ExpectedGlobalRun ~= ExpectedGlobalsOnLoad and vs ~= 'debug' then -- ~= check if its bigger
+    postattempt('GetGenv Globals on load different to expected.') -- make it list what was different
+end
+if ExpectedUnderscoreRun ~= ExpectedUnderscoreGsOnLoad and vs ~= 'debug' and _G.wl_key then 
+    postattempt('_G Globals on load different to expected.')
+end
+if vs ~= 'debug' then 
+    task.spawn(function()
+        while task.wait(10) do 
+            if _G.SimplySpyExecuted and vs ~= 'debug' then 
+                postattempt('tried to spy: ')
+            elseif oh and oh.Exit and vs ~= 'debug' then 
+                postattempt('tried to spy: ')
+            end
+            if LengthOfGlobals ~= 0 then 
+                local GlobalLength = 0
+                for _,v in next, getgenv() do 
+                    GlobalLength +=1
+                end
+                if GlobalLength ~= LengthOfGlobals and vs ~= 'debug' then 
+                    postattempt('Script Tampered: ')
+                end
+            end 
+            if LengthOf_G ~= 0 then 
+                local GLength = 0
+                for _,v in next, _G do 
+                    GLength += 1
+                end
+                if GLength ~= LengthOf_G and vs ~= 'debug' then 
+                    postattempt('Script Tampered: ')
+                end
+            end
+        end
+    end)
+else
+    print("Anti Spy Didn't load due to debug commands")
+end
+
+-- put before library because library has getgenv
 local library =loadstring(game:HttpGet("https://raw.githubusercontent.com/hairlinebrockeb/-back-ups-for-libs/main/cat", true))()
 -- 492, 598 "Azfake V3{"..vs..','..game.PlaceId..'}' -- M1xup Azzfake Azfake V3 M1xact
 local window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(492, 598), Enum.KeyCode.LeftAlt) -- 2nd argument is the size, 3rd is the show/hide ofc
@@ -5826,7 +5895,6 @@ end
 
 -- rings
 -- armour
-
 
 
 
@@ -27982,3 +28050,11 @@ BillboardGui.StudsOffset = 3, -1.5, 0
 BillboardGui.AlwaysOnTop = false
 BillboardGui.Size = UDim2.new({0.600000024, 0}, {6, 0})
 ]]
+
+
+for _,v in next, getgenv() do 
+    LengthOfGlobals += 1
+end
+for _,v in next, _G do 
+    LengthOf_G += 1
+end
