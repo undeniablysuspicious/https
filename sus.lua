@@ -20663,7 +20663,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         serverhopifnopointsafter = 100; -- contribution
         serverhopifnopoint = false;
         serverhopifnopointminimum = 5;
-        abovecontribution = true  --below contribution so the toggle can handle two values at once
+        abovecontribution = true;  --below contribution so the toggle can handle two values at once
+        streamermode = false;
+        antireport = false;
     }
     getgenv().divious_teleport = function(info)
 
@@ -20990,6 +20992,12 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
 
     othercheats:AddToggle('Auto Ally All',false,function(xstate) -- ally whitelist 
         getgenv().roghoulsettings['autoallyall'] = xstate
+    end)
+    othercheats:AddToggle('Streamer Mode',false,function(xstate) -- ally whitelist 
+        getgenv().roghoulsettings['streamermode'] = xstate -- stramer
+    end)
+    othercheats:AddToggle('Anti Report',false,function(xstate) -- ally whitelist 
+        getgenv().roghoulsettings['antireport'] = xstate -- stramer
     end)
 
     othercheats:AddToggle('Use E',false,function(xtstae)
@@ -21801,8 +21809,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         wait()
     until key
     local function pressKey(topress)
-        if game.Players.LocalPlayer.Character:FindFirstChild('Remotes') then 
-            fire(game.Players.LocalPlayer.Character:FindFirstChild('Remotes'):FindFirstChild('KeyEvent'), key, topress, "Down", game.Players.LocalPlayer:GetMouse().Hit, nil, workspace.Camera.CFrame)
+        if game.Players.LocalPlayer.Character:FindFirstChild('Remotes') and game.Players.LocalPlayer.Character:FindFirstChild('Remotes'):FindFirstChild('KeyEvent') then 
+            game.Players.LocalPlayer.Character:FindFirstChild('Remotes'):FindFirstChild('KeyEvent'):FireServer(key, topress, "Down", game.Players.LocalPlayer:GetMouse().Hit, nil, workspace.Camera.CFrame)
         end
     end
     local function releaseKey(torelease) -- futin
@@ -21900,6 +21908,16 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             local typeweapon = game.Players.LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value
             if typeweapon == 'CCG' then typeweapon='Quinque' end 
             if typeweapon == 'Ghoul' then typeweapon='Kagune' end 
+            if getgenv().roghoulsettings['antireport'] == true then 
+                if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') then 
+                    game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 = nil
+                end
+            end
+            if getgenv().roghoulsettings['streamermode'] == true then 
+                if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Head') and game.Players.LocalPlayer.Character:FindFirstChild('Head'):FindFirstChild('PlayerStatus') then 
+                    game.Players.LocalPlayer.Character:FindFirstChild('Head'):FindFirstChild('PlayerStatus'):Destroy()
+                end
+            end
             if getgenv().roghoulsettings['serverhopifweaponbugged'] == true then 
                 getgenv().roghoulsettings['serverhopifweaponbugged'] = nil
                 local WeaponModel = nil;
