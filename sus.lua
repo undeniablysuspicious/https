@@ -23131,10 +23131,13 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                     if ShouldTeleportToSafeMode == true then 
                                                         local DistanceFromGyka = (enemymodel:FindFirstChild('Gyakusatsu'):FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
                                                         if DistanceFromGyka.Magnitude > 10 then 
-                                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = true
-                                                            game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'),TweenInfo.new(.5,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {CFrame = enemymodel:FindFirstChild('Gyakusatsu'):FindFirstChild('HumanoidRootPart').CFrame}):Play()
-                                                            task.wait(.5)
-                                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = false
+                                                            pcall(function()
+                                                                --game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = true
+                                                                --game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'),TweenInfo.new(.5,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {CFrame = enemymodel:FindFirstChild('Gyakusatsu'):FindFirstChild('HumanoidRootPart').CFrame}):Play()
+                                                                --task.wait(.5)
+                                                                --game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = false  
+                                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = enemymodel:FindFirstChild('Gyakusatsu'):FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,getgenv().roghoulsettings['safedistance'],-30)  
+                                                            end)
                                                         else
                                                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = enemymodel:FindFirstChild('Gyakusatsu'):FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,getgenv().roghoulsettings['safedistance'],-3.4)
                                                         end
@@ -23142,6 +23145,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                             getgenv().roghoulsettings['waitingtoteleportfromsafe'] = true 
                                                             task.delay(getgenv().roghoulsettings['delayfromsafebacktoclassic'],function()
                                                                 getgenv().roghoulsettings['waitingtoteleportfromsafe'] = false
+                                                                ShouldTeleportToSafeMode = false
                                                             end) -- safe transition
                                                         end
                                                     elseif ShouldGoHighDueToFilteredMob == true then 
@@ -23170,7 +23174,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                     local ClosestDistance = nil;
                                                     if getgenv()['roghoulsettings']['targettingvictim'] == nil then 
                                                         for _,getp in next, game.Players:GetPlayers() do 
-                                                            if getp.Name ~= game.Players.LocalPlayer.Name and getp.Character and getp.Character:FindFirstChild('Humanoid') and getp.Character:FindFirstChild('Humanoid').Health > 0 and getp.Character:FindFirstChild('HumanoidRootPart') then 
+                                                            if getp.Name ~= game.Players.LocalPlayer.Name and getp.Character and getp.Character:FindFirstChild('Humanoid') and getp.Character:FindFirstChild('Humanoid').Health > 0 and getp.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                                                                 -- can use DistanceFromCharacter()
                                                                 local Distance = (getp.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude -- game.P;ayer
                                                                 -- if Distance <= getgenv().roghoulsettings['targettingdistance'] then 
