@@ -5762,6 +5762,7 @@ local function postattempt(x,info)
 end
 local LengthOfGlobals = 0
 local LengthOf_G = 0
+local FinishedLoadingAllVariables = false
 
 local ExpectedGlobalsOnLoad = 201 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
 local ExpectedUnderscoreGsOnLoad = 4 --1 -- _G.wl_key
@@ -5790,7 +5791,7 @@ if vs ~= 'debug' then
             elseif oh and oh.Exit and vs ~= 'debug' then 
                 postattempt('tried to spy: ','Script Tampering -> Hydroxide')
             end
-            if LengthOfGlobals ~= 0 then 
+            if LengthOfGlobals ~= 0 and FinishedLoadingAllVariables == true then 
                 local GlobalLength = 0
                 for _,v in next, getgenv() do 
                     GlobalLength +=1
@@ -5799,7 +5800,7 @@ if vs ~= 'debug' then
                     postattempt('Script Tampered: ','GETGENV Tampering Detected. Global : '..GlobalLength..' Expected : '..LengthOfGlobals)
                 end
             end 
-            if LengthOf_G ~= 0 then 
+            if LengthOf_G ~= 0 and FinishedLoadingAllVariables == true then 
                 local GLength = 0
                 for _,v in next, _G do 
                     GLength += 1
@@ -28168,3 +28169,4 @@ end
 for _,v in next, _G do 
     LengthOf_G += 1
 end
+FinishedLoadingAllVariables = true
