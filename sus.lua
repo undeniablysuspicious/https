@@ -5761,7 +5761,7 @@ end
 local LengthOfGlobals = 0
 local LengthOf_G = 0
 
-local ExpectedGlobalsOnLoad = 186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
+local ExpectedGlobalsOnLoad = 201 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
 local ExpectedUnderscoreGsOnLoad = 4 --1 -- _G.wl_key
 
 local ExpectedGlobalRun = 0
@@ -20653,7 +20653,13 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         jugheight = 0;
         jugtargetdistance = 0;
         serverhopforgyakusatsuafter = 300;
-        serverhopafterseconds = false
+        serverhopafterseconds = false;
+        serverhopifweaponbugged = false; -- serverhopifquinquebuggedtable to put in a sector with its name and value 
+        serverhopweaponchecktime = 50;
+        serverhopifnopointsafter = 100; -- contribution
+        serverhopifnopoint = false;
+        serverhopifnopointminimum = 5;
+        abovecontribution = true  --below contribution so the toggle can handle two values at once
     }
     getgenv().divious_teleport = function(info)
 
@@ -20856,12 +20862,41 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     sector:AddToggle('Server Hop For Gyakusatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['serverhopgykatsu'] = xstate
     end)
+    sector:AddSeperator('Serverhop Settings')
     sector:AddTextbox('Serverhop Seconds',500,function(xstate)
         getgenv().roghoulsettings['serverhopgyakusatsuafter'] = tonumber(xstate) -- slider
     end)
     sector:AddToggle('Serverhop After Seconds For Gyakusatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['serverhopafterseconds'] = xstate
     end)
+
+
+
+
+    sector:AddTextbox('Serverhop Weapon Time',50,function(xstate)
+        getgenv().roghoulsettings['serverhopifweaponchecktime'] = tonumber(xstate) -- slider 
+    end)
+    sector:AddToggle('Serverhop Weapon Bugged',false,function(xstate) 
+        getgenv()['roghoulsettings']['serverhopifweaponbugged'] = xstate
+    end)
+
+
+
+
+    sector:AddTextbox('Serverhop If No Contribution',100,function(xstate)
+        getgenv().roghoulsettings['serverhopifnopointsafter'] = tonumber(xstate) -- slider
+    end)
+    sector:AddSlider('Minimum Contribution',0,5,100,1,function(xstate)
+        getgenv().roghoulsettings['serverhopifnopointminimum'] = tonumber(xstate) -- slider
+    end)
+    sector:AddToggle('Above Contribution',true,function(xstate) 
+        getgenv()['roghoulsettings']['abovecontribution'] = xstate
+    end)
+    sector:AddToggle('Serverhop If No Contribution',false,function(xstate) 
+        getgenv()['roghoulsettings']['serverhopifnopoint'] = xstate
+    end)
+
+    sector:AddSeperator('')
 
     
     sector:AddToggle('Attempt Kill Gyakusatsu Mobs',false,function(xstate) 
@@ -21835,6 +21870,17 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     local function equiparara()
 
     end
+
+    local function findnameobj(x,r,h)
+        local obj = nil
+        for _,v in next, r:GetChildren()do 
+            if v.Name == x and v:IsA(h) then 
+                obj = v
+            end
+        end 
+        return obj
+    end
+
     -- game:Enypass
     --print(game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value)
     -- get closest npc spawn instead of humanoidrootpart
@@ -21850,6 +21896,28 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             local typeweapon = game.Players.LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value
             if typeweapon == 'CCG' then typeweapon='Quinque' end 
             if typeweapon == 'Ghoul' then typeweapon='Kagune' end 
+            if getgenv().roghoulsettings['serverhopifweaponbugged'] == true then 
+                getgenv().roghoulsettings['serverhopifweaponbugged'] = nil
+                local WeaponModel = nil;
+                local Ticked = 0
+                task.spawn(function()
+                    repeat task.wait(1); 
+                        Ticked += 1
+                        pcall(function()
+                            WeaponModel = findnameobj(typeweapon,game.Players.LocalPlayer.Character,'Model')
+                        end)
+                    until WeaponModel ~= nil or Ticked >= getgenv().roghoulsettings['serverhopifweaponchecktime']
+                end)
+                if WeaponModel == nil then 
+                    task.spawn(function()
+                        getgenv().serverhop()
+                        repeat 
+                            task.wait(5)
+                            getgenv().serverhop()
+                        until 1 == 2
+                    end)
+                end
+            end
             if getgenv().roghoulsettings['rollingbackdata'] == true then 
                 getgenv().roghoulsettings['rollingbackdata'] = nil;
                 task.spawn(function()
@@ -22507,6 +22575,46 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                             enemymodel = c
                         end
                     end
+
+                    if getgenv().roghoulsettings['serverhopifnopoint'] == true then 
+                        task.delay(getgenv().roghoulsettings['serverhopifnopointsafter'],function()
+                            local Points = nil; --'' --0
+                            if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList') and game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List') then 
+                                for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
+                                    if v and string.find(v.Name,game.Players.LocalPlayer.Name) then 
+                                        Points = v:FindFirstChild('GyaPerc').Text
+                                        break
+                                    end
+                                end
+                            end
+                            if Points == nil then 
+                                task.spawn(function()
+                                    repeat 
+                                        task.wait(.5)
+                                        if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList') and game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List') then 
+                                            for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('PlayerList'):FindFirstChild('PlayerListFrame'):FindFirstChild('List'):GetChildren() do 
+                                                if v and string.find(v.Name,game.Players.LocalPlayer.Name) then 
+                                                    Points = v:FindFirstChild('GyaPerc').Text
+                                                    break
+                                                end
+                                            end
+                                        end
+                                    until Points ~= nil
+                                end)
+                            end
+                            repeat task.wait(.5) until Points ~= nil
+                            if getgenv().roghoulsettings['abovecontribution'] == true then 
+                                if tonumber(Points) < getgenv().roghoulsettings['serverhopifnopointminimum'] then -- serverhopifnopoints
+                                    getgenv().serverhop()
+                                end
+                            else
+                                if tonumber(Points) <= getgenv().roghoulsettings['serverhopifnopointminimum'] then -- serverhopifnopoints
+                                    getgenv().serverhop()
+                                end
+                            end
+                        end)
+                    end
+
 
                     local Sacs = game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value
                     azfakenotify('You Have: '..Sacs..' Gykatsu Sacs','untilClick')
