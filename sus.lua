@@ -23011,15 +23011,18 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         task.wait(0.01)
                                         --pcall(function()
                                             if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
-                                                if getgenv().roghoulsettings['antireport'] == true and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 ~= nil then -- go under then set part0 to nil but put a layer under it so it doesn't fall off
-                                                    repeat task.wait(0.0001) until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil
-                                                    --task.wait()
-                                                end 
+                                                pcall(function()
+                                                    if getgenv().roghoulsettings['antireport'] == true and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 ~= nil then -- go under then set part0 to nil but put a layer under it so it doesn't fall off
+                                                        repeat task.wait(0.0001) until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil
+                                                        --task.wait()
+                                                    end 
+                                                end)
                                                 -- local mob = getgenv().roghoulsettings['closestcoiler']
                                                 local ShouldGoHighDueToFilteredMob = false;
                                                 local ShouldntTeleportToOriginalSpace = false
                                                 local ShouldTeleportToSafeMode = false
                                                 local HighAvoidedJug = false
+                                                local JugHigh = nil
                                                 if getgenv()['roghoulsettings']['gohighwhentargetted'] == true or getgenv().roghoulsettings['teleporttosafewheninrange'] == true then 
                                                     for i,mob in next, enemymodel:GetChildren() do 
                                                         if mob.Name == 'Mob' and mob:FindFirstChildWhichIsA('Humanoid') and mob:FindFirstChildWhichIsA('Humanoid').Health >0 and mob:FindFirstChild('HumanoidRootPart') then 
@@ -23035,6 +23038,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                                     if _a == MobName and activated == true then 
                                                                         if MobName == 'Jug' and getgenv()['roghoulsettings']['avoidjughigh'] == true then 
                                                                             HighAvoidedJug = true
+                                                                            JugHigh = nob
                                                                         end
                                                                         if getgenv().roghoulsettings['teleporttosafewheninrange'] == true then 
                                                                             ShouldTeleportToSafeMode = true
@@ -23047,6 +23051,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                                     elseif _a == 'All' and activated == true then 
                                                                         if MobName == 'Jug' and getgenv()['roghoulsettings']['avoidjughigh'] == true then 
                                                                             HighAvoidedJug = true
+                                                                            JugHigh = mob
                                                                         end
                                                                         if getgenv().roghoulsettings['teleporttosafewheninrange'] == true then 
                                                                             ShouldTeleportToSafeMode = true
@@ -23165,17 +23170,32 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                         if HighAvoidedJug == false then 
                                                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)
                                                         else
-                                                            if LoopCFrameSide == Sides['Right'] then -- (getgenv().roghoulsettings['gohightargetdistance']/10)
-                                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Left']  * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)--CFrame.new(-10,getgenv().roghoulsettings['hightargety'],0)
-                                                            elseif LoopCFrameSide == Sides['Left'] then 
-                                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Right'] * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)  --CFrame.new(10,getgenv().roghoulsettings['hightargety'],0)
+                                                            -- if LoopCFrameSide == Sides['Right'] then -- (getgenv().roghoulsettings['gohightargetdistance']/10)
+                                                            --     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Left']  * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)--CFrame.new(-10,getgenv().roghoulsettings['hightargety'],0)
+                                                            -- elseif LoopCFrameSide == Sides['Left'] then 
+                                                            --     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Right'] * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)  --CFrame.new(10,getgenv().roghoulsettings['hightargety'],0)
+                                                            -- end
+                                                            -- used to goto the opposite side but now it goes to the opposite side of which the jug is closest to
+                                                            local DistanceLeft = (JugHigh:FindFirstChild('HumanoidRootPart').Position-Sides['Left'].Position)
+                                                            local DistanceRight = (JugHigh:FindFirstChild('HumanoidRootPart').Position - Sides['Right'].Position) -- Sides Right
+                                                            if DistanceRight.Magnitude < DistanceLeft.Magnitude then 
+                                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Right'] * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)
+                                                            else
+                                                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Left'] * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)
                                                             end
                                                         end
                                                     elseif ShouldGoHighDueToFilteredMob == nil then 
-                                                        if LoopCFrameSide == Sides['Right'] then 
-                                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Left'] --* CFrame.new((getgenv().roghoulsettings['jugtargetdistance']-1),0,0)
-                                                        elseif LoopCFrameSide == Sides['Left'] then 
-                                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Right'] --* CFrame.new(-(getgenv().roghoulsettings['jugtargetdistance']-1),0,0)
+                                                        -- if LoopCFrameSide == Sides['Right'] then 
+                                                        --     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Left'] --* CFrame.new((getgenv().roghoulsettings['jugtargetdistance']-1),0,0)
+                                                        -- elseif LoopCFrameSide == Sides['Left'] then 
+                                                        --     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Right'] --* CFrame.new(-(getgenv().roghoulsettings['jugtargetdistance']-1),0,0)
+                                                        -- end
+                                                        local DistanceLeft = (JugHigh:FindFirstChild('HumanoidRootPart').Position-Sides['Left'].Position)
+                                                        local DistanceRight = (JugHigh:FindFirstChild('HumanoidRootPart').Position - Sides['Right'].Position) -- Sides Right
+                                                        if DistanceRight.Magnitude < DistanceLeft.Magnitude then 
+                                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Right'] * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)
+                                                        else
+                                                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = Sides['Left'] * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)
                                                         end
                                                     else
                                                         game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide
