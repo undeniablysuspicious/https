@@ -20666,6 +20666,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         abovecontribution = true;  --below contribution so the toggle can handle two values at once
         streamermode = false;
         antireport = false;
+        teleporttosafewhenmobinrange = false;
+        waitingtoteleportfromsafe = false;
+        delayfromsafebacktoclassic = 0;
     }
     getgenv().divious_teleport = function(info)
 
@@ -20809,6 +20812,12 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     sector:AddSeperator()
     sector:AddToggle('Go High When Targetted',false,function(xstate) 
         getgenv()['roghoulsettings']['gohighwhentargetted'] = xstate
+    end)
+    sector:AddToggle('Teleport To Safe When Targetted',false,function(xstate)
+        getgenv().roghoulsettings['teleporttosafewheninrange'] = xstate
+    end)
+    sector:AddSlider('Delay From Safe To Classic',0,5,100,function(xstate)
+        getgenv().roghoulsettings['delayfromsafebacktoclassic'] = xstate
     end)
     sector:AddToggle('Avoid Jug High',false,function(xstate) 
         getgenv()['roghoulsettings']['avoidjughigh'] = xstate
@@ -22993,7 +23002,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                     repeat 
                                         task.wait(0.01)
                                         --pcall(function()
-                                            if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                            if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                                                 if getgenv().roghoulsettings['antireport'] == true and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 ~= nil then -- go under then set part0 to nil but put a layer under it so it doesn't fall off
                                                     repeat task.wait(0.0001) until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil
                                                     --task.wait()
@@ -23001,8 +23010,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 -- local mob = getgenv().roghoulsettings['closestcoiler']
                                                 local ShouldGoHighDueToFilteredMob = false;
                                                 local ShouldntTeleportToOriginalSpace = false
+                                                local ShouldTeleportToSafeMode = false
                                                 local HighAvoidedJug = false
-                                                if getgenv()['roghoulsettings']['gohighwhentargetted'] == true then 
+                                                if getgenv()['roghoulsettings']['gohighwhentargetted'] == true or getgenv().roghoulsettings['teleporttosafewheninrange'] == true then 
                                                     for i,mob in next, enemymodel:GetChildren() do 
                                                         if mob.Name == 'Mob' and mob:FindFirstChildWhichIsA('Humanoid') and mob:FindFirstChildWhichIsA('Humanoid').Health >0 and mob:FindFirstChild('HumanoidRootPart') then 
                                                             local Distance = nil
@@ -23018,13 +23028,25 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                                         if MobName == 'Jug' and getgenv()['roghoulsettings']['avoidjughigh'] == true then 
                                                                             HighAvoidedJug = true
                                                                         end
-                                                                        ShouldGoHighDueToFilteredMob = true;
+                                                                        if getgenv().roghoulsettings['teleporttosafewheninrange'] == true then 
+                                                                            ShouldTeleportToSafeMode = true
+                                                                        end
+                                                                        if getgenv().roghoulsettings['gohighwhentargetted'] == true then 
+                                                                            ShouldGoHighDueToFilteredMob = true
+                                                                        end
+                                                                        --ShouldGoHighDueToFilteredMob = true;
                                                                         --break; -- save fps
                                                                     elseif _a == 'All' and activated == true then 
                                                                         if MobName == 'Jug' and getgenv()['roghoulsettings']['avoidjughigh'] == true then 
                                                                             HighAvoidedJug = true
                                                                         end
-                                                                        ShouldGoHighDueToFilteredMob = true;
+                                                                        if getgenv().roghoulsettings['teleporttosafewheninrange'] == true then 
+                                                                            ShouldTeleportToSafeMode = true
+                                                                        end
+                                                                        if getgenv().roghoulsettings['gohighwhentargetted'] == true then 
+                                                                            ShouldGoHighDueToFilteredMob = true
+                                                                        end
+                                                                        --ShouldGoHighDueToFilteredMob = true;
                                                                         --break;
                                                                     end
                                                                 end
@@ -23034,6 +23056,14 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                     end
                                                 end
                                                 
+
+
+                                                if getgenv().roghoulsettings['waitingtoteleportfromsafe'] == true then 
+                                                    ShouldTeleportToSafeMode = true 
+                                                    shouldShouldGoHighDueToFilteredMob = false
+                                                end
+
+
 
 
                                                 if ShouldGoHighDueToFilteredMob == true then 
@@ -23098,7 +23128,15 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 else
                                                     -- if type(ShouldntTeleportToOriginalSpace) ~= 'boolean' and ShouldGoHighDueToFilteredMob == false then 
                                                     --     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame * LoopCFrameSide * ShouldntTeleportToOriginalSpace.CFrame
-                                                    if ShouldGoHighDueToFilteredMob == true then 
+                                                    if ShouldTeleportToSafeMode == true then 
+                                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = enemymodel:FindFirstChild('Gyakusatsu'):FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,getgenv().roghoulsettings['safedistance'],-3.4)
+                                                        if getgenv().roghoulsettings['waitingtoteleportfromsafe'] == false then 
+                                                            getgenv().roghoulsettings['waitingtoteleportfromsafe'] = true 
+                                                            task.delay(getgenv().roghoulsettings['delayfromsafebacktoclassic'],function()
+                                                                getgenv().roghoulsettings['waitingtoteleportfromsafe'] = false
+                                                            end) -- safe transition
+                                                        end
+                                                    elseif ShouldGoHighDueToFilteredMob == true then 
                                                         if HighAvoidedJug == false then 
                                                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = LoopCFrameSide * CFrame.new(0,getgenv().roghoulsettings['hightargety'],0)
                                                         else
