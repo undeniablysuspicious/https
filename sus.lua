@@ -22994,9 +22994,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         task.wait(0.01)
                                         --pcall(function()
                                             if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
-                                                if getgenv().roghoulsettings['antireport'] == true then -- go under then set part0 to nil but put a layer under it so it doesn't fall off
-                                                    repeat task.wait() until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil
-                                                    task.wait()
+                                                if getgenv().roghoulsettings['antireport'] == true and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 ~= nil then -- go under then set part0 to nil but put a layer under it so it doesn't fall off
+                                                    repeat task.wait(0.0001) until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil
+                                                    --task.wait()
                                                 end 
                                                 -- local mob = getgenv().roghoulsettings['closestcoiler']
                                                 local ShouldGoHighDueToFilteredMob = false;
@@ -23088,7 +23088,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
 
 
                                                 if getgenv().roghoulsettings['antireport'] == true and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 ~= nil then -- go under then set part0 to nil but put a layer under it so it doesn't fall off
-                                                    repeat task.wait() until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil
+                                                    repeat task.wait(0.001) until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil
+                                                    task.wait(.5)
                                                 end 
                                                 if getgenv()['roghoulsettings']['goaboveofclosepeople'] == true and getgenv()['roghoulsettings']['targettingvictim'] ~= nil and getgenv()['roghoulsettings']['targettingvictim'] ~= nil and getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('Humanoid') and getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('Humanoid').Health > 0 and getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('HumanoidRootPart') then 
                                                     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = getgenv()['roghoulsettings']['targettingvictim']:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,getgenv().roghoulsettings['highplayertargety'],0)
@@ -23859,7 +23860,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         pcall(function()
                                             if getgenv().roghoulsettings['antireport'] == true then -- go under then set part0 to nil but put a layer under it so it doesn't fall off
                                                 repeat task.wait() until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil
-                                                task.wait()
+                                                --task.wait()
                                             end 
                                             local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],13.2,-3.4) * CFrame.Angles(math.rad(90),0,0)
                                             if getgenv()['roghoulsettings']['highgykatsu'] == true then 
