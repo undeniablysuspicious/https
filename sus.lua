@@ -23019,6 +23019,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                         task.wait(1)
                                                     end 
                                                 end)
+                                                if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil then 
+                                                    game.Players.LocalPlayer.Character.UpperTorso.CFrame = CFrame.new(1,1,1)
+                                                end
                                                 -- local mob = getgenv().roghoulsettings['closestcoiler']
                                                 local ShouldGoHighDueToFilteredMob = false;
                                                 local ShouldntTeleportToOriginalSpace = false
@@ -23948,6 +23951,9 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                 game.Players.LocalPlayer.Character.UpperTorso.CFrame = CFrame.new(1,1,1)
                                                 task.wait(1)
                                             end 
+                                            if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil then 
+                                                game.Players.LocalPlayer.Character.UpperTorso.CFrame = CFrame.new(1,1,1)
+                                            end
                                             local CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],13.2,-3.4) * CFrame.Angles(math.rad(90),0,0)
                                             if getgenv()['roghoulsettings']['highgykatsu'] == true then 
                                                 CFrameMultiplication = CFrame.new(getgenv()['roghoulsettings']['playerx'],getgenv().roghoulsettings['safedistance'],-3.4) * CFrame.Angles(math.rad(-90),0,0)
