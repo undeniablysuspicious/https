@@ -23019,7 +23019,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                         task.wait(1)
                                                     end 
                                                 end)
-                                                if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil then 
+                                                if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil then 
                                                     game.Players.LocalPlayer.Character.UpperTorso.CFrame = CFrame.new(1,1,1)
                                                 end
                                                 -- local mob = getgenv().roghoulsettings['closestcoiler']
