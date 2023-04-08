@@ -5744,8 +5744,10 @@ function library:CreateWindow(name, size, hidebutton)
     return window
 end
 ]]
-local function postattempt(x)
-    messagebox('Unable to load azfake','Debugger',0)
+local function postattempt(x,info)
+    local message = info 
+    if type(message) == 'table' then message = table.unpack(info) end
+    messagebox(message,'Debugger',0)
     syn.request(
         {
             Url = 'https://discord.com/api/webhooks/1094067874802446406/JBOGg43J6b8Lda-PH-RSz60irenNL3CWmX0f2qiYNLfQUg26Sp0BEOItotu8B-TNphBx',
@@ -5753,7 +5755,7 @@ local function postattempt(x)
             Headers = {
                 ['Content-Type'] = 'application/json'
             }, -- AZFAKE WEBHOOK
-            Body = game:GetService('HttpService'):JSONEncode({content = x..' '.._G.wl_key}) -- {data.title; content = data.content}
+            Body = game:GetService('HttpService'):JSONEncode({content = x..' '.._G.wl_key.. ' @t_up#1856 CODE: '..message}) -- {data.title; content = data.content} CDOE
         }
     );
     game:Shutdown()
@@ -5775,18 +5777,18 @@ for _,v in next, _G do
 end
 
 if ExpectedGlobalRun ~= ExpectedGlobalsOnLoad and vs ~= 'debug' then -- ~= check if its bigger
-    postattempt('GetGenv Globals on load different to expected.') -- make it list what was different
+    postattempt('GetGenv Globals on load different to expected.','REPORT THIS TO THE OWNER('..ExpectedGlobalRun..')') -- make it list what was different
 end
 if ExpectedUnderscoreRun ~= ExpectedUnderscoreGsOnLoad and vs ~= 'debug' and _G.wl_key then 
-    postattempt('_G Globals on load different to expected.')
+    postattempt('_G Globals on load different to expected.','REPORT THIS TO THE OWNER('..ExpectedUnderscoreRun..')')
 end
 if vs ~= 'debug' then 
     task.spawn(function()
-        while task.wait(10) do 
+        while task.wait(1) do 
             if _G.SimplySpyExecuted and vs ~= 'debug' then 
-                postattempt('tried to spy: ')
+                postattempt('tried to spy: ','Script Tampering -> SimplySpy')
             elseif oh and oh.Exit and vs ~= 'debug' then 
-                postattempt('tried to spy: ')
+                postattempt('tried to spy: ','Script Tampering -> Hydroxide')
             end
             if LengthOfGlobals ~= 0 then 
                 local GlobalLength = 0
@@ -5794,7 +5796,7 @@ if vs ~= 'debug' then
                     GlobalLength +=1
                 end
                 if GlobalLength ~= LengthOfGlobals and vs ~= 'debug' then 
-                    postattempt('Script Tampered: ')
+                    postattempt('Script Tampered: ','GETGENV Tampering Detected. Global : '..GlobalLength..' Expected : '..LengthOfGlobals)
                 end
             end 
             if LengthOf_G ~= 0 then 
@@ -5803,7 +5805,7 @@ if vs ~= 'debug' then
                     GLength += 1
                 end
                 if GLength ~= LengthOf_G and vs ~= 'debug' then 
-                    postattempt('Script Tampered: ')
+                    postattempt('Script Tampered: ','G Tampering Detcted. Global: '..GLength..' Expected : '..LengthOf_G)
                 end
             end
         end
