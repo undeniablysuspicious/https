@@ -22994,6 +22994,10 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                         task.wait(0.01)
                                         --pcall(function()
                                             if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                                if getgenv().roghoulsettings['antireport'] == true then -- go under then set part0 to nil but put a layer under it so it doesn't fall off
+                                                    repeat task.wait() until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 == nil
+                                                    task.wait()
+                                                end 
                                                 -- local mob = getgenv().roghoulsettings['closestcoiler']
                                                 local ShouldGoHighDueToFilteredMob = false;
                                                 local ShouldntTeleportToOriginalSpace = false
