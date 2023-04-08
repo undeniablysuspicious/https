@@ -23008,7 +23008,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                                             local Distance = nil
                                                             pcall(function()
                                                                 Distance = (mob:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
-                                                            end
+                                                            end)
                                                             if Distance ~= nil and Distance.Magnitude <= getgenv().roghoulsettings['gohightargetdistance'] and mob:FindFirstChildWhichIsA('Script') then 
                                                                 local MobName = string.split(mob:FindFirstChildWhichIsA('Script').Name,'NPC')[1]
                                                                 --print(MobName)
