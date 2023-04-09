@@ -5899,7 +5899,9 @@ end
 
 -- rings
 -- armour
-
+if not isfile('Azfake Hub V3/new layer 2 bell.mp3') then 
+    writefile('new layer 2 bell.mp3','https://cdn.discordapp.com/attachments/1012699571404673075/1085555129136193686/new_layer_2_bell.mp3')
+end
 
 
 
@@ -6228,12 +6230,134 @@ local function setupEspTab(sectorgiven) -- Espwindow
 
 end
 
+local function setupAimbotTab(globaltable)
+    local pvptab = window:CreateTab('Aimbot')
+    local pvpsector = pvptab:CreateSector('Cheats','left')
+    
+    globaltable['aimbotsettings'] = {
+        aimbot = false;
+        movementpredictions = false;
+        aimbottrigger = nil;
+        wallcheck = false;
+        currenttarget = nil;
+        currenttargetdistance = nil;
+        dontswaptarget = false;
+        closestmagnitude = nil;
+    }
+
+    local aimbotbutton = pvpsector:AddToggle('Aimbot',false,function(xstate)
+        globaltable['aimbotsettings']['aimbot'] = xstate
+    end)
+    local aimbotrigger = pvpsector:AddKeybindAttachment('Aimbot Button'):AddKeybind()
+    aimbotbutton:AddKeybind()
+    pvpsector:AddToggle('Movement Prediction',false,function(xstate)
+        globaltable['aimbotsettings']['movementpredictions'] = xstate
+    end)
+    pvpsector:AddToggle('Wall Check',false,function(xstate)
+        globaltable['aimbotsettings']['wallcheck'] = xstate
+    end)
+    pvpsector:AddToggle('Dont Swap Target',false,function(xstate)
+        globaltable['aimbotsettings']['dontswaptarget'] = xstate
+    end)
+    local AimbotLoop = game:GetService('RunService').RenderStepped:Connect(function()
+        local pos,IsVisible = nil,nil
+        if globaltable['aimbotsettings']['currenttarget'] ~= nil and globaltable['aimbotsettings']['currenttarget'].Character and globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart then 
+            local xpos,IsVisibleOld = workspace.Camera:WorldToViewportPoint(globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position)
+            if IsVisibleOld == false then 
+                globaltable['aimbotsettings']['currenttarget'] = nil 
+                globaltable['aimbotsettings']['currenttargetdistance'] = nil
+            else
+                IsVisible = true --IsVisibleOld
+                pos = xpos
+            end
+        end
+        if aimbotrigger:IsPressed() == true and globaltable['aimbotsettings']['aimbot'] == true then 
+            local ClosestPlayer = globaltable['aimbotsettings']['currenttarget'];
+            local ClosestDistance = globaltable['aimbotsettings']['currenttargetdistance'];
+            local ClosestMagnitude = globaltable['aimbotsettings']['closestmagnitude'];
+            if globaltable['aimbotsettings']['currenttarget'] ~= nil and globaltable['aimbotsettings']['currenttarget'].Character and globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart then 
+                local xpos,IsVisibleOld = workspace.Camera:WorldToViewportPoint(globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position)
+                if IsVisibleOld == false then 
+                    globaltable['aimbotsettings']['currenttarget'] = nil 
+                    globaltable['aimbotsettings']['currenttargetdistance'] = nil
+                else
+                    IsVisible = true --IsVisibleOld
+                    pos = xpos
+                end
+            end
+            if IsVisible == nil then --if ClosestPlayer == nil or globaltable['aimbotsettings']['dontswaptarget'] == false and ClosestPlayer == nil or globaltable['aimbotsettings']['dontswaptarget'] == true and ClosestPlayer ~= nil then 
+                for _,v in next, game.Players:GetPlayers() do 
+                    if v ~= game.Players.LocalPlayer and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v.Character and v.Character.PrimaryPart then 
+                        local vRoot = v.Character.PrimaryPart;
+                        local Distance = (vRoot.Position - game.Players.LocalPlayer:GetMouse().hit.Position)--game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                        local DistanceMagnitude = (vRoot.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                        local CanCheck = true
+                        pos,IsVisible = workspace.Camera:WorldToViewportPoint(v.Character.PrimaryPart.Position)
+                        if IsVisible then 
+                            if globaltable['aimbotsettings']['wallcheck'] == true then
+                                local Parts = workspace.Camera:GetPartsObscuringTarget({game.Players.LocalPlayer.Character.Head.Position, v.Character.Head.Position}, {workspace.Camera, game.Players.LocalPlayer.Character})
+                                for i2, v2 in pairs(Parts) do
+                                    if v2:IsDescendantOf(v.Character) == false and v2.Transparency == 0 then
+                                        CanCheck = false
+                                    end
+                                end
+                            end
+                            if globaltable['aimbotsettings']['dontswaptarget'] == false then 
+                                if ClosestPlayer == nil and ClosestDistance == nil and CanCheck == true then 
+                                    ClosestPlayer = v;
+                                    ClosestDistance = Distance.Magnitude; 
+                                    ClosestMagnitude = DistanceMagnitude.Magnitude
+                                elseif CanCheck == true then
+                                    if ClosestDistance > Distance.Magnitude then --and DistanceMagnitude.Magnitude < globaltable['aimbotsettings']['closestmagnitude'] then 
+                                        ClosestPlayer = v;
+                                        ClosestDistance = Distance.Magnitude
+                                        ClosestMagnitude = DistanceMagnitude.Magnitude
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            globaltable['aimbotsettings']['currenttarget'] = ClosestPlayer;
+            globaltable['aimbotsettings']['currenttargetdistance'] = ClosestDistance;
+            if ClosestPlayer ~= nil and workspace:FindFirstChild('Camera') and globaltable['aimbotsettings']['currenttarget'] and globaltable['aimbotsettings']['currenttarget'].Character and globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart then 
+                if globaltable['aimbotsettings']['movementpredictions'] == true then 
+                    --local AimPrediction = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * 1.1 + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('Humanoid').WalkSpeed/100 -- = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * (1 / 10) * (Client.Character.Head.Position - PlayerHead.Position).magnitude / 100
+                   -- workspace.Camera.CFrame = 
+                   game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position)
+                    workspace.CurrentCamera.CoordinateFrame = CFrame.new(
+                        workspace.CurrentCamera.CoordinateFrame.p,--game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position  ,
+                        globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position
+                    ) + globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * 0.05  --+ workspace.CurrentCamera.CoordinateFrame.lookVector --1.1
+                    
+                    --workspace.Camera.CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position)
+                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position)
+                    
+                    --globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.CFrame * CFrame.new(globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('Humanoid').WalkSpeed/100,0,0) +  globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * 1.1--CFrame.new(v.Character:FindFirstChild('Humanoid').MoveDirection.X,0,0)
+                else
+                    --print('l')
+                    workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position)--workspace.Camera:WorldToViewportPoint(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position -  globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position) --workspace.Camera.CFrame = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.CFrame
+                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position)
+                end
+                --mousemoverel((pos.X - game.Players.LocalPlayer:GetMouse().X) * 1, (pos.Y - game.Players.LocalPlayer:GetMouse().Y - game:GetService("GuiService"):GetGuiInset().Y) * 1)
+            end
+        end
+    end)
+    task.spawn(function()
+        repeat task.wait() 
+            if getgenv().loopsUnload == true then 
+                AimbotLoop:Disconnect()
+            end
+        until getgenv().loopsUnload == true
+    end)
+    return pvptab, pvpsector
+end
 
 
 
 
-
-getgenv().AddConfigurations = function()
+function AddConfigurations()
     local Configiuration= window:CreateTab('Configiuration')
     Configiuration:CreateConfigSystem()
 end
@@ -20487,6 +20611,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     --game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
     local tab = window:CreateTab('Ro Ghoul')
     local Configuration = window:CreateTab('Configuration')
+    -- local pvptab = window:CreateTab('PVP')
+    -- local pvpsector = window:CreateSector('Cheats','left')
     local sector = tab:CreateSector('Cheats','left')
     local othercheats = tab:CreateSector('Cheats','right')
     local webhookcheats = tab:CreateSector('Cheats','right')
@@ -21499,6 +21625,24 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     webhookcheats:AddTextbox('Serverhop Webhook','',function(xtstae)
         getgenv().roghoulsettings['serverhopforgykatsuwebhook'] = xtstae -- post
     end)
+
+
+
+
+    setupAimbotTab(getgenv().roghoulsettings)
+
+
+    -- local aimbotbutton = pvpsector:AddToggle('Aimbot',false,function(xstate)
+        
+    -- end)
+    -- local aimbotrigger = pvpsector:AddKeybindAttachment('Aimbot Button'):AddKeybind()
+    -- aimbotbutton:AddKeybind()
+    -- pvpsector:AddToggle('Movement Prediction',false,function(xstate)
+        
+    -- end)
+
+
+
     game.Players.LocalPlayer.Idled:Connect(function()
         game:GetService("VirtualUser"):ClickButton2(Vector2.new())
     end)
@@ -28236,6 +28380,12 @@ else
 
     local tab = window:CreateTab(gameName)
     local weirdsector = tab:CreateSector('Cheats','left')
+
+    getgenv().nogamesettings = {
+        
+    }
+    setupEspTab(getgenv().nogamesettings)
+    AddConfigurations()
     getgenv().AddPlayerList(weirdsector)
 
 
