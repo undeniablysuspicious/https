@@ -21842,8 +21842,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         end
     end
     local function releaseKey(torelease) -- futin
-        if game.Players.LocalPlayer.Character:FindFirstChild('Remotes') then 
-            fire(game.Players.LocalPlayer.Character:FindFirstChild('Remotes'):FindFirstChild('KeyEvent'), key, torelease, "Up", game.Players.LocalPlayer:GetMouse().Hit, nil, workspace.Camera.CFrame)
+        if game.Players.LocalPlayer.Character:FindFirstChild('Remotes') and game.Players.LocalPlayer.Character:FindFirstChild('Remotes'):FindFirstChild('KeyEvent') then 
+            game.Players.LocalPlayer.Character:FindFirstChild('Remotes'):FindFirstChild('KeyEvent'):FireServer( key, torelease, "Up", game.Players.LocalPlayer:GetMouse().Hit, nil, workspace.Camera.CFrame)
         end
     end
     local function getquest(x)
