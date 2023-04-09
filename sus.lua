@@ -20671,6 +20671,8 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         delayfromsafebacktoclassic = 0;
         safespot = false;
         safespotdistance = 0;
+        killselfwhenlow = false;
+        killselflowesthealth = 100; -- killselfrange
     }
     getgenv().divious_teleport = function(info)
 
@@ -20777,6 +20779,13 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         getgenv().roghoulsettings['serverhopifnotfoundstr'] = EnemiesFound 
     end)
 
+
+    sector:AddToggle('Kill Self When Low',false,function(xstate)
+        getgenv().roghoulsettings['killselfwhenlow'] = xstate
+    end)
+    sector:AddSlider('Kill Self Lowest Health',0,100,6000,1,function(xstate)
+        getgenv().roghoulsettings['killselflowesthealth'] = xstate
+    end)
 
     sector:AddToggle('Farm Gyakusatsu',false,function(xstate) 
         getgenv()['roghoulsettings']['gykatfarm'] = xstate
@@ -21927,6 +21936,21 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
             local typeweapon = game.Players.LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value
             if typeweapon == 'CCG' then typeweapon='Quinque' end 
             if typeweapon == 'Ghoul' then typeweapon='Kagune' end 
+            if getgenv().roghoulsettings['killselfwhenlow'] == true then 
+                getgenv().roghoulsettings['killselfwhenlow'] = nil
+                task.spawn(function()
+                    repeat task.wait()
+                        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then --chaarcter
+                            if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health < getgenv().roghoulsettings['killselflowesthealth'] and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                if getgenv().roghoulsettings['antireport'] == true then 
+                                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.new(1,1,1)
+                                end
+                                game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0;
+                            end
+                        end -- not workspace:FindFirstChild('Gyakusatsu') or getgenv().roghoulsettings['farming'] == false or
+                    until getgenv().loopsUnload == true or getgenv().roghoulsettings['killselfwhenlow'] == false
+                end )
+            end
             if getgenv().roghoulsettings['antireport'] == true then 
                 if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso') and game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root') then 
                     game.Players.LocalPlayer.Character:FindFirstChild('LowerTorso'):FindFirstChild('Root').Part1 = nil
@@ -23005,8 +23029,6 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                                     --     end
                                     -- end
                                     
-
-
     
                                     repeat 
                                         task.wait(0.01)
