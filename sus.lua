@@ -5767,7 +5767,9 @@ local LoadedLibrary = false
 
 local ExpectedGlobalsOnLoad = 206 --206 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
 local ExpectedUnderscoreGsOnLoad = 4 --1 -- _G.wl_key
-
+if (KRNL_LOADED) then 
+    ExpectedGlobalsOnLoad = 250
+end
 local ExpectedGlobalRun = 0
 local ExpectedUnderscoreRun = 0
 
@@ -6243,6 +6245,13 @@ local function setupAimbotTab(globaltable)
         currenttargetdistance = nil;
         dontswaptarget = false;
         closestmagnitude = nil;
+        aimparts = {
+            'Chest';
+            'Head';
+            'LeftLeg';
+            'RightLeg';
+        };
+        aimingpart = 'Chest';
     }
 
     local aimbotbutton = pvpsector:AddToggle('Aimbot',false,function(xstate)
@@ -6258,6 +6267,9 @@ local function setupAimbotTab(globaltable)
     end)
     pvpsector:AddToggle('Dont Swap Target',false,function(xstate)
         globaltable['aimbotsettings']['dontswaptarget'] = xstate
+    end)
+    pvpsector:AddDropdown('Aim Part',globaltable['aimbotsettings']['aimparts'],"Chest",false,function(xstate)
+        globaltable['aimbotsettings']['aimingpart'] = xstate
     end)
     local AimbotLoop = game:GetService('RunService').RenderStepped:Connect(function()
         local pos,IsVisible = nil,nil
@@ -6293,22 +6305,22 @@ local function setupAimbotTab(globaltable)
                         local DistanceMagnitude = (vRoot.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
                         local CanCheck = true
                         pos,IsVisible = workspace.Camera:WorldToViewportPoint(v.Character.PrimaryPart.Position)
-                        if IsVisible then 
-                            if globaltable['aimbotsettings']['wallcheck'] == true then
-                                local Parts = workspace.Camera:GetPartsObscuringTarget({game.Players.LocalPlayer.Character.Head.Position, v.Character.Head.Position}, {workspace.Camera, game.Players.LocalPlayer.Character})
-                                for i2, v2 in pairs(Parts) do
-                                    if v2:IsDescendantOf(v.Character) == false and v2.Transparency == 0 then
-                                        CanCheck = false
-                                    end
+                        if globaltable['aimbotsettings']['wallcheck'] == true then
+                            local Parts = workspace.Camera:GetPartsObscuringTarget({game.Players.LocalPlayer.Character.Head.Position, v.Character.Head.Position}, {workspace.Camera, game.Players.LocalPlayer.Character})
+                            for i2, v2 in pairs(Parts) do
+                                if v2:IsDescendantOf(v.Character) == false and v2.Transparency == 0 then
+                                    CanCheck = false
                                 end
                             end
+                        end
+                        if IsVisible and CanCheck == true then 
                             if globaltable['aimbotsettings']['dontswaptarget'] == false then 
                                 if ClosestPlayer == nil and ClosestDistance == nil and CanCheck == true then 
                                     ClosestPlayer = v;
                                     ClosestDistance = Distance.Magnitude; 
                                     ClosestMagnitude = DistanceMagnitude.Magnitude
                                 elseif CanCheck == true then
-                                    if ClosestDistance > Distance.Magnitude then --and DistanceMagnitude.Magnitude < globaltable['aimbotsettings']['closestmagnitude'] then 
+                                    if ClosestDistance > Distance.Magnitude and ClosestMagnitude and DistanceMagnitude.Magnitude < ClosestMagnitude  or ClosestDistance > Distance.Magnitude and ClosestMagnitude == nil  then --and DistanceMagnitude.Magnitude < globaltable['aimbotsettings']['closestmagnitude'] then 
                                         ClosestPlayer = v;
                                         ClosestDistance = Distance.Magnitude
                                         ClosestMagnitude = DistanceMagnitude.Magnitude
@@ -6321,24 +6333,42 @@ local function setupAimbotTab(globaltable)
             end
             globaltable['aimbotsettings']['currenttarget'] = ClosestPlayer;
             globaltable['aimbotsettings']['currenttargetdistance'] = ClosestDistance;
-            if ClosestPlayer ~= nil and workspace:FindFirstChild('Camera') and globaltable['aimbotsettings']['currenttarget'] and globaltable['aimbotsettings']['currenttarget'].Character and globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart then 
+            local AimingPart = nil;
+            if globaltable['aimbotsettings']['aimingpart'] == 'Chest' then 
+                AimingPart = 'HumanoidRootPart'
+            elseif globaltable['aimbotsettings']['aimingpart'] == 'Head' then  
+                AimingPart = 'Head';
+            elseif globaltable['aimbotsettings']['aimingpart'] == 'LeftLeg' then 
+                if ClosestPlayer.Character:FindFirstChild('Left Leg') then 
+                    AimingPart = 'Left Leg';
+                elseif ClosestPlayer.Character:FindFirstChild('LeftUpperLeg') then
+                    AimingPart = 'LeftUpperLeg';
+                end
+            elseif globaltable['aimbotsettings']['aimingpart'] == 'RightLeg' then 
+                if ClosestPlayer.Character:FindFirstChild('Right Leg') then 
+                    AimingPart = 'Right Leg';
+                elseif ClosestPlayer.Character:FindFirstChild('RightUpperLeg') then
+                    AimingPart = 'RightUpperLeg';
+                end
+            end
+            if ClosestPlayer ~= nil and AimingPart ~= nil and workspace:FindFirstChild('Camera') and globaltable['aimbotsettings']['currenttarget'] and globaltable['aimbotsettings']['currenttarget'].Character and globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart then 
                 if globaltable['aimbotsettings']['movementpredictions'] == true then 
                     --local AimPrediction = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * 1.1 + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('Humanoid').WalkSpeed/100 -- = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * (1 / 10) * (Client.Character.Head.Position - PlayerHead.Position).magnitude / 100
                    -- workspace.Camera.CFrame = 
-                   game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position)
+                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position)
                     workspace.CurrentCamera.CoordinateFrame = CFrame.new(
                         workspace.CurrentCamera.CoordinateFrame.p,--game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position  ,
-                        globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position
-                    ) + globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * 0.05  --+ workspace.CurrentCamera.CoordinateFrame.lookVector --1.1
+                        globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position
+                    ) + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Velocity * 0.05  --+ workspace.CurrentCamera.CoordinateFrame.lookVector --1.1
                     
                     --workspace.Camera.CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position)
-                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position)
+                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position)
                     
                     --globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.CFrame * CFrame.new(globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('Humanoid').WalkSpeed/100,0,0) +  globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * 1.1--CFrame.new(v.Character:FindFirstChild('Humanoid').MoveDirection.X,0,0)
                 else
                     --print('l')
-                    workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position)--workspace.Camera:WorldToViewportPoint(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position -  globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position) --workspace.Camera.CFrame = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.CFrame
-                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position)
+                    workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position)--workspace.Camera:WorldToViewportPoint(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position -  globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position) --workspace.Camera.CFrame = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.CFrame
+                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position)
                 end
                 --mousemoverel((pos.X - game.Players.LocalPlayer:GetMouse().X) * 1, (pos.Y - game.Players.LocalPlayer:GetMouse().Y - game:GetService("GuiService"):GetGuiInset().Y) * 1)
             end
@@ -28384,7 +28414,7 @@ else
     getgenv().nogamesettings = {
         
     }
-    setupEspTab(getgenv().nogamesettings)
+    setupAimbotTab(getgenv().nogamesettings)
     AddConfigurations()
     getgenv().AddPlayerList(weirdsector)
 
