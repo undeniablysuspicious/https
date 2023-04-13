@@ -28403,6 +28403,458 @@ elseif game.PlaceId == 6008108575 then
         end
     end)
 
+elseif game.PlaceId == 8651781069 then 
+    local tab = window:CreateTab(gameName)
+    local esptab = window:CreateTab('ESP')
+    local sector = tab:CreateSector('Cheats','left')
+    local espsector = esptab:CreateSector('Cheats','left')
+    getgenv().voxlsettings = {
+        rollbacking = false;
+        antivoid = false;
+        flying = false;
+        flyspeed = 0;
+        istyping = false;
+        walkspeed = false;
+        walkspeedspeed = 0;--walskee
+        savecpu = false;
+        savecpudistance = 0;
+        mobesp = false;
+        mobespcolour = Color3.fromRGB(255,255,255);
+        noclip = false;
+        noclippingfunction = nil;
+    }
+    setupAimbotTab(getgenv().voxlsettings)
+
+    game:GetService('UserInputService').InputBegan:Connect(function(key,istyping)
+        getgenv().voxlsettings['istyping'] = istyping
+    end)
+    game:GetService('UserInputService').InputEnded:Connect(function(key,istyping)
+        getgenv().voxlsettings['istyping'] = istyping
+    end)
+
+    sector:AddToggle('Anti Void',false,function(xstate)
+        getgenv().voxlsettings['antivoid'] = xstate;
+        if getgenv().voxlsettings['antivoid'] == true then 
+            for _,v in next, game:GetService("Workspace").Void:GetChildren() do 
+                for i,voidpart in next, v:GetChildren() do 
+                    voidpart.CanCollide = false;
+                    voidpart.CanTouch = false;
+                end
+            end
+        end
+    end)
+    local ToggleBindFlySpeed = sector:AddToggle("Fly", false, function(e)
+        getgenv().voxlsettings['flying'] = e
+        if getgenv().voxlsettings['flying'] == false  then -- and getgenv().istyping == false
+            -- getgenv().CFloop:Disconnect()
+            --game.Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+            local Head = game.Players.LocalPlayer.Character:WaitForChild("Head")
+            Head.Anchored = false
+            -- getgenv().CFloop = nil
+        elseif getgenv().voxlsettings['flying'] == true and getgenv().voxlsettings['istyping'] == false then
+
+            Players = game.Players
+            -- getgenv().flying = true
+            task.spawn(function()
+                repeat wait()
+                until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game.Players.LocalPlayer.Character:findFirstChild("Torso") and game.Players.LocalPlayer.Character:findFirstChild("Humanoid")
+                local mouse = game.Players.LocalPlayer:GetMouse()
+                repeat wait() until mouse
+                game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+                local plr = game.Players.LocalPlayer
+                local torso = plr.Character.HumanoidRootPart
+                local deb = true
+                local ctrl = {f = 0, b = 0, l = 0, r = 0}
+                local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+                local maxspeed = getgenv().voxlsettings['flyspeed']
+                local speed = maxspeed  
+                function Fly()
+                    local bv = Instance.new("BodyVelocity", game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"));bv.Name ='exploitation'
+                    bv.velocity = Vector3.new(0,0,0)
+                    bv.maxForce = Vector3.new(9e9, 9e9, 9e9) -- 9e9
+                    repeat task.wait(0.01)
+                        if game.Players.LocalPlayer.Character:findFirstChild("HumanoidRootPart") and not game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild('exploitation') then 
+                            bv = Instance.new("BodyVelocity", game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"));bv.Name ='exploitation'
+                            bv.velocity = Vector3.new(0,0,0)
+                            bv.maxForce = Vector3.new(9e9, 9e9, 9e9) -- 9e9
+                        end
+                        if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                            local prevRotation = game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation
+                            speed = getgenv().voxlsettings['flyspeed'] --Options.FlySpeedSlide.Value
+                            maxspeed = getgenv().voxlsettings['flyspeed']
+                            if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+                                speed = maxspeed * 2
+                                -- if speed > maxspeed then
+                                --     speed = maxspeed
+                                -- end
+                                if speed ~= maxspeed * 10 then
+                                    speed = maxspeed * 2
+                                end
+                            elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
+                                speed = 0
+                                if speed < 0 then
+                                    speed = 0
+                                end
+                            end
+                                -- elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
+                            --     bv.velocity = ((game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.lookVector  )) *speed/2
+                            if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
+                                bv.velocity = (( game.Workspace.CurrentCamera.CoordinateFrame.lookVector  *  (ctrl.f+ctrl.b)  )) * speed -- ((game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.p))
+                                -- lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
+                                if (ctrl.r) ~= 0  then 
+                                    --repeat task.wait(0.005) until game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation ~= prevRotation
+                                    ctrl.r = ctrl.r - ctrl.l
+                                    bv.velocity += (( game.Workspace.CurrentCamera.CoordinateFrame.RightVector  )) * speed
+                                end
+                                if (ctrl.l) ~= 0 then 
+                                    --repeat task.wait(0.005) until game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation ~= prevRotation
+                                    ctrl.l = ctrl.l - ctrl.r
+                                    bv.velocity += (( game.Workspace.CurrentCamera.CoordinateFrame.RightVector  )) * -speed
+                                end
+    
+                            else
+                                bv.velocity = Vector3.new(0,0,0)
+                            end
+                                --* CFrame.new((ctrl.l+ctrl.r),0,0) -- *50*speed/maxspeed * Vector3.new(0,0,0) --  
+                        end
+
+                    until getgenv().voxlsettings['flying'] == false or getgenv().loopsUnload == true
+
+                    ctrl = {f = 0, b = 0, l = 0, r = 0}
+                    lastctrl = {f = 0, b = 0, l = 0, r = 0}
+                    speed = 0
+                    bv:Destroy()
+                    plr.Character:WaitForChild('Humanoid').PlatformStand = false
+                    print('stop flying')
+                end
+                mouse.KeyDown:connect(function(key)
+                    if key:lower() == "w" then
+                        ctrl.f = 1
+                    elseif key:lower() == "s" then
+                        ctrl.b = -1
+                    elseif key:lower() == "a" then
+                        ctrl.l = -1
+                    elseif key:lower() == "d" then
+                        ctrl.r = 1
+                    end
+                end)
+                mouse.KeyUp:connect(function(key)
+                    if key:lower() == "w" then
+                        ctrl.f = 0
+                        speed = 0
+                    elseif key:lower() == "s" then
+                        ctrl.b = 0
+                    elseif key:lower() == "a" then
+                        ctrl.l = 0
+                    elseif key:lower() == "d" then
+                        ctrl.r = 0
+                    end
+                end)
+                Fly()  
+            end)
+        end
+    end)
+    sector:AddSlider('Fly Speed',0,0,250,1,function(xstate)
+        getgenv().voxlsettings['flyspeed'] = xstate
+    end)
+    local ToggleBindNoclip = sector:AddToggle("Noclip", false, function(e)
+        if getgenv().voxlsettings['istyping'] == false then 
+            getgenv().voxlsettings['noclip'] = e 
+        end
+        if getgenv().voxlsettings['noclip'] == false then
+            getgenv().voxlsettings['noclippingfunction']:Disconnect()
+        elseif getgenv().voxlsettings['noclip']  then --  
+            -- task.wait(0.1)
+            -- local function NoclipLoop()
+            --     if getgenv()['pilgrammedsettings']['noclip']  == true and game.Players.LocalPlayer.Character  and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >= 0 then
+            -- end
+            getgenv().voxlsettings['noclippingfunction'] = game:GetService('RunService').Stepped:Connect(function()
+                for _, v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                    if v:IsA("Part") and v.CanCollide == true then
+                        v.CanCollide = false
+                    end
+                end
+                for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                    if v:IsA("BasePart") and v.CanCollide == true then
+                        v.CanCollide = false
+                    end
+                end
+            end)
+        end
+    end)
+    local walkspeedtoggle = sector:AddToggle('WalkSpeed',false,function(xstate)
+        getgenv().voxlsettings['walkspeed'] = xstate
+    end)
+    sector:AddSlider('Speed',0,0,250,1,function(xstate)
+        getgenv().voxlsettings['walkspeedspeed'] = xstate
+    end)
+    ToggleBindFlySpeed:AddKeybind()
+    if getgenv().adminCheck == true then 
+        sector:AddToggle('Rollback',false,function(xstate)
+            getgenv().voxlsettings['rollbacking'] = xstate
+        end)
+    end
+
+    
+
+    getgenv().MobEsp = function(v) 
+        local sectionesp = Drawing.new('Text')
+        sectionesp.Visible = false
+        sectionesp.Center = true 
+        sectionesp.Outline = true 
+        sectionesp.Font = 2 
+        sectionesp.Size = 13
+        sectionesp.Color = Color3.new(5,0,0)
+        sectionesp.Text = '<>'
+        local function updPosition()
+            local keeprunning = nil 
+            local cam = workspace.CurrentCamera
+            keeprunning = game:GetService('RunService').RenderStepped:Connect(function() -- global loop
+                if v:FindFirstChild('HumanoidRootPart') and v:FindFirstChildWhichIsA('Humanoid') then 
+                    local vect,onscreen = cam:worldToViewportPoint(v.HumanoidRootPart.Position)
+                    local distance = (v.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                    local isactive = sectionesp['__OBJECT_EXISTS']
+                    if onscreen and isactive  then 
+                        sectionesp.Position = Vector2.new(vect.X,vect.Y ) + Vector2.new(0,15)
+                        sectionesp.Visible = true
+                        local subtext = v.Name..'    '..math.floor(distance)..' studs'
+                        subtext = subtext..string.rep(' ',math.floor(string.len(subtext)/2))..'['..math.floor(v:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(v:FindFirstChildWhichIsA('Humanoid').MaxHealth)..']'
+                        sectionesp.Text = subtext
+                        sectionesp.Color = getgenv().voxlsettings['mobespcolour']
+                    elseif not onscreen and isactive  then
+                        sectionesp.Visible = false
+                    end
+                    if getgenv().loopsUnload == true then 
+                        print('keep running mob esp disconnect') 
+                        pcall(function()
+                            sectionesp:Remove(); 
+                        end) 
+                        keeprunning:Disconnect() 
+                    end -- ; - :  
+                    if getgenv().voxlsettings['mobesp'] == false then 
+                        print('keep running mob esp disconnect') 
+                        pcall(function()
+                            sectionesp:Remove(); 
+                        end) 
+                        keeprunning:Disconnect() 
+                    end
+                    
+                    
+                    if getgenv().voxlsettings['savecpu'] then 
+                        -- if dist check if bigger than savecpudistance
+                        -- 
+                        if distance > getgenv().voxlsettings['savecpudistance'] and isactive == true then 
+                            pcall(function()
+                                sectionesp:Remove() -- table insert removedesps,v
+                            end)    
+                        else
+                            if not isactive  then 
+
+                                sectionesp = Drawing.new('Text')
+                                pcall(function()
+                                    sectionesp.Visible = false
+                                end)
+                                pcall(function()
+                                    sectionesp.Center = true 
+                                end)
+                                pcall(function()
+                                    sectionesp.Outline = true 
+                                end)
+                                pcall(function()
+                                    sectionesp.Font = 2 
+                                end)
+                                pcall(function()
+                                    sectionesp.Size = 13
+                                end)
+                                pcall(function()
+                                    sectionesp.Color = Color3.new(5,0,0)
+                                end)
+                                pcall(function()
+                                    sectionesp.Text = '<>'
+                                end)
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                            end
+                        end
+                    end
+                else
+                    print('no humanoidrootpart break end'); 
+                    pcall(function()
+                        sectionesp:Remove();
+                    end)
+                    pcall(function()
+                        keeprunning:Disconnect()
+                    end)
+                    
+                end
+            end)
+        end
+        coroutine.wrap(updPosition)()
+    end 
+
+
+
+
+
+    espsector:AddToggle('MOB Esp',false,function(xstate)
+        getgenv().voxlsettings['mobesp'] = xstate -- wait a second and see if its still false to do this
+        local vaddeconnections = {} -- P{}
+        for _,v in next, game:GetService("Workspace").NPCS:GetChildren() do 
+            local mob = v:FindFirstChildWhichIsA('Model')
+            if mob then 
+                task.spawn(function()
+                    getgenv().MobEsp(mob)
+                    -- local __assigned = azfake.__esp__call(v,{
+                    --     esptext = 'Trinket';
+                    --     ['removedcallback'] = function()
+                    --         __assigned.object:Remove()
+                    --     end; -- ojbecy
+                    --     ['inloopfunction'] = function()
+                            
+                    --         -- __assigned.object.Text = 'Trinket'
+                    --         -- __assigned.maxdistance = getgenv().fightlocalgame['maxviewtrinketdistance']
+                    --     end;
+                    --     maxdistance = getgenv().fightlocalgame['maxviewtrinketdistance'];
+                    -- })
+                    -- __assigned.inloopfunction = function()
+                    --     __assigned.object.Text = 'Trinket'
+                    --     __assigned.maxdistance = getgenv().fightlocalgame['maxviewtrinketdistance']
+                    -- end
+                    -- __assigned.removedcallback = function()
+                    --     pcall(function()
+                    --         __assigned.object:Remove()
+                    --     end)
+                    -- end
+                    -- __assigned.checkingvalue = getgenv().fightlocalgame['trinketesp']
+                    -- __assigned.waitingvalue = false;
+                end)
+            end
+            local vadded = v.ChildAdded:Connect(function(child)
+                if child:IsA('Model') then 
+                    getgenv().MobEsp(child)
+                end
+            end)
+            table.insert(vaddeconnections,vadded)
+        end
+        local npcadded = game:GetService("Workspace").NPCS.ChildAdded:Connect(function(child)
+            task.wait(2)
+            if child:FindFirstChildWhichIsA('Model') then 
+                getgenv().MobEsp(child:FindFirstChildWhichIsA('Model'))
+            end
+        end)
+        task.spawn(function()
+            repeat task.wait() until getgenv().voxlsettings['mobesp'] == false or getgenv().loopsUnload == true 
+            npcadded:Disconnect()
+            for _,v in next, vaddeconnections do 
+                v:Disconnect()
+            end
+        end)
+    end) -- mob esp distance
+    espsector:AddColorpicker('Mob Esp Colour',Color3.fromRGB(255,255,255),function(xstate)
+        getgenv().voxlsettings['mobespcolour'] = xstate
+    end)
+    espsector:AddToggle('Save CPU',false,function(xstate)
+        getgenv().voxlsettings['savecpu'] = xstate
+    end)
+    espsector:AddSlider('Save CPU Distance',0,0,10000,1,function(xstate)
+        getgenv().voxlsettings['savecpudistance'] = xstate
+    end)
+    -- otheresp:AddColorpicker('Mob Colour',Color3.fromRGB(255, 255,255),function(xstate)
+    --     getgenv().pilgrammedsettings['mobespcolour'] = xstate
+    -- end)
+
+    task.spawn(function()
+        while task.wait(0.1) do 
+            if getgenv().loopsUnload == true then print('voxl loop break') break end
+            if getgenv().voxlsettings['walkspeed'] == true then 
+                getgenv().voxlsettings['walkspeed'] = nil;
+                repeat task.wait() until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid')
+                local speedconnection = game.Players.LocalPlayer.Character:FindFirstChild('Humanoid'):GetPropertyChangedSignal('WalkSpeed'):Connect(function()
+                    game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').WalkSpeed = getgenv().voxlsettings['walkspeedspeed']
+                end)
+                local disconnectedspeed = false
+                game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').WalkSpeed = getgenv().voxlsettings['walkspeedspeed']
+                task.spawn(function()
+                    repeat task.wait() until getgenv().loopsUnload == true or getgenv().voxlsettings['walkspeed'] == false;
+                    speedconnection:Disconnect();
+                    disconnectedspeed = true
+                end)
+                task.spawn(function()
+                    repeat task.wait() until not game.Players.LocalPlayer.Character or not game.Players.LocalPlayer.Character:FindFirstChild('Humanoid')
+                    if disconnectedspeed == false then 
+                        getgenv().voxlsettings['walkspeed'] = false;
+                        task.wait(1)
+                        repeat task.wait() until game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid')
+                        getgenv().voxlsettings['walkspeed'] = true
+                    end
+                end)
+            end
+            if getgenv().voxlsettings['rollbacking'] == true then 
+                getgenv().voxlsettings['rollbacking'] = nil 
+                azfakenotify('Rolling Back Data',2)
+                task.spawn(function()
+                    while task.wait(0) do 
+                        if getgenv().loopsUnload == true then print('rollback data loop break') end;
+                        if getgenv().voxlsettings['rollbacking'] == false then 
+                            local ohTable1 = {
+                                ["CantripKeybind"] = "N",
+                                ["DropsEnabled"] = 2,
+                                ["MouselockKeybind"] = "LeftControl",
+                                ["BlockKeybind"] = "F",
+                                ["MenuKeybind"] = "M",
+                                ["WeaponArtKeybind"] = "Q",
+                                ["RuneKeybind"] = "R",
+                                ["RollKeybind"] = "C",
+                                ["DPSOn"] = false,
+                                ["InteractKeybind"] = "E",
+                                ["ToggleSprint"] = false,
+                                ["HelmetToggle"] = true,
+                                ["ScreenshakeOn"] = true,
+                                ["SprintKeybind"] = "LeftShift",
+                                ["AutotrackQuest"] = true,
+                                ["EquipKeybind"] = "One",
+                                ["MusicVolume"] = 1
+                            }
+                            
+                            game:GetService("ReplicatedStorage").Events.ApplySettings:FireServer(ohTable1)
+                        break end
+                        local ohTable1 = {
+                            ["CantripKeybind"] = "N\255",
+                            ["DropsEnabled"] = 2,
+                            ["MouselockKeybind"] = "LeftControl",
+                            ["BlockKeybind"] = "F",
+                            ["MenuKeybind"] = "M",
+                            ["WeaponArtKeybind"] = "Q",
+                            ["RuneKeybind"] = "R",
+                            ["RollKeybind"] = "C",
+                            ["DPSOn"] = false,
+                            ["InteractKeybind"] = "E",
+                            ["ToggleSprint"] = false,
+                            ["HelmetToggle"] = true,
+                            ["ScreenshakeOn"] = true,
+                            ["SprintKeybind"] = "LeftShift",
+                            ["AutotrackQuest"] = true,
+                            ["EquipKeybind"] = "One",
+                            ["MusicVolume"] = 1
+                        }
+                        
+                        game:GetService("ReplicatedStorage").Events.ApplySettings:FireServer(ohTable1)
+                    end
+                end)
+                task.delay(1,function()
+                    azfakenotify('Data after this point wont save','untilClick')
+                end)
+            end
+        end
+    end)
+
+
+    AddConfigurations()
 else
 
     -- PlayerExperience
