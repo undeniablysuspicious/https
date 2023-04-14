@@ -8201,7 +8201,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                     end
     
                 end 
-                if not sp or sp.Parent ~= spParent or getgenv().loopsUnload == true then ---//and table.find(getIds,sp.ID.Value) and sp.ID.Value == xstayId
+                if not sp or sp.Parent ~= spParent or getgenv().loopsUnload == true or getgenv().esp == false then -- sp.parent == nil - //and table.find(getIds,sp.ID.Value) and sp.ID.Value == xstayId
                     c:Disconnect()
                     esp.Visible = false
                     esp:Remove()
@@ -8213,7 +8213,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     end
     
     getgenv().esp = false --// add to global table
-    getgenv().playeresp = true
+    getgenv().playeresp = false
     getgenv().tracers = false
     getgenv().streamermode = false
     getgenv().waypointfinds = {
@@ -8256,28 +8256,28 @@ elseif game.PlaceId == 10266164381 then --// shitlines
 
 
 
-    for i,v in pairs(game:GetService('Workspace'):GetChildren()) do 
-        local xgetId = nil 
-        if v:FindFirstChild('ID') then xgetId = v.ID.Value end
-        if  table.find(getgenv().AzfakeGlobalTables.bloodlines.pickups,v.Name) then  coroutine.wrap(getgenv().createEsp)(v,xgetId) 
-        elseif table.find(getgenv().enemy,v.Name) or table.find(getgenv().enemy,v.Name:sub(1,4)) then coroutine.wrap(getgenv().createEsp)(v,xgetId) 
-        elseif table.find(getgenv().waypointfinds,v) then print('waypoint found thats added',v.Name) coroutine.wrap(getgenv().createEsp)(v,xgetId) 
-        end;
-    end
-    local add
-    add = workspace.ChildAdded:Connect(function(son)
-        task.wait()
-        local xgetId = nil 
-        if son:FindFirstChild('ID') then xgetId = son.ID.Value end
-        if  table.find(getgenv().AzfakeGlobalTables.bloodlines.pickups,son.Name) then coroutine.wrap(getgenv().createEsp)(son,xgetId) 
-        elseif table.find(getgenv().enemy,son.Name) or table.find(getgenv().enemy,son.Name:sub(1,4)) then print(son.Name) coroutine.wrap(getgenv().createEsp)(son,xgetId)
-        end;
-        for i,v in pairs(getgenv().waypointfinds) do 
-            if workspace:FindFirstChild(v.Name) == workspace:FindFirstChild(son.Name) then 
-                print('waypoint found thats added',son.Name) coroutine.wrap(getgenv().createEsp)(son,xgetId)
-            end
-        end
-    end)
+    -- for i,v in pairs(game:GetService('Workspace'):GetChildren()) do 
+    --     local xgetId = nil 
+    --     if v:FindFirstChild('ID') then xgetId = v.ID.Value end
+    --     if  table.find(getgenv().AzfakeGlobalTables.bloodlines.pickups,v.Name) then  coroutine.wrap(getgenv().createEsp)(v,xgetId) 
+    --     elseif table.find(getgenv().enemy,v.Name) or table.find(getgenv().enemy,v.Name:sub(1,4)) then coroutine.wrap(getgenv().createEsp)(v,xgetId) 
+    --     elseif table.find(getgenv().waypointfinds,v) then print('waypoint found thats added',v.Name) coroutine.wrap(getgenv().createEsp)(v,xgetId) 
+    --     end;
+    -- end
+    -- local add
+    -- add = workspace.ChildAdded:Connect(function(son)
+    --     task.wait()
+    --     local xgetId = nil 
+    --     if son:FindFirstChild('ID') then xgetId = son.ID.Value end
+    --     if  table.find(getgenv().AzfakeGlobalTables.bloodlines.pickups,son.Name) then coroutine.wrap(getgenv().createEsp)(son,xgetId) 
+    --     elseif table.find(getgenv().enemy,son.Name) or table.find(getgenv().enemy,son.Name:sub(1,4)) then print(son.Name) coroutine.wrap(getgenv().createEsp)(son,xgetId)
+    --     end;
+    --     for i,v in pairs(getgenv().waypointfinds) do 
+    --         if workspace:FindFirstChild(v.Name) == workspace:FindFirstChild(son.Name) then 
+    --             print('waypoint found thats added',son.Name) coroutine.wrap(getgenv().createEsp)(son,xgetId)
+    --         end
+    --     end
+    -- end)
 
 
 
@@ -8392,7 +8392,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             local xkeeptracer
             local plsstoptracer = false
             xkeeptracer = game:GetService('RunService').RenderStepped:Connect(function()
-                task.wait(0.2)
+                task.wait(0.1)
                 if v and v.Character and v.Character:FindFirstChild('Humanoid') and v.Character:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer and v.Character.Humanoid.Health >0 then 
                     local vect,onscreen = cam:worldToViewportPoint(v.Character.HumanoidRootPart.Position)
                     
@@ -8406,13 +8406,11 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                     if not v or getgenv().loopsUnload == true then 
                         plsstoptracer = true
                     end
-                elseif not v or getgenv().loopsUnload == true or plsstoptracer then 
-                    xkeeptracer:Disconnect()
-                    if tracer then 
-                        pcall(function()
-                            tracer:Remove()
-                        end)
-                    end
+                elseif getgenv().loopsUnload == true or getgenv().playeresp == false then 
+                    -- xkeeptracer:Disconnect()
+                    pcall(function()
+                        tracer:Remove()
+                    end)
                 else
                     tracer.Visible = false
                 end
@@ -8506,14 +8504,11 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                         pcall(function()
                             health.Visible = false
                         end)
-                       
-                        
-                        
                     end
                 end
-                if not game.Players:FindFirstChild(v.Name) or getgenv().loopsUnload == true  then 
+                if not game.Players:FindFirstChild(v.Name) or getgenv().loopsUnload == true or getgenv().playeresp == false then 
                     xkeeprunning:Disconnect()
-                    task.wait(1)
+                    -- task.wait(1)
                     pcall(function()
                         box:Remove()
                     end)
@@ -9578,7 +9573,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         PlayerTP:Add(xchild.Name)
         --PlayerTP:updateText(getgenv().selectedPlayer)
         --PlayerTP:Set(getgenv().Players)
-        getgenv().CreatePlayerEsp(xchild)
+        --getgenv().CreatePlayerEsp(xchild)
     end)
     game.Players.PlayerRemoving:Connect(function(xchild)
         getgenv().Players = {}
@@ -10775,11 +10770,55 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         getgenv().ESPColour = ztx
     end)
     espsector:AddSeperator('Toggles')
-    espsector:AddToggle("ESP", true, function(e)
+    espsector:AddToggle("ESP", false, function(e)
         getgenv().esp = e
+        if getgenv().esp == true then 
+            for _,v in next, workspace:GetChildren() do 
+                local xgetId = nil 
+                if v:FindFirstChild('ID') then 
+                    xgetId = v.ID.Value 
+                end
+                if table.find(getgenv().AzfakeGlobalTables.bloodlines.pickups,v.Name) then 
+                    coroutine.wrap(getgenv().createEsp)(v,xgetId) 
+                elseif table.find(getgenv().enemy,v.Name) or table.find(getgenv().enemy,v.Name:sub(1,4)) then
+                    coroutine.wrap(getgenv().createEsp)(v,xgetId) 
+                elseif table.find(getgenv().waypointfinds,v) then
+                    print('waypoint found thats added',v.Name) coroutine.wrap(getgenv().createEsp)(v,xgetId) 
+                end;
+            end
+            local espconnection = workspace.ChildAdded:Connect(function(son)
+                task.wait()
+                local xgetId = nil 
+                if son:FindFirstChild('ID') then xgetId = son.ID.Value end
+                if  table.find(getgenv().AzfakeGlobalTables.bloodlines.pickups,son.Name) then coroutine.wrap(getgenv().createEsp)(son,xgetId) 
+                elseif table.find(getgenv().enemy,son.Name) or table.find(getgenv().enemy,son.Name:sub(1,4)) then print(son.Name) coroutine.wrap(getgenv().createEsp)(son,xgetId)
+                end;
+                for i,v in pairs(getgenv().waypointfinds) do 
+                    if workspace:FindFirstChild(v.Name) == workspace:FindFirstChild(son.Name) then 
+                        print('waypoint found thats added',son.Name) coroutine.wrap(getgenv().createEsp)(son,xgetId)
+                    end
+                end
+            end)
+            task.spawn(function()
+                repeat task.wait() until getgenv().esp == false or getgenv().loopsUnload == true 
+                espconnection:Disconnect()
+            end)
+        end
     end)
-    espsector:AddToggle("Player ESP", true, function(e)
+    espsector:AddToggle("Player ESP", false, function(e)
         getgenv().playeresp = e
+        if getgenv().playeresp == true then 
+            for _,v in next, game.Players:GetPlayers() do
+                getgenv().CreatePlayerEsp(v)
+            end
+            local paddedconnection = game.Players.PlayerAdded:Connect(function(child)
+                getgenv().CreatePlayerEsp(child)
+            end)-- p[a]
+            task.spawn(function()
+                repeat task.wait() until getgenv().loopsUnload == true or getgenv().playeresp == false 
+                paddedconnection:Disconnect()
+            end)
+        end
     end)
     espsector:AddSeperator()
     espsector:AddToggle("Streamer Mode", false, function(e)
@@ -10795,8 +10834,8 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         getgenv().tracers = e
     end)
 
-    getgenv().playeresp = true
-    getgenv().esp = true;
+    -- getgenv().playeresp = true
+    -- getgenv().esp = true;
     
     
     -- local label = sector:AddLabel("Label")
@@ -10835,14 +10874,14 @@ elseif game.PlaceId == 10266164381 then --// shitlines
 
 
 
-    task.spawn(function()
-        task.wait()
-        for i,v in pairs(game.Players:GetChildren()) do 
-            if v:IsA('Player') then 
-                getgenv().CreatePlayerEsp(v)
-            end
-        end
-    end)
+    -- task.spawn(function()
+    --     task.wait()
+    --     for i,v in pairs(game.Players:GetChildren()) do 
+    --         if v:IsA('Player') then 
+    --             getgenv().CreatePlayerEsp(v)
+    --         end
+    --     end
+    -- end)
 
 
 
@@ -10898,7 +10937,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     getgenv().currenttween = nil
     task.spawn(function()
         while task.wait() do 
-            game:GetService("Players").LocalPlayer.SoundPlaylist.RainSound.Playing = false
+            --game:GetService("Players").LocalPlayer.SoundPlaylist.RainSound.Playing = false
             if getgenv().loopsUnload == true then if getgenv().connectiontochakra then  getgenv().connectiontochakra:Disconnect() end  print('true break') break end
             -- if getgenv().AzfakeGlobalTables['bloodlines']['voidwalk'] == true then 
             --     for i,v in pairs(workspace:GetChildren()) do 
@@ -11306,10 +11345,10 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     end
 
     task.spawn(function()-- pcall(function()
-        while task.wait(.6) do  
-            sector:FixSize()
-            purchases:FixSize()
-            farming:FixSize()
+        while task.wait(1) do  
+            -- sector:FixSize()
+            -- purchases:FixSize()
+            -- farming:FixSize()
             if getgenv().loopsUnload == true then print('true break while loop main') break end
             task.wait()
             if getgenv().Pickup == true then
@@ -11396,16 +11435,28 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         AdminRb:AddButton('Rollback',function()
             task.spawn(function()
                 while task.wait() do 
+                    -- local ohString1 = "UpdateSettings"
+                    -- local ohString2 = "On\255"
+                    -- local ohString3 = "On"
+                    -- local ohString4 = "On"
+                    -- local ohString5 = "On"
+                    -- local ohString6 = "Off"
+                    -- local ohString7 = "On"
+                    -- local ohString8 = "On"
+                    
+                    -- game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2, ohString3, ohString4, ohString5, ohString6, ohString7, ohString8)   
+                    -- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
+
                     local ohString1 = "UpdateSettings"
-                    local ohString2 = "On\255"
-                    local ohString3 = "On"
+                    local ohString2 = "On"
+                    local ohString3 = "\255"
                     local ohString4 = "On"
                     local ohString5 = "On"
                     local ohString6 = "Off"
                     local ohString7 = "On"
                     local ohString8 = "On"
-                    
-                    game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2, ohString3, ohString4, ohString5, ohString6, ohString7, ohString8)    
+
+                    game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2, ohString3, ohString4, ohString5, ohString6, ohString7, ohString8)
                 end
             end)
         end)
@@ -16923,13 +16974,13 @@ elseif game.PlaceId == 10371908957 or game.PlaceId == 10495850838 then  --- deep
 
         if detect(v,'rbxassetid://10495943900') then -- Rapier-Slash1
             
-            task.wait(.12)
+            task.wait(.15)
             getgenv().quickparry()
             
         end
         if detect(v,'rbxassetid://10495943948') then -- Rapier-Slash2
             
-            task.wait(.12)
+            task.wait(.15)
             getgenv().quickparry()
             
         end
@@ -21481,7 +21532,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         end
                     until FoundFrame == true 
                     for i,c in next, FrameFound:GetChildren() do 
-                        for k,frame in next, frame:GetChildren() do 
+                        for k,frame in next, c:GetChildren() do 
                             if frame:IsA('Frame') or frame:IsA('ScrollingFrame') and frame.Name ~= 'Divider' and frame.Visible == true then 
                                 frame.Visible = false
                             end
@@ -21497,9 +21548,11 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                     end
                     --game.Players.LocalPlayer.PlayerGui:WaitForChild('')
 
-                    local useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.CCGLab.RandomizeColor:InvokeServer(Method)
+                    local useless, colours, uselessagain = nil
                     if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value == 'Ghoul' then 
                         useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.KakuhouSurgeon.RandomizeColor:InvokeServer(Method)
+                    else
+                        useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.CCGLab.RandomizeColor:InvokeServer(Method)
                     end 
                     -- local FoundColour = false;
                     if colours and type(colours) == 'table' then 
@@ -21538,6 +21591,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
                         end)
                     end
                     if game.Players.LocalPlayer:FindFirstChild('PlayerFolder') then 
+                        task.wait(0.1)
                         pcall(function()
                             local ColourPath = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors');
                             if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value == 'Ghoul' then 
