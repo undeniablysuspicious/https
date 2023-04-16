@@ -5768,7 +5768,7 @@ local LoadedLibrary = false
 local ExpectedGlobalsOnLoad = 206 --206 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
 local ExpectedUnderscoreGsOnLoad = 4 --1 -- _G.wl_key
 if (KRNL_LOADED) then 
-    ExpectedGlobalsOnLoad = 250
+    ExpectedGlobalsOnLoad = 251
 end
 local ExpectedGlobalRun = 0
 local ExpectedUnderscoreRun = 0
@@ -11434,6 +11434,9 @@ elseif game.PlaceId == 10266164381 then --// shitlines
 
         AdminRb:AddButton('Rollback',function()
             task.spawn(function()
+                task.delay(3,function()
+                    
+                end)
                 while task.wait() do 
                     -- local ohString1 = "UpdateSettings"
                     -- local ohString2 = "On\255"
