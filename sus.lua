@@ -28912,6 +28912,73 @@ elseif game.PlaceId == 8651781069 then
 
 
     AddConfigurations()
+elseif game.PlaceId == 2483973525 then 
+    local tab = window:CreateTab(gameName)
+    local sector = tab:CreateSector('Cheats','left')
+
+    getgenv().dsbasettings = {
+        instagrab = false;
+        bringing = {
+            ['Villagers'] = false;
+            ['Demon Slayers'] = false;
+            ['Demons'] = false;
+        };
+        bringfilter = {
+            'Villagers';
+            'Demon Slayers';
+            'Demons';
+        };
+        distance = 0;
+    }
+    
+    sector:AddToggle('Insta Grab',false,function(xstate)
+        getgenv().dsbasettings['instagrab'] = xstate
+    end)
+    sector:AddDropdown('Grab Filter',getgenv().dsbasettings['bringfilter'],"",true,function(xstate)
+        local Values = table.concat(xstate,',')
+        for _,v in next, getgenv().dsbasettings['bringing'] do 
+            getgenv().dsbasettings['bringing'][_] = false
+        end
+        for _,value in next, xstate do 
+            for i,v in next, getgenv().dsbasettings['bringing'] do 
+                if value == i then 
+                    getgenv().dsbasettings['bringing'][i] = true 
+                    print('matching')
+                    break
+                end
+                print(tostring(value)..' value '..tostring(v))
+                print(tostring(value)..' value index '..tostring(i))
+            end
+            print(tostring(value)..' value to normal index'..tostring(_))
+        end
+    end)
+    sector:AddSlider('Grab Distance',0,0,100,1,function(xstate)
+        getgenv().dsbasettings['distance'] = xstate
+    end)
+    task.spawn(function()
+        while task.wait(0) do 
+            if getgenv().loopsUnload == true then print('dsba loop break') break end
+            if getgenv().dsbasettings['instagrab'] == true then 
+                for i,mob in next, workspace:FindFirstChild('npc'):FindFirstChild('npcs'):GetChildren() do 
+                    -- if mob.PrimaryPart then 
+                    --     print(isnetworkowner(mob.PrimaryPart))
+                    -- end
+                    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and mob.Name == 'Villager' and getgenv().dsbasettings['bringing']['Villagers'] == true and mob.PrimaryPart and isnetworkowner(mob.PrimaryPart) then 
+                        mob.PrimaryPart.CFrame = game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,0,-getgenv().dsbasettings['distance']) -- is
+                        print(mob.Name)
+                    end
+                    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and mob.Name:find('Demon Slayer') and getgenv().dsbasettings['bringing']['Demon Slayers'] == true and mob.PrimaryPart and isnetworkowner(mob.PrimaryPart) then 
+                        print(mob.Name)
+                        mob.PrimaryPart.CFrame = game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,0,-getgenv().dsbasettings['distance']) -- is
+                    end
+                    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and mob.Name:find('Demon') and getgenv().dsbasettings['bringing']['Demons'] == true and mob.PrimaryPart and isnetworkowner(mob.PrimaryPart) then 
+                        mob.PrimaryPart.CFrame = game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame * CFrame.new(0,0,-getgenv().dsbasettings['distance']) -- is
+                    end
+                    --==print(mob.Name)
+                end
+            end
+        end
+    end)
 else
 
     -- PlayerExperience
