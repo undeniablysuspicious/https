@@ -13559,6 +13559,13 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     getgenv().parry()
                     task.wait(.2)
                     getgenv().parry()
+                elseif detect(v,'rbxassetid://10234795108') then 
+                    task.wait(.1)
+                    getgenv().fastparry()
+                    task.wait(.1)
+                    getgenv().fastparry()
+                    task.wait(.1)
+                    getgenv().fastparry()
                 else
                     getgenv().parry()
                 end
@@ -14016,33 +14023,36 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
 
         -- bell rbxassetid://10974528182 slam 1 big greatswird
-        --[[
+        --[[ 
+            new 1 : rbxassetid://12684972344
+            new 2: rbxassetid://12684978333
+            new 3: rbxassetid://12684981181
             rbxassetid://10974684486 2
             rbxassetid://11286554002 3
             rbxassetid://10976188963 4
 
         --]]
 
-        if detect(v,'rbxassetid://10974528182') and cancelAll == false then 
-            task.wait(.5)
+        if detect(v,'rbxassetid://12684972344') and cancelAll == false then 
+            task.wait(.3)
             getgenv().parry()
             cancelAll = true
         end   
-        if detect(v,'rbxassetid://10974684486') and cancelAll == false then 
-            task.wait(.5)
-            getgenv().parry()
-            cancelAll = true
-        end   
-        if detect(v,'rbxassetid://11286554002') and cancelAll == false then 
-            task.wait(.5)
+        if detect(v,'rbxassetid://12684978333') and cancelAll == false then 
+            task.wait(.3)
             getgenv().roll()
             cancelAll = true
         end   
-        if detect(v,'rbxassetid://10976188963') and cancelAll == false then 
-            task.wait(.5)
+        if detect(v,'rbxassetid://12684981181') and cancelAll == false then 
+            task.wait(.3)
             getgenv().roll()
             cancelAll = true
         end   
+        -- if detect(v,'rbxassetid://10976188963') and cancelAll == false then 
+        --     task.wait(.5)
+        --     getgenv().roll()
+        --     cancelAll = true
+        -- end   
 
         -- geatsword swing 1 rbxassetid://10787560419
         -- greatsword swing 2 rbxassetid://10873957240
@@ -14125,7 +14135,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 weaponwait = 0.1
             end
             if v:FindFirstChild('Katana') then 
-                weaponwait = 0.1
+                weaponwait = 0.05
             end
             if v:FindFirstChild('VigilLongsword') then 
                 weaponwait = 0.1
@@ -14228,13 +14238,13 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         if detect(v,'rbxassetid://8917904390') then 
             task.wait(.2)
             getgenv().parry()
-            if checkStun() then getgenv().roll()
-            else
-                getgenv().roll()
-                removeStuns()
-                getgenv().parry()
-                removeStuns()
-            end
+            -- if checkStun() then getgenv().roll()
+            -- else
+            --     getgenv().roll()
+            --     removeStuns()
+            --     getgenv().parry()
+            --     removeStuns()
+            -- end
             removeStuns()
             cancelAll = true
             -- task.wait(.28)
@@ -14242,8 +14252,9 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             -- cancelAll = true
             repeat 
                 getgenv().fastparry()
+                getgenv().quickfinishparry()
                 removeStuns()
-                task.wait(0.01)
+                task.wait(0.001)
             until detect(v,'rbxassetid://8917904390') == false
         end  
 
@@ -14350,6 +14361,27 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         end  
 
         
+        if detect(v,'rbxassetid://12776704665') then -- lionfish bites
+            task.wait(.22)
+            getgenv().fastparry()
+            getgenv().quickfinishparry()
+            task.wait(.22)
+            getgenv().fastparry()
+            getgenv().quickfinishparry()
+            task.wait(.22)
+            getgenv().fastparry()
+            -- getgenv().quickfinishparry()
+        end 
+        if detect(v,'rbxassetid://12741306104') then 
+            task.spawn(function()
+                repeat 
+                    task.wait(0.001)
+                until not detect(v,'rbxassetid://12741306104')
+                -- check if in range
+                getgenv().roll()
+            end)
+        end
+
         -- new bell
 
 
@@ -14728,18 +14760,18 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                                         'Stun1';
                                     }
                                     -- and not find hitting
-                                    if ffound and ffound:FindFirstChild('Stun') or ffound:FindFirstChild('Stun1') or ffound:FindFirstChild('RagdollStun') or cdfound:FindFirstChild('RollCD') then 
-                                        print('@m1stun')
+                                    if game.Players.LocalPlayer.Character and not game.Players.LocalPlayer.Character:FindFirstChildWhichIsA('ForceField') and ffound and ffound:FindFirstChild('Stun') or ffound:FindFirstChild('Stun1') or ffound:FindFirstChild('RagdollStun') or cdfound:FindFirstChild('RollCD') then 
+                                        --print('@m1stun')
                                         --pcall(function()
                                             -- if ourfolder and cooldowns and statusFolder and
                                             if not cooldowns:FindFirstChild('RollCD') and
                                             not statusFolder:FindFirstChild('ParryCD') then 
-                                                print('@beforem1')
+                                                --print('@beforem1')
                                                 if getgenv().fw3localFw3['jumpwhentargetragdolled'] == true and v:FindFirstChild('Torso') and v:FindFirstChild('Torso'):FindFirstChild('RagdollAttachment') then 
                                                     game.Players.LocalPlayer.Character.Humanoid.Jump = true
                                                     task.wait(.2)
                                                 end
-                                                print('@codem1')
+                                                --print('@codem1')
                                                 getgenv().M1()
                                                 
                                                 -- if ragdolled target then jump for aerial
