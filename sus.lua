@@ -12185,6 +12185,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         momentum = 0;
         CurrentTween = nil;
         fixm1bug = false;
+        randomrollcanceldelay = false;
     }
 
 
@@ -12260,8 +12261,11 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     fakesect:AddToggle("Roll on Feint", true, function(xstate)
         getgenv().fw3localFw3['rollonfeint'] = xstate
     end)
-    fakesect:AddSlider("Roll on feint Delay", 0, 0.07, 1, 100, function(State)
-        getgenv().fw3localFw3['rolldelay'] = State
+    -- fakesect:AddSlider("Roll on feint Delay", 0, 0.07, 1, 100, function(State)
+    --     getgenv().fw3localFw3['rolldelay'] = State
+    -- end)
+    fakesect:AddToggle("Random Roll Cancel Delay",false,function(xstate)
+        getgenv().fw3localFw3['randomrollcanceldelay'] = xstate
     end)
     fakesect:AddToggle("Log Feints", false, function(xstate)
         getgenv().fw3localFw3['logfeints'] = xstate
@@ -12324,7 +12328,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     fakesect:AddButton('Enable Watermark',function()
         wtm:SetState('Active')
     end)
-    fakesect:AddButton('Enable Watermark',function()
+    fakesect:AddButton('Disable Watermark',function()
         wtm:SetState('Disable')
     end)
     fakesect:AddButton('Enable Chat Logger',function()
@@ -13218,9 +13222,18 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 if getgenv().fw3localFw3['rollblatant'] == true then 
                     task.wait(.05)
                 else
-                    task.wait(.2)
+                    if getgenv().fw3localFw3['randomrollcanceldelay'] == true then 
+                        randomint = Random.new()
+                        randomint = randomint:NextNumber(0.05,0.2)
+                        task.wait(randomint) -- math.random(1,2)/10
+                    else
+                        task.wait(.2)
+                    end
                 end
                 if getgenv().fw3localFw3['rollcancel'] == true then 
+                    local shouldfeint = false
+                    shouldfeint = math.random(1,2)
+                    --if getgenv().fw3localFw3['randomrollcanceldelay'] == true and shouldfeint == 2 then return end
                     local m = game.Players.LocalPlayer:GetMouse();
                     inputManager:SendMouseButtonEvent(m.X,m.Y,1,true,game,0)
                     inputManager:SendMouseButtonEvent(m.X,m.Y,1,false,game,0)
@@ -13811,14 +13824,18 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         --rbxassetid://8686839894 -- swing 2 sharko
         -- 
 
-        if detect(v,'rbxassetid://9137450354') and cancelAll == false then -- triple stomp
-            task.wait(.15)
+        if detect(v,'rbxassetid://9137450354') and cancelAll == false then -- triple stomp rbxassetid://9137450354
+            task.wait(.4)
             getgenv().parry()
-            task.wait(.25)
+            -- getgenv().quickfinishparry()
+            task.wait(.4) -- 25
             getgenv().parry()
-            task.wait(.25)
+            -- getgenv().quickfinishparry()
+            task.wait(.4)
             getgenv().parry()
+            -- getgenv().quickfinishparry()
             cancelAll = true
+            print('tsp')
         end
         if detect(v,'rbxassetid://9145941681') and cancelAll == false then --roll prima
             task.wait(.53)
@@ -13977,22 +13994,26 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
 
 
-        if detect(v,'rbxassetid://10013909049') and cancelAll == false then -- owl swing 1
+        if detect(v,'rbxassetid://10013909049') and cancelAll == false then -- axe swing 1
             task.wait(.17)
             getgenv().parry()
             cancelAll = true
         end   
-        if detect(v,'rbxassetid://10013911426') and cancelAll == false then -- owl swing 1
+        if detect(v,'rbxassetid://10013911426') and cancelAll == false then -- axe swing 12
             task.wait(.17)
             getgenv().parry()
             cancelAll = true
         end   
-        if detect(v,'rbxassetid://10013915154') and cancelAll == false then -- owl swing 1
+        if detect(v,'rbxassetid://10013915154') and cancelAll == false then -- axe swing 3
             task.wait(.17)
             getgenv().parry()
             cancelAll = true
         end   
-
+        if detect(v,'rbxassetid://10013919534') and cancelAll == false then -- axe run swing
+            task.wait(.3)
+            getgenv().parry()
+            cancelAll = true
+        end
 
         -- pistol rbxassetid://8787495611 (not done)
 
@@ -14034,17 +14055,17 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         --]]
 
         if detect(v,'rbxassetid://12684972344') and cancelAll == false then 
-            task.wait(.3)
+            task.wait(.32)
             getgenv().parry()
             cancelAll = true
         end   
         if detect(v,'rbxassetid://12684978333') and cancelAll == false then 
-            task.wait(.3)
+            task.wait(.32)
             getgenv().roll()
             cancelAll = true
         end   
         if detect(v,'rbxassetid://12684981181') and cancelAll == false then 
-            task.wait(.3)
+            task.wait(.38)
             getgenv().roll()
             cancelAll = true
         end   
@@ -14079,7 +14100,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         -- rbxassetid://10968567648 -- vent out -- could detect  vent in debrisparts to see if its close
         -- vent in rbxassetid://10878360726
 
-        if detect(v,'rbxassetid://10878360726')  then -- and cancelAll == false
+        if detect(v,'rbxassetid://10878360726')  then -- and cancelAll == false vent
             task.spawn(function()
                 local isJumpingOut = false 
                 repeat task.wait()
@@ -14177,6 +14198,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         -- spear th 2 rbxassetid://11363591881
         -- spear th oneh 1 rbxassetid://11404159898
         -- spear th oneh 2 rbxassetid://11404162476
+        -- spear aerial rbxassetid://9112351440
 
         if detect(v,'rbxassetid://11363516302') and cancelAll == false then 
             task.wait(.1)
@@ -14198,7 +14220,11 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             getgenv().parry()
             cancelAll = true
         end  
-        
+        if detect(v,'rbxassetid://9112351440') then 
+            task.wait(.25)
+            getgenv().parry()
+            cancelAll = true
+        end
 
 
         -- enf kick rbxassetid://8924706624
@@ -14257,7 +14283,6 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 task.wait(0.001)
             until detect(v,'rbxassetid://8917904390') == false
         end  
-
 
 
         -- NEW MOBS
@@ -14365,12 +14390,13 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             task.wait(.22)
             getgenv().fastparry()
             getgenv().quickfinishparry()
-            task.wait(.22)
+            task.wait(.24)
             getgenv().fastparry()
             getgenv().quickfinishparry()
             task.wait(.22)
             getgenv().fastparry()
             -- getgenv().quickfinishparry()
+            cancelAll = true
         end 
         if detect(v,'rbxassetid://12741306104') then 
             task.spawn(function()
@@ -14380,12 +14406,72 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 -- check if in range
                 getgenv().roll()
             end)
+            cancelAll = true
         end
 
         -- new bell
 
 
- 
+        -- new fist anims
+
+
+        -- way of navae
+
+        if detect(v,'rbxassetid://13217644106') then -- punch 1
+            task.wait(.2)
+            getgenv().parry()
+            cancelAll = true
+        end
+        if detect(v,'rbxassetid://13217809061') then -- punch 2
+            task.wait(.2)
+            getgenv().parry()
+            cancelAll = true
+        end
+        if detect(v,'rbxassetid://13218081574') then -- punch 3
+            task.wait(.2)
+            getgenv().parry()
+            cancelAll = true
+        end
+        if detect(v,'rbxassetid://13241762838') then -- punch 4
+            task.wait(.2)
+            getgenv().parry()
+            cancelAll = true
+        end
+        if detect(v,'rbxassetid://10558610693') then -- way of navae aerial   and legion kata
+            task.wait(.25)
+            getgenv().parry()
+            cancelAll = true 
+        end
+        if detect(v,'rbxassetid://9891303051') then -- way of navae run punch  and legion kata
+            task.wait(.25)
+            getgenv().parry()
+            cancelAll = true 
+        end
+        -- rbxassetid://9891303051
+
+
+        -- legon kata
+        if detect(v,'rbxassetid://13049291895') then -- punch one
+            task.wait(.2)
+            getgenv().parry()
+            cancelAll = true
+        end
+        if detect(v,'rbxassetid://13144191563') then -- punch two
+            task.wait(.2)
+            getgenv().parry()
+            cancelAll = true
+        end
+        if detect(v,'rbxassetid://13144489543') then -- punch three
+            task.wait(.2)
+            getgenv().parry()
+            cancelAll = true
+        end
+        if detect(v,'rbxassetid://13147163529') then -- punch four
+            task.wait(.2)
+            getgenv().parry()
+            cancelAll = true
+        end
+
 
         if is_rapier then cancelAll = true end
         local rolling = false
