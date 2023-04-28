@@ -12792,19 +12792,19 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         getgenv().getbell = function()
             local developerProducts = game:GetService("MarketplaceService"):GetDeveloperProductsAsync():GetCurrentPage()
-
+            --r = 'game:GetService"MarketplaceService":PromptProductPurchase(game.Players.LocalPlayer, '..value..')'
+            --loadstring(r)();
             for _, developerProduct in pairs(developerProducts) do
-            for field, value in pairs(developerProduct) do
+                for field, value in pairs(developerProduct) do
+                    if field == 'ProductId' then
 
-            if field == 'ProductId' then
 
-            r = 'game:GetService"MarketplaceService":PromptProductPurchase(game.Players.LocalPlayer, '..value..')'
-            loadstring(r)();
+                    end
+                    print(field .. ": " .. value)
+                end
+                print(" ")
             end
-            print(field .. ": " .. value)
-            end
-            print(" ")
-            end
+            game:GetService"MarketplaceService":PromptProductPurchase(game.Players.LocalPlayer, 1305713469)
         end
 
         -- fakesect:AddButton('disable anticheat',function()
@@ -13021,6 +13021,10 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     elseif getgenv().UsePing == false then 
                         task.wait(0.107)
                     end
+                    local args = {
+                        [1] = "Up"
+                    }
+                    game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
                     local args = {
                         [1] = "Down"
                     }
@@ -13582,8 +13586,16 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 end
             end
         end
-
-        if v:FindFirstChild('Torso') then 
+        local ParryCritExlusions = {-- the anims we will parry ourselves
+            'rbxassetid://13047366938' 
+        }
+        local Excluded = false
+        for i,anims in next, ParryCritExlusions do 
+            if detect(v,anims) then 
+                Excluded = true 
+            end
+        end
+        if v:FindFirstChild('Torso') and Excluded == false then 
             if v:FindFirstChild('Right Arm') and v:FindFirstChild('Right Arm'):FindFirstChild('ManaTrail') or v:FindFirstChild('Torso'):FindFirstChild('Critical') or v:FindFirstChild('Torso'):FindFirstChild('Critical2') or v:FindFirstChild('Torso'):FindFirstChild('Critical1') then 
                 removeStuns()
                 print('ye')
@@ -13622,9 +13634,18 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     getgenv().fastparry()
                     task.wait(.1)
                     getgenv().fastparry()
-                elseif detect(v,'rbxassetid://13047366938') then 
-                    task.wait(.2)
-                    getgenv().parry()
+                    task.wait(.1)
+                    getgenv().fastparry()
+                -- elseif detect(v,'rbxassetid://13047366938') then -- jus karita
+                --     task.wait(1)
+                --     getgenv().parry()
+                -- elseif detect(v,'rbxassetid://12457389891') then --sharko crit
+                --     task.spawn(function()
+                --         repeat 
+                --             task.wait(0.1)
+                --             getgenv().fastparry()
+                --         until not detect(v,'rbxassetid://12457389891')
+                --     end)
                 else
                     getgenv().parry()
                 end
@@ -13878,7 +13899,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             task.wait(.4) -- 25
             getgenv().parry()
             -- getgenv().quickfinishparry()
-            task.wait(.4)
+            task.wait(.35)
             getgenv().parry()
             -- getgenv().quickfinishparry()
             cancelAll = true
@@ -14057,7 +14078,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             cancelAll = true
         end   
         if detect(v,'rbxassetid://10013919534') and cancelAll == false then -- axe run swing
-            task.wait(.3)
+            task.wait(.15)
             getgenv().parry()
             cancelAll = true
         end
@@ -14103,7 +14124,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://12684972344') and cancelAll == false then 
             task.wait(.32)
-            getgenv().parry()
+            getgenv().roll()
             cancelAll = true
         end   
         if detect(v,'rbxassetid://12684978333') and cancelAll == false then 
@@ -14236,7 +14257,16 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             getgenv().parry()
             cancelAll = true
         end  
-        
+        if detect(v,'rbxassetid://8779280417') and cancelAll == false then -- sword run swing
+            task.wait(.15)
+            getgenv().parry()
+            cancelAll = true
+        end
+        if detect(v,'rbxassetid://9112351440') then -- sword and spear aerual
+            task.wait(.2)
+            getgenv().parry()
+            cancelAll = true
+        end
 
 
 
@@ -14267,11 +14297,6 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             getgenv().parry()
             cancelAll = true
         end  
-        if detect(v,'rbxassetid://9112351440') then 
-            task.wait(.25)
-            getgenv().parry()
-            cancelAll = true
-        end
 
 
         -- enf kick rbxassetid://8924706624
@@ -14518,6 +14543,12 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             getgenv().parry()
             cancelAll = true
         end
+        if detect(v,'rbxassetid://13047366938') then -- legon kata crit
+            task.wait(.1)
+            getgenv().parry()
+            cancelAll = true
+        end
+
 
 
         if is_rapier then cancelAll = true end
@@ -14884,7 +14915,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                         local dist = (v:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
                         if dist.Magnitude <= getgenv().Distance then 
                             if game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name) and v.Name ~= game.Players.LocalPlayer.Name then 
-                                if game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('StatusFolder') and game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('Cooldowns') then
+                                if game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('StatusFolder') and not game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('StatusFolder'):FindFirstChild('Hitting') and game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('Cooldowns') then
                                     local ffound = game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('StatusFolder') 
                                     local cdfound = game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('Cooldowns') 
                                     local getstuns = {
@@ -14950,10 +14981,10 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     if (v:FindFirstChild('HumanoidRootPart')) and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                         local dist = (v:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
                         if dist.Magnitude <= getgenv().Distance then 
-                            if game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name) and v.Name ~= game.Players.LocalPlayer.Name then 
+                            if game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name) and not game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('StatusFolder'):FindFirstChild('Hitting') and  v.Name ~= game.Players.LocalPlayer.Name then 
                                 if game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('StatusFolder') then
                                     local ffound = game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('StatusFolder') 
-                                    if ffound:FindFirstChild('Stun') or ffound:FindFirstChild('Stun1') then 
+                                    if ffound:FindFirstChild('Stun') or ffound:FindFirstChild('Stun1') and not game.Players.LocalPlayer.Character:FindFirstChildWhichIsA('ForceField') then 
                                         getgenv().usestrongleft()
                                     end
                                 end
@@ -29144,6 +29175,429 @@ elseif game.PlaceId == 2483973525 then
             end
         end
     end)
+elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceId == 11599532987 then 
+    local tab = window:CreateTab(gameName)
+    local sector = tab:CreateSector('Cheats','left')
+    local othersector = tab:CreateSector('Cheats','right')
+    if game.PlaceId == 11513105086 then 
+        sector:AddButton('Create New Slot',function()
+            game:GetService("ReplicatedStorage").Events.AddSlot:FireServer()
+        end)
+        return
+    end
+
+    getgenv().wisteriasettings = {
+        rollback = false;
+        autospin = false;
+        spinfor = '';
+        rejoinafterspinning = false;
+        autorollbackonspin = false;
+        stoprollbackwhengotlastname = false;
+        getmove = '';
+        nocd = false;
+        nocooldowndestroys = {
+            'Stunned';
+            'CantAttack';
+            'JumpSet';
+        };
+        cangetmoves = {};
+        autobreathe = false;
+        places = {
+            ['butterfly'] = nil;
+        };
+        listedplaces = {
+
+        };
+        tpplace = '';
+        slottoaddto = '1';
+        pagetoaddto = '1';
+        skillmove = '';
+        instakill = false;
+        flying = false;
+        flyspeed = 0;
+        speeding = false;
+        speed = 0;
+        noclipping = false;
+        noclipfunction = nil;
+        demonnames = {
+            'Kurora';
+            'Ozomashi';
+            'Mijikai';
+            'Giji';
+            'Kyodaina';
+        }
+    }   
+    for _,v in next, game:GetService("ReplicatedStorage").ArtInfo:GetChildren() do 
+        table.insert(getgenv().wisteriasettings['cangetmoves'],v.Name)
+    end
+    for i,region in next, workspace.Region:GetChildren() do 
+        if region.Name:find('butterfly') then -- loop in regions and use string.split with - args 2 to get the mansion name
+            getgenv().wisteriasettings['places']['butterfly'] = region
+        end
+        local regionname = string.split(region.Name,'-')[2]--:sub(2,string.len(string.split(region.Name,'-')[2]))
+        if not table.find(getgenv().wisteriasettings['listedplaces'],regionname) then 
+            table.insert(getgenv().wisteriasettings['listedplaces'],regionname)
+        end
+    end
+    -- sector:AddTextbox('Get Skill','',function(xstate)
+    --     getgenv().wisteriasettings['getmove'] = xstate -- gettingmove
+    -- end)
+
+    sector:AddDropdown('Get Skill',getgenv().wisteriasettings['cangetmoves'],'',false,function(xstate)
+        getgenv().wisteriasettings['getmove'] = xstate
+    end)
+    sector:AddButton('Obtain Skill',function()
+        local ohString1 = "GiveArt"
+        local ohString2 = getgenv().wisteriasettings['getmove']
+        game:GetService("Players").LocalPlayer.PlayerGui.Gui.Ui.UiModule.Modules.Rep.GetData:InvokeServer(ohString1, ohString2)   
+    end)
+    sector:AddTextbox('Slot','1',function(xstate)
+        getgenv().wisteriasettings['slottoaddto'] = xstate
+    end)
+    sector:AddTextbox('Page','1',function(xstate)
+        getgenv().wisteriasettings['pagetoaddto'] = xstate
+    end)
+    sector:AddTextbox('Skill','',function(xstate)
+        getgenv().wisteriasettings['skillmove'] = xstate
+    end)
+    sector:AddButton('Set Skill Slot',function()    
+        local ohString1 = "Page"..getgenv().wisteriasettings['pagetoaddto']
+        local ohNumber2 = tonumber(getgenv().wisteriasettings['slottoaddto'])
+        local ohString3 = getgenv().wisteriasettings['skillmove'] 
+        game:GetService("Players").LocalPlayer.PlayerGui.Gui.Ui.UiModule.Modules.Asign.Track:InvokeServer(ohString1, ohNumber2, ohString3)
+    end)
+    sector:AddSeperator('')
+    sector:AddToggle('No Cooldown',false,function(xstate)
+        getgenv().wisteriasettings['nocd'] = xstate
+    end)
+    sector:AddToggle('Auto Breathe',false,function(xstate)
+        getgenv().wisteriasettings['autobreathe'] = xstate
+    end)
+    sector:AddSlider('Fly Speed',0,0,250,1,function(xstate)
+        getgenv().wisteriasettings['flyspeed'] = xstate
+    end)
+    local flytoggle = sector:AddToggle('Fly',false,function(xstate)
+        getgenv().wisteriasettings['flying'] = xstate
+        if getgenv().wisteriasettings['flying'] == true then 
+            game.Players.LocalPlayer.Character:WaitForChild("Head").Anchored = false
+            -- getgenv().flying = true
+            task.spawn(function()
+                repeat wait()
+                until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game.Players.LocalPlayer.Character:FindFirstChild("Torso") and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+                local mouse = game.Players.LocalPlayer:GetMouse()
+                repeat wait() until mouse
+                local plr = game.Players.LocalPlayer
+                local torso = plr.Character:WaitForChild('HumanoidRootPart')
+                local deb = true
+                local ctrl = {f = 0, b = 0, l = 0, r = 0}
+                local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+                local maxspeed = getgenv().wisteriasettings['flyspeed']
+                local speed = maxspeed  
+                function Fly()
+                    local bv = Instance.new("BodyVelocity", game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"));bv.Name ='exploitation'
+                    bv.velocity = Vector3.new(0,0,0)
+                    bv.maxForce = Vector3.new(9e9, 9e9, 9e9) -- 9e9
+                    repeat task.wait(0.01)
+                        if game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and not game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild('exploitation') then 
+                            bv = Instance.new("BodyVelocity", game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"));bv.Name ='exploitation'
+                            bv.velocity = Vector3.new(0,0,0)
+                            bv.maxForce = Vector3.new(9e9, 9e9, 9e9) -- 9e9
+                        end
+                        if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                            local prevRotation = game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation
+                            speed = getgenv().wisteriasettings['flyspeed'] --Options.FlySpeedSlide.Value
+                            maxspeed = getgenv().wisteriasettings['flyspeed']
+                            if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+                                speed = maxspeed * 2
+                                -- if speed > maxspeed then
+                                --     speed = maxspeed
+                                -- end
+                                if speed ~= maxspeed * 10 then
+                                    speed = maxspeed * 2
+                                end
+                            elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
+                                speed = 0
+                                if speed < 0 then
+                                    speed = 0
+                                end
+                            end
+                                -- elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
+                            --     bv.velocity = ((game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.lookVector  )) *speed/2
+                            if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
+                                bv.velocity = (( game.Workspace.CurrentCamera.CoordinateFrame.lookVector  *  (ctrl.f+ctrl.b)  )) * speed -- ((game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.p))
+                                -- lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
+                                if (ctrl.r) ~= 0  then 
+                                    --repeat task.wait(0.005) until game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation ~= prevRotation
+                                    ctrl.r = ctrl.r - ctrl.l
+                                    bv.velocity += (( game.Workspace.CurrentCamera.CoordinateFrame.RightVector  )) * speed
+                                end
+                                if (ctrl.l) ~= 0 then 
+                                    --repeat task.wait(0.005) until game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation ~= prevRotation
+                                    ctrl.l = ctrl.l - ctrl.r
+                                    bv.velocity += (( game.Workspace.CurrentCamera.CoordinateFrame.RightVector    ))  * -speed
+                                end
+    
+                            else
+                                bv.velocity = Vector3.new(0,0,0)
+                            end
+                                --* CFrame.new((ctrl.l+ctrl.r),0,0) -- *50*speed/maxspeed * Vector3.new(0,0,0) --  
+                        end
+
+                    until getgenv().wisteriasettings['flying']  == false or getgenv().loopsUnload == true
+
+                    ctrl = {f = 0, b = 0, l = 0, r = 0}
+                    lastctrl = {f = 0, b = 0, l = 0, r = 0}
+                    speed = 0
+                    bv:Destroy()
+                    game.Players.LocalPlayer.Character:WaitForChild('Humanoid').PlatformStand = false
+                    --print('stop flying')
+                end
+                mouse.KeyDown:connect(function(key)
+                    if key:lower() == "w" then
+                        ctrl.f = 1
+                    elseif key:lower() == "s" then
+                        ctrl.b = -1
+                    elseif key:lower() == "a" then
+                        ctrl.l = -1
+                    elseif key:lower() == "d" then
+                        ctrl.r = 1
+                    end
+                end)
+                mouse.KeyUp:connect(function(key)
+                    if key:lower() == "w" then
+                        ctrl.f = 0
+                        speed = 0
+                    elseif key:lower() == "s" then
+                        ctrl.b = 0
+                    elseif key:lower() == "a" then
+                        ctrl.l = 0
+                    elseif key:lower() == "d" then
+                        ctrl.r = 0
+                    end
+                end)
+                Fly()  
+            end)
+        end
+    end)
+    sector:AddSlider('Speed',0,0,250,1,function(xstate)
+        getgenv().wisteriasettings['speed'] = xstate
+    end)
+    local speedtoggle = sector:AddToggle('Walkspeed',false,function(xstate)
+        getgenv().wisteriasettings['speeding'] = xstate
+    end)
+
+    local nocliptoggle = sector:AddToggle('Noclip',false,function(xstate)
+        getgenv().wisteriasettings['noclipping'] = xstate
+        if getgenv().wisteriasettings['noclipping'] == true then 
+            getgenv().wisteriasettings['noclipfunction'] = game:GetService('RunService').Stepped:Connect(function()
+                for _, v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                    if v:IsA("Part") and v.CanCollide == true then
+                        v.CanCollide = false
+                    end
+                end
+                for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                    if v:IsA("BasePart") and v.CanCollide == true then
+                        v.CanCollide = false
+                    end
+                end
+            end)
+        else
+            if getgenv().wisteriasettings['noclipfunction'] ~= nil then 
+                getgenv().wisteriasettings['noclipfunction']:Disconnect()
+            end
+        end
+    end)
+
+
+    sector:AddDropdown('Regions',getgenv().wisteriasettings['listedplaces'],'',false,function(xstate)
+        getgenv().wisteriasettings['tpplace'] = xstate
+    end)
+    sector:AddButton('Teleport To Region',function()
+        for _,v in next, workspace.Region:GetChildren() do 
+            if string.find(v.Name,getgenv().wisteriasettings['tpplace']) and getgenv().wisteriasettings['tpplace'] ~= '' then 
+                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v.CFrame
+                break
+            end
+        end
+    end)
+    sector:AddButton('God Mode',function()
+        game:GetService("Players").LocalPlayer.Character.Effects.Attackers:Destroy()
+    end)
+
+    if game.PlaceId == 11599532987 then --game.PlaceiD 
+        sector:AddToggle('Insta Kill',false,function(xstate)
+            getgenv().wisteriasettings['instakill'] = xstate
+        end)
+    end
+    local SharedModule = require(game:GetService("ReplicatedStorage").Scripts.Shared)
+
+    local rolbacktoggle = othersector:AddToggle('Rollback',false,function(xstate)
+        getgenv().wisteriasettings['rollback'] = xstate
+    end)
+    othersector:AddToggle('Auto Spin',false,function(xstate) 
+        getgenv().wisteriasettings['autospin'] = xstate -- if you got what you want then it can rejoin or disable rollback then rejoin
+    end)
+    othersector:AddToggle('Auto Rollback On Spin',false,function(xstate)
+        getgenv().wisteriasettings['autorollbackonspin'] = xstate
+    end)
+    othersector:AddToggle('Stop Rollback on Clan',false,function(xstate)
+        getgenv().wisteriasettings['stoprollbackwhengotlastname'] = xstate
+    end)
+    othersector:AddTextbox('Spin For','',function(xstate)
+        getgenv().wisteriasettings['spinfor'] = xstate
+    end)
+    othersector:AddToggle('Rejoin After Spinning',false,function(xstate)
+        getgenv().wisteriasettings['rejoinafterspinning'] = xstate -- only if you didnt get what you want
+    end)
+    othersector:AddSeperator('')
+    othersector:AddButton('Rejoin',function()
+        game:GetService('TeleportService'):teleport(game.PlaceId)
+    end,{
+        ask = 'Do you want to rejoin?';
+        accept = 'Yes';
+        reject = 'No';
+    })
+    othersector:AddButton('Teleport To Final Selection',function()
+        game:GetService("TeleportService"):Teleport(11754723819)
+    end)
+    hookfunction(SharedModule.CanAttack,function()
+        if getgenv().wisteriasettings['nocd'] == true then
+            return true
+        else
+            return true
+        end 
+    end)
+    hookfunction(SharedModule.CanDash,function()
+        if getgenv().wisteriasettings['nocd'] == true then
+            return true
+        else
+            return true
+        end 
+    end)
+    hookfunction(SharedModule.CanBlock,function()
+        if getgenv().wisteriasettings['nocd'] == true then
+            return true
+        else
+            return true
+        end  
+    end)
+    task.spawn(function()
+        while task.wait(0) do 
+            if getgenv().loopsUnload == true then print('wisteria loop break end') break end
+            if getgenv().wisteriasettings['rollback'] == true then
+                getgenv().wisteriasettings['rollback'] = nil
+                azfakenotify('Starting Rollback','untilClick')
+                task.delay(1,function()
+                    azfakenotify('Rolled back; Data from this point wont save','untilClick')
+                end)
+                game:GetService("Players").LocalPlayer:FindFirstChild('PlayerGui'):FindFirstChild('Gui'):FindFirstChild('Gui'):FindFirstChild('Moves').Visible = false
+                task.spawn(function()
+                    while task.wait(0) do 
+                        if getgenv().loopsUnload == true or getgenv().wisteriasettings['rollback'] == false then 
+                            print('wisteria rollback loop break')
+                            local ohNumber1 = 1
+                            local ohString2 = "Z"
+                                
+                            game:GetService("Players").LocalPlayer.PlayerGui.Gui.Ui.UiModule.Modules.Settings.Set:InvokeServer(ohNumber1, ohString2)   
+                            azfakenotify('Ended Rollback','untilClick')  
+                            --game:GetService("Players").LocalPlayer:FindFirstChild('PlayerGui'):FindFirstChild('Gui'):FindFirstChild('Gui'):FindFirstChild('Moves').Visible = true
+                            break
+                        end
+                        game:GetService("Players").LocalPlayer:FindFirstChild('PlayerGui'):FindFirstChild('Gui'):FindFirstChild('Gui'):FindFirstChild('Moves').Visible = false
+                        local ohNumber1 = 1
+                        local ohString2 = "\255"
+                            
+                        game:GetService("Players").LocalPlayer.PlayerGui.Gui.Ui.UiModule.Modules.Settings.Set:InvokeServer(ohNumber1, ohString2)     
+                    end
+                end)
+            end
+            if getgenv().wisteriasettings['autospin'] == true then 
+                -- spin
+                if getgenv().wisteriasettings['autorollbackonspin'] == true then 
+                    getgenv().wisteriasettings['rollback'] = true
+                end
+                firesignal(game:GetService("Players").LocalPlayer.PlayerGui.Gui.DevProducts.Holder.RerollClan.MouseButton1Click)
+                local spins = game:GetService("ReplicatedStorage").Events.GetStats:InvokeServer({["Stat"] = "Spins"})
+                if spins == 0 and getgenv().wisteriasettings['rejoinafterspinning'] == true then 
+                    game:GetService('TeleportService'):teleport(game.PlaceId)
+                end
+                local SpinAmount = spins
+                local SpinFor = getgenv().wisteriasettings['spinfor']
+                for i=1, SpinAmount do 
+                    --task.wait(.01)
+                    local lastname = game:GetService("Players").LocalPlayer.PlayerGui.RerollClan.RollClanFrame.Clan.RRLastName.LocalScript.RR:InvokeServer("RRLastName")
+                    if lastname == SpinFor then 
+                        azfakenotify('Rolled '..lastname..' successfully','untilClick')
+                        if getgenv().wisteriasettings['stoprollbackwhengotlastname'] == true then 
+                            getgenv().wisteriasettings['rollback'] = false;
+                            rolbacktoggle:Set(false)
+                        end
+                        break
+                    end
+                end
+                if getgenv().wisteriasettings['rejoinafterspinning'] == true then 
+                    game:GetService('TeleportService'):teleport(game.PlaceId)
+                end
+                -- repeat 
+
+                -- until 
+            end
+            if getgenv().wisteriasettings['nocd'] == true and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Effects') then 
+                -- game.Players.LocalPlayer.Character.Info.M1.Value = false
+                -- game.Players.LocalPlayer.Character.Effects.HitCount.Value = 0
+                if game.Players.LocalPlayer.Character.Effects:FindFirstChild('CantAttack') then 
+                    game.Players.LocalPlayer.Character.Effects:FindFirstChild('CantAttack') :Destroy()
+                end
+                if not game.Players.LocalPlayer.Character.Effects:FindFirstChild('CanMove') then 
+                    local canmove = Instance.new('BoolValue')
+                    canmove.Name = 'CanMove';
+                    canmove.Value = true
+                    canmove.Parent = game.Players.LocalPlayer.Character.Effects
+                else 
+                    game.Players.LocalPlayer.Character.Effects:FindFirstChild('CanMove').Value = true
+                end
+                if game.Players.LocalPlayer.Character.Effects:FindFirstChild('JumpSet') then 
+                    game.Players.LocalPlayer.Character.Effects:FindFirstChild('JumpSet') :Destroy()
+                end
+                game.Players.LocalPlayer.Character.Effects.AggroMain.Value = nil
+                if game.Players.LocalPlayer.Character.Effects:FindFirstChild('Stunned') then 
+                    game.Players.LocalPlayer.Character.Effects:FindFirstChild('Stunned') :Destroy()
+                end
+                for _,v in next, game.Players.LocalPlayer.Character:FindFirstChild('Effects'):GetChildren() do 
+                    if v.Name:find('CD') then 
+                        v:Destroy()
+                    end
+                end
+            end
+            if getgenv().wisteriasettings['autobreathe'] == true and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Effects') and game.Players.LocalPlayer.Character:FindFirstChild('Effects'):FindFirstChild('Inhaling').Value == false then 
+                game.Players.LocalPlayer.Character:FindFirstChild('Scripts'):FindFirstChild('Local'):FindFirstChild('Breathe'):FireServer(true)
+            end
+            if getgenv().wisteriasettings['instakill'] == true then 
+                for i, mob in next, game:GetService("Workspace").Live:GetChildren() do 
+                    if mob.PrimaryPart and isnetworkowner(mob.PrimaryPart) and mob.Name ~= game.Players.LocalPlayer.Name and mob:FindFirstChild('Head')  then 
+                        mob:FindFirstChildWhichIsA('Humanoid').Health = 0
+                        mob:FindFirstChild('Head'):Destroy()
+                        --print('iowner '..mob.Name)
+                    end
+                end
+            end
+            if getgenv().wisteriasettings['speeding'] == true and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                getgenv().wisteriasettings['speeding'] = nil 
+                local connection = game.Players.LocalPlayer.Character:FindFirstChild('Humanoid'):GetPropertyChangedSignal('WalkSpeed'):Connect(function()
+                    game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').WalkSpeed = getgenv().wisteriasettings['speed'] -- seed
+                end)
+                game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').WalkSpeed = getgenv().wisteriasettings['speed']
+                task.spawn(function()
+                    repeat task.wait() until getgenv().loopsUnload == true or game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health == 0 or getgenv().wisteriasettings['speeding'] == false
+                    connection:Disconnect() 
+                    if getgenv().wisteriasettings['speeding'] == nil then 
+                        getgenv().wisteriasettings['speeding'] = true
+                    end
+                end)
+            end
+        end
+    end)
+    AddConfigurations()
 else
 
     -- PlayerExperience
