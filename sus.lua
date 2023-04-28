@@ -29523,6 +29523,7 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
                 end
                 local SpinAmount = spins
                 local SpinFor = getgenv().wisteriasettings['spinfor']
+                local GotSpunItem = false
                 for i=1, SpinAmount do 
                     --task.wait(.01)
                     local lastname = game:GetService("Players").LocalPlayer:WaitForChild('PlayerGui'):WaitForChild('RerollClan'):WaitForChild('RollClanFrame'):WaitForChild('Clan'):WaitForChild('RRLastName'):WaitForChild('LocalScript'):WaitForChild('RR'):InvokeServer("RRLastName")
@@ -29531,11 +29532,12 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
                         if getgenv().wisteriasettings['stoprollbackwhengotlastname'] == true then 
                             getgenv().wisteriasettings['rollback'] = false;
                             rolbacktoggle:Set(false)
+                            GotSpunItem = true
                         end
                         break
                     end
                 end
-                if getgenv().wisteriasettings['rejoinafterspinning'] == true then 
+                if getgenv().wisteriasettings['rejoinafterspinning'] == true and GotSpunItem == false then 
                     game:GetService('TeleportService'):teleport(game.PlaceId)
                 end
                 -- repeat 
