@@ -29516,7 +29516,7 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
                 if getgenv().wisteriasettings['autorollbackonspin'] == true then 
                     getgenv().wisteriasettings['rollback'] = true
                 end
-                firesignal(game:GetService("Players").LocalPlayer.PlayerGui.Gui.DevProducts.Holder.RerollClan.MouseButton1Click)
+                firesignal(game:GetService("Players").LocalPlayer:WaitForChild('PlayerGui'):WaitForChild('Gui'):WaitForChild('DevProducts'):WaitForChild('Holder'):WaitForChild('RerollClan').MouseButton1Click)
                 local spins = game:GetService("ReplicatedStorage").Events.GetStats:InvokeServer({["Stat"] = "Spins"})
                 if spins == 0 and getgenv().wisteriasettings['rejoinafterspinning'] == true then 
                     game:GetService('TeleportService'):teleport(game.PlaceId)
@@ -29525,7 +29525,7 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
                 local SpinFor = getgenv().wisteriasettings['spinfor']
                 for i=1, SpinAmount do 
                     --task.wait(.01)
-                    local lastname = game:GetService("Players").LocalPlayer.PlayerGui.RerollClan.RollClanFrame.Clan.RRLastName.LocalScript.RR:InvokeServer("RRLastName")
+                    local lastname = game:GetService("Players").LocalPlayer:WaitForChild('PlayerGui'):WaitForChild('RerollClan'):WaitForChild('RollClanFrame'):WaitForChild('Clan'):WaitForChild('RRLastName'):WaitForChild('LocalScript'):WaitForChild('RR'):InvokeServer("RRLastName")
                     if lastname == SpinFor then 
                         azfakenotify('Rolled '..lastname..' successfully','untilClick')
                         if getgenv().wisteriasettings['stoprollbackwhengotlastname'] == true then 
