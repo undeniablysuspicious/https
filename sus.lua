@@ -29178,6 +29178,7 @@ elseif game.PlaceId == 2483973525 then
 elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceId == 11599532987 then 
     local tab = window:CreateTab(gameName)
     local sector = tab:CreateSector('Cheats','left')
+    local farmingsector = tab:CreateSector('Cheats','right')
     local othersector = tab:CreateSector('Cheats','right')
 
     getgenv().wisteriasettings = {
@@ -29463,6 +29464,28 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
             getgenv().wisteriasettings['instakill'] = xstate
         end)
     end
+
+    local bdemon = farmingsector:AddButton('Become A Demon',function()
+        local ohTable1 = {
+            ["Type"] = "Continue",
+            ["Npc"] = workspace.Npcs['Machigai Tenshi'],
+            ["Path"] = "PPath1"
+        }
+
+        game:GetService("ReplicatedStorage").Events.Dialogue:FireServer(ohTable1)
+        local ohTable1 = {
+            ["Type"] = "End",
+            ["Npc"] = workspace.Npcs["Machigai Tenshi"],
+            ["Path"] = "PPath5"
+        }
+        game:GetService("ReplicatedStorage").Events.Dialogue:FireServer(ohTable1)
+    end)
+
+
+
+
+
+
     local SharedModule = require(game:GetService("ReplicatedStorage").Scripts.Shared)
 
     local rolbacktoggle = othersector:AddToggle('Rollback',false,function(xstate)
