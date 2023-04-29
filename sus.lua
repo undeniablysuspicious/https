@@ -14704,7 +14704,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     if IsInDistance == false then 
     
                         repeat 
-                            task.wait(0.1)
+                            task.wait(0.05)
                             if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and workChar:FindFirstChild('HumanoidRootPart') and (workChar.HumanoidRootPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude <= getgenv().Distance then 
                                 IsInDistance = true
                                 --print(workChar.Name..' was detected '.. (workChar.HumanoidRootPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude)
@@ -14793,7 +14793,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 if IsInDistance == false then 
 
                     repeat 
-                        task.wait(0.1)
+                        task.wait(0.05)
                         if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and workChar:FindFirstChild('HumanoidRootPart') and (workChar.HumanoidRootPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude <= getgenv().Distance then 
                             IsInDistance = true
                             --print(workChar.Name..' was detected '.. (workChar.HumanoidRootPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude)
@@ -29179,12 +29179,6 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
     local tab = window:CreateTab(gameName)
     local sector = tab:CreateSector('Cheats','left')
     local othersector = tab:CreateSector('Cheats','right')
-    if game.PlaceId == 11513105086 then 
-        sector:AddButton('Create New Slot',function()
-            game:GetService("ReplicatedStorage").Events.AddSlot:FireServer()
-        end)
-        return
-    end
 
     getgenv().wisteriasettings = {
         rollback = false;
@@ -29225,8 +29219,46 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
             'Mijikai';
             'Giji';
             'Kyodaina';
-        }
+        };
+        slotkey = '';
+        slotdata = {
+            Name = 'bozoing bozo';
+            Data = {
+                Name = 'x';
+                Faction = 'x';
+                Level = 'x';
+                Note = 'x';
+                Key = '1_Slot 1';
+                Completed = true;
+            }
+        };
+        slotnumber = '1'
     }   
+    if game.PlaceId == 11513105086 then 
+        sector:AddTextbox('Slot Number','1',function(xstate)
+            getgenv().wisteriasettings['slotnumber'] = xstate
+            getgenv().wisteriasettings['slotdata']['Data']['Key'] = getgenv().wisteriasettings['slotkey']..'_Slot '..getgenv().wisteriasettings['slotnumber']
+        end)
+        sector:AddTextbox('Slot Key','',function(xstate)
+            getgenv().wisteriasettings['slotkey'] = xstate
+            getgenv().wisteriasettings['slotdata']['Data']['Key'] = xstate..'_Slot '..getgenv().wisteriasettings['slotnumber']
+        end)
+        local checkslotkey = sector:AddButton('Check Slot Key',function()
+            azfakenotify('Saving and Loading To '..getgenv().wisteriasettings['slotdata']['Data']['Key'],'untilClick')
+        end) -- button to check which slots its created and the ids
+        checkslotkey:ActivateKnowledge()
+        checkslotkey:AddKnowledge("Check The Key You're saving to.")
+        sector:AddButton('Create New Slot',function()
+            local MakeSlotFunction = nil
+            for i,funct in next, getgc() do 
+                if getinfo(funct).source:find('SlotPicker') and getinfo(funct).name == 'MakeSlot' then 
+                    MakeSlotFunction = funct
+                end
+            end
+            MakeSlotFunction(getgenv().wisteriasettings['slotdata'])
+        end)
+        return
+    end
     for _,v in next, game:GetService("ReplicatedStorage").ArtInfo:GetChildren() do 
         table.insert(getgenv().wisteriasettings['cangetmoves'],v.Name)
     end
@@ -29243,38 +29275,16 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
     --     getgenv().wisteriasettings['getmove'] = xstate -- gettingmove
     -- end)
 
-    sector:AddDropdown('Get Skill',getgenv().wisteriasettings['cangetmoves'],'',false,function(xstate)
-        getgenv().wisteriasettings['getmove'] = xstate
-    end)
-    sector:AddButton('Obtain Skill',function()
-        local ohString1 = "GiveArt"
-        local ohString2 = getgenv().wisteriasettings['getmove']
-        game:GetService("Players").LocalPlayer.PlayerGui.Gui.Ui.UiModule.Modules.Rep.GetData:InvokeServer(ohString1, ohString2)   
-    end)
-    sector:AddTextbox('Slot','1',function(xstate)
-        getgenv().wisteriasettings['slottoaddto'] = xstate
-    end)
-    sector:AddTextbox('Page','1',function(xstate)
-        getgenv().wisteriasettings['pagetoaddto'] = xstate
-    end)
-    sector:AddTextbox('Skill','',function(xstate)
-        getgenv().wisteriasettings['skillmove'] = xstate
-    end)
-    sector:AddButton('Set Skill Slot',function()    
-        local ohString1 = "Page"..getgenv().wisteriasettings['pagetoaddto']
-        local ohNumber2 = tonumber(getgenv().wisteriasettings['slottoaddto'])
-        local ohString3 = getgenv().wisteriasettings['skillmove'] 
-        game:GetService("Players").LocalPlayer.PlayerGui.Gui.Ui.UiModule.Modules.Asign.Track:InvokeServer(ohString1, ohNumber2, ohString3)
-    end)
-    sector:AddSeperator('')
+
+    
     sector:AddToggle('No Cooldown',false,function(xstate)
         getgenv().wisteriasettings['nocd'] = xstate
     end)
     sector:AddToggle('Auto Breathe',false,function(xstate)
         getgenv().wisteriasettings['autobreathe'] = xstate
     end)
-    sector:AddSlider('Fly Speed',0,0,250,1,function(xstate)
-        getgenv().wisteriasettings['flyspeed'] = xstate
+    sector:AddButton('God Mode',function()
+        game:GetService("Players").LocalPlayer.Character.Effects.Attackers:Destroy()
     end)
     local flytoggle = sector:AddToggle('Fly',false,function(xstate)
         getgenv().wisteriasettings['flying'] = xstate
@@ -29379,11 +29389,14 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
             end)
         end
     end)
-    sector:AddSlider('Speed',0,0,250,1,function(xstate)
-        getgenv().wisteriasettings['speed'] = xstate
+    sector:AddSlider('Fly Speed',0,0,250,1,function(xstate)
+        getgenv().wisteriasettings['flyspeed'] = xstate
     end)
     local speedtoggle = sector:AddToggle('Walkspeed',false,function(xstate)
         getgenv().wisteriasettings['speeding'] = xstate
+    end)
+    sector:AddSlider('Speed',0,0,250,1,function(xstate)
+        getgenv().wisteriasettings['speed'] = xstate
     end)
 
     local nocliptoggle = sector:AddToggle('Noclip',false,function(xstate)
@@ -29408,7 +29421,7 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
         end
     end)
 
-
+    sector:AddSeperator('')
     sector:AddDropdown('Regions',getgenv().wisteriasettings['listedplaces'],'',false,function(xstate)
         getgenv().wisteriasettings['tpplace'] = xstate
     end)
@@ -29420,10 +29433,31 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
             end
         end
     end)
-    sector:AddButton('God Mode',function()
-        game:GetService("Players").LocalPlayer.Character.Effects.Attackers:Destroy()
+    sector:AddSeperator('')
+    sector:AddDropdown('Get Skill',getgenv().wisteriasettings['cangetmoves'],'',false,function(xstate)
+        getgenv().wisteriasettings['getmove'] = xstate
     end)
-
+    sector:AddButton('Obtain Skill',function()
+        local ohString1 = "GiveArt"
+        local ohString2 = getgenv().wisteriasettings['getmove']
+        game:GetService("Players").LocalPlayer.PlayerGui.Gui.Ui.UiModule.Modules.Rep.GetData:InvokeServer(ohString1, ohString2)   
+    end)
+    sector:AddTextbox('Slot','1',function(xstate)
+        getgenv().wisteriasettings['slottoaddto'] = xstate
+    end)
+    sector:AddTextbox('Page','1',function(xstate)
+        getgenv().wisteriasettings['pagetoaddto'] = xstate
+    end)
+    sector:AddTextbox('Skill','',function(xstate)
+        getgenv().wisteriasettings['skillmove'] = xstate
+    end)
+    sector:AddButton('Set Skill Slot',function()    
+        local ohString1 = "Page"..getgenv().wisteriasettings['pagetoaddto']
+        local ohNumber2 = tonumber(getgenv().wisteriasettings['slottoaddto'])
+        local ohString3 = getgenv().wisteriasettings['skillmove'] 
+        game:GetService("Players").LocalPlayer.PlayerGui.Gui.Ui.UiModule.Modules.Asign.Track:InvokeServer(ohString1, ohNumber2, ohString3)
+    end)
+    sector:AddSeperator('')
     if game.PlaceId == 11599532987 then --game.PlaceiD 
         sector:AddToggle('Insta Kill',false,function(xstate)
             getgenv().wisteriasettings['instakill'] = xstate
@@ -29450,15 +29484,18 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
         getgenv().wisteriasettings['rejoinafterspinning'] = xstate -- only if you didnt get what you want
     end)
     othersector:AddSeperator('')
-    othersector:AddButton('Rejoin',function()
+    sector:AddButton('Rejoin',function()
         game:GetService('TeleportService'):teleport(game.PlaceId)
     end,{
         ask = 'Do you want to rejoin?';
         accept = 'Yes';
         reject = 'No';
     })
-    othersector:AddButton('Teleport To Final Selection',function()
+    sector:AddButton('Teleport To Final Selection',function()
         game:GetService("TeleportService"):Teleport(11754723819)
+    end)
+    sector:AddButton('Teleport To Main Menu',function()
+        game:GetService('TeleportService'):Teleport(11513105086)
     end)
     hookfunction(SharedModule.CanAttack,function()
         if getgenv().wisteriasettings['nocd'] == true then
