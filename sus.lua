@@ -29233,7 +29233,8 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
                 Completed = true;
             }
         };
-        slotnumber = '1'
+        slotnumber = '1';
+        antiburn = false;
     }   
     if game.PlaceId == 11513105086 then 
         sector:AddTextbox('Slot Number','1',function(xstate)
@@ -29258,6 +29259,14 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
             end
             MakeSlotFunction(getgenv().wisteriasettings['slotdata'])
         end)
+        local pgame = sector:AddButton('Play Game',function()
+            game:GetService("ReplicatedStorage").Events.SaveKey:InvokeServer(getgenv().wisteriasettings['slotkey'])
+            game:GetService("ReplicatedStorage").Events.SaveData:InvokeServer(game:GetService("Players").LocalPlayer)
+            task.wait(0.1)
+            game.ReplicatedStorage.Events:FindFirstChild('Teleport'):FireServer('true','')
+        end)
+        pgame:ActivateKnowledge()
+        pgame:AddKnowledge('Uses Key')
         return
     end
     for _,v in next, game:GetService("ReplicatedStorage").ArtInfo:GetChildren() do 
@@ -29286,6 +29295,9 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
     end)
     sector:AddButton('God Mode',function()
         game:GetService("Players").LocalPlayer.Character.Effects.Attackers:Destroy()
+    end)
+    sector:AddToggle('Anti Burn',false,function(xstate)
+        getgenv().wisteriasettings['antiburn'] = xstate
     end)
     local flytoggle = sector:AddToggle('Fly',false,function(xstate)
         getgenv().wisteriasettings['flying'] = xstate
@@ -29491,7 +29503,7 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
     local rolbacktoggle = othersector:AddToggle('Rollback',false,function(xstate)
         getgenv().wisteriasettings['rollback'] = xstate
     end)
-    othersector:AddToggle('Auto Spin',false,function(xstate) 
+    local rollspin = othersector:AddToggle('Auto Spin',false,function(xstate) 
         getgenv().wisteriasettings['autospin'] = xstate -- if you got what you want then it can rejoin or disable rollback then rejoin
     end)
     othersector:AddToggle('Auto Rollback On Spin',false,function(xstate)
@@ -29541,6 +29553,14 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
             return true
         end  
     end)
+
+    local metahook; metahook = hookmetamethod(game,'__namecall',newcclosure(function(self,...)
+        if tostring(self) == 'SunlightBurn' and getnamecallmethod() == 'FireServer' and getgenv().wisteriasettings['antiburn'] == true then -- self.Name ngetnamecallmethod
+            return metahook(self,false)
+        end
+        return metahook(self,...)
+    end))
+
     task.spawn(function()
         while task.wait(0) do 
             if getgenv().loopsUnload == true then print('wisteria loop break end') break end
@@ -29593,6 +29613,8 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
                             getgenv().wisteriasettings['rollback'] = false;
                             rolbacktoggle:Set(false)
                             GotSpunItem = true
+                            getgenv().wisteriasettings['autospin'] = false;
+                            rollspin:Set(false)
                         end
                         break
                     end
