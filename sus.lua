@@ -801,6 +801,7 @@ getgenv().AzfakeGlobalTables = {
         checkforcombat = false;
         serverhopwhenmod = true;
         rollback = false;
+        autokillmobs = false;
     };
     shonen = {
         no_fall = true
@@ -9356,6 +9357,10 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         end
         --distance:AddDivider()
 
+        PremiumSector:AddToggle('Auto Kill Mobs',false,function(xstate)
+            getgenv().AzfakeGlobalTables['bloodlines']['autokillmobs'] = xstate
+        end)
+
         PremiumSector:AddButton('Attempt Kill Mob',function()
             local dir = game:GetService("Workspace")
             if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
@@ -10932,14 +10937,114 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         end
     end)
 
+    local mobs = {}
+    for _,instance in pairs(workspace:GetChildren()) do 
+        local foundPart = false
+        if table.find(getgenv().AzfakeGlobalTables['bloodlines']['pickups'],instance.Name) then 
+            foundPart = true
+        elseif table.find(getgenv().fruits,instance.Name) then
+            foundPart = true
+        elseif string.split(instance.Name,' ')[2] == 'Gem' then 
+            foundPart = true
+        elseif instance.Name:sub(1,4) == 'Item' then
+            foundPart = true
+        elseif instance.Name:sub(1,4) == 'Ring' then 
+            foundPart = true
+        elseif  instance.Name:sub(1,6) == 'Silver'  then -- or string.split(instance.Name,' ')[2] == 'Schematics'
+            foundPart = true
+        elseif string.split(instance.Name,' ')[2] == 'Schematics' then 
+            foundPart = true
+        end
+        if foundPart  then -- or 
+            --print(instance.Name.. ' xloop')
+            task.wait()
+            getgenv().function_pick(instance)
+            if instance.Name:sub(1,4) == 'Item' then 
+                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild('Right Leg') ,instance, 0)
+            else
+                getgenv().function_pick(instance)
+            end  
+            repeat 
+                task.wait(1)
+                getgenv().function_pick(instance)
+                if instance.Name:sub(1,4) == 'Item' then 
+                    firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild('Right Leg') ,instance, 0)
+                else
+                    getgenv().function_pick(instance)
+                end  
+            until instance.Transparency == 1 or not instance
+        elseif instance:FindFirstChild('Humanoid') and instance:FindFirstChild('HumanoidRootPart') and not game.Players:FindFirstChild(instance.Name) then 
+            table.insert(mobs,instance)             
+        end
+    end
 
+    
+
+    local workspaceconnection = workspace.ChildAdded:Connect(function(instance)
+        local foundPart = false
+        if table.find(getgenv().AzfakeGlobalTables['bloodlines']['pickups'],instance.Name) then 
+            foundPart = true
+        elseif table.find(getgenv().fruits,instance.Name) then
+            foundPart = true
+        elseif string.split(instance.Name,' ')[2] == 'Gem' then 
+            foundPart = true
+        elseif instance.Name:sub(1,4) == 'Item' then
+            foundPart = true
+        elseif instance.Name:sub(1,4) == 'Ring' then 
+            foundPart = true
+        elseif  instance.Name:sub(1,6) == 'Silver'  then -- or string.split(instance.Name,' ')[2] == 'Schematics'
+            foundPart = true
+        elseif string.split(instance.Name,' ')[2] == 'Schematics' then 
+            foundPart = true
+        end
+        if foundPart  then -- or 
+            --print(instance.Name.. ' xloop')
+            task.wait()
+            getgenv().function_pick(instance)
+            if instance.Name:sub(1,4) == 'Item' then 
+                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild('Right Leg') ,instance, 0)
+            else
+                getgenv().function_pick(instance)
+            end  
+            repeat 
+                task.wait(1)
+                getgenv().function_pick(instance)
+                if instance.Name:sub(1,4) == 'Item' then 
+                    firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild('Right Leg') ,instance, 0)
+                else
+                    getgenv().function_pick(instance)
+                end  
+            until instance.Transparency == 1 or not instance
+        elseif instance:FindFirstChild('Humanoid') and instance:FindFirstChild('HumanoidRootPart') and not game.Players:FindFirstChild(instance.Name) then 
+            table.insert(mobs,instance)              
+        end
+    end)
 
 
     getgenv().currenttween = nil
     task.spawn(function()
         while task.wait() do 
             --game:GetService("Players").LocalPlayer.SoundPlaylist.RainSound.Playing = false
-            if getgenv().loopsUnload == true then if getgenv().connectiontochakra then  getgenv().connectiontochakra:Disconnect() end  print('true break') break end
+            if getgenv().loopsUnload == true then 
+                if getgenv().connectiontochakra then  
+                    getgenv().connectiontochakra:Disconnect() 
+                end 
+                workspaceconnection:Disconnect()
+                print('true break') 
+                break 
+            end
+
+            if getgenv().AzfakeGlobalTables['bloodlines']['autokillmobs'] == true then 
+                -- sethiddenproperty(game.Players.LocalPlayer, "SimulationRadius", math.huge)
+                -- sethiddenproperty(game.Players.LocalPlayer, "MaximumSimulationRadius", math.huge)
+                for _,v in next, mobs do 
+                    if v.PrimaryPart and isnetworkowner(v.PrimaryPart) then 
+                        v:FindFirstChild('Humanoid').Health = 1
+                        print(v.Name)
+                    end
+                end
+            end
+
 
             if getgenv().AzfakeGlobalTables['bloodlines']['rollback'] == true then 
                 getgenv().AzfakeGlobalTables['bloodlines']['rollback'] = nil;
@@ -11360,54 +11465,59 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         end
     end
 
-    task.spawn(function()-- pcall(function()
-        while task.wait(1) do  
-            -- sector:FixSize()
-            -- purchases:FixSize()
-            -- farming:FixSize()
-            if getgenv().loopsUnload == true then print('true break while loop main') break end
-            task.wait()
-            if getgenv().Pickup == true then
-                for _,instance in pairs(workspace:GetChildren()) do 
-                    local foundPart = false
-                    if table.find(getgenv().AzfakeGlobalTables['bloodlines']['pickups'],instance.Name) then 
-                        foundPart = true
-                    elseif table.find(getgenv().fruits,instance.Name) then
-                        foundPart = true
-                    elseif string.split(instance.Name,' ')[2] == 'Gem' then 
-                        foundPart = true
-                    elseif instance.Name:sub(1,4) == 'Item' then
-                        foundPart = true
-                    elseif instance.Name:sub(1,4) == 'Ring' then 
-                        foundPart = true
-                    elseif  instance.Name:sub(1,6) == 'Silver'  then -- or string.split(instance.Name,' ')[2] == 'Schematics'
-                        foundPart = true
-                    elseif string.split(instance.Name,' ')[2] == 'Schematics' then 
-                        foundPart = true
-                    end
-                    if foundPart  then -- or 
-                        --print(instance.Name.. ' xloop')
-                        task.wait()
-                        getgenv().function_pick(instance)
-                        if instance.Name:sub(1,4) == 'Item' then 
-                            firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild('Right Leg') ,instance, 0)
-                        else
-                            getgenv().function_pick(instance)
-                        end                 
-                    end
-                end
-                task.wait(.5)
-            end
-        end 
-            -- task.wait(0.3)
-            --game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation = Vector3.new(0,90,0) 
-            -- for _,instance in pairs(workspace:GetChildren()) do 
-            --     if table.find(getgenv().AzfakeGlobalTables.bloodlines.pickups,instance.Name) then 
-            --         getgenv().function_pick(instance)
-            --     end
-            -- end
+
+
+
+
+
+    -- task.spawn(function()-- pcall(function()
+    --     while task.wait(1) do  
+    --         -- sector:FixSize()
+    --         -- purchases:FixSize()
+    --         -- farming:FixSize()
+    --         if getgenv().loopsUnload == true then print('true break while loop main') break end
+    --         task.wait()
+    --         if getgenv().Pickup == true then
+    --             for _,instance in pairs(workspace:GetChildren()) do 
+    --                 local foundPart = false
+    --                 if table.find(getgenv().AzfakeGlobalTables['bloodlines']['pickups'],instance.Name) then 
+    --                     foundPart = true
+    --                 elseif table.find(getgenv().fruits,instance.Name) then
+    --                     foundPart = true
+    --                 elseif string.split(instance.Name,' ')[2] == 'Gem' then 
+    --                     foundPart = true
+    --                 elseif instance.Name:sub(1,4) == 'Item' then
+    --                     foundPart = true
+    --                 elseif instance.Name:sub(1,4) == 'Ring' then 
+    --                     foundPart = true
+    --                 elseif  instance.Name:sub(1,6) == 'Silver'  then -- or string.split(instance.Name,' ')[2] == 'Schematics'
+    --                     foundPart = true
+    --                 elseif string.split(instance.Name,' ')[2] == 'Schematics' then 
+    --                     foundPart = true
+    --                 end
+    --                 if foundPart  then -- or 
+    --                     --print(instance.Name.. ' xloop')
+    --                     task.wait()
+    --                     getgenv().function_pick(instance)
+    --                     if instance.Name:sub(1,4) == 'Item' then 
+    --                         firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild('Right Leg') ,instance, 0)
+    --                     else
+    --                         getgenv().function_pick(instance)
+    --                     end                 
+    --                 end
+    --             end
+    --             task.wait(.5)
+    --         end
+    --     end 
+    --         -- task.wait(0.3)
+    --         --game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation = Vector3.new(0,90,0) 
+    --         -- for _,instance in pairs(workspace:GetChildren()) do 
+    --         --     if table.find(getgenv().AzfakeGlobalTables.bloodlines.pickups,instance.Name) then 
+    --         --         getgenv().function_pick(instance)
+    --         --     end
+    --         -- end
         
-    end)-- end)
+    -- end)-- end)
     task.wait()
 
 
@@ -19263,12 +19373,12 @@ elseif game.PlaceId == 7162704734 then -- fighting game
     getgenv().fightlocalgame = {
         nocooldown = false;
         nocooldownsettings = {
-            rollcooldown = false;
-            runcooldown = false;
-            blockcooldown = false;
-            nojump = false;
-            dashcooldown = false;
-            freezecooldown = false;
+            rollcooldown = true;
+            runcooldown = true;
+            blockcooldown = true;
+            nojump = true;
+            dashcooldown = true;
+            freezecooldown = true;
         };
         trinketesp = false;
         showinvisibletrinkets = false;
@@ -19335,30 +19445,30 @@ elseif game.PlaceId == 7162704734 then -- fighting game
     local no_coolsector = sector:AddToggle('No Cooldowns',false,function(xstate)
         getgenv().fightlocalgame['nocooldown'] = xstate
     end)
-    local RollCooldown = sector:AddToggle('Roll Cooldown',false,function(xtstae)
-        getgenv().fightlocalgame['nocooldownsettings']['rollcooldown'] = xtstae
-    end)
-    local RunCooldown = sector:AddToggle('Run Cooldown',false,function(xtstae)
-        getgenv().fightlocalgame['nocooldownsettings']['runcooldown'] = xtstae
-    end)
-    local BlockCooldown = sector:AddToggle('Block Cooldown',false,function(xtstae)
-        getgenv().fightlocalgame['nocooldownsettings']['blockcooldown'] = xtstae
-    end)
-    local DashCooldown = sector:AddToggle('Dash Cooldown',false,function(xtstae)
-        getgenv().fightlocalgame['nocooldownsettings']['dashcooldown'] = xtstae
-    end)
-    local JumpCooldown = sector:AddToggle('Jump Cooldown',false,function(xtstae)
-        getgenv().fightlocalgame['nocooldownsettings']['nojump'] = xtstae
-    end)
-    local FreezeCooldown = sector:AddToggle('Freeze Cooldown',false,function(xtstae)
-        getgenv().fightlocalgame['nocooldownsettings']['freezecooldown'] = xtstae
-    end)
-    no_coolsector:MakeVisibleIfActive(RollCooldown)
-    no_coolsector:MakeVisibleIfActive(RunCooldown)
-    no_coolsector:MakeVisibleIfActive(BlockCooldown)
-    no_coolsector:MakeVisibleIfActive(DashCooldown)
-    no_coolsector:MakeVisibleIfActive(JumpCooldown)
-    no_coolsector:MakeVisibleIfActive(FreezeCooldown)
+    -- local RollCooldown = sector:AddToggle('Roll Cooldown',false,function(xtstae)
+    --     getgenv().fightlocalgame['nocooldownsettings']['rollcooldown'] = xtstae
+    -- end)
+    -- local RunCooldown = sector:AddToggle('Run Cooldown',false,function(xtstae)
+    --     getgenv().fightlocalgame['nocooldownsettings']['runcooldown'] = xtstae
+    -- end)
+    -- local BlockCooldown = sector:AddToggle('Block Cooldown',false,function(xtstae)
+    --     getgenv().fightlocalgame['nocooldownsettings']['blockcooldown'] = xtstae
+    -- end)
+    -- local DashCooldown = sector:AddToggle('Dash Cooldown',false,function(xtstae)
+    --     getgenv().fightlocalgame['nocooldownsettings']['dashcooldown'] = xtstae
+    -- end)
+    -- local JumpCooldown = sector:AddToggle('Jump Cooldown',false,function(xtstae)
+    --     getgenv().fightlocalgame['nocooldownsettings']['nojump'] = xtstae
+    -- end)
+    -- local FreezeCooldown = sector:AddToggle('Freeze Cooldown',false,function(xtstae)
+    --     getgenv().fightlocalgame['nocooldownsettings']['freezecooldown'] = xtstae
+    -- end)
+    -- no_coolsector:MakeVisibleIfActive(RollCooldown)
+    -- no_coolsector:MakeVisibleIfActive(RunCooldown)
+    -- no_coolsector:MakeVisibleIfActive(BlockCooldown)
+    -- no_coolsector:MakeVisibleIfActive(DashCooldown)
+    -- no_coolsector:MakeVisibleIfActive(JumpCooldown)
+    -- no_coolsector:MakeVisibleIfActive(FreezeCooldown)
 
 
     sector:AddButton('Reset Character',function()
@@ -19933,7 +20043,7 @@ elseif game.PlaceId == 7162704734 then -- fighting game
     metahook = hookmetamethod(game,'__namecall',function(self,...)
         local args = {...}
         local call_type = getnamecallmethod();
-        if call_type == 'FireServer'  and self.Name == 'Communicate' and getgenv().fightlocalgame['nopackets'] == true then 
+        if call_type == 'FireServer'  and tostring(self) == 'Communicate' and getgenv().fightlocalgame['nopackets'] == true then 
             return metahook(self,'__azfake__')
         elseif call_type == 'Kick' then 
             warn('Attempted to kick')
@@ -19943,7 +20053,13 @@ elseif game.PlaceId == 7162704734 then -- fighting game
         end
         return metahook(self,...)
     end)
-
+    local metaindex;
+    metaindex = hookmetamethod(game,'__index',function(self,reading)
+        -- if tostring(self) == 'Blocking' and tostring(reading) == 'Value' and getgenv().fightlocalgame['nocooldown'] == true then 
+        --     return false
+        -- end
+        return metaindex(self,reading)
+    end)
 
     -- assign esp 
         
@@ -20233,22 +20349,25 @@ elseif game.PlaceId == 7162704734 then -- fighting game
                     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') .Anchored = false;
                 end
                 for _,child in next, game.Players.LocalPlayer.Character:GetChildren() do 
-                    if child and child.Name:find('rollcooldown') and getgenv().fightlocalgame['nocooldownsettings']['rollcooldown'] == true then 
+                    if child and child.Name == 'StoppedBlocking' then --and getgenv().fightlocalgame['nocooldownsettings']['rollcooldown'] == true then 
                         child:Destroy()
                     end
-                    if child and child.Name:find('RunCooldown') and getgenv().fightlocalgame['nocooldownsettings']['runcooldown'] == true then 
+                    if child and child.Name:find('rollcooldown') then --and getgenv().fightlocalgame['nocooldownsettings']['rollcooldown'] == true then 
                         child:Destroy()
                     end
-                    if child and child.Name:find('BlockCooldown') and getgenv().fightlocalgame['nocooldownsettings']['blockcooldown'] == true then 
+                    if child and child.Name:find('RunCooldown') then --and getgenv().fightlocalgame['nocooldownsettings']['runcooldown'] == true then 
                         child:Destroy()
                     end
-                    if child and child.Name:find('DashCooldown') and getgenv().fightlocalgame['nocooldownsettings']['dashcooldown'] == true then 
+                    if child and child.Name:find('BlockCooldown') then -- and getgenv().fightlocalgame['nocooldownsettings']['blockcooldown'] == true then 
                         child:Destroy()
                     end
-                    if child and child.Name:find('NoJump') and getgenv().fightlocalgame['nocooldownsettings']['nojump'] == true then 
+                    if child and child.Name:find('DashCooldown') then -- and getgenv().fightlocalgame['nocooldownsettings']['dashcooldown'] == true then 
                         child:Destroy()
                     end
-                    if child and child.Name:find('Freeze') and getgenv().fightlocalgame['nocooldownsettings']['freezecooldown'] == true then  -- freezejump
+                    if child and child.Name:find('NoJump') then --and getgenv().fightlocalgame['nocooldownsettings']['nojump'] == true then 
+                        child:Destroy()
+                    end
+                    if child and child.Name:find('Freeze') then -- and getgenv().fightlocalgame['nocooldownsettings']['freezecooldown'] == true then  -- freezejump
                         child:Destroy()
                     end
                 end
@@ -29235,6 +29354,7 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
         };
         slotnumber = '1';
         antiburn = false;
+        instantmoney = false;
     }   
     if game.PlaceId == 11513105086 then 
         sector:AddTextbox('Slot Number','1',function(xstate)
@@ -29259,6 +29379,13 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
             end
             MakeSlotFunction(getgenv().wisteriasettings['slotdata'])
         end)
+        local metahook;
+        metahook = hookmetamethod(game,'__namecall',newcclosure(function(self,...)
+            if getnamecallmethod() == 'InvokeServer' and tostring(self) == 'SaveKey' then 
+                return true
+            end
+            return metahook(self,...)
+        end))
         local pgame = sector:AddButton('Play Game',function()
             game:GetService("ReplicatedStorage").Events.SaveKey:InvokeServer(getgenv().wisteriasettings['slotkey'])
             game:GetService("ReplicatedStorage").Events.SaveData:InvokeServer(game:GetService("Players").LocalPlayer)
@@ -29299,7 +29426,70 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
     sector:AddToggle('Anti Burn',false,function(xstate)
         getgenv().wisteriasettings['antiburn'] = xstate
     end)
-    local flytoggle = sector:AddToggle('Fly',false,function(xstate)
+
+    sector:AddSeperator('')
+    sector:AddDropdown('Regions',getgenv().wisteriasettings['listedplaces'],'',false,function(xstate)
+        getgenv().wisteriasettings['tpplace'] = xstate
+    end)
+    sector:AddButton('Teleport To Region',function()
+        for _,v in next, workspace.Region:GetChildren() do 
+            if string.find(v.Name,getgenv().wisteriasettings['tpplace']) and getgenv().wisteriasettings['tpplace'] ~= '' then 
+                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v.CFrame
+                break
+            end
+        end
+    end)
+    sector:AddSeperator('')
+    sector:AddDropdown('Get Skill',getgenv().wisteriasettings['cangetmoves'],'',false,function(xstate)
+        getgenv().wisteriasettings['getmove'] = xstate
+    end)
+    sector:AddButton('Obtain Skill',function()
+        local ohString1 = "GiveArt"
+        local ohString2 = getgenv().wisteriasettings['getmove']
+        game:GetService("Players").LocalPlayer.PlayerGui.Gui.Ui.UiModule.Modules.Rep.GetData:InvokeServer(ohString1, ohString2)   
+    end)
+    sector:AddTextbox('Slot','1',function(xstate)
+        getgenv().wisteriasettings['slottoaddto'] = xstate
+    end)
+    sector:AddTextbox('Page','1',function(xstate)
+        getgenv().wisteriasettings['pagetoaddto'] = xstate
+    end)
+    sector:AddTextbox('Skill','',function(xstate)
+        getgenv().wisteriasettings['skillmove'] = xstate
+    end)
+    sector:AddButton('Set Skill Slot',function()    
+        local ohString1 = "Page"..getgenv().wisteriasettings['pagetoaddto']
+        local ohNumber2 = tonumber(getgenv().wisteriasettings['slottoaddto'])
+        local ohString3 = getgenv().wisteriasettings['skillmove'] 
+        game:GetService("Players").LocalPlayer.PlayerGui.Gui.Ui.UiModule.Modules.Asign.Track:InvokeServer(ohString1, ohNumber2, ohString3)
+    end)
+    sector:AddSeperator('')
+    if game.PlaceId == 11599532987 then --game.PlaceiD 
+        sector:AddToggle('Insta Kill',false,function(xstate)
+            getgenv().wisteriasettings['instakill'] = xstate
+        end)
+    end
+
+    local bdemon = farmingsector:AddButton('Become A Demon',function()
+        local ohTable1 = {
+            ["Type"] = "Continue",
+            ["Npc"] = workspace.Npcs['Machigai Tenshi'],
+            ["Path"] = "PPath1"
+        }
+
+        game:GetService("ReplicatedStorage").Events.Dialogue:FireServer(ohTable1)
+        local ohTable1 = {
+            ["Type"] = "End",
+            ["Npc"] = workspace.Npcs["Machigai Tenshi"],
+            ["Path"] = "PPath5"
+        }
+        game:GetService("ReplicatedStorage").Events.Dialogue:FireServer(ohTable1)
+    end)
+    farmingsector:AddToggle('Instant Money',false,function(xstate)
+        getgenv().wisteriasettings['instantmoney'] = xstate
+    end)
+
+    local flytoggle = farmingsector:AddToggle('Fly',false,function(xstate)
         getgenv().wisteriasettings['flying'] = xstate
         if getgenv().wisteriasettings['flying'] == true then 
             game.Players.LocalPlayer.Character:WaitForChild("Head").Anchored = false
@@ -29402,17 +29592,17 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
             end)
         end
     end)
-    sector:AddSlider('Fly Speed',0,0,250,1,function(xstate)
+    farmingsector:AddSlider('Fly Speed',0,0,250,1,function(xstate)
         getgenv().wisteriasettings['flyspeed'] = xstate
     end)
-    local speedtoggle = sector:AddToggle('Walkspeed',false,function(xstate)
+    local speedtoggle = farmingsector:AddToggle('Walkspeed',false,function(xstate)
         getgenv().wisteriasettings['speeding'] = xstate
     end)
-    sector:AddSlider('Speed',0,0,250,1,function(xstate)
+    farmingsector:AddSlider('Speed',0,0,250,1,function(xstate)
         getgenv().wisteriasettings['speed'] = xstate
     end)
 
-    local nocliptoggle = sector:AddToggle('Noclip',false,function(xstate)
+    local nocliptoggle = farmingsector:AddToggle('Noclip',false,function(xstate)
         getgenv().wisteriasettings['noclipping'] = xstate
         if getgenv().wisteriasettings['noclipping'] == true then 
             getgenv().wisteriasettings['noclipfunction'] = game:GetService('RunService').Stepped:Connect(function()
@@ -29433,68 +29623,6 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
             end
         end
     end)
-
-    sector:AddSeperator('')
-    sector:AddDropdown('Regions',getgenv().wisteriasettings['listedplaces'],'',false,function(xstate)
-        getgenv().wisteriasettings['tpplace'] = xstate
-    end)
-    sector:AddButton('Teleport To Region',function()
-        for _,v in next, workspace.Region:GetChildren() do 
-            if string.find(v.Name,getgenv().wisteriasettings['tpplace']) and getgenv().wisteriasettings['tpplace'] ~= '' then 
-                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = v.CFrame
-                break
-            end
-        end
-    end)
-    sector:AddSeperator('')
-    sector:AddDropdown('Get Skill',getgenv().wisteriasettings['cangetmoves'],'',false,function(xstate)
-        getgenv().wisteriasettings['getmove'] = xstate
-    end)
-    sector:AddButton('Obtain Skill',function()
-        local ohString1 = "GiveArt"
-        local ohString2 = getgenv().wisteriasettings['getmove']
-        game:GetService("Players").LocalPlayer.PlayerGui.Gui.Ui.UiModule.Modules.Rep.GetData:InvokeServer(ohString1, ohString2)   
-    end)
-    sector:AddTextbox('Slot','1',function(xstate)
-        getgenv().wisteriasettings['slottoaddto'] = xstate
-    end)
-    sector:AddTextbox('Page','1',function(xstate)
-        getgenv().wisteriasettings['pagetoaddto'] = xstate
-    end)
-    sector:AddTextbox('Skill','',function(xstate)
-        getgenv().wisteriasettings['skillmove'] = xstate
-    end)
-    sector:AddButton('Set Skill Slot',function()    
-        local ohString1 = "Page"..getgenv().wisteriasettings['pagetoaddto']
-        local ohNumber2 = tonumber(getgenv().wisteriasettings['slottoaddto'])
-        local ohString3 = getgenv().wisteriasettings['skillmove'] 
-        game:GetService("Players").LocalPlayer.PlayerGui.Gui.Ui.UiModule.Modules.Asign.Track:InvokeServer(ohString1, ohNumber2, ohString3)
-    end)
-    sector:AddSeperator('')
-    if game.PlaceId == 11599532987 then --game.PlaceiD 
-        sector:AddToggle('Insta Kill',false,function(xstate)
-            getgenv().wisteriasettings['instakill'] = xstate
-        end)
-    end
-
-    local bdemon = farmingsector:AddButton('Become A Demon',function()
-        local ohTable1 = {
-            ["Type"] = "Continue",
-            ["Npc"] = workspace.Npcs['Machigai Tenshi'],
-            ["Path"] = "PPath1"
-        }
-
-        game:GetService("ReplicatedStorage").Events.Dialogue:FireServer(ohTable1)
-        local ohTable1 = {
-            ["Type"] = "End",
-            ["Npc"] = workspace.Npcs["Machigai Tenshi"],
-            ["Path"] = "PPath5"
-        }
-        game:GetService("ReplicatedStorage").Events.Dialogue:FireServer(ohTable1)
-    end)
-
-
-
 
 
 
@@ -29678,6 +29806,10 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
                         getgenv().wisteriasettings['speeding'] = true
                     end
                 end)
+            end
+            if getgenv().wisteriasettings['instantmoney'] == true then 
+                game:GetService("ReplicatedStorage").Events.Dialogue:FireServer({["Type"] = "End",["Npc"] = workspace.Npcs.Mita,["Path"] = "Accept"})
+                game:GetService("ReplicatedStorage").Events.Dialogue:FireServer({["Type"] = "End",["Npc"] = workspace.Npcs:FindFirstChild("Saru Kenshi"),["Path"] = "SetSpawn"})
             end
         end
     end)
