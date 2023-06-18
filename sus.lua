@@ -5758,13 +5758,13 @@ end
 local function postattempt(x,info)
     local message = info 
     if type(message) == 'table' then message = table.unpack(info) end
-    if (messagebox) then 
+    if (messagebox) and not (IsElectron) then 
         messagebox(message,'Debugger',0)
     else
-        azfakenotify(message,'untilClick')
+        azfakenotify(x,'untilClick')
         azfakenotify('send this to the owner','untilClick')
         for i=1, 5 do 
-            azfakenotify('game will shut down in '..i,'untilClick')
+            azfakenotify('game will shut down in '..5-i,'untilClick')
             task.wait(1)
         end
         game:Shutdown()
@@ -5803,6 +5803,9 @@ local ExpectedGlobalsOnLoad = 206 --206 --186 + 6 -- remove getgenv().teleportke
 local ExpectedUnderscoreGsOnLoad = 4 --1 -- _G.wl_key
 if (KRNL_LOADED) then 
     ExpectedGlobalsOnLoad = 251
+end
+if (IsElectron) then 
+    ExpectedGlobalsOnLoad = 287 --261 without hub loaded
 end
 local ExpectedGlobalRun = 0
 local ExpectedUnderscoreRun = 0
