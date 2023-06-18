@@ -20,6 +20,8 @@ getgenv().azfake_version = 'v3 '..getgenv().versioncode
 
 -- could make it so when on tp it does getgenv().premiumWhitelist = true
 
+if not (rconsoleprint) then rconsoleprint = print end
+
 
 local dungeon_quest_games = {
     ["Dungeon Quest!"]=2414851778;
@@ -6254,11 +6256,18 @@ local function setupAimbotTab(globaltable)
             'RightLeg';
         };
         aimingpart = 'Chest';
+        lookcframe = false;
+        smoothness = 0;
+        smoiothaimbot = false;
+        randomoffset = false;
+        robloxvirtualmouse = false;
+        teamcheck = false;
     }
 
     local aimbotbutton = pvpsector:AddToggle('Aimbot',false,function(xstate)
         globaltable['aimbotsettings']['aimbot'] = xstate
     end)
+    pvpsector:AddSeperator('')
     local aimbotrigger = pvpsector:AddKeybindAttachment('Aimbot Button'):AddKeybind()
     aimbotbutton:AddKeybind()
     pvpsector:AddToggle('Movement Prediction',false,function(xstate)
@@ -6267,12 +6276,35 @@ local function setupAimbotTab(globaltable)
     pvpsector:AddToggle('Wall Check',false,function(xstate)
         globaltable['aimbotsettings']['wallcheck'] = xstate
     end)
+    pvpsector:AddToggle('Team Check',false,function(xstate)
+        globaltable['aimbotsettings']['teamcheck'] = xstate
+    end)
     pvpsector:AddToggle('Dont Swap Target',false,function(xstate)
         globaltable['aimbotsettings']['dontswaptarget'] = xstate
+    end)
+    pvpsector:AddToggle('Set Looking CFrame',false,function(xstate)
+        globaltable['aimbotsettings']['lookcframe'] = xstate
     end)
     pvpsector:AddDropdown('Aim Part',globaltable['aimbotsettings']['aimparts'],"Chest",false,function(xstate)
         globaltable['aimbotsettings']['aimingpart'] = xstate
     end)
+    pvpsector:AddSeperator('')
+    pvpsector:AddToggle('Smooth Aimbot',false,function(xstate)
+        globaltable['aimbotsettings']['smoiothaimbot'] = xstate
+    end)
+    pvpsector:AddSlider('Smoothness',0,0,10,1,function(xstate)
+        globaltable['aimbotsettings']['smoothness'] = xstate
+    end)
+    pvpsector:AddSeperator('')
+    pvpsector:AddToggle('Random Offsets',false,function(xstate)
+        globaltable['aimbotsettings']['randomoffset'] = xstate
+    end)
+    pvpsector:AddToggle('Move Roblox Virtual Mouse',false,function(xstate)
+        globaltable['aimbotsettings']['robloxvirtualmouse'] = xstate
+    end)
+    
+
+
     local AimbotLoop = game:GetService('RunService').RenderStepped:Connect(function()
         local pos,IsVisible = nil,nil
         if globaltable['aimbotsettings']['currenttarget'] ~= nil and globaltable['aimbotsettings']['currenttarget'].Character and globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart then 
@@ -6283,6 +6315,8 @@ local function setupAimbotTab(globaltable)
             else
                 IsVisible = true --IsVisibleOld
                 pos = xpos
+                globaltable['aimbotsettings']['currenttarget'] = nil 
+                globaltable['aimbotsettings']['currenttargetdistance'] = nil
             end
         end
         if aimbotrigger:IsPressed() == true and globaltable['aimbotsettings']['aimbot'] == true then 
@@ -6314,6 +6348,9 @@ local function setupAimbotTab(globaltable)
                                     CanCheck = false
                                 end
                             end
+                        end
+                        if globaltable['aimbotsettings']['teamcheck'] == true then 
+                            if v.Team == game.Players.LocalPlayer.Team then CanCheck = false end
                         end
                         if IsVisible and CanCheck == true then 
                             if globaltable['aimbotsettings']['dontswaptarget'] == false then 
@@ -6353,24 +6390,66 @@ local function setupAimbotTab(globaltable)
                     AimingPart = 'RightUpperLeg';
                 end
             end
+            local function quad_bezier(t, p0, p1, o0)
+                return (1 - t)^2 * p0 + 2 * (1 - t) * t * (p0 + (p1 - p0) * o0) + t^2 * p1;
+            end
+            local additionalvector = Vector3.new(0,0,0)
+            if globaltable['aimbotsettings']['randomoffset'] == true then 
+                additionalvector = Vector3.new(0, math.random(1,2) / math.random(3,5) , 0) -- 0.1 - 0.5
+            end
             if ClosestPlayer ~= nil and AimingPart ~= nil and workspace:FindFirstChild('Camera') and globaltable['aimbotsettings']['currenttarget'] and globaltable['aimbotsettings']['currenttarget'].Character and globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart then 
                 if globaltable['aimbotsettings']['movementpredictions'] == true then 
                     --local AimPrediction = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * 1.1 + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('Humanoid').WalkSpeed/100 -- = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * (1 / 10) * (Client.Character.Head.Position - PlayerHead.Position).magnitude / 100
                    -- workspace.Camera.CFrame = 
-                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position)
-                    workspace.CurrentCamera.CoordinateFrame = CFrame.new(
-                        workspace.CurrentCamera.CoordinateFrame.p,--game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position  ,
-                        globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position
-                    ) + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Velocity * 0.05  --+ workspace.CurrentCamera.CoordinateFrame.lookVector --1.1
+                    --game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position)
+                    if globaltable['aimbotsettings']['lookcframe'] == true then 
+                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position + additionalvector)
+                    end
+
+                    if globaltable['aimbotsettings']['robloxvirtualmouse'] == true then
+                        local RedirectPos = Redirect.Position
+                        local Tuple, Visible = WorldToViewportPoint(workspace.CurrentCamera, globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart));
+                        local CharacterVec2 = Vector2.new(Tuple.X, Tuple.Y);
+                        mousemoveabs(CharacterVec2.X, CharacterVec2.Y); -- + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Velocity * 0.05
+                    elseif globaltable['aimbotsettings']['smoiothaimbot'] == false then 
+                        workspace.CurrentCamera.CoordinateFrame = CFrame.new(
+                            workspace.CurrentCamera.CoordinateFrame.p,--game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position  ,
+                            globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position + additionalvector
+                        ) + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Velocity * 0.05  --+ workspace.CurrentCamera.CoordinateFrame.lookVector --1.1
+                        
+                    else
+                        game:GetService('TweenService'):Create(workspace.Camera,TweenInfo.new(globaltable['aimbotsettings']['smoothness']/10,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), { CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position) + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Velocity * 0.05 } ):Play()
+                         
                     
+                    end
+
+
                     --workspace.Camera.CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position)
-                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position)
+                    
                     
                     --globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.CFrame * CFrame.new(globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('Humanoid').WalkSpeed/100,0,0) +  globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * 1.1--CFrame.new(v.Character:FindFirstChild('Humanoid').MoveDirection.X,0,0)
                 else
                     --print('l')
-                    workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position)--workspace.Camera:WorldToViewportPoint(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position -  globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position) --workspace.Camera.CFrame = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.CFrame
-                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position)
+                    local inputManager = game:GetService('VirtualInputManager')
+                    --[[
+                                            inputManager:SendMouseButtonEvent(m.X,m.Y,1,true,game,0)
+                    inputManager:SendMouseButtonEvent(m.X,m.Y,1,false,game,0)
+                    ]]
+                    if globaltable['aimbotsettings']['lookcframe'] == true then 
+                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position)
+                    end
+                    if globaltable['aimbotsettings']['robloxvirtualmouse'] == true then 
+                        local RedirectPos = Redirect.Position
+                        local Tuple, Visible = WorldToViewportPoint(workspace.CurrentCamera, globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart));
+                        local CharacterVec2 = Vector2.new(Tuple.X, Tuple.Y);
+                        mousemoveabs(CharacterVec2.X, CharacterVec2.Y);
+                    elseif globaltable['aimbotsettings']['smoiothaimbot'] == false then 
+                        workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position + additionalvector)--workspace.Camera:WorldToViewportPoint(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position -  globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position) --workspace.Camera.CFrame = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.CFrame
+                    else
+                        game:GetService('TweenService'):Create(workspace.Camera,TweenInfo.new(globaltable['aimbotsettings']['smoothness']/10,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), { CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position + additionalvector) } ):Play()
+                    end
+                    
+                    
                 end
                 --mousemoverel((pos.X - game.Players.LocalPlayer:GetMouse().X) * 1, (pos.Y - game.Players.LocalPlayer:GetMouse().Y - game:GetService("GuiService"):GetGuiInset().Y) * 1)
             end
@@ -12313,6 +12392,10 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         CurrentTween = nil;
         fixm1bug = false;
         randomrollcanceldelay = false;
+        norollcooldown = false;
+        humanoiddeadconnection = nil; -- on
+        norollvelocity = false;
+        norollvelocityconnection = nil;
     }
 
 
@@ -12387,6 +12470,68 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     end)
     fakesect:AddToggle("Roll on Feint", true, function(xstate)
         getgenv().fw3localFw3['rollonfeint'] = xstate
+    end)
+    fakesect:AddToggle("No Roll Cooldown", false, function(xstate)
+        getgenv().fw3localFw3['norollcooldown'] = xstate
+        -- if getgenv().fw3localFw3['noroolcooldown'] == true then 
+        --     for _,v in next, getgc() do 
+        --         -- print(getinfo(v).source)
+        --         if getinfo(v).source:find('Roll') then 
+        --             for i,upvalue in next, debug.getupvalues(v) do 
+        --                 --print(i,type(upvalue))
+        --                 if type(upvalue) == 'boolean' then --tostring(upvalue) == 'true' or tostring(upvalue) == 'false' or upvalue == true
+        --                     --print('setting')
+        --                     task.spawn(function()
+        --                         repeat 
+        --                             pcall(function()
+        --                                 for i,v in next, game:GetService("ReplicatedStorage").CharacterData:FindFirstChild(game.Players.LocalPlayer.Name):FindFirstChild('StatusFolder'):GetChildren() do 
+        --                                     v:Destroy() 
+        --                                 end
+        --                             end)
+        --                             debug.setupvalue(v,i,false)
+        --                             task.wait(0)
+        --                         until getgenv().fw3localFw3['noroolcooldown'] == false or getgenv().loopsUnload == true
+        --                     end)
+        --                 end
+        --             end
+        --         end
+        --     end
+        --     getgenv().fw3localFw3['humanoiddeadconnection'] = game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Died:Connect(function()
+        --         repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health > 0 or getgenv().fw3localFw3['noroolcooldown'] == false or getgenv().loopsUnload == true
+        --         if getgenv().loopsUnload == true or getgenv().fw3localFw3['noroolcooldown'] == false then return end 
+        --         for _,v in next, getgc() do 
+        --             -- print(getinfo(v).source)
+        --             if getinfo(v).source:find('Roll') then 
+        --                 for i,upvalue in next, debug.getupvalues(v) do 
+        --                     --print(i,type(upvalue))
+        --                     if type(upvalue) == 'boolean' then --tostring(upvalue) == 'true' or tostring(upvalue) == 'false' or upvalue == true
+        --                         --print('setting')
+        --                         task.spawn(function()
+        --                             repeat 
+        --                                 debug.setupvalue(v,i,false)
+        --                                 task.wait(0)
+        --                             until getgenv().fw3localFw3['noroolcooldown'] == false or getgenv().loopsUnload == true
+        --                         end)
+        --                     end
+        --                 end
+        --             end
+        --         end
+        --     end)
+        -- end
+    end)
+    fakesect:AddToggle('No Roll Velocity',false,function(xstate)
+        getgenv().fw3localFw3['norollvelocity'] = xstate
+        -- if getgenv().fw3localFw3['norollvelocity'] == true then 
+        --     getgenv().fw3localFw3['norollvelocityconnection'] =  game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart').ChildAdded:Connect(function(x)
+        --         if x.Name == 'RollVelocity' then 
+        --             print('bv')
+        --             x:Destroy() 
+        --             x.Velocity = Vector3.new(0,0,0)
+        --         end
+        --     end)
+        -- elseif getgenv().fw3localFw3['norollvelocity'] == false and getgenv().fw3localFw3['norollvelocityconnection'] ~= nil then 
+        --     getgenv().fw3localFw3['norollvelocityconnection']:Disconnect()
+        -- end
     end)
     -- fakesect:AddSlider("Roll on feint Delay", 0, 0.07, 1, 100, function(State)
     --     getgenv().fw3localFw3['rolldelay'] = State
@@ -13015,7 +13160,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     -- end)
 
 
-
+    -- BlatantCheats:AddToggle('')
     BlatantCheats:AddToggle("WalkSpeed", false, function(xstate)
         getgenv().fw3localFw3['walkspeedtoggle'] = xstate 
     end)
@@ -15010,7 +15155,53 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     getgenv().allparryobjects = {}
     task.spawn(function()
         while task.wait() do 
-            if getgenv().loopsUnload == true then print('m1 loop anim loop break') break end 
+            if getgenv().loopsUnload == true then 
+                print('m1 loop anim loop break')
+                if getgenv().fw3localFw3['humanoiddeadconnection'] ~= nil then 
+                    getgenv().fw3localFw3['humanoiddeadconnection']:Disconnect()
+                end
+                if getgenv().fw3localFw3['norollvelocityconnection'] ~= nil then 
+                    getgenv().fw3localFw3['norollvelocityconnection']:Disconnect()
+                end
+                break 
+            end 
+            
+            if getgenv().fw3localFw3['norollcooldown'] == true then 
+                getgenv().fw3localFw3['norollcooldown'] = nil 
+                for _,v in next, getgc() do 
+                    -- print(getinfo(v).source)
+                    if getinfo(v).source:find('Roll') then 
+                        for i,upvalue in next, debug.getupvalues(v) do 
+                            --print(i,type(upvalue))
+                            if type(upvalue) == 'boolean' then --tostring(upvalue) == 'true' or tostring(upvalue) == 'false' or upvalue == true
+                                --print('setting')
+                                task.spawn(function()
+                                    repeat 
+                                        pcall(function()
+                                            for i,v in next, game:GetService("ReplicatedStorage").CharacterData:FindFirstChild(game.Players.LocalPlayer.Name):FindFirstChild('StatusFolder'):GetChildren() do 
+                                                v:Destroy() 
+                                            end
+                                        end)
+                                        debug.setupvalue(v,i,false)
+                                        task.wait(0)
+                                    until getgenv().fw3localFw3['noroolcooldown'] == false or getgenv().loopsUnload == true
+                                end)
+                            end
+                        end
+                    end
+                end
+                task.spawn(function()
+                    repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health == 0
+                    task.wait(6)
+                    if getgenv().fw3localFw3['norollcooldown'] == nil then 
+                        getgenv().fw3localFw3['norollcooldown'] = true
+                    end
+                end)
+            end
+            if getgenv().fw3localFw3['norollvelocity'] == true and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'):FindFirstChild('RollVelocity') then 
+                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'):FindFirstChild('RollVelocity'):Destroy()
+            end
+
             if getgenv().fw3localFw3['fixm1bug'] == true then 
                 task.spawn(function()
                     if cooldowns and cooldowns:FindFirstChild('M1') then 
@@ -20348,6 +20539,7 @@ elseif game.PlaceId == 7162704734 then -- fighting game
                 if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored == true then 
                     game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') .Anchored = false;
                 end
+                game.Players.LocalPlayer.Character.WalkSpeed = 26
                 for _,child in next, game.Players.LocalPlayer.Character:GetChildren() do 
                     if child and child.Name == 'StoppedBlocking' then --and getgenv().fightlocalgame['nocooldownsettings']['rollcooldown'] == true then 
                         child:Destroy()
@@ -21008,6 +21200,7 @@ elseif game.PlaceId == 6679968919 then -- fly race
     end
 elseif game.PlaceId == 914010731 then --  ro ghoul
     --game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
+    window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), Enum.KeyCode.LeftAlt)
     local tab = window:CreateTab('Ro Ghoul')
     local Configuration = window:CreateTab('Configuration')
     -- local pvptab = window:CreateTab('PVP')
@@ -29828,6 +30021,10 @@ else
     setupAimbotTab(getgenv().nogamesettings)
     AddConfigurations()
     getgenv().AddPlayerList(weirdsector)
+
+    weirdsector:AddButton('Rejoin',function()
+        game:GetService('TeleportService'):teleport(game.PlaceId)
+    end)
 
 
 end
