@@ -852,13 +852,15 @@ end
 if getgenv().premiumWhitelist == true and vs ~= 'debug' then 
     --typeofazfake = '9ee-be4a-k89va-p10f'
     if _G.wl_key then 
-        typeofazfake = encrypt{str = _G.wl_key}:sub(1,16)
+        pcall(function()
+            typeofazfake = encrypt{str = _G.wl_key}:sub(1,16)
 
-        for i=1,string.len(typeofazfake) do 
-            if i%4 == 0 then 
-                typeofazfake = typeofazfake:sub(1,i)..'-'..typeofazfake:sub(i+1,string.len(typeofazfake))
+            for i=1,string.len(typeofazfake) do 
+                if i%4 == 0 then 
+                    typeofazfake = typeofazfake:sub(1,i)..'-'..typeofazfake:sub(i+1,string.len(typeofazfake))
+                end
             end
-        end
+        end)
     end
 end
 
