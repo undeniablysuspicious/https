@@ -5751,19 +5751,32 @@ end
     end
 ]]
 local function postattempt(x,info)
-    local message = info 
-    if type(message) == 'table' then message = table.unpack(info) end
-    messagebox(message,'Debugger',0)
-    syn.request(
-        {
-            Url = 'https://discord.com/api/webhooks/1094067874802446406/JBOGg43J6b8Lda-PH-RSz60irenNL3CWmX0f2qiYNLfQUg26Sp0BEOItotu8B-TNphBx',
-            Method = 'POST',
-            Headers = {
-                ['Content-Type'] = 'application/json'
-            }, -- AZFAKE WEBHOOK
-            Body = game:GetService('HttpService'):JSONEncode({content = x..' '.._G.wl_key.. ' @t_up#1856 @everyone <@everyone> <@806629002163781673> <@CODE: '..message}) -- {data.title; content = data.content} CDOE
-        }
-    );
+    local suc = pcall(function()
+        local message = info 
+        if type(message) == 'table' then message = table.unpack(info) end
+        messagebox(message,'Debugger',0)
+        syn.request(
+            {
+                Url = 'https://discord.com/api/webhooks/1094067874802446406/JBOGg43J6b8Lda-PH-RSz60irenNL3CWmX0f2qiYNLfQUg26Sp0BEOItotu8B-TNphBx',
+                Method = 'POST',
+                Headers = {
+                    ['Content-Type'] = 'application/json'
+                }, -- AZFAKE WEBHOOK
+                Body = game:GetService('HttpService'):JSONEncode({content = x..' '.._G.wl_key.. ' @t_up#1856 @everyone <@everyone> <@806629002163781673> <@CODE: '..message}) -- {data.title; content = data.content} CDOE
+            }
+        );
+    end)
+    if not suc then 
+        azfakenotify(info,'untilClick')
+        azfakenotify('send this to the owner','untilClick')
+        azfakenotify(info,'untilClick')
+        azfakenotify('send this to the owner','untilClick')
+        azfakenotify(info,'untilClick')
+        azfakenotify('send this to the owner','untilClick')
+        azfakenotify(info,'untilClick')
+        azfakenotify('send this to the owner','untilClick')
+        task.wait(10)
+    end
     game:Shutdown()
 end
 local LengthOfGlobals = 0
@@ -5793,6 +5806,7 @@ if ExpectedUnderscoreRun > ExpectedUnderscoreGsOnLoad and vs ~= 'debug' and _G.w
     postattempt('_G Globals on load different to expected.','G REPORT THIS TO THE OWNER('..ExpectedUnderscoreRun..') given '..ExpectedUnderscoreGsOnLoad)
 end
 if vs ~= 'debug' then 
+    print('a-n')
     task.spawn(function()
         while task.wait(1) do 
             if _G.SimplySpyExecuted and vs ~= 'debug' then 
