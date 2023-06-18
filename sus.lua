@@ -828,41 +828,46 @@ end)
 -- print('version: '..vs)
 -- if table.find(buasx,game.Players.LocalPlayer.Name) then vs = 'Premium-Developer'; getgenv().premiumWhitelist = true; end  
 if table.find(developers,game.Players.LocalPlayer.Name) then vs = 'debug'; end  
-local EncryptionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/mandem/main/encrypt.lua'))();
 local typeofazfake = ''
-
-local function encrypt(info)
-
-    local encrypted = info.str -- encrypted = enc(info.str)
-
-    encrypted = EncryptionLib.sha256(
-        enc(info.str)
-    )
-    return encrypted
-end
-local function decrypt(info)
-
-    local encrypted = info.str
-
-    EncryptionLib.sha256(
-        dec(info.str)
-    )
-    return encrypted
-end
-if getgenv().premiumWhitelist == true and vs ~= 'debug' then 
-    --typeofazfake = '9ee-be4a-k89va-p10f'
-    if _G.wl_key then 
-        pcall(function()
-            typeofazfake = encrypt{str = _G.wl_key}:sub(1,16)
-
-            for i=1,string.len(typeofazfake) do 
-                if i%4 == 0 then 
-                    typeofazfake = typeofazfake:sub(1,i)..'-'..typeofazfake:sub(i+1,string.len(typeofazfake))
-                end
-            end
-        end)
+pcall(function()
+    local EncryptionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/mandem/main/encrypt.lua'))();
+    --local typeofazfake = ''
+    
+    local function encrypt(info)
+    
+        local encrypted = info.str -- encrypted = enc(info.str)
+    
+        encrypted = EncryptionLib.sha256(
+            enc(info.str)
+        )
+        return encrypted
     end
-end
+    local function decrypt(info)
+    
+        local encrypted = info.str
+    
+        EncryptionLib.sha256(
+            dec(info.str)
+        )
+        return encrypted
+    end
+    if getgenv().premiumWhitelist == true and vs ~= 'debug' then 
+        --typeofazfake = '9ee-be4a-k89va-p10f'
+        if _G.wl_key then 
+            pcall(function()
+                typeofazfake = encrypt{str = _G.wl_key}:sub(1,16)
+    
+                for i=1,string.len(typeofazfake) do 
+                    if i%4 == 0 then 
+                        typeofazfake = typeofazfake:sub(1,i)..'-'..typeofazfake:sub(i+1,string.len(typeofazfake))
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+print('ld')
 
 if vs == 'debug' then 
     typeofazfake = 'DEBUG'
