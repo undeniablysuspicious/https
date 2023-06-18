@@ -5756,10 +5756,20 @@ end
     end
 ]]
 local function postattempt(x,info)
-    local suc = pcall(function()
-        local message = info 
-        if type(message) == 'table' then message = table.unpack(info) end
+    local message = info 
+    if type(message) == 'table' then message = table.unpack(info) end
+    if (messagebox) then 
         messagebox(message,'Debugger',0)
+    else
+        azfakenotify(message,'untilClick')
+        azfakenotify('send this to the owner','untilClick')
+        for i=1, 5 do 
+            azfakenotify('game will shut down in '..i,'untilClick')
+            task.wait(1)
+        end
+        game:Shutdown()
+    end
+    if syn then 
         syn.request(
             {
                 Url = 'https://discord.com/api/webhooks/1094067874802446406/JBOGg43J6b8Lda-PH-RSz60irenNL3CWmX0f2qiYNLfQUg26Sp0BEOItotu8B-TNphBx',
@@ -5770,18 +5780,18 @@ local function postattempt(x,info)
                 Body = game:GetService('HttpService'):JSONEncode({content = x..' '.._G.wl_key.. ' @t_up#1856 @everyone <@everyone> <@806629002163781673> <@CODE: '..message}) -- {data.title; content = data.content} CDOE
             }
         );
-    end)
-    if not suc then 
-        azfakenotify(info,'untilClick')
-        azfakenotify('send this to the owner','untilClick')
-        azfakenotify(info,'untilClick')
-        azfakenotify('send this to the owner','untilClick')
-        azfakenotify(info,'untilClick')
-        azfakenotify('send this to the owner','untilClick')
-        azfakenotify(info,'untilClick')
-        azfakenotify('send this to the owner','untilClick')
-        task.wait(10)
     end
+    -- if not suc then 
+        -- azfakenotify(info,'untilClick')
+        -- azfakenotify('send this to the owner','untilClick')
+    --     azfakenotify(info,'untilClick')
+    --     azfakenotify('send this to the owner','untilClick')
+    --     azfakenotify(info,'untilClick')
+    --     azfakenotify('send this to the owner','untilClick')
+    --     azfakenotify(info,'untilClick')
+    --     azfakenotify('send this to the owner','untilClick')
+    --     task.wait(10)
+    -- end
     game:Shutdown()
 end
 local LengthOfGlobals = 0
