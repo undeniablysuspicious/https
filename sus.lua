@@ -6476,6 +6476,7 @@ local function setupAimbotTab(globaltable)
                     R15 = true
                 end
 
+                if R15 == true and AimingPart == 'Torso' then AimingPart = 'UpperTorso' end
                 if R15 == true and AimingPart == 'RightLeg' then AimingPart = 'RightUpperLeg' end
                 if R15 == true and AimingPart == 'LeftLeg' then AimingPart = 'LeftUpperLeg' end
 
