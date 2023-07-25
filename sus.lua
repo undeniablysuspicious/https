@@ -6397,7 +6397,7 @@ local function setupAimbotTab(globaltable)
                             if v.Team == game.Players.LocalPlayer.Team then CanCheck = false end
                         end
                         if IsVisible and CanCheck == true then 
-                            if globaltable['aimbotsettings']['dontswaptarget'] == false then 
+                            if globaltable['aimbotsettings']['dontswaptarget'] == false or globaltable['aimbotsettings']['dontswaptarget'] == true and globaltable['aimbotsettings']['currenttarget'] == nil then 
                                 if ClosestPlayer == nil and ClosestDistance == nil and CanCheck == true then 
                                     ClosestPlayer = v;
                                     ClosestDistance = Distance.Magnitude; 
