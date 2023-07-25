@@ -6339,7 +6339,7 @@ local function setupAimbotTab(globaltable)
     pvpsector:AddToggle('Smooth Aimbot',false,function(xstate)
         globaltable['aimbotsettings']['smoiothaimbot'] = xstate
     end)
-    pvpsector:AddSlider('Smoothness',0,0,10,1,function(xstate)
+    pvpsector:AddSlider('Smoothness',0,0,10,100,function(xstate)
         globaltable['aimbotsettings']['smoothness'] = xstate
     end)
     pvpsector:AddSeperator('')
