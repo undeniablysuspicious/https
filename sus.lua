@@ -6169,12 +6169,15 @@ end
 
 
 
-local function setupEspTab(sectorgiven) -- Espwindow
+local function setupEspTab(globaltable) -- Espwindow
     local EspTab = window:AddTab('ESP')
     local playerespsector = EspTab:CreateSector('Player Esp','left')
+    globaltable['setupespsettings'] = {
+
+    }
     playerespsector:AddToggle("Player ESP", false, function(xstate)
-        getgenv().fightlocalgame['playeresp'] = xstate
-        if getgenv().fightlocalgame['playeresp'] == true then 
+        globaltable['setupespsettings']['playeresp'] = xstate
+        if globaltable['setupespsettings']['playeresp'] == true then 
             for _,loop_player in next, game.Players:GetChildren() do 
                 --if not table.find(game.Players:GetPlayers())
                 local v = loop_player.Character
@@ -6189,14 +6192,14 @@ local function setupEspTab(sectorgiven) -- Espwindow
                             --
                         end;
                         playersettings = true;
-                        maxdistance = getgenv().fightlocalgame['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+                        maxdistance = globaltable['setupespsettings']['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
                     })
                     __assigned.inloopfunction = function()-- whati f no max health
                         if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
                             __assigned.object.Text = loop_character.Name..' - '..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
                         end
-                        __assigned.maxdistance = getgenv().fightlocalgame['maxviewplayerdistance']
-                        __assigned.checkingvalue = getgenv().fightlocalgame['playeresp']
+                        __assigned.maxdistance = globaltable['setupespsettings']['maxviewplayerdistance']
+                        __assigned.checkingvalue = globaltable['setupespsettings']['playeresp']
                     end
                     __assigned.removedcallback = function()
                         pcall(function()
@@ -6220,14 +6223,14 @@ local function setupEspTab(sectorgiven) -- Espwindow
                             --
                         end;
                         playersettings = true;
-                        maxdistance = getgenv().fightlocalgame['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+                        maxdistance = globaltable['setupespsettings']['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
                     })
                     __assigned.inloopfunction = function()-- whati f no max health
                         if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
                             __assigned.object.Text = loop_character.Name..' - '..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
                         end
-                        __assigned.maxdistance = getgenv().fightlocalgame['maxviewplayerdistance']
-                        __assigned.checkingvalue = getgenv().fightlocalgame['playeresp']
+                        __assigned.maxdistance = globaltable['setupespsettings']['maxviewplayerdistance']
+                        __assigned.checkingvalue = globaltable['setupespsettings']['playeresp']
                     end
                     __assigned.removedcallback = function()
                         pcall(function()
@@ -6270,7 +6273,7 @@ local function setupEspTab(sectorgiven) -- Espwindow
         end
     end)
     playerespsector:AddSlider('Player Esp Distance',0,100,10000,1,function(xstate)
-        getgenv().fightlocalgame['maxviewplayerdistance'] = xstate -- maxplayermobdistance
+        globaltable['setupespsettings']['maxviewplayerdistance'] = xstate -- maxplayermobdistance
     end)
 
 end
@@ -30064,14 +30067,14 @@ else
         
     }
     setupAimbotTab(getgenv().nogamesettings)
-    setupEspTab(weirdsector)
+    
     AddConfigurations()
     getgenv().AddPlayerList(weirdsector)
 
     weirdsector:AddButton('Rejoin',function()
         game:GetService('TeleportService'):teleport(game.PlaceId)
     end)
-
+    setupEspTab(getgenv().nogamesettings)
 
 end
 
