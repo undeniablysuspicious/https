@@ -30064,6 +30064,7 @@ else
         
     }
     setupAimbotTab(getgenv().nogamesettings)
+    setupEspTab(weirdsector)
     AddConfigurations()
     getgenv().AddPlayerList(weirdsector)
 
