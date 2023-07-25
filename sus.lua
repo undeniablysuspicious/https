@@ -6462,25 +6462,42 @@ local function setupAimbotTab(globaltable)
             end
             local additionalvector = Vector3.new(0,globaltable['aimbotsettings']['partoffset'],0)
             if globaltable['aimbotsettings']['randomoffset'] == true then 
-                additionalvector = Vector3.new(0, -(math.random(1,3)) , 0) -- 0.1 - 0.5 math.random(1,5) / math.random(5,8
+                additionalvector = Vector3.new(0, -(math.random(1,4) / math.random(1,4)) , 0) -- 0.1 - 0.5 math.random(1,5) / math.random(5,8
             end
             if ClosestPlayer ~= nil and AimingPart ~= nil and workspace:FindFirstChild('Camera') and globaltable['aimbotsettings']['currenttarget'] and globaltable['aimbotsettings']['currenttarget'].Character and globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart then 
                 if globaltable['aimbotsettings']['swapaimingpart'] == true then 
                     AimingPart = globaltable['aimbotsettings']['aimparts'][math.random(1,#globaltable['aimbotsettings']['aimparts'])]
-                    if string.find(AimingPart,'Leg') and globaltable['aimbotsettings']['randomoffset'] == true then 
-                        additionalvector = Vector3.new(0, (math.random(1,3)) , 0) -- 0.1 - 0.5 math.random(1,5) / math.random(5,8
+                    if AimingPart == 'Chest' then 
+                        AimingPart = 'HumanoidRootPart'
+                    elseif AimingPart == 'Head' then  
+                        AimingPart = 'Head';
+                    elseif AimingPart == 'LeftLeg' then 
+                        if ClosestPlayer.Character:FindFirstChild('Left Leg') then 
+                            AimingPart = 'Left Leg';
+                        elseif ClosestPlayer.Character:FindFirstChild('LeftUpperLeg') then
+                            AimingPart = 'LeftUpperLeg';
+                        end
+                    elseif AimingPart == 'RightLeg' then 
+                        if ClosestPlayer.Character:FindFirstChild('Right Leg') then 
+                            AimingPart = 'Right Leg';
+                        elseif ClosestPlayer.Character:FindFirstChild('RightUpperLeg') then
+                            AimingPart = 'RightUpperLeg';
+                        end
                     end
+                end
+                if string.find(AimingPart,'Leg') and globaltable['aimbotsettings']['randomoffset'] == true then 
+                    additionalvector = Vector3.new(0, (math.random(1,2)) , 0) -- 0.1 - 0.5 math.random(1,5) / math.random(5,8
                 end
                 local R15 = false
                 if globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('RightUpperLeg') then 
                     R15 = true
                 end
 
-                if R15 == true and AimingPart == 'Torso' then AimingPart = 'UpperTorso' end
-                if R15 == true and AimingPart == 'RightLeg' then AimingPart = 'RightUpperLeg' end
-                if R15 == true and AimingPart == 'LeftLeg' then AimingPart = 'LeftUpperLeg' end
+                -- if R15 == true and AimingPart == 'Torso' then AimingPart = 'UpperTorso' end
+                -- if R15 == true and AimingPart == 'RightLeg' then AimingPart = 'RightUpperLeg' end
+                -- if R15 == true and AimingPart == 'LeftLeg' then AimingPart = 'LeftUpperLeg' end
 
-                print(AimingPart)
+                --print(AimingPart)
 
 
                 if globaltable['aimbotsettings']['movementpredictions'] == true then 
