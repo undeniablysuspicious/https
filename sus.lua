@@ -6359,8 +6359,8 @@ local function setupAimbotTab(globaltable)
             else
                 IsVisible = true --IsVisibleOld
                 pos = xpos
-                globaltable['aimbotsettings']['currenttarget'] = nil 
-                globaltable['aimbotsettings']['currenttargetdistance'] = nil
+                -- globaltable['aimbotsettings']['currenttarget'] = nil 
+                -- globaltable['aimbotsettings']['currenttargetdistance'] = nil
             end
         end
         if aimbotrigger:IsPressed() == true and globaltable['aimbotsettings']['aimbot'] == true then 
@@ -6377,7 +6377,7 @@ local function setupAimbotTab(globaltable)
                     pos = xpos
                 end
             end
-            if IsVisible == nil then --if ClosestPlayer == nil or globaltable['aimbotsettings']['dontswaptarget'] == false and ClosestPlayer == nil or globaltable['aimbotsettings']['dontswaptarget'] == true and ClosestPlayer ~= nil then 
+            if IsVisible == nil or IsVisible == nil and globaltable['aimbotsettings']['dontswaptarget'] == true and globaltable['aimbotsettings']['currenttarget'] == nil then --if ClosestPlayer == nil or globaltable['aimbotsettings']['dontswaptarget'] == false and ClosestPlayer == nil or globaltable['aimbotsettings']['dontswaptarget'] == true and ClosestPlayer ~= nil then 
                 for _,v in next, game.Players:GetPlayers() do 
                     if v ~= game.Players.LocalPlayer and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v.Character and v.Character.PrimaryPart then 
                         local vRoot = v.Character.PrimaryPart;
@@ -6403,7 +6403,7 @@ local function setupAimbotTab(globaltable)
                                     ClosestDistance = Distance.Magnitude; 
                                     ClosestMagnitude = DistanceMagnitude.Magnitude
                                 elseif CanCheck == true then
-                                    if ClosestDistance > Distance.Magnitude and ClosestMagnitude and DistanceMagnitude.Magnitude < ClosestMagnitude  or ClosestDistance > Distance.Magnitude and ClosestMagnitude == nil  then --and DistanceMagnitude.Magnitude < globaltable['aimbotsettings']['closestmagnitude'] then 
+                                    if ClosestDistance > Distance.Magnitude and ClosestMagnitude and DistanceMagnitude.Magnitude < ClosestMagnitude  then --and DistanceMagnitude.Magnitude < globaltable['aimbotsettings']['closestmagnitude'] then //  or ClosestDistance > Distance.Magnitude and ClosestMagnitude == nil
                                         ClosestPlayer = v;
                                         ClosestDistance = Distance.Magnitude
                                         ClosestMagnitude = DistanceMagnitude.Magnitude
