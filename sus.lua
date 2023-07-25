@@ -6316,7 +6316,7 @@ local function setupAimbotTab(globaltable)
     pvpsector:AddToggle('Movement Prediction',false,function(xstate)
         globaltable['aimbotsettings']['movementpredictions'] = xstate
     end)
-    pvpsector:AddSlider('Prediction Power',0,0,100,100,function(xstate)
+    pvpsector:AddSlider('Prediction Power',0,0.5,100,100,function(xstate)
         globaltable['aimbotsettings']['predictionpower'] = xstate
     end)
     pvpsector:AddSeperator('')
