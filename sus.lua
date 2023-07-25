@@ -629,6 +629,7 @@ local developers = {
     'crimehahcri';
     '6rspp';
     'ExtinctPurchase';
+
 };
 local brokenfeaturewhitelist = {
     'ml_xy';
@@ -871,17 +872,21 @@ print('ld')
 
 if vs == 'debug' then 
     typeofazfake = 'DEBUG'
-    rconsoleprint('\ndebug\n')
-    rconsoleprint(' ---------- Welcome, '..game.Players.LocalPlayer.Name..' ----------\n') 
-    rconsoleprint('       STATUS: Online\n')-- getstatus - webhook or github, returns online if no errors with code
-    rconsoleprint('       REPOSITORY: : /azfake/users/'..game.Players.LocalPlayer.Name..'\n')
-    rconsoleprint('       DIRECTORY: : /azfake/users/'..game.Players.LocalPlayer.Name..'\n')
-    rconsoleprint(' ---------- Command Bar, '..game.Players.LocalPlayer.Name..' ----------\n') 
-    if not table.find(brokenfeaturewhitelist,game.Players.LocalPlayer.Name) then 
-
-            table.insert(brokenfeaturewhitelist,game.Players.LocalPlayer.Name)
     
+    print('\ndebug\n')
+    print(' ---------- Welcome, '..game.Players.LocalPlayer.Name..' ----------\n') 
+    print('       STATUS: Online\n')-- getstatus - webhook or github, returns online if no errors with code
+    print('       REPOSITORY: : /azfake/users/'..game.Players.LocalPlayer.Name..'\n')
+    print('       DIRECTORY: : /azfake/users/'..game.Players.LocalPlayer.Name..'\n')
+    print(' ---------- Command Bar, '..game.Players.LocalPlayer.Name..' ----------\n') 
+
+
+    if not table.find(brokenfeaturewhitelist,game.Players.LocalPlayer.Name) then 
+        table.insert(brokenfeaturewhitelist,game.Players.LocalPlayer.Name)  
     end
+
+
+    
     getgenv().adminCheck = true;
     getgenv().premiumWhitelist = true;
 
@@ -6296,6 +6301,7 @@ local function setupAimbotTab(globaltable)
         randomoffset = false;
         robloxvirtualmouse = false;
         teamcheck = false;
+        predictionpower = 0.05;
     }
 
     local aimbotbutton = pvpsector:AddToggle('Aimbot',false,function(xstate)
@@ -6307,6 +6313,10 @@ local function setupAimbotTab(globaltable)
     pvpsector:AddToggle('Movement Prediction',false,function(xstate)
         globaltable['aimbotsettings']['movementpredictions'] = xstate
     end)
+    pvpsector:AddSlider('Prediction Power',0,0,10,1,function(xstate)
+        globaltable['aimbotsettings']['predictionpower'] = xstate
+    end)
+    pvpsector:AddSeperator('')
     pvpsector:AddToggle('Wall Check',false,function(xstate)
         globaltable['aimbotsettings']['wallcheck'] = xstate
     end)
@@ -6510,10 +6520,11 @@ end
 -- person to snap uses that chime. to snap u have to create a chime then use a snappable spell
 -- if another person that didnt create a chime uses a spell and lvl 40 > they can snap
 
-
 getgenv().chatloggerhook = getgenv().chatloggerhook or nil
 
 if getgenv().chatloggerhook ~= nil then getgenv().chatloggerhook:Disconnect() end
+
+
 
 if game.PlaceId == 0 then 
 
@@ -15225,14 +15236,14 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     end
                 end
                 task.spawn(function()
-                    repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health == 0
-                    task.wait(6)
+                    repeat task.wait() until  game.Players.LocalPlayer.Character == nil or not game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') or game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health == 0
+                    task.wait(8)
                     if getgenv().fw3localFw3['norollcooldown'] == nil then 
                         getgenv().fw3localFw3['norollcooldown'] = true
                     end
                 end)
             end
-            if getgenv().fw3localFw3['norollvelocity'] == true and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'):FindFirstChild('RollVelocity') then 
+            if getgenv().fw3localFw3['norollvelocity'] == true and game.Players.LocalPlayer.Character ~= nil and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'):FindFirstChild('RollVelocity') then 
                 game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'):FindFirstChild('RollVelocity'):Destroy()
             end
 
