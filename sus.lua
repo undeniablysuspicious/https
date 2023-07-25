@@ -6380,7 +6380,7 @@ local function setupAimbotTab(globaltable)
                     pos = xpos
                 end
             end
-            if not globaltable['aimbotsettings']['currenttarget'] or globaltable['aimbotsettings']['currenttarget'] == nil or globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('Humanoid').Health == 0 then :
+            if not globaltable['aimbotsettings']['currenttarget'] or globaltable['aimbotsettings']['currenttarget'] == nil or globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('Humanoid').Health == 0 then 
                 globaltable['aimbotsettings']['currenttarget'] = nil
                 globaltable['aimbotsettings']['currenttargetdistance'] = nil
             end
@@ -6457,7 +6457,7 @@ local function setupAimbotTab(globaltable)
                         game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position + additionalvector)
                     end
                     
-                    local predictionnumber = globaltable['aimbotsettings']['predictionpower']/100
+                    local predictionnumber = globaltable['aimbotsettings']['predictionpower'] /100
                     if globaltable['aimbotsettings']['robloxvirtualmouse'] == true then
                         local RedirectPos = Redirect.Position
                         local Tuple, Visible = WorldToViewportPoint(workspace.CurrentCamera, globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart));
