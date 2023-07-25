@@ -6316,7 +6316,7 @@ local function setupAimbotTab(globaltable)
     pvpsector:AddToggle('Movement Prediction',false,function(xstate)
         globaltable['aimbotsettings']['movementpredictions'] = xstate
     end)
-    pvpsector:AddSlider('Prediction Power',0,0,10,1,function(xstate)
+    pvpsector:AddSlider('Prediction Power',0,0,100,100,function(xstate)
         globaltable['aimbotsettings']['predictionpower'] = xstate
     end)
     pvpsector:AddSeperator('')
@@ -6456,7 +6456,8 @@ local function setupAimbotTab(globaltable)
                     if globaltable['aimbotsettings']['lookcframe'] == true then 
                         game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position + additionalvector)
                     end
-
+                    
+                    local predictionnumber = globaltable['aimbotsettings']['predictionpower']/100
                     if globaltable['aimbotsettings']['robloxvirtualmouse'] == true then
                         local RedirectPos = Redirect.Position
                         local Tuple, Visible = WorldToViewportPoint(workspace.CurrentCamera, globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart));
@@ -6466,10 +6467,10 @@ local function setupAimbotTab(globaltable)
                         workspace.CurrentCamera.CoordinateFrame = CFrame.new(
                             workspace.CurrentCamera.CoordinateFrame.p,--game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position  ,
                             globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position + additionalvector
-                        ) + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Velocity * 0.05  --+ workspace.CurrentCamera.CoordinateFrame.lookVector --1.1
+                        ) + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Velocity * predictionnumber  --+ workspace.CurrentCamera.CoordinateFrame.lookVector --1.1
                         
                     else
-                        game:GetService('TweenService'):Create(workspace.Camera,TweenInfo.new(globaltable['aimbotsettings']['smoothness']/10,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), { CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position) + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Velocity * 0.05 } ):Play()
+                        game:GetService('TweenService'):Create(workspace.Camera,TweenInfo.new(globaltable['aimbotsettings']['smoothness']/10,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), { CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position) + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Velocity * predictionnumber} ):Play()
                          
                     
                     end
