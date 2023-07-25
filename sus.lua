@@ -6390,7 +6390,7 @@ local function setupAimbotTab(globaltable)
             end
             if IsVisible == nil or IsVisible == nil and globaltable['aimbotsettings']['dontswaptarget'] == true and globaltable['aimbotsettings']['currenttarget'] == nil then --if ClosestPlayer == nil or globaltable['aimbotsettings']['dontswaptarget'] == false and ClosestPlayer == nil or globaltable['aimbotsettings']['dontswaptarget'] == true and ClosestPlayer ~= nil then 
                 for _,v in next, game.Players:GetPlayers() do 
-                    if v ~= game.Players.LocalPlayer and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v.Character and v.Character.PrimaryPart and v.Character:FindFirstChildWhichIsA('Humanoid') and v.Character:FindFirstChildWhichIsA('Humanoid').Health > 0 then 
+                    if v ~= game.Players.LocalPlayer and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v.Character and v.Character.PrimaryPart and v.Character:FindFirstChildWhichIsA('Humanoid') and v.Character:FindFirstChildWhichIsA('Humanoid').Health > 0 and v.Character:FindFirstChildWhichIsA('Humanoid'):GetState() ~= Enum.HumanoidStateType.Dead then 
                         local vRoot = v.Character.PrimaryPart;
                         local Distance = (vRoot.Position - game.Players.LocalPlayer:GetMouse().hit.Position)--game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
                         local DistanceMagnitude = (vRoot.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
@@ -6509,6 +6509,9 @@ local function setupAimbotTab(globaltable)
                 end
                 --mousemoverel((pos.X - game.Players.LocalPlayer:GetMouse().X) * 1, (pos.Y - game.Players.LocalPlayer:GetMouse().Y - game:GetService("GuiService"):GetGuiInset().Y) * 1)
             end
+        else
+            globaltable['aimbotsettings']['currenttarget'] = nil 
+            globaltable['aimbotsettings']['currenttargetdistance'] = nil
         end
     end)
     task.spawn(function()
