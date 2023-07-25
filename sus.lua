@@ -6467,8 +6467,8 @@ local function setupAimbotTab(globaltable)
             if ClosestPlayer ~= nil and AimingPart ~= nil and workspace:FindFirstChild('Camera') and globaltable['aimbotsettings']['currenttarget'] and globaltable['aimbotsettings']['currenttarget'].Character and globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart then 
                 if globaltable['aimbotsettings']['swapaimingpart'] == true then 
                     AimingPart = globaltable['aimbotsettings']['aimparts'][math.random(1,#globaltable['aimbotsettings']['aimparts'])]
-                    if string.find(AimingPart,'Leg') then 
-                        additionalvector = Vector3.new(0, (math.random(3,7)) , 0) -- 0.1 - 0.5 math.random(1,5) / math.random(5,8
+                    if string.find(AimingPart,'Leg') and globaltable['aimbotsettings']['randomoffset'] == true then 
+                        additionalvector = Vector3.new(0, (math.random(1,3)) , 0) -- 0.1 - 0.5 math.random(1,5) / math.random(5,8
                     end
                 end
                 local R15 = false
