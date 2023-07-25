@@ -6479,6 +6479,8 @@ local function setupAimbotTab(globaltable)
                 if R15 == true and AimingPart == 'RightLeg' then AimingPart = 'RightUpperLeg' end
                 if R15 == true and AimingPart == 'LeftLeg' then AimingPart = 'LeftUpperLeg' end
 
+                print(AimingPart)
+
 
                 if globaltable['aimbotsettings']['movementpredictions'] == true then 
                     --local AimPrediction = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * 1.1 + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('Humanoid').WalkSpeed/100 -- = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * (1 / 10) * (Client.Character.Head.Position - PlayerHead.Position).magnitude / 100
