@@ -6305,6 +6305,7 @@ local function setupAimbotTab(globaltable)
         robloxvirtualmouse = false;
         teamcheck = false;
         predictionpower = 0.05;
+        distancecheck = 30
     }
 
     local aimbotbutton = pvpsector:AddToggle('Aimbot',false,function(xstate)
@@ -6318,6 +6319,9 @@ local function setupAimbotTab(globaltable)
     end)
     pvpsector:AddSlider('Prediction Power',0,0.5,100,100,function(xstate)
         globaltable['aimbotsettings']['predictionpower'] = xstate
+    end)
+    pvpsector:AddSlider('Distance',0,30,10000,1,function(xstate)
+        globaltable['aimbotsettings']['distancecheck'] = xstate
     end)
     pvpsector:AddSeperator('')
     pvpsector:AddToggle('Wall Check',false,function(xstate)
@@ -6404,13 +6408,13 @@ local function setupAimbotTab(globaltable)
                             if v.Team == game.Players.LocalPlayer.Team then CanCheck = false end
                         end
                         if IsVisible and CanCheck == true then 
-                            if globaltable['aimbotsettings']['dontswaptarget'] == false or globaltable['aimbotsettings']['dontswaptarget'] == true and globaltable['aimbotsettings']['currenttarget'] == nil then 
+                            if globaltable['aimbotsettings']['dontswaptarget'] == false or globaltable['aimbotsettings']['dontswaptarget'] == true and globaltable['aimbotsettings']['currenttarget'] == nil and DistanceMagnitude <= globaltable['aimbotsettings']['distancecheck'] then 
                                 if ClosestPlayer == nil and ClosestDistance == nil and CanCheck == true then 
                                     ClosestPlayer = v;
                                     ClosestDistance = Distance.Magnitude; 
                                     ClosestMagnitude = DistanceMagnitude.Magnitude
                                 elseif CanCheck == true then
-                                    if ClosestDistance > Distance.Magnitude and ClosestMagnitude and DistanceMagnitude.Magnitude < ClosestMagnitude  then --and DistanceMagnitude.Magnitude < globaltable['aimbotsettings']['closestmagnitude'] then //  or ClosestDistance > Distance.Magnitude and ClosestMagnitude == nil
+                                    if ClosestMagnitude > DistanceMagnitude.Magnitude and ClosestDistance > Distance.Magnitude  then --and DistanceMagnitude.Magnitude < globaltable['aimbotsettings']['closestmagnitude'] then //  or ClosestDistance > Distance.Magnitude and ClosestMagnitude == nil
                                         ClosestPlayer = v;
                                         ClosestDistance = Distance.Magnitude
                                         ClosestMagnitude = DistanceMagnitude.Magnitude
