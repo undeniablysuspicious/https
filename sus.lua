@@ -6380,6 +6380,10 @@ local function setupAimbotTab(globaltable)
                     pos = xpos
                 end
             end
+            if not globaltable['aimbotsettings']['currenttarget'] or globaltable['aimbotsettings']['currenttarget'] == nil or globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('Humanoid').Health == 0 then :
+                globaltable['aimbotsettings']['currenttarget'] = nil
+                globaltable['aimbotsettings']['currenttargetdistance'] = nil
+            end
             if IsVisible == nil or IsVisible == nil and globaltable['aimbotsettings']['dontswaptarget'] == true and globaltable['aimbotsettings']['currenttarget'] == nil then --if ClosestPlayer == nil or globaltable['aimbotsettings']['dontswaptarget'] == false and ClosestPlayer == nil or globaltable['aimbotsettings']['dontswaptarget'] == true and ClosestPlayer ~= nil then 
                 for _,v in next, game.Players:GetPlayers() do 
                     if v ~= game.Players.LocalPlayer and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v.Character and v.Character.PrimaryPart then 
