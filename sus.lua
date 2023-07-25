@@ -6454,14 +6454,14 @@ local function setupAimbotTab(globaltable)
             end
             local additionalvector = Vector3.new(0,0,0)
             if globaltable['aimbotsettings']['randomoffset'] == true then 
-                additionalvector = Vector3.new(0, -(math.random(1,6)) , 0) -- 0.1 - 0.5 math.random(1,5) / math.random(5,8
+                additionalvector = Vector3.new(0, -(math.random(1,3)) , 0) -- 0.1 - 0.5 math.random(1,5) / math.random(5,8
             end
             if ClosestPlayer ~= nil and AimingPart ~= nil and workspace:FindFirstChild('Camera') and globaltable['aimbotsettings']['currenttarget'] and globaltable['aimbotsettings']['currenttarget'].Character and globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart then 
                 if globaltable['aimbotsettings']['swapaimingpart'] == true then 
                     AimingPart = globaltable['aimbotsettings']['aimparts'][math.random(1,#globaltable['aimbotsettings']['aimparts'])]
                 end
                 if string.find(AimingPart,'Leg') then 
-                    additionalvector = Vector3.new(0, (math.random(1,6)) , 0) -- 0.1 - 0.5 math.random(1,5) / math.random(5,8
+                    additionalvector = Vector3.new(0, (math.random(3,7)) , 0) -- 0.1 - 0.5 math.random(1,5) / math.random(5,8
                 end
                 if globaltable['aimbotsettings']['movementpredictions'] == true then 
                     --local AimPrediction = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * 1.1 + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('Humanoid').WalkSpeed/100 -- = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * (1 / 10) * (Client.Character.Head.Position - PlayerHead.Position).magnitude / 100
