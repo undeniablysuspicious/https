@@ -6305,7 +6305,8 @@ local function setupAimbotTab(globaltable)
         robloxvirtualmouse = false;
         teamcheck = false;
         predictionpower = 0.05;
-        distancecheck = 30
+        distancecheck = 30;
+        swapaimingpart = false;
     }
 
     local aimbotbutton = pvpsector:AddToggle('Aimbot',false,function(xstate)
@@ -6349,6 +6350,9 @@ local function setupAimbotTab(globaltable)
     pvpsector:AddSeperator('')
     pvpsector:AddToggle('Random Offsets',false,function(xstate)
         globaltable['aimbotsettings']['randomoffset'] = xstate
+    end)
+    pvpsector:AddToggle('Random Aim Parts',false,function(xstate)
+        globaltable['aimbotsettings']['swapaimingpart'] = xstate
     end)
     pvpsector:AddToggle('Move Roblox Virtual Mouse',false,function(xstate)
         globaltable['aimbotsettings']['robloxvirtualmouse'] = xstate
@@ -6453,6 +6457,12 @@ local function setupAimbotTab(globaltable)
                 additionalvector = Vector3.new(0, -(math.random(1,6)) , 0) -- 0.1 - 0.5 math.random(1,5) / math.random(5,8
             end
             if ClosestPlayer ~= nil and AimingPart ~= nil and workspace:FindFirstChild('Camera') and globaltable['aimbotsettings']['currenttarget'] and globaltable['aimbotsettings']['currenttarget'].Character and globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart then 
+                if globaltable['aimbotsettings']['swapaimingpart'] == true then 
+                    AimingPart = globaltable['aimbotsettings']['aimparts'][math.random(1,#globaltable['aimbotsettings']['aimparts'])]
+                end
+                if string.find(AimingPart,'Leg') then 
+                    additionalvector = Vector3.new(0, (math.random(1,6)) , 0) -- 0.1 - 0.5 math.random(1,5) / math.random(5,8
+                end
                 if globaltable['aimbotsettings']['movementpredictions'] == true then 
                     --local AimPrediction = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * 1.1 + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('Humanoid').WalkSpeed/100 -- = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Velocity * (1 / 10) * (Client.Character.Head.Position - PlayerHead.Position).magnitude / 100
                    -- workspace.Camera.CFrame = 
@@ -6474,7 +6484,7 @@ local function setupAimbotTab(globaltable)
                         ) + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Velocity * predictionnumber  --+ workspace.CurrentCamera.CoordinateFrame.lookVector --1.1
                         
                     else
-                        game:GetService('TweenService'):Create(workspace.Camera,TweenInfo.new(globaltable['aimbotsettings']['smoothness']/10,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), { CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position) + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Velocity * predictionnumber} ):Play()
+                        game:GetService('TweenService'):Create(workspace.Camera,TweenInfo.new(globaltable['aimbotsettings']['smoothness']/10,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), { CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position + additionalvector) + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Velocity * predictionnumber} ):Play()
                          
                     
                     end
