@@ -13628,29 +13628,53 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 end
             end
             remove_rollstuns()
+
+
             task.spawn(function()
-                local inputManager = game:GetService('VirtualInputManager')
-                inputManager:SendKeyEvent(true,Enum.KeyCode.Q,false,game)
-                inputManager:SendKeyEvent(false,Enum.KeyCode.Q,false,game)
-                if getgenv().fw3localFw3['rollblatant'] == true then 
-                    task.wait(.05)
+                if ourfolder:FindFirstChild('Cooldowns'):FindFirstChild('RollCD') then 
+                    local args = {
+                        [1] = "Up"
+                    }
+                    game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+                    local args = {
+                        [1] = "Down"
+                    }
+                    game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+                    local args = {
+                        [1] = "Hold"
+                    }
+                    game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+                    
+                    task.wait(0.2)--// pingwait
+                    local args = {
+                        [1] = "Up"
+                    }
+                    game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
                 else
-                    if getgenv().fw3localFw3['randomrollcanceldelay'] == true then 
-                        randomint = Random.new()
-                        randomint = randomint:NextNumber(0.05,0.2)
-                        task.wait(randomint) -- math.random(1,2)/10
+                    local inputManager = game:GetService('VirtualInputManager')
+                    inputManager:SendKeyEvent(true,Enum.KeyCode.Q,false,game)
+                    inputManager:SendKeyEvent(false,Enum.KeyCode.Q,false,game)
+                    if getgenv().fw3localFw3['rollblatant'] == true then 
+                        task.wait(.05)
                     else
-                        task.wait(.2)
+                        if getgenv().fw3localFw3['randomrollcanceldelay'] == true then 
+                            randomint = Random.new()
+                            randomint = randomint:NextNumber(0.05,0.2)
+                            task.wait(randomint) -- math.random(1,2)/10
+                        else
+                            task.wait(.2)
+                        end
+                    end
+                    if getgenv().fw3localFw3['rollcancel'] == true then 
+                        local shouldfeint = false
+                        shouldfeint = math.random(1,2)
+                        --if getgenv().fw3localFw3['randomrollcanceldelay'] == true and shouldfeint == 2 then return end
+                        local m = game.Players.LocalPlayer:GetMouse();
+                        inputManager:SendMouseButtonEvent(m.X,m.Y,1,true,game,0)
+                        inputManager:SendMouseButtonEvent(m.X,m.Y,1,false,game,0)
                     end
                 end
-                if getgenv().fw3localFw3['rollcancel'] == true then 
-                    local shouldfeint = false
-                    shouldfeint = math.random(1,2)
-                    --if getgenv().fw3localFw3['randomrollcanceldelay'] == true and shouldfeint == 2 then return end
-                    local m = game.Players.LocalPlayer:GetMouse();
-                    inputManager:SendMouseButtonEvent(m.X,m.Y,1,true,game,0)
-                    inputManager:SendMouseButtonEvent(m.X,m.Y,1,false,game,0)
-                end
+
             end)
 
             -- keypress(0x51)
