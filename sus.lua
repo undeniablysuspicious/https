@@ -14197,6 +14197,9 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             print('strong left.')
             -- removeStuns()
             task.wait(.1)
+            if not detect(v,'rbxassetid://9912709174') then 
+                return
+            end
             -- if checkStun() then getgenv().roll()
             -- else
             --     getgenv().parry()
