@@ -14914,7 +14914,26 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             cancelAll = true
         end
 
+        -- HARDCODED GUNS
 
+        if detect(v,'rbxassetid://10206784771') then -- gun shoot 1
+            task.wait(.05)
+            getgenv().parry()
+            cancelAll = true
+        end
+
+        if detect(v,'rbxassetid://10206804975') then -- gun shoot 2
+            task.wait(.05)
+            getgenv().parry()
+            cancelAll = true
+        end
+        if detect(v,'rbxassetid://9112351440') then -- aerial
+            task.wait(.1)
+            getgenv().parry()
+            cancelAll = true
+        end
+        -- aerial gun rbxassetid://9112351440
+        -- critical gun rbxassetid://8787495611 but i can just make it detect the ball
 
         if is_rapier then cancelAll = true end
         local rolling = false
