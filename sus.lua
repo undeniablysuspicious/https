@@ -13407,7 +13407,9 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     local function removeStuns()
                         if ourfolder:FindFirstChild('Cooldowns') then 
                             for i,v in pairs(ourfolder:FindFirstChild('Cooldowns'):GetChildren()) do 
-                                v:Destroy()
+                                if v.Name ~= 'RollCD' then 
+                                    v:Destroy()
+                                end
                                 --print('-- DESTROYED BECAUSE FEINTED')
                             end
                         end
@@ -13447,7 +13449,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                         end
                         if ourfolder:FindFirstChild('Cooldowns') then 
                             for i,v in pairs(ourfolder:FindFirstChild('Cooldowns'):GetChildren()) do 
-                                if table.find(cooldown_folder_rollcheckstuns,v.Name) then 
+                                if table.find(cooldown_folder_rollcheckstuns,v.Name) and v.Name ~= 'RollCD' then 
                                     v:Destroy()
                                 end
                             end
@@ -13577,7 +13579,9 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             local function removeStuns()
                 if ourfolder:FindFirstChild('Cooldowns') then 
                     for i,v in pairs(ourfolder:FindFirstChild('Cooldowns'):GetChildren()) do 
-                        v:Destroy()
+                        if v.Name ~= 'RollCD' then 
+                            v:Destroy()
+                        end
                         --print('-- DESTROYED BECAUSE FEINTED')
                     end
                 end
@@ -13617,7 +13621,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 end
                 if ourfolder:FindFirstChild('Cooldowns') then 
                     for i,v in pairs(ourfolder:FindFirstChild('Cooldowns'):GetChildren()) do 
-                        if table.find(cooldown_folder_rollcheckstuns,v.Name) then 
+                        if table.find(cooldown_folder_rollcheckstuns,v.Name) and v.Name ~= 'RollCD' then 
                             v:Destroy()
                         end
                     end
@@ -13858,6 +13862,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         local function removeFeintCD()
             if ourfolder:FindFirstChild('Cooldowns') and ourfolder:FindFirstChild('Cooldowns'):FindFirstChild('FeintCD') then 
                 ourfolder:FindFirstChild('Cooldowns'):FindFirstChild('FeintCD') :Destroy()
+                --print('remove feint called didnt remove cuz new update to prevent feint spam but i could detect if the person that is attacking just fnt')
             end
         end
 
@@ -13895,7 +13900,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             end
             if ourfolder:FindFirstChild('Cooldowns') then 
                 for i,v in pairs(ourfolder:FindFirstChild('Cooldowns'):GetChildren()) do 
-                    if table.find(cooldown_folder_rollcheckstuns,v.Name) then 
+                    if table.find(cooldown_folder_rollcheckstuns,v.Name) and v.Name ~= 'RollCD' then 
                         v:Destroy()
                     end
                 end
@@ -14934,6 +14939,11 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         end
         -- aerial gun rbxassetid://9112351440
         -- critical gun rbxassetid://8787495611 but i can just make it detect the ball
+
+
+
+        
+
 
         if is_rapier then cancelAll = true end
         local rolling = false
