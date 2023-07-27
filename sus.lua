@@ -14827,6 +14827,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
 
         if detect(v,'rbxassetid://11946556384') then -- golem slash
+            print('golem slash')
             task.wait(.2)
             getgenv().parry()
             cancelAll = true
