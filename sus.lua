@@ -13403,27 +13403,27 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
                 else
                     getgenv().fw3localFw3['rollnotparry'] = false;
-                    if ourfolder:FindFirstChild('Cooldowns'):FindFirstChild('RollCD') then 
-                        local args = {
-                            [1] = "Up"
-                        }
-                        game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
-                        local args = {
-                            [1] = "Down"
-                        }
-                        game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
-                        local args = {
-                            [1] = "Hold"
-                        }
-                        game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+                    -- if ourfolder:FindFirstChild('Cooldowns'):FindFirstChild('RollCD') then 
+                    --     local args = {
+                    --         [1] = "Up"
+                    --     }
+                    --     game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+                    --     local args = {
+                    --         [1] = "Down"
+                    --     }
+                    --     game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+                    --     local args = {
+                    --         [1] = "Hold"
+                    --     }
+                    --     game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
                         
-                        task.wait(0.2)--// pingwait
-                        local args = {
-                            [1] = "Up"
-                        }
-                        game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
-                        return
-                    end
+                    --     task.wait(0.2)--// pingwait
+                    --     local args = {
+                    --         [1] = "Up"
+                    --     }
+                    --     game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+                    --     return
+                    -- end
                     print('parry but roll')
                     local function removeStuns()
                         if ourfolder:FindFirstChild('Cooldowns') then 
