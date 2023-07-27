@@ -15143,7 +15143,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     if IsInDistance == false then 
     
                         repeat 
-                            task.wait(0.05)
+                            task.wait(0.01) -- 0.05
                             if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and workChar:FindFirstChild('HumanoidRootPart') and (workChar.HumanoidRootPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude <= getgenv().Distance then 
                                 IsInDistance = true
                                 --print(workChar.Name..' was detected '.. (workChar.HumanoidRootPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude)
@@ -15232,7 +15232,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 if IsInDistance == false then 
 
                     repeat 
-                        task.wait(0.05)
+                        task.wait(0.01) -- 0.05
                         if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and workChar:FindFirstChild('HumanoidRootPart') and (workChar.HumanoidRootPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude <= getgenv().Distance then 
                             IsInDistance = true
                             --print(workChar.Name..' was detected '.. (workChar.HumanoidRootPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude)
