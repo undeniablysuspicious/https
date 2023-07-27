@@ -14479,21 +14479,33 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://10013909049') and cancelAll == false then -- axe swing 1
             task.wait(.17)
+            if not detect(v,'rbxassetid://10013909049') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end   
         if detect(v,'rbxassetid://10013911426') and cancelAll == false then -- axe swing 12
             task.wait(.17)
+            if not detect(v,'rbxassetid://10013911426') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end   
         if detect(v,'rbxassetid://10013915154') and cancelAll == false then -- axe swing 3
             task.wait(.17)
+            if not detect(v,'rbxassetid://10013915154') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end   
         if detect(v,'rbxassetid://10013919534') and cancelAll == false then -- axe run swing
             task.wait(.15)
+            if not detect(v,'rbxassetid://10013919534') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end
@@ -14564,16 +14576,25 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://10787560419') and cancelAll == false then 
             task.wait(.2)
+            if not detect(v,'rbxassetid://10787560419') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://10873957240') and cancelAll == false then 
             task.wait(.2)
+            if not detect(v,'rbxassetid://10873957240') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://10771933209') and cancelAll == false then -- greatsword runswing
             task.wait(.4)
+            if not detect(v,'rbxassetid://10771933209') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
@@ -14654,31 +14675,49 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://8698443433') and cancelAll == false then -- and distance < 15 
             task.wait( getWaitTime() )
+            if not detect(v,'rbxassetid://8698443433') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://8699014368') and cancelAll == false then 
             task.wait( getWaitTime() )
+            if not detect(v,'rbxassetid://8699014368') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://9215215492') and cancelAll == false then 
             task.wait( getWaitTime() )
+            if not detect(v,'rbxassetid://9215215492') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://9255163830') and cancelAll == false then 
             task.wait( getWaitTime() )
+            if not detect(v,'rbxassetid://9255163830') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://8779280417') and cancelAll == false then -- sword run swing
             task.wait(.15)
+            if not detect(v,'rbxassetid://8779280417') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end
         if detect(v,'rbxassetid://9112351440') then -- sword and spear aerual
             task.wait(.2)
+            if not detect(v,'rbxassetid://9112351440') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end
@@ -14694,21 +14733,33 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://11363516302') and cancelAll == false then 
             task.wait(.1)
+            if not detect(v,'rbxassetid://11363516302') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://11363591881') and cancelAll == false then 
             task.wait(.1)
+            if not detect(v,'rbxassetid://11363591881') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://11404159898') and cancelAll == false then 
             task.wait(.1)
+            if not detect(v,'rbxassetid://11404159898') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://11404162476') and cancelAll == false then 
             task.wait(.1)
+            if not detect(v,'rbxassetid://11404162476') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
@@ -14782,9 +14833,9 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         end  
         
         if detect(v,'rbxassetid://11946771956') then -- golem slash 2
-            -- rconsoleprint('golem slash 2')
+            print('golem slash 2')
             task.wait(.2)
-            getgenv().fastparry()
+            getgenv().parry()
             task.wait(.1)
             getgenv().parry()
             cancelAll = true
@@ -15143,7 +15194,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     if IsInDistance == false then 
     
                         repeat 
-                            task.wait(0.01) -- 0.05
+                            task.wait(0.05) -- 0.05
                             if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and workChar:FindFirstChild('HumanoidRootPart') and (workChar.HumanoidRootPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude <= getgenv().Distance then 
                                 IsInDistance = true
                                 --print(workChar.Name..' was detected '.. (workChar.HumanoidRootPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude)
@@ -15232,7 +15283,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 if IsInDistance == false then 
 
                     repeat 
-                        task.wait(0.01) -- 0.05
+                        task.wait(0.05) -- 0.05
                         if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and workChar:FindFirstChild('HumanoidRootPart') and (workChar.HumanoidRootPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude <= getgenv().Distance then 
                             IsInDistance = true
                             --print(workChar.Name..' was detected '.. (workChar.HumanoidRootPart.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude)
