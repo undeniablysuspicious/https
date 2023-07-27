@@ -14836,7 +14836,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             print('golem slash 2')
             task.wait(.2)
             getgenv().parry()
-            task.wait(.1)
+            task.wait(.5)
             getgenv().parry()
             cancelAll = true
         end  
