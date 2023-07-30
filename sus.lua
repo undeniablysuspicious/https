@@ -12505,6 +12505,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         norollvelocity = false;
         norollvelocityconnection = nil;
         set_to_roll_before_parry = false;
+        parryhasfeintedsonoparry = false;
     }
 
 
@@ -13354,6 +13355,10 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
     end
     getgenv().parry = function()-- check roll on next attack because feinted
+        if getgenv().fw3localFw3['parryhasfeintedsonoparry'] == true then 
+            print('parry so no parry')
+            getgenv().fw3localFw3['parryhasfeintedsonoparry'] = false    
+        return end
         -- task.spawn(function()
         --     local ping_adjustment = 0
         --     local getping = getgenv().Ping; if getping == 0 then ping_adjustment = 1 else ping_adjustment = getping end; 
@@ -13385,6 +13390,10 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     elseif getgenv().UsePing == false then 
                         task.wait(0.107)
                     end
+                    if getgenv().fw3localFw3['parryhasfeintedsonoparry'] == true then 
+                        print('parry so no parry')
+                        getgenv().fw3localFw3['parryhasfeintedsonoparry'] = false    
+                    return end
                     local args = {
                         [1] = "Up"
                     }
@@ -13398,7 +13407,19 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     }
                     game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
                     
-                    task.wait(0.2)--// pingwait
+                    --task.wait(0.2)--// pingwait
+
+                    task.wait(0.1)
+                    if getgenv().fw3localFw3['parryhasfeintedsonoparry'] == true then 
+                        print('parry so no parry')
+                        getgenv().fw3localFw3['parryhasfeintedsonoparry'] = false    
+                        local args = {
+                            [1] = "Up"
+                        }
+                        game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+                    return end
+                    task.wait(0.1)
+
                     local args = {
                         [1] = "Up"
                     }
@@ -14033,7 +14054,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             end
         end
         local ParryCritExlusions = {-- the anims we will parry ourselves
-            'rbxassetid://13047366938' 
+            'rbxassetid://13047366938';
+            'rbxassetid://8787495611'
         }
         local Excluded = false
         for i,anims in next, ParryCritExlusions do 
@@ -14055,8 +14077,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 dontparry = true
                 cancelAll = true
                 print('trying to parry')
-                if detect(v,'rbxassetid://8787495611') then 
-                    task.wait(.2)
+                if detect(v,'rbxassetid://8787495611') then -- i think it depends on the sword so i might do a sword check  -- excluded it
+                    task.wait(.2) -- .2
                     getgenv().parry()
                 elseif detect(v,'rbxassetid://10022838306') or detect(v,'rbxassetid://10876826705') then 
                     task.wait(.3)
@@ -14337,13 +14359,16 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             if coolchild.Name == 'FeintCD' then 
                 feintedattack = true
                 cancelAll = true
+                getgenv().fw3localFw3['parryhasfeintedsonoparry'] = true
                 print('FeintCD detected')
                 getgenv().quickfinishparry ()
                 getgenv().M2()
                 if getgenv().fw3localFw3['rollonfeint'] == true then
                     getgenv().fw3localFw3['set_to_roll_before_parry'] = true
                 end
-                cooldownconnection:Disconnect()
+                pcall(function()
+                    cooldownconnection:Disconnect()
+                end)
             end
         end)
 
@@ -14829,13 +14854,22 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             getgenv().parry()
             cancelAll = true
         end
-        if detect(v,'rbxassetid://9112351440') then -- sword and spear aerual check what weapon they have though
+        if detect(v,'rbxassetid://9112351440') and cancelAll == false  then -- sword and spear aerual check what weapon they have though
             task.wait(.05)
             -- if not detect(v,'rbxassetid://9112351440') then 
             --     return
             -- end
             getgenv().parry()
             cancelAll = true
+        end
+
+        -- sword crit
+
+        if detect(v,'rbxassetid://8787495611') and cancelAll == false  then 
+            task.wait(.35)
+            getgenv().parry()
+            cancelAll = true 
+            print('sword crit')
         end
 
 
@@ -15207,7 +15241,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         else
             print('Act couldnt be confirmed. Status: ROLLING - '..tostring(rolling)..' IF WAS ABLE TO PARRY - '..tostring(cantParry)..' but did nothing is cancel value - '..tostring(cancelAll).. '?')
         end
-        
+
         cooldownconnection:Disconnect()
 
     end
@@ -15343,6 +15377,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     if newchild.Name == 'Hitting' or checkCrit(workChar) then 
                         if getgenv().fw3localFw3['set_to_roll_before_parry'] == true then 
                             getgenv().fw3localFw3['rollnotparry'] = true
+                            getgenv().fw3localFw3['set_to_roll_before_parry'] = false
                             print('FeintCD Rollnotparry')
                         end
                         getgenv().ParryAct(workChar)
@@ -15437,6 +15472,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     print('type of parry act')
                     if getgenv().fw3localFw3['set_to_roll_before_parry'] == true then 
                         getgenv().fw3localFw3['rollnotparry'] = true
+                        getgenv().fw3localFw3['set_to_roll_before_parry'] = false
                         print('FeintCD Rollnotparry')
                     end
                     getgenv().ParryAct(workChar)
