@@ -11124,6 +11124,8 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         end
     end)
 
+    print('p1')
+
     local mobs = {}
     for _,instance in pairs(workspace:GetChildren()) do 
         local foundPart = false
@@ -11151,21 +11153,29 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             else
                 getgenv().function_pick(instance)
             end  
-            repeat 
-                task.wait(1)
-                getgenv().function_pick(instance)
-                if instance.Name:sub(1,4) == 'Item' then 
-                    firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild('Right Leg') ,instance, 0)
-                else
+            local transparencyisone = false
+            task.spawn(function()
+                repeat 
+                    task.wait(1)
                     getgenv().function_pick(instance)
-                end  
-            until instance.Transparency == 1 or not instance
+                    if instance.Name:sub(1,4) == 'Item' then 
+                        firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild('Right Leg') ,instance, 0)
+                    else
+                        getgenv().function_pick(instance)
+                    end  
+                    pcall(function()
+                        if instance.Transparency == 1 then 
+                            transparencyisone = true
+                        end
+                    end)
+                until not instance or instance.Parent == nil or transparencyisone == true
+            end)
         elseif instance:FindFirstChild('Humanoid') and instance:FindFirstChild('HumanoidRootPart') and not game.Players:FindFirstChild(instance.Name) then 
             table.insert(mobs,instance)             
         end
     end
 
-    
+    print('p1')
 
     local workspaceconnection = workspace.ChildAdded:Connect(function(instance)
         local foundPart = false
@@ -11193,21 +11203,29 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             else
                 getgenv().function_pick(instance)
             end  
-            repeat 
-                task.wait(1)
-                getgenv().function_pick(instance)
-                if instance.Name:sub(1,4) == 'Item' then 
-                    firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild('Right Leg') ,instance, 0)
-                else
+            local transparencyisone = false
+            task.spawn(function()
+                repeat 
+                    task.wait(1)
                     getgenv().function_pick(instance)
-                end  
-            until instance.Transparency == 1 or not instance
+                    if instance.Name:sub(1,4) == 'Item' then 
+                        firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild('Right Leg') ,instance, 0)
+                    else
+                        getgenv().function_pick(instance)
+                    end  
+                    pcall(function()
+                        if instance.Transparency == 1 then 
+                            transparencyisone = true
+                        end
+                    end)
+                until instance.Transparency == 1 or not instance or transparencyisone == true
+            end)
         elseif instance:FindFirstChild('Humanoid') and instance:FindFirstChild('HumanoidRootPart') and not game.Players:FindFirstChild(instance.Name) then 
             table.insert(mobs,instance)              
         end
     end)
 
-
+    print('p1')
     getgenv().currenttween = nil
     task.spawn(function()
         while task.wait() do 
@@ -11525,6 +11543,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     local vdown
     local venter
     local vleave
+    print('p1')
     -- local function makeClickable()
     --     for i,v in pairs(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.PlayerList.List:GetChildren()) do 
 
@@ -11577,26 +11596,29 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     --     makeClickable()
     -- end)
 
+    task.spawn(function()
+        for i,v in pairs(game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List'):GetChildren()) do 
+            v.MouseButton1Down:Connect(function()
+                pcall(function()if game.Players:FindFirstChild(v.RealName.Value) then 
+                    local playerSave = game.Players:FindFirstChild(v.RealName.Value)
+                    game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
+                    --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
+                end end)
+            end)
+        end
     
-    for i,v in pairs(game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List'):GetChildren()) do 
-        v.MouseButton1Down:Connect(function()
-            pcall(function()if game.Players:FindFirstChild(v.RealName.Value) then 
-                local playerSave = game.Players:FindFirstChild(v.RealName.Value)
-                game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
-                --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
-            end end)
+        game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List').ChildAdded:Connect(function(child)
+            child.MouseButton1Down:Connect(function()
+                pcall(function()if game.Players:FindFirstChild(child.RealName.Value) then 
+                    local playerSave = game.Players:FindFirstChild(child.RealName.Value)
+                    game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
+                    --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
+                end end)
+            end)
         end)
-    end
-
-    game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List').ChildAdded:Connect(function(child)
-        child.MouseButton1Down:Connect(function()
-            pcall(function()if game.Players:FindFirstChild(child.RealName.Value) then 
-                local playerSave = game.Players:FindFirstChild(child.RealName.Value)
-                game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
-                --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
-            end end)
-        end)
+    
     end)
+    
 
 
     -- task.spawn(function()
@@ -15099,6 +15121,15 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             cancelAll = true
         end
 
+
+        -- duke
+
+        if detect(v,'rbxassetid://13583107119') then -- stomp duke
+            task.wait(.7)
+            getgenv().roll()
+            cancelAll = true
+        end
+
         -- new bell
 
 
@@ -15200,6 +15231,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         --     getgenv().parry()
         --     cancelAll = true
         -- end
+
+
 
         if is_rapier then cancelAll = true end
         local rolling = false
