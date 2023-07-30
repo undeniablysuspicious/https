@@ -12504,6 +12504,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         humanoiddeadconnection = nil; -- on
         norollvelocity = false;
         norollvelocityconnection = nil;
+        set_to_roll_before_parry = false;
     }
 
 
@@ -13653,48 +13654,50 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
 
             task.spawn(function()
-                if ourfolder:FindFirstChild('Cooldowns'):FindFirstChild('RollCD') then 
-                    local args = {
-                        [1] = "Up"
-                    }
-                    game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
-                    local args = {
-                        [1] = "Down"
-                    }
-                    game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
-                    local args = {
-                        [1] = "Hold"
-                    }
-                    game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+                -- if ourfolder:FindFirstChild('Cooldowns'):FindFirstChild('RollCD') then 
+                --     local args = {
+                --         [1] = "Up"
+                --     }
+                --     game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+                --     local args = {
+                --         [1] = "Down"
+                --     }
+                --     game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+                --     local args = {
+                --         [1] = "Hold"
+                --     }
+                --     game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
                     
-                    task.wait(0.2)--// pingwait
-                    local args = {
-                        [1] = "Up"
-                    }
-                    game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+                --     task.wait(0.2)--// pingwait
+                --     local args = {
+                --         [1] = "Up"
+                --     }
+                --     game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+                -- else
+
+                -- end
+
+                local inputManager = game:GetService('VirtualInputManager')
+                inputManager:SendKeyEvent(true,Enum.KeyCode.Q,false,game)
+                inputManager:SendKeyEvent(false,Enum.KeyCode.Q,false,game)
+                if getgenv().fw3localFw3['rollblatant'] == true then 
+                    task.wait(.05)
                 else
-                    local inputManager = game:GetService('VirtualInputManager')
-                    inputManager:SendKeyEvent(true,Enum.KeyCode.Q,false,game)
-                    inputManager:SendKeyEvent(false,Enum.KeyCode.Q,false,game)
-                    if getgenv().fw3localFw3['rollblatant'] == true then 
-                        task.wait(.05)
+                    if getgenv().fw3localFw3['randomrollcanceldelay'] == true then 
+                        randomint = Random.new()
+                        randomint = randomint:NextNumber(0.05,0.2)
+                        task.wait(randomint) -- math.random(1,2)/10
                     else
-                        if getgenv().fw3localFw3['randomrollcanceldelay'] == true then 
-                            randomint = Random.new()
-                            randomint = randomint:NextNumber(0.05,0.2)
-                            task.wait(randomint) -- math.random(1,2)/10
-                        else
-                            task.wait(.2)
-                        end
+                        task.wait(.2)
                     end
-                    if getgenv().fw3localFw3['rollcancel'] == true then 
-                        local shouldfeint = false
-                        shouldfeint = math.random(1,2)
-                        --if getgenv().fw3localFw3['randomrollcanceldelay'] == true and shouldfeint == 2 then return end
-                        local m = game.Players.LocalPlayer:GetMouse();
-                        inputManager:SendMouseButtonEvent(m.X,m.Y,1,true,game,0)
-                        inputManager:SendMouseButtonEvent(m.X,m.Y,1,false,game,0)
-                    end
+                end
+                if getgenv().fw3localFw3['rollcancel'] == true then 
+                    local shouldfeint = false
+                    shouldfeint = math.random(1,2)
+                    --if getgenv().fw3localFw3['randomrollcanceldelay'] == true and shouldfeint == 2 then return end
+                    local m = game.Players.LocalPlayer:GetMouse();
+                    inputManager:SendMouseButtonEvent(m.X,m.Y,1,true,game,0)
+                    inputManager:SendMouseButtonEvent(m.X,m.Y,1,false,game,0)
                 end
 
             end)
@@ -13794,7 +13797,21 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     local function getmobrollwaittime()
 
     end
+
+
+
     getgenv().ParryObjects = {}
+
+    local function loopobjects(obj)
+        local x = false
+        for _,v in next, getgenv().ParryObjects do 
+            if obj == v then 
+                x = true
+            end
+        end
+        return x
+    end
+
     getgenv().ParryAct = function(v)--,hiting value;
         -- aztup detects the maximum range you can get hit in
         -- function to print distance on how far you are from the enemy to check the maximum range that you wont get hit in
@@ -13823,6 +13840,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             return xvalue
         end
         
+
 
         if getgenv().fw3localFw3['parryfacingforward'] then
 
@@ -13890,6 +13908,21 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         local strongleft = 0 
 
 
+        local function detect(v,dect)
+            local x = false
+            if cancelAll == false and v:FindFirstChild('Humanoid') then 
+                for i,anim in pairs(v.Humanoid:GetPlayingAnimationTracks()) do 
+                    if anim.Animation.AnimationId == dect then
+                        x =  true
+                    end
+                end
+            end
+            if cancelAll == true then 
+                --print('didnt parry '..dect..' because cancel all was already true')
+            end
+    
+            return x
+        end
 
         local stuns = {
             'Stun1';
@@ -14043,12 +14076,19 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 elseif detect(v,'rbxassetid://10234795108') then 
                     task.wait(.1)
                     getgenv().fastparry()
+                    getgenv().quickfinishparry()
                     task.wait(.1)
                     getgenv().fastparry()
+                    getgenv().quickfinishparry()
                     task.wait(.1)
                     getgenv().fastparry()
+                    getgenv().quickfinishparry()
                     task.wait(.1)
                     getgenv().fastparry()
+                    getgenv().quickfinishparry()
+                    task.wait(.1)
+                    getgenv().fastparry()
+                    getgenv().quickfinishparry()
                 -- elseif detect(v,'rbxassetid://13047366938') then -- jus karita
                 --     task.wait(1)
                 --     getgenv().parry()
@@ -14131,118 +14171,193 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 wait_roll = 0.05
             }
         }
+
+        local endautoparry = false
+        local feintedattack = false
+
         --task.spawn(function()
             --cancelAll = true
-            local stopcheckingfeint = false
-            repeat 
-                task.wait()
-                strongleft += 0.5
-                -- print('yee')
-                removeStuns()
-                if enemyfolder:FindFirstChild('Cooldowns') and cooldowns then  if not cooldowns:FindFirstChild('RollCD')  and  enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('FeintCD') or not cooldowns:FindFirstChild('RollCD') and enemyfolder:FindFirstChild('Cooldowns'):FindFirstChild('FeintCD') then
-                    print('feinted'); cantParry = true; rolling = true; cancelAll = true; removeStuns(); strongleft = 1.5; -- 
+            
+        -- local stopcheckingfeint = false
+        -- repeat 
+        --     task.wait()
+        --     strongleft += 0.5
+        --     -- print('yee')
+        --     removeStuns()
+        --     if enemyfolder:FindFirstChild('Cooldowns') and cooldowns then  
+        --         -- print(loopobjects(enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('FeintCD')))  not cooldowns:FindFirstChild('RollCD')  and not cooldowns:FindFirstChild('RollCD') and
+        --         if  enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('FeintCD') and loopobjects(enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('FeintCD')) == false or  enemyfolder:FindFirstChild('Cooldowns'):FindFirstChild('FeintCD') and loopobjects(enemyfolder:FindFirstChild('Cooldowns'):FindFirstChild('FeintCD')) == false then
+        --             print('feinted'); cantParry = true; rolling = true; cancelAll = true; removeStuns(); strongleft = 1.5; -- or just stop the script from running further
+        --             feintedattack = true
+        --             table.insert(getgenv().ParryObjects, enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('FeintCD'))
+        --             --endautoparry = true
+        --             if getgenv().fw3localFw3['swingthroughfeint'] == true then 
+        --                 getgenv().M1()
+        --             else
+        --                 getgenv().M2()  
+        --                 local finishedtick = 0
+        --                 local endloop = false
+        --                 repeat  
+        --                     task.wait(0.01)
+        --                     finishedtick += 0.1
+        --                     if finishedtick >= 2.5 then 
+        --                         endloop = true
+        --                     end
+        --                     -- and enemy statusfolder hitting value isnt the hitting value passed with parryact
+        --                 until finishedtick >= 1.6 or not enemyfolder:FindFirstChild('StatusFolder') or enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting') and not findparryobject(enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting'))
 
-                    if getgenv().fw3localFw3['swingthroughfeint'] == true then 
-                        getgenv().M1()
-                    else
-                        getgenv().M2()  
-                        local finishedtick = 0
-                        local endloop = false
-                        repeat  
-                            task.wait(.1)
-                            finishedtick += 0.1
-                            if finishedtick >= 2.5 then 
-                                endloop = true
-                            end
-                            -- and enemy statusfolder hitting value isnt the hitting value passed with parryact
-                        until finishedtick >= 1.6 or not enemyfolder:FindFirstChild('StatusFolder') or enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting') and not findparryobject(enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting'))
-                        -- what if enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting') was nil and it would check objects
-                        -- since its nil the object in parryobjects might be nil
-                        -- so it might find another nil object
-                        -- essenitally doing if nil == nil
-                        if endloop == true then 
-                            removeStuns()
-                            cantParry = false; rolling = false; cancelAll = false;
-                        else
-                            -- if getgenv().fw3localFw3['rollonfeint'] and is_mob == nil then 
-                            --     stopcheckingfeint = true -- if roll cd then block if blockwhencantfeint
-                            --     task.spawn(function()
-                            --         print('s1')
-                            --         remove_rollstuns()
-                            --         removeStuns()
-                            --         local ItemAttackTime = getRoll_Time()
-                            --         -- or just parryact but use a roll
-                            --         -- getgenv() value called hasfeinted
-                            --         -- set to true and then parry will read if its true to roll
-                            --         print('s2')
-                            --         print('sike '..ItemAttackTime)
-                            --         task.wait( ItemAttackTime )
+        --                 --[[
+        --                     maybe put the hitting instance as a parameter so we can see if a different one is added
+        --                 if enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting') and not findparryobject(enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting')) and enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('FeintCD') and not findparryobject(enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('enemyfolder:FindFirstChild('Cooldowns'):FindFirstChild('Hitting') and not findparryobject(enemyfolder:FindFirstChild('Cooldowns'):FindFirstChild('Hitting'))')) then 
+        --                 --]]
 
-                            --         print('s3')
-                            --         -- for _ind,animselection in next, AnimationDetectables do 
-                            --         --     if detect(v,animselection['id']) then 
-                            --         --         task.wait( animselection['wait_until_parry'] )
-                            --         --     end
-                            --         -- end
+        --                 -- could check if it detects another feint different from the one inside parryobjects along with hitting
+
+        --                 -- cant just unregister hitting and put it inside parry objects because if you attack again it wont create a different value nvm each time you swing it creates hitting
+        --                 --[[
+        --                     game:GetService("ReplicatedStorage").CharacterData.xiMilxy.StatusFolder.ChildAdded:Connect(function(CHILD)
+        --                         print(CHILD.Name)
+        --                     end)
+
+        --                 --]]
 
 
-                            --         -- if getRoll_Time2() ~= nil then 
-                            --         --     task.wait(roll_timings[getRoll_Time2()]['wait_roll'])
-                            --         -- end
-                            --         --task.wait(getgenv().fw3localFw3['rolldelay']) -- if mob then wait like 0.2 more or just dont roll
-                            --         -- if getRoll_Complicated() == true then  -- true = dagger, nil = sword etc
-                            --         --     task.wait(0.05)
-                            --         -- else
+        --                 -- what if enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting') was nil and it would check objects
+        --                 -- since its nil the object in parryobjects might be nil
+        --                 -- so it might find another nil object
+        --                 -- essenitally doing if nil == nil
+        --                 if endloop == true then 
+        --                     removeStuns()
+        --                     cantParry = false; rolling = false; cancelAll = false;
+        --                 else
+        --                     -- if getgenv().fw3localFw3['rollonfeint'] and is_mob == nil then 
+        --                     --     stopcheckingfeint = true -- if roll cd then block if blockwhencantfeint
+        --                     --     task.spawn(function()
+        --                     --         print('s1')
+        --                     --         remove_rollstuns()
+        --                     --         removeStuns()
+        --                     --         local ItemAttackTime = getRoll_Time()
+        --                     --         -- or just parryact but use a roll
+        --                     --         -- getgenv() value called hasfeinted
+        --                     --         -- set to true and then parry will read if its true to roll
+        --                     --         print('s2')
+        --                     --         print('sike '..ItemAttackTime)
+        --                     --         task.wait( ItemAttackTime )
 
-                            --         --     task.wait(getgenv().fw3localFw3['rolldelay'])
-                            --         -- end
-                            --         if getnotRollOn() == true then 
-                            --             removeStuns()
-                            --             remove_rollstuns()
-                            --             getgenv().roll() 
-                            --             removeStuns()
-                            --             remove_rollstuns()
-                            --         else
-                            --             getgenv().quickfinishparry()
-                            --         end
-                            --         if getgenv().fw3localFw3['logfeints'] then 
-                            --             logIt('AZFAKE-SERVER'..' x Rolled;(due to feint)','AZFAKE-SERVER')
-                            --         end
-                            --     end)
+        --                     --         print('s3')
+        --                     --         -- for _ind,animselection in next, AnimationDetectables do 
+        --                     --         --     if detect(v,animselection['id']) then 
+        --                     --         --         task.wait( animselection['wait_until_parry'] )
+        --                     --         --     end
+        --                     --         -- end
 
-                            --     -- stopcheckingfeint = true
-                            -- elseif getgenv().fw3localFw3['rollonfeint'] then
-                            --     if is_mob == 'squibbo' then 
-                            --         stopcheckingfeint = true
-                            --         remove_rollstuns()
-                            --         removeStuns()
-                            --         task.wait(0.2)
+
+        --                     --         -- if getRoll_Time2() ~= nil then 
+        --                     --         --     task.wait(roll_timings[getRoll_Time2()]['wait_roll'])
+        --                     --         -- end
+        --                     --         --task.wait(getgenv().fw3localFw3['rolldelay']) -- if mob then wait like 0.2 more or just dont roll
+        --                     --         -- if getRoll_Complicated() == true then  -- true = dagger, nil = sword etc
+        --                     --         --     task.wait(0.05)
+        --                     --         -- else
+
+        --                     --         --     task.wait(getgenv().fw3localFw3['rolldelay'])
+        --                     --         -- end
+        --                     --         if getnotRollOn() == true then 
+        --                     --             removeStuns()
+        --                     --             remove_rollstuns()
+        --                     --             getgenv().roll() 
+        --                     --             removeStuns()
+        --                     --             remove_rollstuns()
+        --                     --         else
+        --                     --             getgenv().quickfinishparry()
+        --                     --         end
+        --                     --         if getgenv().fw3localFw3['logfeints'] then 
+        --                     --             logIt('AZFAKE-SERVER'..' x Rolled;(due to feint)','AZFAKE-SERVER')
+        --                     --         end
+        --                     --     end)
+
+        --                     --     -- stopcheckingfeint = true
+        --                     -- elseif getgenv().fw3localFw3['rollonfeint'] then
+        --                     --     if is_mob == 'squibbo' then 
+        --                     --         stopcheckingfeint = true
+        --                     --         remove_rollstuns()
+        --                     --         removeStuns()
+        --                     --         task.wait(0.2)
                                     
-                            --         remove_rollstuns()
-                            --         removeStuns()
-                            --         getgenv().roll() 
-                            --         removeStuns()
-                            --         remove_rollstuns()
-                            --     end
-                            -- end
-                            if getgenv().fw3localFw3['rollonfeint'] == true and not findparryobject(enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting')) then 
-                                cantParry = false; rolling = false; cancelAll = false;
-                                getgenv().fw3localFw3['rollnotparry'] = true
-                                print('feinted')
-                                table.insert(getgenv().ParryObjects,enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting'))
-                                
-                            end
-                        end
+        --                     --         remove_rollstuns()
+        --                     --         removeStuns()
+        --                     --         getgenv().roll() 
+        --                     --         removeStuns()
+        --                     --         remove_rollstuns()
+        --                     --     end
+        --                     -- end
+        --                     if cooldowns:FindFirstChild('RollCD') then 
+        --                         print('on roll cooldown feinted')
+        --                     end
+        --                     -- if hitting is a number value to wait until parry then we can just wait the value assigned to it instead of doing animations
+        --                     if not cooldowns:FindFirstChild('RollCD') and getgenv().fw3localFw3['rollonfeint'] == true and enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting') and not findparryobject(enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting')) and not findparryobject(enemyfolder:FindFirstChild('Cooldowns'):FindFirstChild('FeintCD')) then 
+        --                         cantParry = false; rolling = false; cancelAll = false;-- endautoparry = true;
+        --                         getgenv().fw3localFw3['rollnotparry'] = true
+        --                         print('feinted')
+        --                         table.insert(getgenv().ParryObjects,enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting'))
+        --                         getgenv().quickfinishparry ()
+        --                     -- elseif cooldowns:FindFirstChild('RollCD') and getgenv().fw3localFw3['rollonfeint'] == true and not findparryobject(enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting')) an then 
+        --                     --     getgenv().quickfinishparry ()
+        --                     --     cantParry = false; rolling = false; cancelAll = false; --endautoparry = true;
+        --                     --     getgenv().fw3localFw3['rollnotparry'] = false
+        --                     --     print('feinted but parry')
+        --                     --     table.insert(getgenv().ParryObjects,enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('Hitting'))
+        --                     end
+        --                     if getgenv().fw3localFw3['rollonfeint'] == false then 
+        --                         cantParry = true; rolling = true; cancelAll = true; 
+        --                         print('feinted roll is false so cancelling further action')
+        --                         endautoparry = true
+        --                         getgenv().quickfinishparry ()
+        --                     end
+        --                 end
+        --             end
+        --         else 
+        --             if cooldowns:FindFirstChild('RollCD') then 
+        --                 -- cancelAll = false 
+        --                 -- cantParry = false; rolling = false; 
+        --                 print('cant roll')
+        --             end
+        --             cancelAll = false 
+        --             -- cantParry = false; rolling = false; 
+        --             -- print('sta1'..tostring(cooldowns:FindFirstChild('RollCD')))
+        --             -- print('sta2'..tostring(enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('FeintCD')))
+        --             -- print('sta3'..tostring(loopobjects(enemyfolder:FindFirstChild('StatusFolder'):FindFirstChild('FeintCD'))))
+        --         end 
+        --     end -- cancelAll = true; -- print('setto false')
+        -- until strongleft == 1.5 or stopcheckingfeint == true or endautoparry == true
+        -- --end)
 
-                    end
+
+        local cooldownconnection = enemyfolder:FindFirstChild('Cooldowns').ChildAdded:Connect(function(coolchild)
+            if coolchild.Name == 'FeintCD' then 
+                feintedattack = true
+                cancelAll = true
+                print('FeintCD detected')
+                getgenv().quickfinishparry ()
+                getgenv().M2()
+                if getgenv().fw3localFw3['rollonfeint'] == true then
+                    getgenv().fw3localFw3['set_to_roll_before_parry'] = true
+                end
+                cooldownconnection:Disconnect()
+            end
+        end)
 
 
-                else cancelAll = false end end -- cancelAll = true; -- print('setto false')
-            until strongleft == 1.5 or stopcheckingfeint == true
-        --end)
 
         removeStuns()
 
+        if endautoparry == true or feintedattack == true then 
+            print('end auto 1')
+            return
+        end
+        if endautoparry == true then 
+            print('end auto 2')
+        end
         -- strong left
         if detect(v,'rbxassetid://9912709174') then 
             print('strong left.')
@@ -14312,10 +14427,10 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             task.wait(.4)
             getgenv().parry()
             -- getgenv().quickfinishparry()
-            task.wait(.4) -- 25
+            task.wait(.29) -- 25
             getgenv().parry()
             -- getgenv().quickfinishparry()
-            task.wait(.35)
+            task.wait(.2)
             getgenv().parry()
             -- getgenv().quickfinishparry()
             cancelAll = true
@@ -14480,33 +14595,33 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://10013909049') and cancelAll == false then -- axe swing 1
             task.wait(.17)
-            if not detect(v,'rbxassetid://10013909049') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://10013909049') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end   
         if detect(v,'rbxassetid://10013911426') and cancelAll == false then -- axe swing 12
             task.wait(.17)
-            if not detect(v,'rbxassetid://10013911426') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://10013911426') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end   
         if detect(v,'rbxassetid://10013915154') and cancelAll == false then -- axe swing 3
             task.wait(.17)
-            if not detect(v,'rbxassetid://10013915154') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://10013915154') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end   
         if detect(v,'rbxassetid://10013919534') and cancelAll == false then -- axe run swing
             task.wait(.15)
-            if not detect(v,'rbxassetid://10013919534') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://10013919534') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end
@@ -14577,25 +14692,25 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://10787560419') and cancelAll == false then 
             task.wait(.2)
-            if not detect(v,'rbxassetid://10787560419') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://10787560419') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://10873957240') and cancelAll == false then 
             task.wait(.2)
-            if not detect(v,'rbxassetid://10873957240') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://10873957240') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://10771933209') and cancelAll == false then -- greatsword runswing
             task.wait(.4)
-            if not detect(v,'rbxassetid://10771933209') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://10771933209') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end  
@@ -14658,7 +14773,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 weaponwait = 0.1
             end
             if v:FindFirstChild('Scimitar') then 
-                weaponwait = 0.1
+                weaponwait = 0.05
             end
             if v:FindFirstChild('Katana') then 
                 weaponwait = 0.05
@@ -14676,49 +14791,49 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://8698443433') and cancelAll == false then -- and distance < 15 
             task.wait( getWaitTime() )
-            if not detect(v,'rbxassetid://8698443433') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://8698443433') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://8699014368') and cancelAll == false then 
             task.wait( getWaitTime() )
-            if not detect(v,'rbxassetid://8699014368') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://8699014368') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://9215215492') and cancelAll == false then 
             task.wait( getWaitTime() )
-            if not detect(v,'rbxassetid://9215215492') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://9215215492') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://9255163830') and cancelAll == false then 
             task.wait( getWaitTime() )
-            if not detect(v,'rbxassetid://9255163830') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://9255163830') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://8779280417') and cancelAll == false then -- sword run swing
             task.wait(.15)
-            if not detect(v,'rbxassetid://8779280417') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://8779280417') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end
-        if detect(v,'rbxassetid://9112351440') then -- sword and spear aerual
-            task.wait(.2)
-            if not detect(v,'rbxassetid://9112351440') then 
-                return
-            end
+        if detect(v,'rbxassetid://9112351440') then -- sword and spear aerual check what weapon they have though
+            task.wait(.05)
+            -- if not detect(v,'rbxassetid://9112351440') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end
@@ -14734,33 +14849,33 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://11363516302') and cancelAll == false then 
             task.wait(.1)
-            if not detect(v,'rbxassetid://11363516302') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://11363516302') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://11363591881') and cancelAll == false then 
             task.wait(.1)
-            if not detect(v,'rbxassetid://11363591881') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://11363591881') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://11404159898') and cancelAll == false then 
             task.wait(.1)
-            if not detect(v,'rbxassetid://11404159898') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://11404159898') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://11404162476') and cancelAll == false then 
             task.wait(.1)
-            if not detect(v,'rbxassetid://11404162476') then 
-                return
-            end
+            -- if not detect(v,'rbxassetid://11404162476') then 
+            --     return
+            -- end
             getgenv().parry()
             cancelAll = true
         end  
@@ -15031,18 +15146,26 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             getgenv().parry()
             cancelAll = true
         end
-        if detect(v,'rbxassetid://9112351440') then -- aerial
-            task.wait(.1)
-            getgenv().parry()
-            cancelAll = true
-        end
+        -- if detect(v,'rbxassetid://9112351440') then -- aerial
+        --     task.wait(.1)
+        --     getgenv().parry()
+        --     cancelAll = true
+        -- end
         -- aerial gun rbxassetid://9112351440
         -- critical gun rbxassetid://8787495611 but i can just make it detect the ball
 
 
 
-        
-
+        -- if detect(v,'rbxassetid://10300203796') then -- dagger 1
+        --     task.wait(.01)
+        --     getgenv().parry()
+        --     cancelAll = true
+        -- end
+        -- if detect(v,'rbxassetid://10300357869') then -- dagger 2
+        --     task.wait(.01)
+        --     getgenv().parry()
+        --     cancelAll = true
+        -- end
 
         if is_rapier then cancelAll = true end
         local rolling = false
@@ -15084,6 +15207,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         else
             print('Act couldnt be confirmed. Status: ROLLING - '..tostring(rolling)..' IF WAS ABLE TO PARRY - '..tostring(cantParry)..' but did nothing is cancel value - '..tostring(cancelAll).. '?')
         end
+        
+        cooldownconnection:Disconnect()
 
     end
 
@@ -15216,6 +15341,10 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and IsInDistance == true and getgenv().AutoParryingFW == true  then 
                     --print(newchild.Name)
                     if newchild.Name == 'Hitting' or checkCrit(workChar) then 
+                        if getgenv().fw3localFw3['set_to_roll_before_parry'] == true then 
+                            getgenv().fw3localFw3['rollnotparry'] = true
+                            print('FeintCD Rollnotparry')
+                        end
                         getgenv().ParryAct(workChar)
                     end
                 end
@@ -15306,6 +15435,10 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 --print(newchild.Name)
                 if newchild.Name == 'Hitting' or checkCrit(workChar) then 
                     print('type of parry act')
+                    if getgenv().fw3localFw3['set_to_roll_before_parry'] == true then 
+                        getgenv().fw3localFw3['rollnotparry'] = true
+                        print('FeintCD Rollnotparry')
+                    end
                     getgenv().ParryAct(workChar)
                 end
             end
