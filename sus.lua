@@ -14077,7 +14077,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         end
         local ParryCritExlusions = {-- the anims we will parry ourselves
             'rbxassetid://13047366938';
-            'rbxassetid://8787495611'
+            'rbxassetid://8787495611';
+            'rbxassetid://10022838306'
         }
         local Excluded = false
         for i,anims in next, ParryCritExlusions do 
@@ -14095,17 +14096,21 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 else
                     task.wait(0.2) -- 0.2
                 end
-                
+                for i,anims in next, ParryCritExlusions do 
+                    if detect(v,anims) then 
+                        Excluded = true 
+                    end
+                end
                 dontparry = true
                 cancelAll = true
                 print('trying to parry')
-                if detect(v,'rbxassetid://8787495611') then -- i think it depends on the sword so i might do a sword check  -- excluded it
+                if detect(v,'rbxassetid://8787495611') and Excluded == false then -- i think it depends on the sword so i might do a sword check  -- excluded it
                     task.wait(.2) -- .2
                     getgenv().parry()
-                elseif detect(v,'rbxassetid://10022838306') or detect(v,'rbxassetid://10876826705') then 
+                elseif detect(v,'rbxassetid://10022838306') and Excluded == false or detect(v,'rbxassetid://10876826705') and Excluded == false then 
                     task.wait(.3)
                     getgenv().parry()
-                elseif detect(v,'rbxassetid://11859752490') then 
+                elseif detect(v,'rbxassetid://11859752490') and Excluded == false then 
                     print('spin crit log')
                     task.wait(.3)
                     getgenv().parry()
@@ -14117,7 +14122,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     getgenv().parry()
                     task.wait(.2)
                     getgenv().parry()
-                elseif detect(v,'rbxassetid://10234795108') then 
+                elseif detect(v,'rbxassetid://10234795108') and Excluded == false  then 
                     task.wait(.1)
                     getgenv().fastparry()
                     getgenv().quickfinishparry()
@@ -14144,8 +14149,11 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 --         until not detect(v,'rbxassetid://12457389891')
                 --     end)
                 else
-                    getgenv().parry()
+                    if Excluded == false then 
+                        getgenv().parry()
+                    end
                 end
+                getgenv().quickfinishparry()
                 task.wait()
             end
         end
@@ -14669,6 +14677,11 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             -- if not detect(v,'rbxassetid://10013919534') then 
             --     return
             -- end
+            getgenv().parry()
+            cancelAll = true
+        end
+        if detect(v,'rbxassetid://10022838306') and cancelAll == false then 
+            task.wait(.55)
             getgenv().parry()
             cancelAll = true
         end
