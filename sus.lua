@@ -10282,9 +10282,9 @@ elseif game.PlaceId == 10266164381 then --// shitlines
 
     end)
     sector:AddSeperator('-')
-    local t_DataEvent = ReplicatedStorage.Events.DataEvent;
-    local t_DataFunction = ReplicatedStorage.Events.DataFunction;
-    
+    local t_DataEvent = game.ReplicatedStorage.Events.DataEvent;
+    local t_DataFunction = game.ReplicatedStorage.Events.DataFunction;
+
     sector:AddButton('Exchange 1 Fragment',function()
         t_DataFunction:InvokeServer("1FragmentExchange");
     end)
