@@ -177,7 +177,7 @@ azfake.__esp__call = function(instance,info) -- espstate,notinrangecallback,remo
     __esp.__charactersettings = false 
     if info.charactersettings then __esp.__charactersettings = info.charactersettings end
     __esp.__playersettings = false;
-    if info.playersettings then __esp.playersettings = true; __esp.__charactersettings = false; end
+    if info.playersettings == true then __esp.playersettings = true; __esp.__charactersettings = false; end
     -- __removed and checkingvalue shouldnt be the same value
     -- if info.checkingvalue then 
     --     __esp.checkingvalue  = info.checkingvalue['value'] 
@@ -201,18 +201,26 @@ azfake.__esp__call = function(instance,info) -- espstate,notinrangecallback,remo
             if instance and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                 local Distance = nil;
                 local __instanceposition = nil;
-                if __esp.__playersettings == true and instance.Character and instance:FindFirstChild('HumanoidRootPart') then 
+                if __esp.__playersettings == true and instance.Character and instance.Character:FindFirstChild('HumanoidRootPart') then 
                     Distance = (instance.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
-                    __instanceposition = instance.Position
+                    __instanceposition = instance.Character:FindFirstChild('HumanoidRootPart').Position
                 elseif __esp.__charactersettings == true and instance:FindFirstChild('HumanoidRootPart')  then -- custom part
                     Distance = (instance:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
                     __instanceposition = instance:FindFirstChild('HumanoidRootPart').Position
                 else
-                    Distance = (instance.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
-                    __instanceposition = instance.Position
+                    if instance and not instance:FindFirstChild('HumanoidRootPart') and not instance:IsA('Player') then 
+                        Distance = (instance.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                        __instanceposition = instance.Position
+                    elseif instance and instance:FindFirstChild('HumanoidRootPart') then 
+                        Distance = (instance:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                        __instanceposition = instance:FindFirstChild('HumanoidRootPart').Position
+                    elseif instance and instance:IsA('Player') and instance.Character and instance.Character:FindFirstChild('HumanoidRootPart') then 
+                        Distance = (instance.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                        __instanceposition = instance.Character:FindFirstChild('HumanoidRootPart').Position
+                    end
                 end
                 --local Distance = (instance.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
-
+                if not __instanceposition then return end 
                 local vect,IsShowingOnScreen = workspace.CurrentCamera:worldToViewportPoint(__instanceposition)
                 __esp.__remtable_f()
                 if __esp.waitingvalue == __esp.checkingvalue then __esp.removed = true end;
@@ -236,6 +244,9 @@ azfake.__esp__call = function(instance,info) -- espstate,notinrangecallback,remo
             elseif not instance:FindFirstChild('HumanoidRootPart') and __esp.__charactersettings == true then 
                 __esp.removed = true; -- or repeat until they have a root part
             elseif not instance then
+                pcall(function()
+                    __esp.object:Remove() 
+                end)
                 if type(__esp.removedcallback) == 'function' then 
                     __esp.removedcallback()
                 elseif type (__esp.removedcallback) == 'string' then 
@@ -245,7 +256,9 @@ azfake.__esp__call = function(instance,info) -- espstate,notinrangecallback,remo
                 end
             end
             if __esp.__removed  == true or getgenv().loopsUnload == true then 
-                __esp.object:Remove() -- Doesnt run removed callback
+                pcall(function()
+                    __esp.object:Remove() -- Doesnt run removed callback
+                end)
                 connection:Disconnect() -- Break
             end
         end)
@@ -6041,6 +6054,7 @@ getgenv().DefaultEspPlayer = function(v)
                 local vect,onscreen = cam:worldToViewportPoint(v.Character.HumanoidRootPart.Position)
                 
                 if onscreen and getgenv().playeresp and getgenv().tracers and tracer then 
+                    
                     tracer.From = Vector2.new(cam.ViewportSize.X/2,cam.ViewportSize.Y/1)
                     tracer.To = Vector2.new(vect.X,vect.Y)
                     tracer.Visible = true
@@ -6168,13 +6182,152 @@ getgenv().DefaultEspPlayer = function(v)
 
 end
 
+azfake.traceresp = function(opposing,info) 
 
+    local tracerting = {
+
+    }
+    local AimingPart = info.tableg['aimingpart']
+    if info.aimpart == true then 
+        if AimingPart == 'Chest' then 
+            AimingPart = 'HumanoidRootPart'
+        elseif AimingPart == 'Head' then  
+            AimingPart = 'Head';
+        end
+    else
+        AimingPart = 'HumanoidRootPart'
+    end
+    local addcircle = info.circlepoint
+    local prep = {
+        ['function'] = {};
+        ['vis'] = {};
+        ['trac'] = {};
+        ['circ'] = {};
+    }
+
+    -- number Thickness;
+    -- number NumSides;
+    -- number Radius;
+    -- bool Filled;
+    -- Vector2 Position;
+    local circle = Drawing.new('Circle')
+    circle.Visible = false
+    circle.Color = Color3.new(128, 187, 219)
+    circle.Radius = info.radius
+    circle.Filled = true
+
+
+
+    local tracer = Drawing.new('Line')
+    tracer.Visible = false
+    tracer.Color = Color3.new(128, 187, 219)
+    tracer.Thickness = 5
+    tracer.Transparency = 1 
+    local visualizer = Instance.new("Part")
+    visualizer.Color = Color3.fromRGB(128, 187, 219)
+    visualizer.Transparency = 0.6
+    visualizer.Anchored = true
+    visualizer.CanCollide = false
+    visualizer.Size = Vector3.new(5,5,5)
+    visualizer.BottomSurface = Enum.SurfaceType.Smooth
+    visualizer.TopSurface = Enum.SurfaceType.Smooth
+    visualizer.Shape = Enum.PartType.Ball
+	visualizer.Material = Enum.Material.ForceField
+
+    table.insert(prep['vis'],visualizer)
+    table.insert(prep['trac'],tracer)
+    table.insert(prep['circ'],circle)
+
+    local function rootesp()
+        local xkeeptracer
+        local plsstoptracer = false
+        cam = workspace.CurrentCamera
+        local mouse = game.Players.LocalPlayer:GetMouse()
+        warn('loaded')
+        xkeeptracer = game:GetService('RunService').RenderStepped:Connect(function()
+            task.wait(0)
+            if opposing and opposing.Character and opposing.Character:FindFirstChild('Humanoid') and opposing.Character:FindFirstChild('HumanoidRootPart') and opposing ~= game.Players.LocalPlayer and opposing.Character.Humanoid.Health > 0 then 
+                --warn('om')
+                if AimingPart == 'LeftLeg' then 
+                    if opposing.Character:FindFirstChild('Left Leg') then 
+                        AimingPart = 'Left Leg';
+                    elseif opposing.Character:FindFirstChild('LeftUpperLeg') then
+                        AimingPart = 'LeftUpperLeg';
+                    end
+                elseif AimingPart == 'RightLeg' then 
+                    if opposing.Character:FindFirstChild('Right Leg') then 
+                        AimingPart = 'Right Leg';
+                    elseif opposing.Character:FindFirstChild('RightUpperLeg') then
+                        AimingPart = 'RightUpperLeg';
+                    end
+                end
+                local vect,onscreen = cam:worldToViewportPoint(opposing.Character:FindFirstChild(AimingPart).Position)
+                
+                if onscreen and tracer then 
+                    tracer.From = Vector2.new(game.Players.LocalPlayer:GetMouse().X,game.Players.LocalPlayer:GetMouse().Y)--Vector2.new((cam.ViewportSize.X/2)/game.Players.LocalPlayer:GetMouse().X,(cam.ViewportSize.Y/1)/game.Players.LocalPlayer:GetMouse().Y) --Vector2.new(cam.ViewportSize.X/2,cam.ViewportSize.Y/1)
+                    tracer.To = Vector2.new(vect.X,vect.Y)
+                    --tracer.Transparency = 0
+                    tracer.Visible = true
+                    if addcircle == true then 
+                        circle.Visible = true
+                    end
+                    circle.Position = Vector2.new(vect.X,vect.Y)
+                    visualizer.Transparency = 0
+                    visualizer.CFrame = opposing.Character.HumanoidRootPart.CFrame
+                    if visualizer.Parent ~= workspace then 
+                        visualizer.Parent = workspace
+                    end
+                else
+                    tracer.Visible = false
+                    visualizer.Transparency = 1
+                end
+                if not opposing or getgenv().loopsUnload == true then 
+                    plsstoptracer = true
+                    pcall(function()
+                        tracer:Remove()
+                    end)
+                    pcall(function()
+                        xkeeptracer:Disconnect()
+                    end)
+                    pcall(function()
+                        visualizer:Destroy()
+                    end)
+                end
+            elseif not opposing or getgenv().loopsUnload == true or plsstoptracer then 
+                pcall(function()
+                    xkeeptracer:Disconnect()
+                end)
+                pcall(function()
+                    visualizer:Destroy()
+                end)
+                if tracer then 
+                    pcall(function()
+                        tracer:Remove()
+                    end)
+                end
+            else
+                tracer.Visible = false
+            end
+        end) 
+        table.insert(prep['function'],xkeeptracer)
+    end
+    task.spawn(function()
+        coroutine.wrap(rootesp)()
+    end)
+    return prep
+end
 
 local function setupEspTab(globaltable) -- Espwindow
-    local EspTab = window:AddTab('ESP')
+    local EspTab = window:CreateTab('ESP')
     local playerespsector = EspTab:CreateSector('Player Esp','left')
     globaltable['setupespsettings'] = {
-
+        playeresp = false;
+        traceraim = false;
+        maxviewplayerdistance = 100;
+        savedtracer = nil;
+        savedvis = nil;
+        savedfunction = nil;
+        savedcirc = nil;
     }
     playerespsector:AddToggle("Player ESP", false, function(xstate)
         globaltable['setupespsettings']['playeresp'] = xstate
@@ -6193,12 +6346,14 @@ local function setupEspTab(globaltable) -- Espwindow
                             --
                         end;
                         playersettings = true;
+                        yoffset = 5;
                         maxdistance = globaltable['setupespsettings']['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
                     })
                     __assigned.inloopfunction = function()-- whati f no max health
                         if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
-                            __assigned.object.Text = loop_character.Name..' - '..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                            local dist = (loop_player.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
                         end
+                        __assigned.object.Text = loop_character.Name..' - '..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'\n'..tostring(dist)..' studs away'--(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
                         __assigned.maxdistance = globaltable['setupespsettings']['maxviewplayerdistance']
                         __assigned.checkingvalue = globaltable['setupespsettings']['playeresp']
                     end
@@ -6208,6 +6363,7 @@ local function setupEspTab(globaltable) -- Espwindow
                         end)
                     end
                     __assigned.waitingvalue = false;
+                    __assigned.playersettings = false;
                 end)
             end
             local DirectoryAdded = game.Players.ChildAdded:Connect(function(loop_player)
@@ -6228,8 +6384,9 @@ local function setupEspTab(globaltable) -- Espwindow
                     })
                     __assigned.inloopfunction = function()-- whati f no max health
                         if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
-                            __assigned.object.Text = loop_character.Name..' - '..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                            local dist = (loop_player.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
                         end
+                        __assigned.object.Text = loop_character.Name..' - '..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'\n'..tostring(dist)..' studs away'--(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
                         __assigned.maxdistance = globaltable['setupespsettings']['maxviewplayerdistance']
                         __assigned.checkingvalue = globaltable['setupespsettings']['playeresp']
                     end
@@ -6238,7 +6395,7 @@ local function setupEspTab(globaltable) -- Espwindow
                             __assigned.object:Remove()
                         end)
                     end
-                    __assigned.waitingvalue = false;
+                    __assigned.playersettings = false;
                 end)
                 -- if not game.Players:FindFirstChild(v.Name) then 
                 --     task.spawn(function()
@@ -6273,8 +6430,102 @@ local function setupEspTab(globaltable) -- Espwindow
             end)
         end
     end)
+    playerespsector:AddToggle("Tracer ESP", false, function(xstate)
+        globaltable['setupespsettings']['traceraim'] = xstate
+        if globaltable['setupespsettings']['traceraim'] == true then 
+           
+        else 
+            pcall(function()
+                globaltable['setupespsettings']['savedtracer']:Remove()
+            end)
+            pcall(function()
+                globaltable['setupespsettings']['savedvis']:Destroy()
+            end)
+            pcall(function()
+                globaltable['setupespsettings']['savedfunction']:Disconnect()
+            end)
+        end
+    end)
     playerespsector:AddSlider('Player Esp Distance',0,100,10000,1,function(xstate)
         globaltable['setupespsettings']['maxviewplayerdistance'] = xstate -- maxplayermobdistance
+    end)
+    task.spawn(function()
+        while task.wait() do 
+            if getgenv().loopsUnload == true then break end 
+            if globaltable['setupespsettings']['traceraim'] == true then 
+                local closestplayer = nil 
+                local closestdist = 0
+                local closestmouse= 0
+                for _,loop_player in next, game.Players:GetChildren() do 
+                    if loop_player.Character and loop_player.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and loop_player ~= game.Players.LocalPlayer then 
+                        local playerdist = (game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position - loop_player.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                        local mouseidst = (game.Players.LocalPlayer:GetMouse().hit.p - loop_player.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                        if playerdist <= globaltable['setupespsettings']['maxviewplayerdistance'] then 
+                            if closestplayer == nil and mouseidst <= 5 then 
+                                closestplayer = loop_player
+                                closestdist = playerdist
+                                closestmouse = mouseidst
+                            elseif mouseidst < closestmouse and mouseidst <= 5 then 
+                                closestplayer = loop_player
+                                closestdist = playerdist
+                                closestmouse = mouseidst
+                            end
+                        end
+                    end
+                end
+                if closestplayer ~= nil then 
+                    globaltable['setupespsettings']['traceraim'] = nil
+                    local preps = azfake.traceresp(closestplayer, {aimpart = true,tableg = globaltable['aimbotsettings'],circlepoint = true,radius = 5})
+                    globaltable['setupespsettings']['savedtracer'] = preps['trac'][1]
+                    globaltable['setupespsettings']['savedvis'] = preps['vis'][1]
+                    globaltable['setupespsettings']['savedcirc'] = preps['circ'][1]
+                    globaltable['setupespsettings']['savedfunction'] = preps['function'][1]
+                    warn('tracered '..closestplayer.Name)
+                end
+                -- task.spawn(function()
+                --     repeat task.wait(.3) until getgenv().loopsUnload == true ;
+                --     DirectoryAdded:Disconnect()
+                -- end)
+                task.spawn(function()
+                    local endrepeat = false 
+                    repeat 
+                        task.wait(0.1)
+                        if closestplayer and closestplayer.Character:FindFirstChild('HumanoidRootPart') then 
+                            local mouseidst = (game.Players.LocalPlayer:GetMouse().hit.p - closestplayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                            if mouseidst > 5 then 
+                                pcall(function()
+                                    globaltable['setupespsettings']['savedtracer']:Remove()
+                                end)
+                                pcall(function()
+                                    globaltable['setupespsettings']['savedvis']:Destroy()
+                                end)
+                                pcall(function()
+                                    globaltable['setupespsettings']['savedfunction']:Disconnect()
+                                    pcall(function()
+                                        globaltable['setupespsettings']['savedcirc']:Remove()
+                                    end)
+                                end)
+                                globaltable['setupespsettings']['traceraim'] = true
+                            end
+                        else
+                            pcall(function()
+                                globaltable['setupespsettings']['savedtracer']:Remove()
+                            end)
+                            pcall(function()
+                                globaltable['setupespsettings']['savedvis']:Destroy()
+                            end)
+                            pcall(function()
+                                globaltable['setupespsettings']['savedfunction']:Disconnect()
+                            end)
+                            pcall(function()
+                                globaltable['setupespsettings']['savedcirc']:Remove()
+                            end)
+                            globaltable['setupespsettings']['traceraim'] = true
+                        end 
+                    until getgenv().loopsUnload == true or globaltable['setupespsettings']['traceraim'] == true
+                end)
+            end
+        end
     end)
 
 end
@@ -6297,7 +6548,7 @@ local function setupAimbotTab(globaltable)
             'Chest';
             'Head';
             'LeftLeg';
-            'RightLeg';
+            'RightLeg'; -- project hit position, small circle on the hit point
         };
         aimingpart = 'Chest';
         lookcframe = false;
@@ -6313,6 +6564,8 @@ local function setupAimbotTab(globaltable)
             partoffset = false;
         };
         partoffset = 0;
+        aimbotlength = 100;
+        fov = 70
     }
 
     local aimbotbutton = pvpsector:AddToggle('Aimbot',false,function(xstate)
@@ -6366,7 +6619,14 @@ local function setupAimbotTab(globaltable)
     pvpconfigsector:AddSlider('Part Offset',0,0,10,100,function(xstate)
         globaltable['aimbotsettings']['partoffset'] = xstate
     end)
-    
+    game.Workspace.Camera:GetPropertyChangedSignal('FieldOfView'):Connect(function()
+        game.Workspace.Camera.FieldOfView = globaltable['aimbotsettings']['fov']
+    end)
+
+    pvpconfigsector:AddSlider('FOV Slider',70,0,120,1,function(xstate)
+        globaltable['aimbotsettings']['fov'] = xstate
+        game.Workspace.Camera.FieldOfView = globaltable['aimbotsettings']['fov']
+    end)
 
 
     local AimbotLoop = game:GetService('RunService').RenderStepped:Connect(function()
@@ -6387,6 +6647,7 @@ local function setupAimbotTab(globaltable)
             local ClosestPlayer = globaltable['aimbotsettings']['currenttarget'];
             local ClosestDistance = globaltable['aimbotsettings']['currenttargetdistance'];
             local ClosestMagnitude = globaltable['aimbotsettings']['closestmagnitude'];
+            local prevaimingscore = 1000000
             if globaltable['aimbotsettings']['currenttarget'] ~= nil and globaltable['aimbotsettings']['currenttarget'].Character and globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart then 
                 local xpos,IsVisibleOld = workspace.Camera:WorldToViewportPoint(globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position)
                 if IsVisibleOld == false then 
@@ -6403,7 +6664,7 @@ local function setupAimbotTab(globaltable)
             end
             if IsVisible == nil or IsVisible == nil and globaltable['aimbotsettings']['dontswaptarget'] == true and globaltable['aimbotsettings']['currenttarget'] == nil then --if ClosestPlayer == nil or globaltable['aimbotsettings']['dontswaptarget'] == false and ClosestPlayer == nil or globaltable['aimbotsettings']['dontswaptarget'] == true and ClosestPlayer ~= nil then 
                 for _,v in next, game.Players:GetPlayers() do 
-                    if v ~= game.Players.LocalPlayer and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v.Character and v.Character.PrimaryPart and v.Character:FindFirstChildWhichIsA('Humanoid') and v.Character:FindFirstChildWhichIsA('Humanoid').Health > 0 and v.Character:FindFirstChildWhichIsA('Humanoid'):GetState() ~= Enum.HumanoidStateType.Dead then 
+                    if v ~= game.Players.LocalPlayer and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v.Character and v.Character.PrimaryPart and v.Character:FindFirstChildWhichIsA('Humanoid') and v.Character:FindFirstChildWhichIsA('Humanoid').Health > 0 and v.Character:FindFirstChildWhichIsA('Humanoid'):GetState() ~= Enum.HumanoidStateType.Dead  and (game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position - v.Character.PrimaryPart.Position).Magnitude <= globaltable['aimbotsettings']['distancecheck'] then 
                         local vRoot = v.Character.PrimaryPart;
                         local Distance = (vRoot.Position - game.Players.LocalPlayer:GetMouse().hit.Position)--game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
                         local DistanceMagnitude = (vRoot.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
@@ -6420,14 +6681,16 @@ local function setupAimbotTab(globaltable)
                         if globaltable['aimbotsettings']['teamcheck'] == true then 
                             if v.Team == game.Players.LocalPlayer.Team then CanCheck = false end
                         end
+                        local aimingscore = Distance.Magnitude + DistanceMagnitude.Magnitude
                         if IsVisible and CanCheck == true then 
                             if globaltable['aimbotsettings']['dontswaptarget'] == false or globaltable['aimbotsettings']['dontswaptarget'] == true and globaltable['aimbotsettings']['currenttarget'] == nil and DistanceMagnitude <= globaltable['aimbotsettings']['distancecheck'] then 
                                 if ClosestPlayer == nil and ClosestDistance == nil and CanCheck == true then 
                                     ClosestPlayer = v;
                                     ClosestDistance = Distance.Magnitude; 
                                     ClosestMagnitude = DistanceMagnitude.Magnitude
-                                elseif CanCheck == true then
-                                    if ClosestMagnitude > DistanceMagnitude.Magnitude and ClosestDistance > Distance.Magnitude  then --and DistanceMagnitude.Magnitude < globaltable['aimbotsettings']['closestmagnitude'] then //  or ClosestDistance > Distance.Magnitude and ClosestMagnitude == nil
+                                    prevaimingscore = aimingscore
+                                elseif CanCheck == true then -- ClosestMagnitude > DistanceMagnitude.Magnitude and ClosestDistance > Distance.Magnitude 
+                                    if  ClosestDistance > Distance.Magnitude then    --       ClosestMagnitude > DistanceMagnitude.Magnitude and                    --  if aimingscore < prevaimingscore then--                 --and DistanceMagnitude.Magnitude < globaltable['aimbotsettings']['closestmagnitude'] then //  or ClosestDistance > Distance.Magnitude and ClosestMagnitude == nil
                                         ClosestPlayer = v;
                                         ClosestDistance = Distance.Magnitude
                                         ClosestMagnitude = DistanceMagnitude.Magnitude
@@ -7065,7 +7328,6 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         if game:GetService("Players").LocalPlayer.PlayerGui.ClientGui.Mainframe.Danger.Visible == false then 
             local cf = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
             game.Players.LocalPlayer.Character.Head:Destroy()
-            game.Players.LocalPlayer.Character.Humanoid:Destroy()
             task.spawn(function()
                 wait(6.3)
                 game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
@@ -9223,6 +9485,173 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         --local pTab = window:CreateTab('Premium');
         local PremiumSector = bloodlinesTab:CreateSector("Premium Access", "extra") -- can be "left" --  pTab
         local Bots = window:CreateTab('Bots');
+        local bsect = Bots:CreateSector('botting','left')
+
+        getgenv().treefruitfarm = false
+        bsect:AddToggle('Tree Fruit Farm',false,function(xstate)
+            getgenv().treefruitfarm = xstate
+            if getgenv().treefruitfarm == true then 
+                local cango = false -- function_pick
+                local addedfruit  = workspace.ChildAdded:Connect(function(child)
+                    if child:FindFirstChild('ID') and (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - child.Position).Magnitude <= 100 or child:FindFirstChild('ClickDetector') and (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - child.Position).Magnitude <= 100 then 
+                        cango = true
+                    end
+                end)
+                task.spawn(function()
+                    while getgenv().treefruitfarm == true do 
+                        task.wait(1)
+                        local treetables = {}
+                        for _,v in next, workspace:GetChildren() do 
+                            if v.Name:sub(1,4) == 'Tree' and v:FindFirstChild('TreeBush1') then 
+                                table.insert(treetables,v)
+                            end
+                        end
+                        game.Players.LocalPlayer.Character.HumanoidRootPart.Anchored = true
+                        -- task.spawn(function()
+                        --     repeat 
+                        --         task.wait(0.1)
+                        --         game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,math.random(2,18)*0.1,0)
+                        --     until getgenv().treefruitfarm == false
+                        -- end)
+                        for _,v in next, treetables do 
+                            if getgenv().treefruitfarm == false then 
+                                game.Players.LocalPlayer.Character.HumanoidRootPart.Anchored = false
+                                break 
+                            end
+                            local CompletedIn = false 
+                            local tween = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character.HumanoidRootPart,TweenInfo.new(3,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = v.TreeBush1.CFrame * CFrame.new(0,2,0)})
+                            tween:Play()
+                            tween.Completed:Connect(function()
+                                repeat task.wait() until (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.TreeBush1.Position).Magnitude <= 15
+                                task.wait(.5)
+                                CompletedIn = true
+                            end)
+                            repeat task.wait() until CompletedIn == true
+                            for index,part in next, v:GetChildren() do 
+                                if getgenv().treefruitfarm == false then 
+                                    game.Players.LocalPlayer.Character.HumanoidRootPart.Anchored = false
+                                    break 
+                                end
+                                if string.find(part.Name,'Bush') then 
+                                    game.Players.LocalPlayer.Character.HumanoidRootPart.Anchored = true
+                                    local CompletedIn = false 
+                                    local tween = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character.HumanoidRootPart,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = part.CFrame * CFrame.new(0,2,0)})
+                                    tween:Play()
+                                    tween.Completed:Connect(function()
+                                        repeat task.wait(0.019) until (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - part.Position).Magnitude <= 15
+                                        -- task.wait(1)
+                                        CompletedIn = true
+                                    end)
+                                    --game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame * CFrame.new(0,2,0)
+                                     --  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame * CFrame.new(math.random(2,18)*0.1,math.random(2,18)*0.1,math.random(2,18)*0.1) 
+                                    --repeat task.wait(.01) game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame * CFrame.new(math.random(2,18)*0.1,math.random(2,18)*0.1,math.random(2,18)*0.1)  until CompletedIn == true and cango == true
+                                    cango = false
+                                end
+                            end
+
+                            task.wait(1)
+                            local loopbroke = false
+                            task.delay(.1,function()
+                                if cango == false then 
+                                    cango = true
+                                end
+                            end)
+                        end
+                    end
+                end)
+            end
+        end)
+
+        getgenv().itemfarm = false
+        getgenv().tweeningf = false
+        getgenv().axistween = false;
+        getgenv().tpdelay = 0.01;
+        getgenv().waittimespawn = 0.01;
+        bsect:AddToggle('Tween',false,function(xstate)
+            getgenv().tweeningf = xstate
+        end)
+        bsect:AddToggle('Axis Tween',false,function(xstate)
+            getgenv().axistween = xstate
+        end)
+        bsect:AddSlider("Teleport Delay", 0.01, 0, 5, 10000, function(State)
+            getgenv().tpdelay = State
+        end)
+        bsect:AddSlider("Wait Time", 0.01, 0, 5, 10000, function(State)
+            getgenv().waittimespawn = State
+        end)
+        bsect:AddToggle('Item Farm',false,function(xstate)
+            getgenv().itemfarm = xstate
+            if getgenv().itemfarm == true then 
+                local teleportingwhilst = false
+                while true do 
+                    if getgenv().itemfarm == false then
+                        break
+                    end 
+                    task.wait(getgenv().tpdelay + 0.0001)
+                    if  game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = true
+                    end
+                    if teleportingwhilst == false then 
+                        teleportingwhilst = true 
+                        for _,object in next, game.ReplicatedStorage:GetChildren() do 
+                            if getgenv().itemfarm == false then
+                                break
+                            end 
+                            if not object:IsA('Folder') and not object:IsA('Model') and not object:IsA('StringValue') and not object:IsA('ModuleScript') then 
+                                local axisx = object.CFrame.X
+                                local axisy = object.CFrame.Y
+                                local axisz = object.CFrame.Z 
+                                
+                                local cfx = game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame.X 
+                                local cfy = game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame.Y 
+                                local cyz = game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame.Z
+        
+                                if getgenv().axistween == true and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                    if  game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = true
+                                    end
+                                    local tween1 = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'),TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = CFrame.new(axisx,game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame.Y ,game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame.Z)})
+                                    tween1:Play()
+                                    task.wait(1.01)
+                                    local tween2 = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'),TweenInfo.new(0.5,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = CFrame.new(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame.X,axisy,game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame.Z)})
+                                    tween2:Play()
+                                    task.wait(0.5)
+                                    local tween3 = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'),TweenInfo.new(0.1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = CFrame.new(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame.X,game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame.Y,axisz)})
+                                    tween3:Play()
+                                    task.wait(getgenv().waittimespawn)
+                                
+                                elseif getgenv().axistween == true and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                    if  game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = true
+                                    end
+                                    local tween1 = game:GetService('TweenService'):Create(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart'),TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = CFrame.new(axisx,axisy,axisz)}) -- caxfz
+                                    tween1:Play()
+                                    task.wait(getgenv().waittimespawn)
+                                else
+                                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.new(axisx,axisy+3,axisz)
+                                    if  game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = false
+                                    end
+                                    task.wait(getgenv().waittimespawn)
+                                    if  game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = false
+                                    end
+                                end
+                                getgenv().function_pick(object)
+                            end
+                        end 
+                        teleportingwhilst = false
+                    end
+                end
+            else
+                if  game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                    game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Anchored = false
+                end
+            end
+        end)
+
+
+
         PremiumSector:AddSeperator('Teleport Premium Functions')
         PremiumSector:AddTextbox('Waypoint',nil,function(State)
             getgenv().waypointselected = State
@@ -9852,7 +10281,23 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         end
 
     end)
-    sector:AddSeperator()
+    sector:AddSeperator('-')
+    local t_DataEvent = ReplicatedStorage.Events.DataEvent;
+    local t_DataFunction = ReplicatedStorage.Events.DataFunction;
+    
+    sector:AddButton('Exchange 1 Fragment',function()
+        t_DataFunction:InvokeServer("1FragmentExchange");
+    end)
+    sector:AddButton('Exchange 5 Fragments',function()
+        t_DataFunction:InvokeServer("5FragmentsExchange");
+    end)
+    sector:AddButton('Hallow Byakugan',function()
+        t_DataFunction:InvokeServer("HalloByakuganCheck");
+    end)
+    sector:AddButton('Cursed Schematic',function()
+        t_DataFunction:InvokeServer("CursedSchematicsCheck");
+    end)
+    sector:AddSeperator('-')
     sector:AddButton('Notify All Uchiha',function()
         for i,v in pairs(game.ReplicatedStorage.Settings:GetChildren()) do 
             if v.Name ~= game.Players.LocalPlayer.Name and v:FindFirstChild('Bloodline') and game.Players:FindFirstChild(v.Name) then 
@@ -10078,6 +10523,9 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         end
     end)
     sector:AddButton('Heal',getgenv().Injury)
+    sector:AddButton('Kill If Knocked',function()
+        game:GetService("ReplicatedStorage").Events.DataEvent:FireServer('KillMe')
+    end)
     sector:AddSeperator()
     getgenv().ServerHopToNonUsedServer = function()
         task.spawn(function()
@@ -11168,7 +11616,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                             transparencyisone = true
                         end
                     end)
-                until not instance or instance.Parent == nil or transparencyisone == true
+                until not instance or instance.Parent == nil or transparencyisone == true or instance.Parent == nil
             end)
         elseif instance:FindFirstChild('Humanoid') and instance:FindFirstChild('HumanoidRootPart') and not game.Players:FindFirstChild(instance.Name) then 
             table.insert(mobs,instance)             
@@ -11178,6 +11626,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     print('p1')
 
     local workspaceconnection = workspace.ChildAdded:Connect(function(instance)
+        task.wait(1)
         local foundPart = false
         if table.find(getgenv().AzfakeGlobalTables['bloodlines']['pickups'],instance.Name) then 
             foundPart = true
@@ -11195,11 +11644,14 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             foundPart = true
         end
         if foundPart  then -- or 
-            --print(instance.Name.. ' xloop')
             task.wait()
             getgenv().function_pick(instance)
             if instance.Name:sub(1,4) == 'Item' then 
-                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild('Right Leg') ,instance, 0)
+                firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChild('Right Leg') ,instance, 0)
+                firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChild('Left Leg') ,instance, 0)
+                firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') ,instance, 0)
+                firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChild('Head') ,instance, 0)
+                warn('item pickup, '..instance.Name)
             else
                 getgenv().function_pick(instance)
             end  
@@ -11209,16 +11661,20 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                     task.wait(1)
                     getgenv().function_pick(instance)
                     if instance.Name:sub(1,4) == 'Item' then 
-                        firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild('Right Leg') ,instance, 0)
+                        firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChild('Right Leg') ,instance, 0)
+                        firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChild('Left Leg') ,instance, 0)
+                        firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') ,instance, 0)
+                        firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChild('Head') ,instance, 0)
                     else
                         getgenv().function_pick(instance)
                     end  
                     pcall(function()
-                        if instance.Transparency == 1 then 
+                        if instance.Transparency == 1 and instance.Name:sub(1,4) ~= 'Item' then 
                             transparencyisone = true
                         end
                     end)
-                until instance.Transparency == 1 or not instance or transparencyisone == true
+                until not instance or transparencyisone == true or  instance.Parent == nil --- or previousparent
+                warn('picked up item')
             end)
         elseif instance:FindFirstChild('Humanoid') and instance:FindFirstChild('HumanoidRootPart') and not game.Players:FindFirstChild(instance.Name) then 
             table.insert(mobs,instance)              
@@ -15810,7 +16266,16 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
 
 
-
+                if workspace:FindFirstChild('DebrisParts'):FindFirstChild('Vent') and workspace:FindFirstChild('DebrisParts'):FindFirstChild('Part') and getgenv().AutoParryingFW == true and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                    for _,v in pairs(workspace:FindFirstChild('DebrisParts'):GetChildren()) do 
+                        if v.Name == 'Part' then
+                            local dist = (v.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                            if dist.Magnitude < 3 then 
+                                getgenv().roll()
+                            end
+                        end
+                    end
+                end
 
 
 
@@ -30460,6 +30925,174 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
         end
     end)
     AddConfigurations()
+elseif game.PlaceId == 8884043854 then 
+    local tab = window:CreateTab('Fortblox')
+    local sector = tab:CreateSector('Cheats','left')
+
+    getgenv().fortblo1settings = {
+        autopickup = false;
+        pickup1 = '';
+        pickup2 = '';
+        pickup3 = '';
+        pickup4 = '';
+        pickup5 = '';
+        find = '';
+        find2 = '';
+        find3 = '';
+        find4 = '';
+        find5 = '';
+    }
+    setupAimbotTab(getgenv().fortblo1settings)
+    setupEspTab(getgenv().fortblo1settings)
+    AddConfigurations()
+    sector:AddButton('Rejoin',function()
+        game:GetService('TeleportService'):teleport(game.PlaceId)
+    end)
+    sector:AddButton('Get Ammo',function()
+        for _,v in next, workspace.Drops:GetChildren() do 
+            if string.find(string.lower(v.Name),'ammo') then 
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame 
+                task.wait(.2)
+                game:GetService("ReplicatedStorage").Remotes.Pickup:FireServer(v)
+                break
+            end
+        end
+    end)
+    sector:AddToggle('Auto Pickup',false,function(xstate)
+        getgenv().fortblo1settings['autopickup'] = xstate
+    end)
+    sector:AddTextbox('Auto Pickup 1',nil,function(xstate)
+        getgenv().fortblo1settings['pickup1'] = xstate
+    end)
+    sector:AddTextbox('Auto Pickup 2',nil,function(xstate)
+        getgenv().fortblo1settings['pickup2'] = xstate
+    end)
+    sector:AddTextbox('Auto Pickup 3',nil,function(xstate)
+        getgenv().fortblo1settings['pickup3'] = xstate
+    end)
+    sector:AddTextbox('Auto Pickup 4',nil,function(xstate)
+        getgenv().fortblo1settings['pickup4'] = xstate
+    end)
+    sector:AddTextbox('Auto Pickup 5',nil,function(xstate)
+        getgenv().fortblo1settings['pickup5'] = xstate
+    end)
+    sector:AddTextbox('Get Pickup',nil,function(xstate)
+        getgenv().fortblo1settings['find'] = xstate
+    end)
+    sector:AddButton('Pickup Selected',function()
+        for _,v in next, workspace.Drops:GetChildren() do 
+            if v.Name:sub(1,string.len(getgenv().fortblo1settings['find'])) == getgenv().fortblo1settings['find'] then 
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame 
+                task.wait(.5)
+                game:GetService("ReplicatedStorage").Remotes.Pickup:FireServer(v)
+                break
+            end
+        end
+    end)
+    sector:AddSeperator('-')
+    sector:AddTextbox('Get Pickup 2',nil,function(xstate)
+        getgenv().fortblo1settings['find2'] = xstate
+    end)
+    sector:AddButton('Pickup Selected 2',function()
+        for _,v in next, workspace.Drops:GetChildren() do 
+            if v.Name:sub(1,string.len(getgenv().fortblo1settings['find2'])) == getgenv().fortblo1settings['find2'] then 
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame 
+                task.wait(.5)
+                game:GetService("ReplicatedStorage").Remotes.Pickup:FireServer(v)
+                break
+            end
+        end
+    end)
+    sector:AddSeperator('-')
+    sector:AddTextbox('Get Pickup 3',nil,function(xstate)
+        getgenv().fortblo1settings['find3'] = xstate
+    end)
+    sector:AddButton('Pickup Selected 3',function()
+        for _,v in next, workspace.Drops:GetChildren() do 
+            if v.Name:sub(1,string.len(getgenv().fortblo1settings['find3'])) == getgenv().fortblo1settings['find3'] then 
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame 
+                task.wait(.5)
+                game:GetService("ReplicatedStorage").Remotes.Pickup:FireServer(v)
+                break
+            end
+        end
+    end)
+    sector:AddSeperator('-')    sector:AddTextbox('Get Pickup',nil,function(xstate)
+        getgenv().fortblo1settings['find4'] = xstate
+    end)
+    sector:AddButton('Pickup Selected 4',function()
+        for _,v in next, workspace.Drops:GetChildren() do 
+            if v.Name:sub(1,string.len(getgenv().fortblo1settings['find4'])) == getgenv().fortblo1settings['find4'] then 
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame 
+                task.wait(.5)
+                game:GetService("ReplicatedStorage").Remotes.Pickup:FireServer(v)
+                break
+            end
+        end
+    end)
+    sector:AddSeperator('-')    sector:AddTextbox('Get Pickup',nil,function(xstate)
+        getgenv().fortblo1settings['find5'] = xstate
+    end)
+    sector:AddButton('Pickup Selected 4',function()
+        for _,v in next, workspace.Drops:GetChildren() do 
+            if v.Name:sub(1,string.len(getgenv().fortblo1settings['find5'])) == getgenv().fortblo1settings['find5'] then 
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame 
+                task.wait(.5)
+                game:GetService("ReplicatedStorage").Remotes.Pickup:FireServer(v)
+                break
+            end
+        end
+    end)
+    sector:AddSeperator('-')
+    task.spawn(function()
+        while task.wait(1) do 
+            if getgenv().fortblo1settings['autopickup']  == true then
+                getgenv().fortblo1settings['autopickup'] = nil 
+                for _,v in next, workspace.Drops:GetChildren() do 
+                    if getgenv().fortblo1settings['autopickup'] == false then 
+                        break 
+                    end
+                    task.wait(0.1)
+                    local p1 = getgenv().fortblo1settings['pickup1']
+                    local p2 = getgenv().fortblo1settings['pickup2']
+                    local p3 = getgenv().fortblo1settings['pickup3']
+                    local p4 = getgenv().fortblo1settings['pickup4']
+                    local p5 = getgenv().fortblo1settings['pickup5']
+                    if v.Name:sub(1,string.len(p1)) == p1 then 
+                        pcall(function()
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame 
+                        end)
+                        game:GetService("ReplicatedStorage").Remotes.Pickup:FireServer(v)
+                    elseif v.Name:sub(1,string.len(p2)) == p2 then 
+                        pcall(function()
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame 
+                        end)
+                        game:GetService("ReplicatedStorage").Remotes.Pickup:FireServer(v)
+                    elseif v.Name:sub(1,string.len(p3)) == p3 then 
+                        pcall(function()
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame 
+                        end)
+                        game:GetService("ReplicatedStorage").Remotes.Pickup:FireServer(v)
+                    elseif v.Name:sub(1,string.len(p4)) == p4 then 
+                        pcall(function()
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame 
+                        end)
+                        game:GetService("ReplicatedStorage").Remotes.Pickup:FireServer(v)
+                    elseif v.Name:sub(1,string.len(p5)) == p5 then 
+                        pcall(function()
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame 
+                        end)
+                        game:GetService("ReplicatedStorage").Remotes.Pickup:FireServer(v)
+                    else
+                        task.wait(.005)
+                    end
+                end
+                if getgenv().fortblo1settings['autopickup'] == nil then 
+                    getgenv().fortblo1settings['autopickup'] = true
+                end
+            end
+        end
+    end)
 else
 
     -- PlayerExperience
