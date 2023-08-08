@@ -6350,10 +6350,13 @@ local function setupEspTab(globaltable) -- Espwindow
                         maxdistance = globaltable['setupespsettings']['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
                     })
                     __assigned.inloopfunction = function()-- whati f no max health
+                        local dist = nil
                         if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
-                            local dist = (loop_player.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                            dist = (loop_player.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
                         end
-                        __assigned.object.Text = loop_character.Name..' - '..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'\n'..tostring(dist)..' studs away'--(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                        if loop_player and loop_player.Character then 
+                            __assigned.object.Text = loop_player.Name..' - '..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'\n'..tostring(dist)..' studs away'--(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                        end
                         __assigned.maxdistance = globaltable['setupespsettings']['maxviewplayerdistance']
                         __assigned.checkingvalue = globaltable['setupespsettings']['playeresp']
                     end
@@ -6383,10 +6386,13 @@ local function setupEspTab(globaltable) -- Espwindow
                         maxdistance = globaltable['setupespsettings']['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
                     })
                     __assigned.inloopfunction = function()-- whati f no max health
+                        local dist = nil
                         if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
-                            local dist = (loop_player.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                            dist = (loop_player.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
                         end
-                        __assigned.object.Text = loop_character.Name..' - '..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'\n'..tostring(dist)..' studs away'--(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                        if loop_player and loop_player.Character then 
+                            __assigned.object.Text = loop_player.Name..' - '..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'\n'..tostring(dist)..' studs away'--(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                        end
                         __assigned.maxdistance = globaltable['setupespsettings']['maxviewplayerdistance']
                         __assigned.checkingvalue = globaltable['setupespsettings']['playeresp']
                     end
@@ -10294,6 +10300,9 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     sector:AddButton('Hallow Byakugan',function()
         t_DataFunction:InvokeServer("HalloByakuganCheck");
     end)
+    sector:AddButton('Pumpkin Check',function()
+        t_DataFunction:InvokeServer("PumpkinCheck", 'Quit');
+    end)
     sector:AddButton('Cursed Schematic',function()
         t_DataFunction:InvokeServer("CursedSchematicsCheck");
     end)
@@ -10609,7 +10618,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         getgenv().listfiring = State
     end)
     tpsect:AddButton('join server', function()
-        getgenv().toList({fire = State})
+        getgenv().toList({fire = getgenv().listfiring})
     end)
     tpsect:AddButton('Get JobId', function() setclipboard(game.JobId) end)
 
@@ -12698,6 +12707,12 @@ elseif game.PlaceId == 11363208180 then --// skyfall
 elseif game.PlaceId == 147848991 then-- be a parkour ninja
     local Top = window:CreateTab("Parkour Ninja");
     local NinjaSect = Top:CreateSector('Ninja','left')
+    getgenv().parkourninja = {
+
+    }
+    setupAimbotTab(getgenv().parkourninja)
+    setupEspTab(getgenv().parkourninja)
+
     getgenv().Distance = 0
     getgenv().Dodge = false
     NinjaSect:AddSlider("AutoParry Distance", 0, 0, 100, 1, function(State)
@@ -12745,6 +12760,7 @@ elseif game.PlaceId == 147848991 then-- be a parkour ninja
             end
         end
     end)
+    AddConfigurations()
 elseif game.PlaceId == 8350658333 then --// fakewoken 3
     
     
@@ -30941,6 +30957,8 @@ elseif game.PlaceId == 8884043854 then
         find3 = '';
         find4 = '';
         find5 = '';
+        slentaim = false;
+        dist = 1000;
     }
     setupAimbotTab(getgenv().fortblo1settings)
     setupEspTab(getgenv().fortblo1settings)
@@ -30958,6 +30976,103 @@ elseif game.PlaceId == 8884043854 then
             end
         end
     end)
+    local function getclosestplayer()
+        local closestplayer = nil 
+        local closestdist = nil 
+        for _,v in next, game.Players:GetPlayers() do 
+            if v.Character and v ~= game.Players.LocalPlayer and v.Character:FindFirstChild('Humanoid') and v.Character:FindFirstChild('Humanoid').Health > 0 and v.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                local dist = (v.Character:FindFirstChild('HumanoidRootPart').Position -game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                if dist <= getgenv().fortblo1settings['dist'] then 
+                    if closestplayer == nil then 
+                        closestplayer = v 
+                        closestdist = dist
+                    else 
+                        if dist < closestdist then 
+                            closestplayer = v 
+                            closestdist = dist
+                        end
+                    end
+                end
+            end
+        end
+        return closestplayer
+    end
+    -- local mt = getrawmetatable(game)
+    -- local namecall = mt.__namecall
+    -- make_writeable(mt)
+    -- local oldind = mt.__index; 
+    -- mt.__namecall = newcclosure(function(self,...)
+    --     if getnamecallmethod() == 'FireServer' and tostring(self) == 'Shoot' and getgenv().fortblo1settings['slentaim'] == true then --// checkcaller
+    --         local args = {...}
+    --         local closeplayer = getclosestplayer()
+    --         if closeplayer ~= nil then 
+    --             args[2] = closeplayer.Character.Head.Position
+    --         end
+    --         return namecall(self,unpack(args))
+    --     end
+    --     return namecall(self,...)
+    -- end)
+    local metahook;
+    -- metahook = hookmetamethod(game,'__namecall',function(self,...)
+    --     local args = {...}
+    --     local call_type = getnamecallmethod();
+    --     if call_type == 'FireServer'  and tostring(self) == 'Shoot' then 
+    --         -- local closeplayer = getclosestplayer()
+    --         -- print('close player: '..tostring(closeplayer))
+    --         -- if closeplayer ~= nil then 
+    --         --     args[2] = closeplayer.Character.Head.Position
+    --         -- end
+    --         print('hi')
+    --         for i,child in next, workspace:GetChildren () do 
+    --             if game.Players:FindFirstChild(child.Name) and child:FindFirstChild('HumanoidRootPart') then 
+    --                 args[2] = child:FindFirstChild('HumanoidRootPart').Position
+    --             end
+    --         end
+    --         -- print(tostring(args[2])..' args 2')
+    --         -- for _,v in next, args do 
+    --         --     print(_,v)
+    --         -- end
+    --         -- return metahook(self,args[1],args[2],args[3])
+    --         -- local closestplayer = nil 
+    --         -- local closestdist = nil 
+    --         -- for _,v in next, game.Players:GetPlayers() do 
+    --         --     if v.Character and v ~= game.Players.LocalPlayer and v.Character:FindFirstChild('Humanoid') and v.Character:FindFirstChild('Humanoid').Health > 0 and v.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+    --         --         local dist = (game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position - v.Character:FindFirstChild('HumanoidRootPart').Position ).Magnitude
+    --         --         if dist <= getgenv().fortblo1settings['dist'] then 
+    --         --             if closestplayer == nil then 
+    --         --                 closestplayer = v 
+    --         --                 closestdist = dist
+    --         --             else 
+    --         --                 if dist < closestdist then 
+    --         --                     closestplayer = v 
+    --         --                     closestdist = dist
+    --         --                 end
+    --         --             end
+    --         --         end
+    --         --     end
+    --         -- end
+    --         -- if closestplayer ~= nil then
+    --         --     args[2] = closestplayer.Character.Head.Position
+    --         -- end 
+    --     end
+    --     return metahook(self,unpack(args))
+    -- end)
+    --[[
+
+                local ohInstance1 = workspace.TheVeinsRunWild.Items.Dragon
+            local ohVector32 = Vector3.new(-90.17420196533203, 167.70375061035156, -969.10546875)
+            local ohTable3 = {
+                [1] = -0.674522876739502, 0.0316326729953289, 0.737575888633728
+            }
+            
+            game:GetService("ReplicatedStorage").Remotes.Shoot:FireServer(ohInstance1, ohVector32, ohTable3)])
+    ]]
+    -- sector:AddSlider('Distance',0,1000,10000,10,function(xstate)
+    --     getgenv().fortblo1settings['dist'] = xstate
+    -- end)
+    -- sector:AddToggle('Silent Aim',false,function(xstate)
+    --     getgenv().fortblo1settings['slentaim'] = xstate
+    -- end)
     sector:AddToggle('Auto Pickup',false,function(xstate)
         getgenv().fortblo1settings['autopickup'] = xstate
     end)
