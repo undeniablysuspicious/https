@@ -10290,23 +10290,25 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     sector:AddSeperator('-')
     local t_DataEvent = game.ReplicatedStorage.Events.DataEvent;
     local t_DataFunction = game.ReplicatedStorage.Events.DataFunction;
+    if getgenv().iamamodplsgiveexchangeykwhatimsayingimagoodcivilianinjesusnameamen then 
+        sector:AddButton('Exchange 1 Fragment',function()
+            t_DataFunction:InvokeServer("1FragmentExchange");
+        end)
+        sector:AddButton('Exchange 5 Fragments',function()
+            t_DataFunction:InvokeServer("5FragmentsExchange");
+        end)
+        sector:AddButton('Hallow Byakugan',function()
+            t_DataFunction:InvokeServer("HalloByakuganCheck");
+        end)
+        sector:AddButton('Pumpkin Check',function()
+            t_DataFunction:InvokeServer("PumpkinCheck", 'Quit');
+        end)
+        sector:AddButton('Cursed Schematic',function()
+            t_DataFunction:InvokeServer("CursedSchematicsCheck");
+        end)
+        sector:AddSeperator('-')
+    end
 
-    sector:AddButton('Exchange 1 Fragment',function()
-        t_DataFunction:InvokeServer("1FragmentExchange");
-    end)
-    sector:AddButton('Exchange 5 Fragments',function()
-        t_DataFunction:InvokeServer("5FragmentsExchange");
-    end)
-    sector:AddButton('Hallow Byakugan',function()
-        t_DataFunction:InvokeServer("HalloByakuganCheck");
-    end)
-    sector:AddButton('Pumpkin Check',function()
-        t_DataFunction:InvokeServer("PumpkinCheck", 'Quit');
-    end)
-    sector:AddButton('Cursed Schematic',function()
-        t_DataFunction:InvokeServer("CursedSchematicsCheck");
-    end)
-    sector:AddSeperator('-')
     sector:AddButton('Notify All Uchiha',function()
         for i,v in pairs(game.ReplicatedStorage.Settings:GetChildren()) do 
             if v.Name ~= game.Players.LocalPlayer.Name and v:FindFirstChild('Bloodline') and game.Players:FindFirstChild(v.Name) then 
