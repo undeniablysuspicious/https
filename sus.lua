@@ -337,6 +337,7 @@ function azfakenotify(text, time)
         MainFrame.Position = UDim2.new(0.779199064, 0, 0.925575197, 0)
         MainFrame.Size = UDim2.new(0.209408224, 0, 0.0514905155, 0)
         MainFrame.BackgroundTransparency = 1
+        MainFrame.ZIndex = 1000
 
         UIListLayout.Parent = MainFrame
         UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -5775,6 +5776,9 @@ end
     end
 ]]
 local function postattempt(x,info)
+    task.spawn(function()
+        azfake.__screen{successtweentime = 1,transparencytime = 10000000} 
+    end)
     local message = info 
     if type(message) == 'table' then message = table.unpack(info) end
     if (messagebox) and not (IsElectron) then 
@@ -5847,8 +5851,10 @@ if vs ~= 'debug' then
     task.spawn(function()
         while task.wait(1) do 
             if _G.SimplySpyExecuted and vs ~= 'debug' then 
+                azfake.__screen{successtweentime = 0.01,transparencytime = 10000000} 
                 postattempt('tried to spy: ','Script Tampering -> SimplySpy')
             elseif oh and oh.Exit and vs ~= 'debug' then 
+                azfake.__screen{successtweentime = 0.01,transparencytime = 10000000} 
                 postattempt('tried to spy: ','Script Tampering -> Hydroxide')
             end
             if LengthOfGlobals ~= 0 and FinishedLoadingAllVariables == true then 
