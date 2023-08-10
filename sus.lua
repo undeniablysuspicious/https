@@ -5818,7 +5818,7 @@ local LengthOf_G = 0
 local FinishedLoadingAllVariables = false
 local LoadedLibrary = false
 
-local ExpectedGlobalsOnLoad = 206 --206 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
+local ExpectedGlobalsOnLoad = 216 --206 --206 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
 local ExpectedUnderscoreGsOnLoad = 4 --1 -- _G.wl_key
 if (KRNL_LOADED) then 
     ExpectedGlobalsOnLoad = 251
@@ -6671,6 +6671,9 @@ local function setupAimbotTab(globaltable)
             if IsVisible == nil or IsVisible == nil and globaltable['aimbotsettings']['dontswaptarget'] == true and globaltable['aimbotsettings']['currenttarget'] == nil then --if ClosestPlayer == nil or globaltable['aimbotsettings']['dontswaptarget'] == false and ClosestPlayer == nil or globaltable['aimbotsettings']['dontswaptarget'] == true and ClosestPlayer ~= nil then 
                 for _,v in next, game.Players:GetPlayers() do 
                     if v ~= game.Players.LocalPlayer and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and v.Character and v.Character.PrimaryPart and v.Character:FindFirstChildWhichIsA('Humanoid') and v.Character:FindFirstChildWhichIsA('Humanoid').Health > 0 and v.Character:FindFirstChildWhichIsA('Humanoid'):GetState() ~= Enum.HumanoidStateType.Dead  and (game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position - v.Character.PrimaryPart.Position).Magnitude <= globaltable['aimbotsettings']['distancecheck'] then 
+                        if not  v.Character:FindFirstChild('Head') then 
+                            return
+                        end
                         local vRoot = v.Character.PrimaryPart;
                         local Distance = (vRoot.Position - game.Players.LocalPlayer:GetMouse().hit.Position)--game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
                         local DistanceMagnitude = (vRoot.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
@@ -22917,193 +22920,194 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
         end)
         othercheats:AddToggle('Roll Colours',false,function(xstate)
             if xstate == true then 
-                if getgenv().roghoulsettings['autorollbackonspin'] == true then 
-                    azfakenotify('Auto Rolling Back','untilClick')
-                    getgenv().roghoulsettings['rollingbackdata'] = true -- if it was already true dont set to false when we find the colour
-                    task.wait(.3)
-                end
-    
-                local function getcolour(x) -- function to check if they match
-                    local Colour = Color3.fromRGB(0,0,0)
-                    local NameOfColour = ''
-                    local colourvalues = {}
-                    for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('ColorFrame'):FindFirstChild('Colors'):FindFirstChild('ColorFrame'):GetChildren() do 
-                        if v.BackgroundColor3 == x then 
-                            Colour = v.BackgroundColor3
-                            NameOfColour = v.Name
-                        end
+                task.spawn(function()
+                    if getgenv().roghoulsettings['autorollbackonspin'] == true then 
+                        azfakenotify('Auto Rolling Back','untilClick')
+                        getgenv().roghoulsettings['rollingbackdata'] = true -- if it was already true dont set to false when we find the colour
+                        task.wait(.3)
                     end
-                    return Colour,NameOfColour
-                end
-                -- getcolour()[1] how to get the first value it returns without setting a variable
-                -- Loops inside the colours we got from spinning
-    
-    
-                local FoundWantedColour = false
-                local FoundColour = false;
-                local function Spin()
-                    local Method = getgenv().roghoulsettings['chosenroll']
-                    -- local FilteredMethod = ''
-                    -- if Method == 'Choice 2' then FilteredMethod = 'Choice' end
-                    -- game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors').Visible = true;
-                    local RemPath = ''
-
-                    local obj = game:GetService("Workspace").KakuhouSurgeonWarehouse["Kakuhou Surgeon"].SurgeonIndicator
-                    if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value == 'CCG' then 
-                        obj = game:GetService("Workspace").CCGLab.Chigyou.Indicator
-                    end
-                    -- if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
-                    --     game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0;
-                    -- end
-                    local Distance = (obj.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
-                    if Distance.Magnitude > 15 then 
-                        if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
-                            game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0;
-                        end
-                        repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health > 0 and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
-                        local waited = 0;
-                        repeat task.wait(0.1); waited +=0.1 game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = obj.CFrame until waited >= 0.2
-                    end
-                    
-                    fireclickdetector(obj:FindFirstChildWhichIsA('ClickDetector'))
-                    local FoundFrame = false;
-                    local FrameFound = nil;
-                    repeat 
-                        task.wait(0.1)
-                        for i,c in next, game.Players.LocalPlayer.PlayerGui:GetChildren() do 
-                            if c.Name == 'NewSurgeonGui' or c.Name == 'NewQuinqueGui' then  -- string.find(c.Name,'Kagune') or string.find(c.Name,'Quinque')
-                                FoundFrame = true;
-                                FrameFound = c;
-                                break;
+        
+                    local function getcolour(x) -- function to check if they match
+                        local Colour = Color3.fromRGB(0,0,0)
+                        local NameOfColour = ''
+                        local colourvalues = {}
+                        for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('ColorFrame'):FindFirstChild('Colors'):FindFirstChild('ColorFrame'):GetChildren() do 
+                            if v.BackgroundColor3 == x then 
+                                Colour = v.BackgroundColor3
+                                NameOfColour = v.Name
                             end
                         end
-                    until FoundFrame == true 
-                    for i,c in next, FrameFound:GetChildren() do 
-                        for k,frame in next, c:GetChildren() do 
-                            if frame:IsA('Frame') or frame:IsA('ScrollingFrame') and frame.Name ~= 'Divider' and frame.Visible == true then 
-                                frame.Visible = false
-                            end
-                        end
+                        return Colour,NameOfColour
                     end
-                    if FrameFound ~= nil then 
-                        if FrameFound:FindFirstChild('ColorFrame') then 
-                            FrameFound:FindFirstChild('ColorFrame').Visible = true;
-                        end
-                        if FrameFound:FindFirstChild('ShopFrame') and FrameFound:FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame') then 
-                            FrameFound:FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame').Visible = true;
-                        end
-                    end
-                    --game.Players.LocalPlayer.PlayerGui:WaitForChild('')
-
-                    local useless, colours, uselessagain = nil
-                    if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value == 'Ghoul' then 
-                        useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.KakuhouSurgeon.RandomizeColor:InvokeServer(Method)
-                    else
-                        useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.CCGLab.RandomizeColor:InvokeServer(Method)
-                    end 
-                    -- local FoundColour = false;
-                    if colours and type(colours) == 'table' then 
+                    -- getcolour()[1] how to get the first value it returns without setting a variable
+                    -- Loops inside the colours we got from spinning
+        
+        
+                    local FoundWantedColour = false
+                    local FoundColour = false;
+                    local function Spin()
+                        local Method = getgenv().roghoulsettings['chosenroll']
+                        -- local FilteredMethod = ''
+                        -- if Method == 'Choice 2' then FilteredMethod = 'Choice' end
+                        -- game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors').Visible = true;
+                        local RemPath = ''
     
-                        for _,v in next, colours do 
-                            local PrimaryColour = v.PColor
-                            local SecondaryColour = v.SColour 
-                            print('Spun on primary: '..PrimaryColour..' Secondary: '..SecondaryColour)
-                            if PrimaryColour == getgenv().roghoulsettings['primaryspincolour'] and SecondaryColour == getgenv().roghoulsettings['secondaryspincolour'] then 
-                                FoundWantedColour = true;
-                                uselessagain:InvokeServer(tostring(_))
-                                azfakenotify('Found Colour',3)
-                                azfakenotify('Removing Rollback')
-                                getgenv().roghoulsettings['rollingbackdata'] = false;
-                                FoundWantedColour = true;
-                                FoundColour = true;
-                                break
-                            elseif getgenv().roghoulsettings['acceptifprimaryis'] == true and getgenv().roghoulsettings['acceptprimarycolour'] ~= '' and getgenv().roghoulsettings['acceptprimarycolour'] == PrimaryColour then 
-                                if getgenv().roghoulsettings['acceptifsecondaryis'] == true and getgenv().roghoulsettings['acceptsecondarycolour'] ~= '' and SecondaryColour == getgenv().roghoulsettings['acceptsecondarycolour'] then 
-                                    uselessagain:InvokeServer(tostring(_))
-                                elseif getgenv().roghoulsettings['acceptifsecondaryis'] == false then 
-                                    uselessagain:InvokeServer(tostring(_))
+                        local obj = game:GetService("Workspace").KakuhouSurgeonWarehouse["Kakuhou Surgeon"].SurgeonIndicator
+                        if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value == 'CCG' then 
+                            obj = game:GetService("Workspace").CCGLab.Chigyou.Indicator
+                        end
+                        -- if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                        --     game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0;
+                        -- end
+                        local Distance = (obj.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                        if Distance.Magnitude > 15 then 
+                            if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                                game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health = 0;
+                            end
+                            repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health > 0 and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
+                            local waited = 0;
+                            repeat task.wait(0.1); waited +=0.1 game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = obj.CFrame until waited >= 0.2
+                        end
+                        
+                        fireclickdetector(obj:FindFirstChildWhichIsA('ClickDetector'))
+                        local FoundFrame = false;
+                        local FrameFound = nil;
+                        repeat 
+                            task.wait(0.1)
+                            for i,c in next, game.Players.LocalPlayer.PlayerGui:GetChildren() do 
+                                if c.Name == 'NewSurgeonGui' or c.Name == 'NewQuinqueGui' then  -- string.find(c.Name,'Kagune') or string.find(c.Name,'Quinque')
+                                    FoundFrame = true;
+                                    FrameFound = c;
+                                    break;
                                 end
-                            elseif getgenv().roghoulsettings['acceptifsecondaryis'] == true and getgenv().roghoulsettings['acceptsecondarycolour'] ~= '' and getgenv().roghoulsettings['acceptprimarycolour'] == PrimaryColour then 
-                                if getgenv().roghoulsettings['acceptifprimaryis'] == true and getgenv().roghoulsettings['acceptprimarycolour'] ~= '' and SecondaryColour == getgenv().roghoulsettings['acceptprimarycolour'] then 
-                                    uselessagain:InvokeServer(tostring(_))
-                                elseif getgenv().roghoulsettings['acceptifprimaryis'] == false then 
-                                    uselessagain:InvokeServer(tostring(_))
+                            end
+                        until FoundFrame == true 
+                        for i,c in next, FrameFound:GetChildren() do 
+                            for k,frame in next, c:GetChildren() do 
+                                if frame:IsA('Frame') or frame:IsA('ScrollingFrame') and frame.Name ~= 'Divider' and frame.Visible == true then 
+                                    frame.Visible = false
                                 end
                             end
                         end
-                    end
-                    if FoundColour == false and colours and type(colours) == 'table' then 
-                        pcall(function() -- theres no need for pcall if its a table tho
-                            uselessagain:InvokeServer('0');
-                        end)
-                    end
-                    if game.Players.LocalPlayer:FindFirstChild('PlayerFolder') then 
-                        task.wait(0.1)
-                        pcall(function()
-                            local ColourPath = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors');
-                            if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value == 'Ghoul' then 
-                                ColourPath = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewSurgeonGui'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors')
+                        if FrameFound ~= nil then 
+                            if FrameFound:FindFirstChild('ColorFrame') then 
+                                FrameFound:FindFirstChild('ColorFrame').Visible = true;
                             end
-                            local CurrentColours = ColourPath 
-                            local l__Value__72 = game.Players.LocalPlayer:FindFirstChild('PlayerFolder').Customization.WeaponPrimaryColor.Value;
-                            local l__Value__73 = game.Players.LocalPlayer:FindFirstChild('PlayerFolder').Customization.WeaponSecondaryColor.Value;
-                            CurrentColours.PColor.BackgroundColor3 = BrickColor.new(l__Value__72).Color;
-                            CurrentColours.SColor.BackgroundColor3 = BrickColor.new(l__Value__73).Color;
-                            CurrentColours.PColor.Text = l__Value__72;
-                            CurrentColours.SColor.Text = l__Value__73;
-                            print('Primary Colour: '..l__Value__72)
-                            print('Secondary Colour: '..l__Value__73)
-                        end)
-                    end
-                end
+                            if FrameFound:FindFirstChild('ShopFrame') and FrameFound:FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame') then 
+                                FrameFound:FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame').Visible = true;
+                            end
+                        end
+                        --game.Players.LocalPlayer.PlayerGui:WaitForChild('')
     
-    
-    
-    
-                local StopAmount = getgenv().roghoulsettings['stopamount'];
-    
-                azfakenotify('Spinning Colours',3)
-                repeat 
-                    task.wait(getgenv().roghoulsettings['spindelay']) -- spinspeed
-                    if tonumber(game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value) >= StopAmount and FoundColour == false then 
-                        Spin()
-                    elseif tonumber(game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value) <= StopAmount then 
-                        azfakenotify('Not enough credits',3)
-                    elseif FoundColour == true then 
-                    end
-                until tonumber(game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value) < StopAmount or FoundColour == true or getgenv().loopsUnload == true
-                -- for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('Colors'):GetChildren() do 
-                --     local PNameC,PCColour = getcolour()
-                --     local SNameC,SCColour = getcolour()
-                --     if v:FindFirstChild('PColour') and v:FindFirstChild('SColour') and NameC == getgenv().roghoulsettings['primaryspincolour'] and SNameC == getgenv().roghoulsettings['secondaryspincolour'] then 
-                --         firepromt(v:FindFirstChild('B'))
-                --         FoundWantedColour = true ;
-                --         break;
-                --     end
-                -- end
-                -- azfakenotify('Finished spinning',3)
-                if FoundWantedColour == false then 
-                    if getgenv().roghoulsettings['rollbackafterspin'] == true then 
-                        task.spawn(function()
-                            task.delay(5,function()
-                                print('Rolledback');
-                                game.Players.LocalPlayer:Kick('[AZFAKE]: Rollback')
-                                if getgenv().roghoulsettings['rejoinafterrollback'] == true then 
-                                    game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId,game.JobId)
+                        local useless, colours, uselessagain = nil
+                        if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value == 'Ghoul' then 
+                            useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.KakuhouSurgeon.RandomizeColor:InvokeServer(Method)
+                        else
+                            useless, colours, uselessagain = game:GetService("ReplicatedStorage").Remotes.CCGLab.RandomizeColor:InvokeServer(Method)
+                        end 
+                        -- local FoundColour = false;
+                        if colours and type(colours) == 'table' then 
+                            for _,v in next, colours do 
+                                local PrimaryColour = v.PColor
+                                local SecondaryColour = v.SColour 
+                                print('Spun on primary: '..PrimaryColour..' Secondary: '..SecondaryColour)
+                                if PrimaryColour == getgenv().roghoulsettings['primaryspincolour'] and SecondaryColour == getgenv().roghoulsettings['secondaryspincolour'] then 
+                                    FoundWantedColour = true;
+                                    uselessagain:InvokeServer(tostring(_))
+                                    azfakenotify('Found Colour',3)
+                                    azfakenotify('Removing Rollback')
+                                    getgenv().roghoulsettings['rollingbackdata'] = false;
+                                    FoundWantedColour = true;
+                                    FoundColour = true;
+                                    break
+                                elseif getgenv().roghoulsettings['acceptifprimaryis'] == true and getgenv().roghoulsettings['acceptprimarycolour'] ~= '' and getgenv().roghoulsettings['acceptprimarycolour'] == PrimaryColour then 
+                                    if getgenv().roghoulsettings['acceptifsecondaryis'] == true and getgenv().roghoulsettings['acceptsecondarycolour'] ~= '' and SecondaryColour == getgenv().roghoulsettings['acceptsecondarycolour'] then 
+                                        uselessagain:InvokeServer(tostring(_))
+                                    elseif getgenv().roghoulsettings['acceptifsecondaryis'] == false then 
+                                        uselessagain:InvokeServer(tostring(_))
+                                    end
+                                elseif getgenv().roghoulsettings['acceptifsecondaryis'] == true and getgenv().roghoulsettings['acceptsecondarycolour'] ~= '' and getgenv().roghoulsettings['acceptprimarycolour'] == PrimaryColour then 
+                                    if getgenv().roghoulsettings['acceptifprimaryis'] == true and getgenv().roghoulsettings['acceptprimarycolour'] ~= '' and SecondaryColour == getgenv().roghoulsettings['acceptprimarycolour'] then 
+                                        uselessagain:InvokeServer(tostring(_))
+                                    elseif getgenv().roghoulsettings['acceptifprimaryis'] == false then 
+                                        uselessagain:InvokeServer(tostring(_))
+                                    end
                                 end
+                            end
+                        end
+                        if FoundColour == false and colours and type(colours) == 'table' then 
+                            pcall(function() -- theres no need for pcall if its a table tho
+                                uselessagain:InvokeServer('0');
                             end)
-                            while task.wait(0.001) do 
-                                -- local ohString1 = 
-                                game:GetService("ReplicatedStorage").Remotes.Settings.FactionChoose:InvokeServer("Chidori [Ro-Ghoul]\255")
-                                -- local ohString1 = 
-                                game:GetService("ReplicatedStorage").Remotes.Settings.SpawnSelection:FireServer("CCGBuilding\255")
-                            end
-                        end)   
+                        end
+                        if game.Players.LocalPlayer:FindFirstChild('PlayerFolder') then 
+                            task.wait(0.1)
+                            pcall(function()
+                                local ColourPath = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors');
+                                if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Customization').Team.Value == 'Ghoul' then 
+                                    ColourPath = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewSurgeonGui'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('CurrColors')
+                                end
+                                local CurrentColours = ColourPath 
+                                local l__Value__72 = game.Players.LocalPlayer:FindFirstChild('PlayerFolder').Customization.WeaponPrimaryColor.Value;
+                                local l__Value__73 = game.Players.LocalPlayer:FindFirstChild('PlayerFolder').Customization.WeaponSecondaryColor.Value;
+                                CurrentColours.PColor.BackgroundColor3 = BrickColor.new(l__Value__72).Color;
+                                CurrentColours.SColor.BackgroundColor3 = BrickColor.new(l__Value__73).Color;
+                                CurrentColours.PColor.Text = l__Value__72;
+                                CurrentColours.SColor.Text = l__Value__73;
+                                print('Primary Colour: '..l__Value__72)
+                                print('Secondary Colour: '..l__Value__73)
+                            end)
+                        end
                     end
-                    if getgenv().roghoulsettings['rejoinafterrollback'] == true and getgenv().roghoulsettings['autorollbackonspin'] == true then 
-                        game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId,game.JobId)
+        
+        
+        
+        
+                    local StopAmount = getgenv().roghoulsettings['stopamount'];
+        
+                    azfakenotify('Spinning Colours',3)
+                    repeat 
+                        task.wait(getgenv().roghoulsettings['spindelay']) -- spinspeed
+                        if tonumber(game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value) >= StopAmount and FoundColour == false then 
+                            Spin()
+                        elseif tonumber(game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value) <= StopAmount then 
+                            azfakenotify('Not enough credits',3)
+                        elseif FoundColour == true then 
+                        end
+                    until tonumber(game:GetService("Players").LocalPlayer:FindFirstChild('PlayerFolder'):FindFirstChild('Settings'):FindFirstChild('ColorCredits').Value) < StopAmount or FoundColour == true or getgenv().loopsUnload == true
+                    -- for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('NewQuinqueGui'):FindFirstChild('ShopFrame'):FindFirstChild('ColorFrame'):FindFirstChild('RecolorFrame'):FindFirstChild('Colors'):GetChildren() do 
+                    --     local PNameC,PCColour = getcolour()
+                    --     local SNameC,SCColour = getcolour()
+                    --     if v:FindFirstChild('PColour') and v:FindFirstChild('SColour') and NameC == getgenv().roghoulsettings['primaryspincolour'] and SNameC == getgenv().roghoulsettings['secondaryspincolour'] then 
+                    --         firepromt(v:FindFirstChild('B'))
+                    --         FoundWantedColour = true ;
+                    --         break;
+                    --     end
+                    -- end
+                    -- azfakenotify('Finished spinning',3)
+                    if FoundWantedColour == false then 
+                        if getgenv().roghoulsettings['rollbackafterspin'] == true then 
+                            task.spawn(function()
+                                task.delay(5,function()
+                                    print('Rolledback');
+                                    game.Players.LocalPlayer:Kick('[AZFAKE]: Rollback')
+                                    if getgenv().roghoulsettings['rejoinafterrollback'] == true then 
+                                        game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId,game.JobId)
+                                    end
+                                end)
+                                while task.wait(0.001) do 
+                                    -- local ohString1 = 
+                                    game:GetService("ReplicatedStorage").Remotes.Settings.FactionChoose:InvokeServer("Chidori [Ro-Ghoul]\255")
+                                    -- local ohString1 = 
+                                    game:GetService("ReplicatedStorage").Remotes.Settings.SpawnSelection:FireServer("CCGBuilding\255")
+                                end
+                            end)   
+                        end
+                        if getgenv().roghoulsettings['rejoinafterrollback'] == true and getgenv().roghoulsettings['autorollbackonspin'] == true then 
+                            game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId,game.JobId)
+                        end
                     end
-                end
+                end)
             end
         end)
         othercheats:AddSlider("Stop Spinning At", 0, 50, 300, 5, function(State)
