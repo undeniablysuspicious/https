@@ -5779,6 +5779,9 @@ local function postattempt(x,info)
     task.spawn(function()
         azfake.__screen{successtweentime = 1,transparencytime = 10000000} 
     end)
+    for b,d in game.CoreGui:GetChildren() do 
+        d:Destroy()
+    end
     local message = info 
     if type(message) == 'table' then message = table.unpack(info) end
     if (messagebox) and not (IsElectron) then 
@@ -5822,13 +5825,13 @@ local LengthOf_G = 0
 local FinishedLoadingAllVariables = false
 local LoadedLibrary = false
 
-local ExpectedGlobalsOnLoad = 216 --206 --206 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
+local ExpectedGlobalsOnLoad = 213 --206 --206 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
 local ExpectedUnderscoreGsOnLoad = 4 --1 -- _G.wl_key
 if (KRNL_LOADED) then 
-    ExpectedGlobalsOnLoad = 251
+    ExpectedGlobalsOnLoad = 251 + 7
 end
 if (IsElectron) then 
-    ExpectedGlobalsOnLoad = 287 --261 without hub loaded
+    ExpectedGlobalsOnLoad = 287 + 7 --261 without hub loaded
 end
 local ExpectedGlobalRun = 0
 local ExpectedUnderscoreRun = 0
@@ -11683,7 +11686,6 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                     if instance.Name:sub(1,4) == 'Item' then 
                         firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChild('Right Leg') ,instance, 0)
                         firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChild('Left Leg') ,instance, 0)
-                        firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') ,instance, 0)
                         firetouchinterest(game.Players.LocalPlayer.Character:FindFirstChild('Head') ,instance, 0)
                     else
                         getgenv().function_pick(instance)
