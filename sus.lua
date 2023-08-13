@@ -7106,7 +7106,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                     'i stood no chance';
                     'i stood no chance from the start';
                     'my fate was sealed from the beginning';
-                    'ill tell my mommy about you' -- son
+                    'ill tell my mommy about you'; -- son
                     'deary me';
                     'im in shambles';
                 }
