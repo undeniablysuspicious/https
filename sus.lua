@@ -7047,6 +7047,10 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     local event = game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.OnMessageDoneFiltering
     -- xeventset
     local stopbringing = false
+    m_GameManager = require(game.ReplicatedStorage.GameManager)
+    local animsplayingforced = {
+
+    }
     getgenv().chatloggerhook = event.OnClientEvent:Connect(function(object)
         local msg = string.format("%s : %s", object.FromSpeaker, object.Message or ""),game.Players:FindFirstChild(object.FromSpeaker)
         local splitName = string.split(msg,' ')
@@ -7136,6 +7140,15 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                 end)
             elseif text == 'can you invite me to yo clan' then 
                 game.ReplicatedStorage.Events:FindFirstChild('DataEvent'):FireServer("InviteToClan",game.Players:FindFirstChild(senderName).Character.Name)
+            elseif text:sub(1,5) == '!play' then 
+                Animation6 = m_GameManager:getAnimation(text:sub(6,string.len(text)), game.Players.LocalPlayer.Character.Humanoid);
+                Animation6:Play()
+                table.insert(animsplayingforced,Animation6)
+            elseif text == 'endanims' then 
+                for i,v in next, animsplayingforced do 
+                    v:Stop()
+                    table.remove(animsplayingforced,i)
+                end
             end
             
         end
