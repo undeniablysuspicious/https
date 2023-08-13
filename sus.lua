@@ -54,6 +54,49 @@ local dungeon_quest_games = {
     ["Krampus"]=11926349271;
 }
 
+local shindogames = {
+    "7214033433",
+    "6505734854",
+    "5451410109",
+    "5451405681",
+    "5743370338",
+    "4601350809",
+    "5255237254",
+    "6602103757",
+    "5824792748",
+    "6593188260",
+    "5664805984",
+    "4601350214",
+    "5431069982",
+    "4601350656",
+    "4616652839",
+    "11910138955",
+    "5943872934",
+    "7923764447",
+    "5451398863",
+    "6444873399",
+    "5307141034",
+    "4601350760",
+    "8184506020",
+    "6602058266",
+    "9310522814",
+    "7534339269",
+    "7524811367",
+    "5084678830",
+    "6986372023",
+    "4601350394",
+    "5664803952",
+    "6341670805",
+    "6984568732",
+    "7524809704",
+    "6901575446",
+    "5447073001",
+    "5451401540",
+    "6593187011",
+    "8472733618",
+    "5431071837",
+
+}
 -- getgenv().TableOfFunctions = {}
 
 
@@ -5887,7 +5930,8 @@ end
 -- put before library because library has getgenv
 local library =loadstring(game:HttpGet("https://raw.githubusercontent.com/hairlinebrockeb/-back-ups-for-libs/main/cat", true))()
 -- 492, 598 "Azfake V3{"..vs..','..game.PlaceId..'}' -- M1xup Azzfake Azfake V3 M1xact
-local window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(492, 598), Enum.KeyCode.LeftAlt) -- 2nd argument is the size, 3rd is the show/hide ofc
+local OpenGUBUTTON = Enum.KeyCode.Alt
+local window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(492, 598), OpenGUBUTTON) -- 2nd argument is the size, 3rd is the show/hide ofc
 local wtm = library:CreateWatermark('Azfake HUB V3',Vector3.new(100,100,50))
 
 
@@ -6873,7 +6917,7 @@ if getgenv().chatloggerhook ~= nil then getgenv().chatloggerhook:Disconnect() en
 if game.PlaceId == 0 then 
 
 elseif game.PlaceId == 10266164381 then --// shitlines 
-    window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), Enum.KeyCode.LeftAlt)
+    window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), OpenGUBUTTON)
     local xrTT = false 
     -- pcall(function() 
     --     local mt = getrawmetatable(game)
@@ -8703,83 +8747,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         'Band';
         'Barbarit The Rose';
     }
-    getgenv().ESPColour = Color3.fromRGB(70,255,70)
-    getgenv().createEsp = function(sp,xstayId)
-        task.wait()
-        local esp = Drawing.new('Text')
-        esp.Visible = false
-        esp.Center = true 
-        esp.Outline = true 
-        esp.Font = 2 
-        esp.Size = 13
-        esp.Color = Color3.new(5,25,0)
-        esp.Text = 'SEXY'
-        
-        local spParent = sp.Parent
-        local function upd()
-            local c 
-            c = game:GetService('RunService').RenderStepped:Connect(function()
-                task.wait()
-                --if sp and sp:FindFirstChild('ID') then spHasId = true end --//and sp.ID.Value ==xstayId 
-                if sp and spParent == sp.Parent then --//and workspace:FindFirstChild(sp.Name)
-                    local espv,onscreen = nil,nil
-                    pcall(function()
-                        if table.find(getgenv().enemy,sp.Name)  then 
-                            espv,onscreen = workspace.CurrentCamera:worldToViewportPoint(sp.HumanoidRootPart.Position)
-                        elseif sp:FindFirstChild('Head') then 
-                            espv,onscreen = workspace.CurrentCamera:worldToViewportPoint(sp.Head.Position)
-                        elseif sp:FindFirstChild('LowerTorso') then 
-                            espv,onscreen = workspace.CurrentCamera:worldToViewportPoint(sp.LowerTorso.Position)
-                        else
-                            espv,onscreen = workspace.CurrentCamera:worldToViewportPoint(sp.Position)
-                        end
-                    end)
-                    if espv and onscreen == nil or espv == nil then 
-                        pcall(function()
-                            espv,onscreen = workspace.CurrentCamera:worldToViewportPoint(sp:FindFirstChildWhichIsA('Part').Position)
-                        end)
-                    end
-                    local show = true
-                    pcall(function()
-                        if not sp then show = false end
-                        if sp.Transparency == 1 then show = false end
-                    end)
-                    if onscreen and show == true then 
-                        esp.Position = Vector2.new(espv.X,espv.Y)
-                        esp.Text = sp.Name
-                        esp.Color = getgenv().ESPColour
-                        if getgenv().esp == true then esp.Visible = true end
-                        if table.find(getgenv().enemy,sp.Name) and sp:FindFirstChild('Humanoid') then esp.Text =  esp.Text.. math.floor(math.clamp(0,(sp.Humanoid.Health/sp.Humanoid.MaxHealth),100)*100) ..'%  ['.. sp.Humanoid.Health..'/'.. sp.Humanoid.MaxHealth..']' end
     
-                    else
-                        esp.Visible = false
-                    end
-    
-                end 
-                if not sp or sp.Parent ~= spParent or getgenv().loopsUnload == true or getgenv().esp == false then -- sp.parent == nil - //and table.find(getIds,sp.ID.Value) and sp.ID.Value == xstayId
-                    c:Disconnect()
-                    esp.Visible = false
-                    esp:Remove()
-                    print('removed esp') -- spastic
-                end
-            end)
-        end
-        coroutine.wrap(upd)()
-    end
-    
-    getgenv().esp = false --// add to global table
-    getgenv().playeresp = false
-    getgenv().tracers = false
-    getgenv().streamermode = false
-    getgenv().waypointfinds = {
-
-    }
-    getgenv().waypointsdone = {
-        
-    }
-    getgenv().showDistance = false
-    getgenv().showHealth = false
-
 
 
 
@@ -8833,269 +8801,6 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     --         end
     --     end
     -- end)
-
-
-
-    local lp = game.Players.LocalPlayer
-    local cam = workspace.CurrentCamera
-    local worldToViewportPoint = cam.worldToViewportPoint
-    
-    local head_offset =  Vector3.new(0,1.5,0)
-    local leg_offset = Vector3.new(0,10,0)
-    getgenv().HealthDisplayColour=Color3.fromRGB(70,255,70)
-    getgenv().DistanceColour=Color3.fromRGB(70,255,70)
-    getgenv().NameColour =Color3.fromRGB(70,255,70)
-    getgenv().CreatePlayerEsp = function(v)
-        -- print(v.Name)
-        task.wait(0.1)
-        local esp = Drawing.new('Text')
-        esp.Visible = false
-        esp.Center = true 
-        esp.Outline = true 
-        esp.Font = 2 
-        esp.Size = 13
-        esp.Color = Color3.new(5,0,0)
-        esp.Text = 'SEXY'
-    
-        -- local function upd()
-        --     local c 
-        --     c = game:GetService('RunService').RenderStepped:Connect(function()
-        --         task.wait()
-        --         if v.Character and v~= game.Players.LocalPlayer  and v.Character:FindFirstChild('HumanoidRootPart') then 
-        --             local espv,onscreen = workspace.CurrentCamera:worldToViewportPoint(v.Character.HumanoidRootPart.Position)
-    
-        --             if onscreen and getgenv().playeresp == true then 
-        --                 esp.Position = Vector2.new(espv.X,espv.Y ) + Vector2.new(0,1)
-        --                 if getgenv().streamermode == false then 
-        --                     esp.Text = v.Name
-        --                 else
-        --                     esp.Text = v.Name:sub(1,2)..'cummybuttermilk'
-        --                 end
-
-        --                 if getgenv().playeresp == true then esp.Visible = true end
-                     
-    
-        --             else
-        --                 esp.Visible = false
-        --             end
-    
-        --         else
-        --             if game.Players:FindFirstChild(v.Name) == nil then c:Disconnect() end
-        --             esp.Visible = false
-        --         end
-        --     end)
-        -- end
-
-
-        local tracer = Drawing.new('Line')
-        tracer.Visible = false
-        tracer.Color = Color3.new(1,0,0)
-        tracer.Thickness = 1 
-        tracer.Transparency = 1 
-        
-        
-        local box_o = Drawing.new('Square')
-        box_o.Visible = false
-        box_o.Color = Color3.new(0,0,0)
-        box_o.Thickness = 2
-        box_o.Transparency =1 
-        box_o.Filled = false
-        
-        local box = Drawing.new('Square')
-        box.Visible = false
-        box.Color = Color3.new(1,0,0)
-        box.Thickness = 1.5
-        box.Transparency =1 
-        box.Filled = false
-        
-        local hb_o = Drawing.new('Square')
-        hb_o.Visible = false
-        hb_o.Color = Color3.new(0,0,0)
-        hb_o.Thickness = 1
-        hb_o.Transparency =1 
-        hb_o.Filled = false
-        
-        local hb = Drawing.new('Square')
-        hb.Visible = false
-        hb.Color = Color3.new(1,0,0)
-        hb.Thickness = 1
-        hb.Transparency =1 
-        hb.Filled = true
-        local health = Drawing.new('Text')
-        health.Visible = false
-        local distancex = Drawing.new('Text')
-        distancex.Visible = false
-        if getgenv().showHealth == true then 
-            health.Visible = false
-            health.Center = true 
-            health.Outline = true 
-            health.Font = 2 
-            health.Size = 13
-            health.Color = Color3.new(5,0,0)
-            health.Text = 'SEXY'
-        end
-        if getgenv().showDistance == true then 
-            distancex.Visible = false
-            distancex.Center = true 
-            distancex.Outline = true 
-            distancex.Font = 2 
-            distancex.Size = 13
-            distancex.Color = Color3.new(5,0,0)
-            distancex.Text = 'SEXY'
-        end
-        local function rootesp()
-            local xkeeptracer
-            local plsstoptracer = false
-            xkeeptracer = game:GetService('RunService').RenderStepped:Connect(function()
-                task.wait(0.1)
-                if v and v.Character and v.Character:FindFirstChild('Humanoid') and v.Character:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer and v.Character.Humanoid.Health >0 then 
-                    local vect,onscreen = cam:worldToViewportPoint(v.Character.HumanoidRootPart.Position)
-                    
-                    if onscreen and getgenv().playeresp and getgenv().tracers and tracer then 
-                        tracer.From = Vector2.new(cam.ViewportSize.X/2,cam.ViewportSize.Y/1)
-                        tracer.To = Vector2.new(vect.X,vect.Y)
-                        tracer.Visible = true
-                    else
-                        tracer.Visible = false
-                    end
-                    if not v or getgenv().loopsUnload == true then 
-                        plsstoptracer = true
-                    end
-                elseif getgenv().loopsUnload == true or getgenv().playeresp == false then 
-                    -- xkeeptracer:Disconnect()
-                    pcall(function()
-                        tracer:Remove()
-                    end)
-                else
-                    tracer.Visible = false
-                end
-            end) 
-        end
-        local function boxroot()
-            local xkeeprunning 
-            xkeeprunning = game:GetService('RunService').RenderStepped:Connect(function()
-                task.wait(0.1)
-                if v.Character and v.Character:FindFirstChild('Humanoid') and v.Character:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer  then  -- and v.Character.Humanoid.Health >0
-                    local vect,onscreen = cam:worldToViewportPoint(v.Character.HumanoidRootPart.Position)
-                    
-                    local vroot = v.Character.HumanoidRootPart
-                    local head = v.Character.Head
-                    
-                    local rootpos,rootvis = worldToViewportPoint(cam,vroot.Position)
-                    local distance = (v.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart').Position).Magnitude
-                    if distance < 30 and distance > 5 then head_offset = Vector3.new(0,1.2,0); leg_offset = Vector3.new(0,5,0) 
-                    elseif distance < 100 and distance > 30 then head_offset = Vector3.new(0,1,0); leg_offset = Vector3.new(0,8,0)  end
-                    local headpos = worldToViewportPoint(cam,vroot.Position + head_offset)
-                    local legpos = worldToViewportPoint(cam,vroot.Position - leg_offset)
-                    
-                    if onscreen and getgenv().playeresp and box then 
-                        cam = workspace.CurrentCamera
-                        --print('e: '..cam.ViewportSize.X..' '..tostring(rootpos)..' '..tostring(headpos)..' '..tostring(box_o))
-
-    
-                        if box_o and cam.ViewportSize and rootpos and headpos then 
-                            box_o.Size = Vector2.new(cam.ViewportSize.X/2/rootpos.Z,headpos.Y - legpos.Y)
-                            box_o.Position = Vector2.new(rootpos.X - box_o.Size.X / 1.5, rootpos.Y - box_o.Size.Y / 2)
-                            box_o.Visible = true 
-                        end
-                        if box then 
-                            box.Size = Vector2.new(cam.ViewportSize.X/2/rootpos.Z,headpos.Y - legpos.Y)
-                            box.Position = Vector2.new(rootpos.X - box.Size.X / 2, rootpos.Y - box.Size.Y / 2)
-                            box.Visible = true
-                        end
-
-                        hb_o.Size = Vector2.new(2,headpos.Y - legpos.Y)
-                        hb_o.Position = box_o.Position - Vector2.new(6,0)
-                        hb_o.Visible = true
-                        hb.Size = Vector2.new(2,(headpos.Y - legpos.Y) / (v.Character.Humanoid.MaxHealth / math.clamp(v.Character.Humanoid.Health, 0 , v.Character.Humanoid.MaxHealth) ))
-                        hb.Position = Vector2.new(box.Position.X - 6,box.Position.Y + (1/hb.Size.Y))
-                        hb.Color = Color3.fromRGB(255-255/(v.Character.Humanoid.MaxHealth /v.Character.Humanoid.Health ),255/(v.Character.Humanoid.MaxHealth /v.Character.Humanoid.Health ),0)
-                        hb.Visible = true
-
-                        
-
-
-                        if getgenv().showHealth == true then 
-                            health.Position = Vector2.new(vect.X,vect.Y ) + Vector2.new(0,-20)
-                            health.Text = math.floor(v.Character.Humanoid.Health)..'/'..v.Character.Humanoid.MaxHealth
-                            health.Visible = true
-                            health.Color = getgenv().HealthDisplayColour
-                        end
-                        if getgenv().showDistance == true then 
-                            distancex.Position = Vector2.new(vect.X,vect.Y ) + Vector2.new(0,-32) -- -28
-                            distancex.Text = math.floor((v.Character.HumanoidRootPart.Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude)..' studs'
-                            distancex.Visible = true
-                            distancex.Color = getgenv().DistanceColour
-                        end
-                        esp.Position = Vector2.new(vect.X,vect.Y ) + Vector2.new(0,1)
-                        esp.Color = getgenv().NameColour
-                        if getgenv().streamermode == false then 
-                            esp.Text = v.Name
-                        else
-                            esp.Text = v.Name:sub(1,2)..'cummybuttermilk'..math.random(1,20)
-                        end
-
-                        if getgenv().playeresp == true then esp.Visible = true end
-                     
-                    else
-                        pcall(function()
-                            box.Visible = false
-                        end)
-                        pcall(function()
-                            box_o.Visible = false
-                        end)
-                        pcall(function()
-                            hb.Visible = false
-                        end)
-                        pcall(function()
-                            hb_o.Visible = false
-                        end)
-                        pcall(function()
-                            esp.Visible = false
-                        end)
-                        pcall(function()
-                            distancex.Visible = false 
-                        end)
-                        pcall(function()
-                            health.Visible = false
-                        end)
-                    end
-                end
-                if not game.Players:FindFirstChild(v.Name) or getgenv().loopsUnload == true or getgenv().playeresp == false then 
-                    xkeeprunning:Disconnect()
-                    -- task.wait(1)
-                    pcall(function()
-                        box:Remove()
-                    end)
-                    pcall(function()
-                        box_o:Remove()
-                    end)
-                    pcall(function()
-                        hb:Remove()
-                    end)
-                    pcall(function()
-                        hb_o:Remove()
-                    end)
-                    pcall(function()
-                        esp:Remove()
-                    end)
-                    pcall(function()
-                        distancex:Remove()
-                    end)
-                    pcall(function()
-                        health:Remove()
-                    end)
-                end
-            end) 
-        end
-        task.spawn(function()
-            coroutine.wrap(rootesp)()
-            coroutine.wrap(boxroot)()
-        end)
-
-    end
-    -- could make esp so that its a global function so it wouldnt just be in the if statement and that the if statement just rewrites/overwrites the esp
-
 
 
 
@@ -9822,7 +9527,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                             repeat 
                                 task.wait(0.001)
                                 game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = findtopickup()
-                            until tonumber(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.Ryo.Amount.Text) > currentryo  
+                            until tonumber(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.Ryo.Amount.Text) > currentryo  or getgenv().moneyfarming == false or getgenv().loopsUnload == true
                         else
                             game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = findtopickup()
                         end
@@ -10512,7 +10217,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         task.spawn(function()
             t_DataFunction:InvokeServer('Block')
             repeat task.wait(0.01) until blox.hb.Parent ~= blox.parent
-            task.wait(.1) -- until blox == nil
+            task.wait(.2) -- until blox == nil
             t_DataFunction:InvokeServer('EndBlock')
         end)
     end
@@ -10795,6 +10500,9 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             t_DataFunction:InvokeServer('SellingBulk',i,'Trinket')
         end
     end) 
+    sector:AddButton('New Game',function()
+        t_DataEvent:FireServer("NewGame");
+    end)
     sector:AddButton('Instant Wipe',function()
         t_DataEvent:FireServer("NewGame");
         task.wait(.1)
@@ -11671,6 +11379,361 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     -- else
     --     tp1:AddLabel('Oops, you need premium!')
     -- end
+
+
+
+
+
+
+
+
+    local lp = game.Players.LocalPlayer
+    local cam = workspace.CurrentCamera
+    local worldToViewportPoint = cam.worldToViewportPoint
+    
+    local head_offset =  Vector3.new(0,1.5,0)
+    local leg_offset = Vector3.new(0,10,0)
+    getgenv().HealthDisplayColour=Color3.fromRGB(70,255,70)
+    getgenv().DistanceColour=Color3.fromRGB(70,255,70)
+    getgenv().NameColour =Color3.fromRGB(70,255,70)
+    getgenv().esp = false --// add to global table
+    getgenv().playeresp = false
+    getgenv().tracers = false
+    getgenv().streamermode = false
+    getgenv().waypointfinds = {
+
+    }
+    getgenv().waypointsdone = {
+        
+    }
+    getgenv().showDistance = false
+    getgenv().showHealth = false
+
+    getgenv().ESPColour = Color3.fromRGB(70,255,70)
+    getgenv().createEsp = function(sp,xstayId)
+        task.wait()
+        local esp = Drawing.new('Text')
+        esp.Visible = false
+        esp.Center = true 
+        esp.Outline = true 
+        esp.Font = 2 
+        esp.Size = 13
+        esp.Color = Color3.new(5,25,0)
+        esp.Text = 'SEXY'
+        
+        local spParent = sp.Parent
+        local function upd()
+            local c 
+            c = game:GetService('RunService').RenderStepped:Connect(function()
+                task.wait()
+                --if sp and sp:FindFirstChild('ID') then spHasId = true end --//and sp.ID.Value ==xstayId 
+                if sp and spParent == sp.Parent then --//and workspace:FindFirstChild(sp.Name)
+                    local espv,onscreen = nil,nil
+                    pcall(function()
+                        if table.find(getgenv().enemy,sp.Name)  then 
+                            espv,onscreen = workspace.CurrentCamera:worldToViewportPoint(sp.HumanoidRootPart.Position)
+                        elseif sp:FindFirstChild('Head') then 
+                            espv,onscreen = workspace.CurrentCamera:worldToViewportPoint(sp.Head.Position)
+                        elseif sp:FindFirstChild('LowerTorso') then 
+                            espv,onscreen = workspace.CurrentCamera:worldToViewportPoint(sp.LowerTorso.Position)
+                        else
+                            espv,onscreen = workspace.CurrentCamera:worldToViewportPoint(sp.Position)
+                        end
+                    end)
+                    if espv and onscreen == nil or espv == nil then 
+                        pcall(function()
+                            espv,onscreen = workspace.CurrentCamera:worldToViewportPoint(sp:FindFirstChildWhichIsA('Part').Position)
+                        end)
+                    end
+                    local show = true
+                    pcall(function()
+                        if not sp then show = false end
+                        if sp.Transparency == 1 then show = false end
+                    end)
+                    if onscreen and show == true then 
+                        esp.Position = Vector2.new(espv.X,espv.Y)
+                        esp.Text = sp.Name
+                        esp.Color = getgenv().ESPColour
+                        if getgenv().esp == true then esp.Visible = true end
+                        if table.find(getgenv().enemy,sp.Name) and sp:FindFirstChildWhichIsA('Humanoid') then esp.Text =  esp.Text.. math.floor(math.clamp(0,(sp:FindFirstChildWhichIsA('Humanoid').Health/sp:FindFirstChildWhichIsA('Humanoid').MaxHealth),100)*100) ..'%  ['.. sp:FindFirstChildWhichIsA('Humanoid').Health..'/'.. sp:FindFirstChildWhichIsA('Humanoid').MaxHealth..']' end
+    
+                    else
+                        esp.Visible = false
+                    end
+    
+                end 
+                if not sp or sp.Parent ~= spParent or getgenv().loopsUnload == true or getgenv().esp == false then -- sp.parent == nil - //and table.find(getIds,sp.ID.Value) and sp.ID.Value == xstayId
+                    esp:Remove()
+                    print('removed esp') -- spastic
+                    c:Disconnect()
+                end
+            end)
+        end
+        coroutine.wrap(upd)()
+    end
+    getgenv().CreatePlayerEsp = function(v)
+        -- print(v.Name)
+        task.wait(0.1)
+        local esp = Drawing.new('Text')
+        esp.Visible = false
+        esp.Center = true 
+        esp.Outline = true 
+        esp.Font = 2 
+        esp.Size = 13
+        esp.Color = Color3.new(5,0,0)
+        esp.Text = 'SEXY'
+    
+        -- local function upd()
+        --     local c 
+        --     c = game:GetService('RunService').RenderStepped:Connect(function()
+        --         task.wait()
+        --         if v.Character and v~= game.Players.LocalPlayer  and v.Character:FindFirstChild('HumanoidRootPart') then 
+        --             local espv,onscreen = workspace.CurrentCamera:worldToViewportPoint(v.Character.HumanoidRootPart.Position)
+    
+        --             if onscreen and getgenv().playeresp == true then 
+        --                 esp.Position = Vector2.new(espv.X,espv.Y ) + Vector2.new(0,1)
+        --                 if getgenv().streamermode == false then 
+        --                     esp.Text = v.Name
+        --                 else
+        --                     esp.Text = v.Name:sub(1,2)..'cummybuttermilk'
+        --                 end
+
+        --                 if getgenv().playeresp == true then esp.Visible = true end
+                     
+    
+        --             else
+        --                 esp.Visible = false
+        --             end
+    
+        --         else
+        --             if game.Players:FindFirstChild(v.Name) == nil then c:Disconnect() end
+        --             esp.Visible = false
+        --         end
+        --     end)
+        -- end
+
+
+        local tracer = Drawing.new('Line')
+        tracer.Visible = false
+        tracer.Color = Color3.new(1,0,0)
+        tracer.Thickness = 1 
+        tracer.Transparency = 1 
+        
+        
+        local box_o = Drawing.new('Square')
+        box_o.Visible = false
+        box_o.Color = Color3.new(0,0,0)
+        box_o.Thickness = 2
+        box_o.Transparency =1 
+        box_o.Filled = false
+        
+        local box = Drawing.new('Square')
+        box.Visible = false
+        box.Color = Color3.new(1,0,0)
+        box.Thickness = 1.5
+        box.Transparency =1 
+        box.Filled = false
+        
+        local hb_o = Drawing.new('Square')
+        hb_o.Visible = false
+        hb_o.Color = Color3.new(0,0,0)
+        hb_o.Thickness = 1
+        hb_o.Transparency =1 
+        hb_o.Filled = false
+        
+        local hb = Drawing.new('Square')
+        hb.Visible = false
+        hb.Color = Color3.new(1,0,0)
+        hb.Thickness = 1
+        hb.Transparency =1 
+        hb.Filled = true
+        local health = Drawing.new('Text')
+        health.Visible = false
+        local distancex = Drawing.new('Text')
+        distancex.Visible = false
+        if getgenv().showHealth == true then 
+            health.Visible = false
+            health.Center = true 
+            health.Outline = true 
+            health.Font = 2 
+            health.Size = 13
+            health.Color = Color3.new(5,0,0)
+            health.Text = 'SEXY'
+        end
+        if getgenv().showDistance == true then 
+            distancex.Visible = false
+            distancex.Center = true 
+            distancex.Outline = true 
+            distancex.Font = 2 
+            distancex.Size = 13
+            distancex.Color = Color3.new(5,0,0)
+            distancex.Text = 'SEXY'
+        end
+        local function rootesp()
+            local xkeeptracer
+            local plsstoptracer = false
+            xkeeptracer = game:GetService('RunService').RenderStepped:Connect(function()
+                task.wait(0.1)
+                if v and v.Character and v.Character:FindFirstChild('Humanoid') and v.Character:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer and v.Character.Humanoid.Health >0 then 
+                    local vect,onscreen = cam:worldToViewportPoint(v.Character.HumanoidRootPart.Position)
+                    
+                    if onscreen and getgenv().playeresp and getgenv().tracers and tracer then 
+                        tracer.From = Vector2.new(cam.ViewportSize.X/2,cam.ViewportSize.Y/1)
+                        tracer.To = Vector2.new(vect.X,vect.Y)
+                        tracer.Visible = true
+                    else
+                        tracer.Visible = false
+                    end
+                    if not v or getgenv().loopsUnload == true then 
+                        plsstoptracer = true
+                    end
+                elseif v and not v.Character then 
+                    tracer.Visible = false
+                elseif getgenv().loopsUnload == true or getgenv().playeresp == false or not game.Players:FindFirstChild(v) then 
+                    
+                    pcall(function()
+                        tracer:Remove()
+                    end)
+                    xkeeptracer:Disconnect()
+                end
+            end) 
+        end
+        local function boxroot()
+            local xkeeprunning 
+            xkeeprunning = game:GetService('RunService').RenderStepped:Connect(function()
+                task.wait(0.1)
+                if v.Character and v.Character:FindFirstChild('Humanoid') and v.Character:FindFirstChild('HumanoidRootPart') and v ~= game.Players.LocalPlayer  then  -- and v.Character.Humanoid.Health >0
+                    local vect,onscreen = cam:worldToViewportPoint(v.Character.HumanoidRootPart.Position)
+                    
+                    local vroot = v.Character.HumanoidRootPart
+                    local head = v.Character.Head
+                    
+                    local rootpos,rootvis = worldToViewportPoint(cam,vroot.Position)
+                    local distance = (v.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart').Position).Magnitude
+                    if distance < 30 and distance > 5 then head_offset = Vector3.new(0,1.2,0); leg_offset = Vector3.new(0,5,0) 
+                    elseif distance < 100 and distance > 30 then head_offset = Vector3.new(0,1,0); leg_offset = Vector3.new(0,8,0)  end
+                    local headpos = worldToViewportPoint(cam,vroot.Position + head_offset)
+                    local legpos = worldToViewportPoint(cam,vroot.Position - leg_offset)
+                    
+                    if onscreen and getgenv().playeresp and box then 
+                        cam = workspace.CurrentCamera
+                        --print('e: '..cam.ViewportSize.X..' '..tostring(rootpos)..' '..tostring(headpos)..' '..tostring(box_o))
+
+    
+                        if box_o and cam.ViewportSize and rootpos and headpos then 
+                            box_o.Size = Vector2.new(cam.ViewportSize.X/2/rootpos.Z,headpos.Y - legpos.Y)
+                            box_o.Position = Vector2.new(rootpos.X - box_o.Size.X / 1.5, rootpos.Y - box_o.Size.Y / 2)
+                            box_o.Visible = true 
+                        end
+                        if box then 
+                            box.Size = Vector2.new(cam.ViewportSize.X/2/rootpos.Z,headpos.Y - legpos.Y)
+                            box.Position = Vector2.new(rootpos.X - box.Size.X / 2, rootpos.Y - box.Size.Y / 2)
+                            box.Visible = true
+                        end
+
+                        hb_o.Size = Vector2.new(2,headpos.Y - legpos.Y)
+                        hb_o.Position = box_o.Position - Vector2.new(6,0)
+                        hb_o.Visible = true
+                        hb.Size = Vector2.new(2,(headpos.Y - legpos.Y) / (v.Character.Humanoid.MaxHealth / math.clamp(v.Character.Humanoid.Health, 0 , v.Character.Humanoid.MaxHealth) ))
+                        hb.Position = Vector2.new(box.Position.X - 6,box.Position.Y + (1/hb.Size.Y))
+                        hb.Color = Color3.fromRGB(255-255/(v.Character.Humanoid.MaxHealth /v.Character.Humanoid.Health ),255/(v.Character.Humanoid.MaxHealth /v.Character.Humanoid.Health ),0)
+                        hb.Visible = true
+
+                        
+
+
+                        if getgenv().showHealth == true then 
+                            health.Position = Vector2.new(vect.X,vect.Y ) + Vector2.new(0,-20)
+                            health.Text = math.floor(v.Character.Humanoid.Health)..'/'..v.Character.Humanoid.MaxHealth
+                            health.Visible = true
+                            health.Color = getgenv().HealthDisplayColour
+                        end
+                        if getgenv().showDistance == true then 
+                            distancex.Position = Vector2.new(vect.X,vect.Y ) + Vector2.new(0,-32) -- -28
+                            distancex.Text = math.floor((v.Character.HumanoidRootPart.Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude)..' studs'
+                            distancex.Visible = true
+                            distancex.Color = getgenv().DistanceColour
+                        end
+                        esp.Position = Vector2.new(vect.X,vect.Y ) + Vector2.new(0,1)
+                        esp.Color = getgenv().NameColour
+                        if getgenv().streamermode == false then 
+                            esp.Text = v.Name
+                        else
+                            esp.Text = v.Name:sub(1,2)..'cummybuttermilk'..math.random(1,20)
+                        end
+
+                        if getgenv().playeresp == true then esp.Visible = true end
+                     
+                    else
+                        pcall(function()
+                            box.Visible = false
+                        end)
+                        pcall(function()
+                            box_o.Visible = false
+                        end)
+                        pcall(function()
+                            hb.Visible = false
+                        end)
+                        pcall(function()
+                            hb_o.Visible = false
+                        end)
+                        pcall(function()
+                            esp.Visible = false
+                        end)
+                        pcall(function()
+                            distancex.Visible = false 
+                        end)
+                        pcall(function()
+                            health.Visible = false
+                        end)
+                    end
+                end
+                if not game.Players:FindFirstChild(v.Name) or getgenv().loopsUnload == true or getgenv().playeresp == false then 
+                    pcall(function()
+                        box:Remove()
+                    end)
+                    pcall(function()
+                        box_o:Remove()
+                    end)
+                    pcall(function()
+                        hb:Remove()
+                    end)
+                    pcall(function()
+                        hb_o:Remove()
+                    end)
+                    pcall(function()
+                        esp:Remove()
+                    end)
+                    pcall(function()
+                        distancex:Remove()
+                    end)
+                    pcall(function()
+                        health:Remove()
+                    end)
+                    xkeeprunning:Disconnect()
+                end
+            end) 
+        end
+        task.spawn(function()
+            coroutine.wrap(rootesp)()
+            coroutine.wrap(boxroot)()
+        end)
+
+    end
+    -- could make esp so that its a global function so it wouldnt just be in the if statement and that the if statement just rewrites/overwrites the esp
+
+
+
+
+
+
+
+
+
+
+
+
+
     espsector:AddColorpicker('Health Display Colour',Color3.fromRGB(255, 255,255), function(ztx)
         getgenv().HealthDisplayColour = ztx
     end)
@@ -11955,6 +12018,19 @@ elseif game.PlaceId == 10266164381 then --// shitlines
 
     print('p1')
     getgenv().currenttween = nil
+    for i,v in pairs(game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List'):GetChildren()) do 
+        v.MouseButton1Down:Connect(function()
+            if game.Players:FindFirstChild(v.RealName.Value) and game.Players:FindFirstChild(v.RealName.Value).Character then 
+                local playerSave = game.Players:FindFirstChild(v.RealName.Value)
+                game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
+                --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
+            end
+        end)
+        local donevalue = Instance.new('BoolValue')
+        donevalue.Name = 'done'
+        donevalue.Parent = game.Players.LocalPlayer.PlayerGui
+    end
+    local hasdied = false
     task.spawn(function()
         while task.wait() do 
             --game:GetService("Players").LocalPlayer.SoundPlaylist.RainSound.Playing = false
@@ -11967,12 +12043,25 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                 print('true break') 
                 break 
             end
-
+            if not game.Players.LocalPlayer.PlayerGui:FindFirstChild('done') then 
+                for i,v in pairs(game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List'):GetChildren()) do 
+                    v.MouseButton1Down:Connect(function()
+                        if game.Players:FindFirstChild(v.RealName.Value) and game.Players:FindFirstChild(v.RealName.Value).Character then 
+                            local playerSave = game.Players:FindFirstChild(v.RealName.Value)
+                            game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
+                            --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
+                        end
+                    end) 
+                end
+                local donevalue = Instance.new('BoolValue')
+                donevalue.Name = 'done'
+                donevalue.Parent = game.Players.LocalPlayer.PlayerGui
+            end
             if getgenv().AzfakeGlobalTables['bloodlines']['autokillmobs'] == true then 
                 -- sethiddenproperty(game.Players.LocalPlayer, "SimulationRadius", math.huge)
                 -- sethiddenproperty(game.Players.LocalPlayer, "MaximumSimulationRadius", math.huge)
                 for _,v in next, mobs do 
-                    if v.PrimaryPart and isnetworkowner(v.PrimaryPart) then 
+                    if (isnetworkowner) and v.PrimaryPart and isnetworkowner(v.PrimaryPart) then 
                         v:FindFirstChild('Humanoid').Health = 1
                         print(v.Name)
                     end
@@ -12326,27 +12415,31 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     -- end)
 
 
-        for i,v in pairs(game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List'):GetChildren()) do 
-            v.MouseButton1Down:Connect(function()
-                if game.Players:FindFirstChild(v.RealName.Value) and game.Players:FindFirstChild(v.RealName.Value).Character then 
-                    local playerSave = game.Players:FindFirstChild(v.RealName.Value)
-                    game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
-                    --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
-                end
-            end)
-        end
+        -- for i,v in pairs(game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List'):GetChildren()) do 
+        --     v.MouseButton1Down:Connect(function()
+        --         if game.Players:FindFirstChild(v.RealName.Value) and game.Players:FindFirstChild(v.RealName.Value).Character then 
+        --             local playerSave = game.Players:FindFirstChild(v.RealName.Value)
+        --             game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
+        --             --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
+        --         end
+        --     end)
+        -- end
     
-        game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List').ChildAdded:Connect(function(child)
-            task.wait(1)
-            child.MouseButton1Down:Connect(function()
-                if game.Players:FindFirstChild(child.RealName.Value) and game.Players:FindFirstChild(child.RealName.Value).Character then 
-                    local playerSave = game.Players:FindFirstChild(child.RealName.Value)
-                    game.Workspace.Camera.CameraSubject = game.Players:FindFirstChild(child.RealName.Value).Character
-                    --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
-                end
-            end)
-        end)
+        -- game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List').ChildAdded:Connect(function(child)
+        --     task.wait(1)
+        --     child.MouseButton1Down:Connect(function()
+        --         if game.Players:FindFirstChild(child.RealName.Value) and game.Players:FindFirstChild(child.RealName.Value).Character then 
+        --             local playerSave = game.Players:FindFirstChild(child.RealName.Value)
+        --             game.Workspace.Camera.CameraSubject = game.Players:FindFirstChild(child.RealName.Value).Character
+        --             --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
+        --         end
+        --     end)
+        -- end)
+        -- game.Players.LocalPlayer.Character:WaitForChild('Humanoid').Died:Connect(function()
+        
+        -- end)
     
+
 
 
     -- task.spawn(function()
@@ -12364,35 +12457,35 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     --     makeClickable()
     -- end 
     getgenv().WaitForFruit()
-    game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.ChildAdded:Connect(function()
-        game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List')
-        for i,v in pairs(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.PlayerList.List:GetChildren()) do 
-            v.MouseButton1Down:Connect(function()
-                if game.Players:FindFirstChild(v.RealName.Value) and game.Players:FindFirstChild(v.RealName.Value).Character then 
-                    local playerSave = game.Players:FindFirstChild(v.RealName.Value)
-                    game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
-                    --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
-                end
-            end)
+    -- game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.ChildAdded:Connect(function()
+    --     game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List')
+    --     for i,v in pairs(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.PlayerList.List:GetChildren()) do 
+    --         v.MouseButton1Down:Connect(function()
+    --             if game.Players:FindFirstChild(v.RealName.Value) and game.Players:FindFirstChild(v.RealName.Value).Character then 
+    --                 local playerSave = game.Players:FindFirstChild(v.RealName.Value)
+    --                 game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
+    --                 --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
+    --             end
+    --         end)
         
-            v.MouseEnter:Connect(function()
-                pcall(function() if v.RealName.Value == game.Players.LocalPlayer.Name then 
-                    v.PlayerName.TextColor3 = Color3.fromRGB(0,255,0)
-                    v.PlayerName.Text = 'HUH'
-                else
-                    v.PlayerName.TextColor3 = Color3.fromRGB(255,255,255)
-                end end)
-            end)
-            v.MouseLeave:Connect(function()
-                pcall(function() if v.RealName.Value == game.Players.LocalPlayer.Name then 
-                    v.PlayerName.TextColor3 = Color3.fromRGB(0,255,0)
-                    v.PlayerName.Text = 'HUH'
-                else
-                    v.PlayerName.TextColor3 = Color3.fromRGB(255,255,255)
-                end end)
-            end)
-        end
-    end)
+    --         v.MouseEnter:Connect(function()
+    --             pcall(function() if v.RealName.Value == game.Players.LocalPlayer.Name then 
+    --                 v.PlayerName.TextColor3 = Color3.fromRGB(0,255,0)
+    --                 v.PlayerName.Text = 'HUH'
+    --             else
+    --                 v.PlayerName.TextColor3 = Color3.fromRGB(255,255,255)
+    --             end end)
+    --         end)
+    --         v.MouseLeave:Connect(function()
+    --             pcall(function() if v.RealName.Value == game.Players.LocalPlayer.Name then 
+    --                 v.PlayerName.TextColor3 = Color3.fromRGB(0,255,0)
+    --                 v.PlayerName.Text = 'HUH'
+    --             else
+    --                 v.PlayerName.TextColor3 = Color3.fromRGB(255,255,255)
+    --             end end)
+    --         end)
+    --     end
+    -- end)
 
 
     -- could make kamui toggle make a getgenv() value set as true and then mousekeydown would detect the keybind for kamui
@@ -13245,7 +13338,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     -- s = {}; s.side = 'r';
     -- print(s.side=='extra1')
     
-    window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), Enum.KeyCode.LeftAlt)
+    window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), OpenGUBUTTON)
     local Top = window:CreateTab("Fakewoken 3");
     local ESPTab = window:CreateTab("ESP");
     local Configiuration = window:CreateTab("Configuration");
@@ -17337,7 +17430,7 @@ elseif game.PlaceId == 6168898345 then -- BULWARK
         end
     end)
 elseif game.PlaceId == 10371908957 or game.PlaceId == 10495850838 then  --- deep dev, 10495850838 = depths; 10371908957 etrean
-    window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), Enum.KeyCode.LeftAlt)
+    window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), OpenGUBUTTON)
     local function createLogger()
         pcall(function() if game.CoreGui:FindFirstChild('ChatLogger') then game.CoreGui:FindFirstChild('ChatLogger'):Destroy() end end)
         
@@ -22448,7 +22541,7 @@ elseif game.PlaceId == 6679968919 then -- fly race
     end
 elseif game.PlaceId == 914010731 then --  ro ghoul
     --game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
-    window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), Enum.KeyCode.LeftAlt)
+    window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), OpenGUBUTTON)
     local tab = window:CreateTab('Ro Ghoul')
     local Configuration = window:CreateTab('Configuration')
     -- local pvptab = window:CreateTab('PVP')
@@ -26255,7 +26348,7 @@ elseif game.PlaceId == 914010731 then --  ro ghoul
     end)
 
 elseif game.PlaceId == 6735572261 then -- pilgrammed
-    window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), Enum.KeyCode.LeftAlt)
+    window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), OpenGUBUTTON)
     local tab = window:CreateTab(gameName)
     local Configuration = window:CreateTab('Configurations')
     local esptab = window:CreateTab('Esp')
@@ -31521,6 +31614,38 @@ elseif game.PlaceId == 8884043854 then
                     getgenv().fortblo1settings['autopickup'] = true
                 end
             end
+        end
+    end)
+elseif table.find(shindogames,tostring(game.PlaceId)) then 
+    local tab = window:CreateTab(gameName)
+    local sector = tab:CreateSector('Cheats','left')
+    getgenv().shindo1settings = {
+        instakill = false;
+        autoquest = false;
+        autorebirth = false;
+        autostats = {
+            on = false;
+            chakra = false;
+            ninjutsu = false;
+            taijutsu = false;
+            health = false;
+        };
+
+    };
+
+    local MissionRepo = game:GetService("Workspace").missiongivers
+
+    local function addstat(x,a) -- chakra,ninjutsu,taijutsu,health
+        local ohString1 = "addstat"
+        local ohString2 = x
+        local ohNumber3 = a
+
+        game:GetService("Players").LocalPlayer.startevent:FireServer(ohString1, ohString2, ohNumber3)
+    end
+
+    task.spawn(function()
+        while task.wait(0) do 
+            --if getgenv()
         end
     end)
 else
