@@ -7046,6 +7046,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     end
     local event = game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.OnMessageDoneFiltering
     -- xeventset
+    local stopbringing = false
     getgenv().chatloggerhook = event.OnClientEvent:Connect(function(object)
         local msg = string.format("%s : %s", object.FromSpeaker, object.Message or ""),game.Players:FindFirstChild(object.FromSpeaker)
         local splitName = string.split(msg,' ')
@@ -7067,6 +7068,74 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                 local ohString1 = "DropItem"
                 local ohNumber2 = 100
                 game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohNumber2)  
+            elseif text == 'dropall' then 
+                local ohString1 = "DropItem"
+                local ohNumber2 = tonumber(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.Ryo.Amount.Text)
+                game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohNumber2)  
+            elseif text == 'drop1k' then
+                local ohString1 = "DropItem"
+                local ohNumber2 = 1000
+                game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohNumber2) 
+            elseif text == 'anchor-'..game.Players.LocalPlayer.Name then 
+                game.Players.LocalPlayer.Character.HumanoidRootPart.Anchored = not game.Players.LocalPlayer.Character.HumanoidRootPart.Anchored
+            elseif text == '!bring-'..game.Players.LocalPlayer.Name then 
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players:FindFirstChild(senderName).Character.HumanoidRootPart.CFrame * CFrame.new(0,0,-3)
+            elseif text == '!loopbring-'..game.Players.LocalPlayer.Name then 
+                stopbringing = false
+                task.spawn(function()
+                    repeat 
+                        task.wait(0)
+                        pcall(function()
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players:FindFirstChild(senderName).Character.HumanoidRootPart.CFrame * CFrame.new(0,0,-3)
+                        end)
+                    until stopbringing == true
+                end)
+            elseif text == '!cancel_limitations' then 
+                stopbringing = true
+            elseif text == '!plead' then 
+                stopbringing = false
+                local pleads = {
+                    'pls im sorry';
+                    'i will never do it again';
+                    'PLEASE IM SORRY';
+                    'HELP ME';
+                    'AHH THE THOUGHTS IN MY BRAIN';
+                    'KILL OR NOT KILL';
+                    'HUH WHAT WHEN HOW';
+                    'IVE LOST THIS BATTLE';
+                    'i stood no chance';
+                    'i stood no chance from the start';
+                    'my fate was sealed from the beginning';
+                    'ill tell my mommy about you' -- son
+                    'deary me';
+                    'im in shambles';
+                }
+                task.spawn(function()
+                    local screening = Instance.new('ScreenGui')
+                    local screenframe = Instance.new('Frame',screening)
+                    screenframe.Size = UDim2.fromScale(1,0)
+                    screenframe.BackgroundColor3 = Color3.fromRGB(255,0,0)
+                    screenframe.Transparency = .8 -- play mangekyo sharingan sound
+                    screening.Parent = game.CoreGui
+                    task.spawn(function()
+                        repeat task.wait()
+                            game:GetService('TweenService'):Create(screenframe,TweenInfo.new(.3,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+                            task.wait(.3)
+                            game:GetService('TweenService'):Create(screenframe,TweenInfo.new(.3,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{BackgroundColor3 = Color3.fromRGB(255,0,0)}):Play()
+                            task.wait(.3)
+                        until stopbringing == true
+                    end)
+                    repeat 
+                        task.wait(5)
+                        local args = {
+                            [1] = tostring(pleads[math.random(1,#pleads)]),
+                            [2] = "All" 
+                        };
+                        (game:GetService("ReplicatedStorage")).DefaultChatSystemChatEvents.SayMessageRequest:FireServer(unpack(args));
+                    until stopbringing == true
+                end)
+            elseif text == 'can you invite me to yo clan' then 
+                game.ReplicatedStorage.Events:FindFirstChild('DataEvent'):FireServer("InviteToClan",game.Players:FindFirstChild(senderName).Character.Name)
             end
             
         end
@@ -7708,10 +7777,13 @@ elseif game.PlaceId == 10266164381 then --// shitlines
 
     end
     getgenv().InnKeeper = function()
+        local pos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        local InnKeepers = {}
         local ohString1 = "StartQuest"
         local ohString2 = "InnKeeper's Reunion"
         game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
         -- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0,0,0)
         local ohString1 = "GetQuestProgress"
         local ohString2 = "InnKeeper's Reunion"
         local ohString3 = "DontComplete"
@@ -7723,6 +7795,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         local ohString1 = "GetQuestProgress"
         local ohString2 = "InnKeeper's Reunion"
         game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = pos
     end
     getgenv().Lavaroldy = function()
         local ohString1 = "GetQuestProgress"
@@ -9248,14 +9321,14 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             h.OutlineColor = Color3.fromRGB(0,0,0)
             h.FillTransparency = 0.5
             h.Parent = x
-            PVPSection2:AddLabel('waypoint: '..getgenv().waypointselected)
+            -- PVPSection2:AddLabel('waypoint: '..getgenv().waypointselected)
             x.Name = 'waypoint-'..getgenv().waypointselected
             table.insert(getgenv().waypointfinds,x)
             x.Parent = workspace
         elseif workspace:FindFirstChild('waypoint-'..getgenv().waypointselected) then 
-            getgenv().message('already created waypoint')
+            azfakenotify('already created waypoint')
         else
-            getgenv().message('waypoint cannot be ""')
+            azfakenotify('waypoint cannot be ""')
         end
     end
     getgenv().tpToPoint = function()
@@ -9679,6 +9752,103 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         end)
         PremiumSector:AddButton('Teleport To Waypoint',function()
             getgenv().tpToPoint()
+        end)
+        getgenv().moneyfarming = false
+        PremiumSector:AddToggle('Auto Money',false,function(xstate)
+            getgenv().moneyfarming = xstate
+            if getgenv().moneyfarming == true then 
+                task.spawn(function()
+                    local t_DataEvent = game.ReplicatedStorage.Events.DataEvent;
+                    local t_DataFunction = game.ReplicatedStorage.Events.DataFunction;
+                    local position = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+                    local pospickup = position * CFrame.new(0,0,-2)
+                    local function findtopickup()
+                        local item = workspace:FindFirstChild('Item'..game.Players.LocalPlayer.Name)
+                        if item then 
+                            item = item.CFrame
+                        else
+                            item = position
+                        end
+                        return item
+                    end
+                    local function checkifitem()
+                        local item = workspace:FindFirstChild('Item'..game.Players.LocalPlayer.Name)
+                        if item then 
+                            item = true
+                        else
+                            item = false
+                        end
+                        return item
+                    end
+                    while task.wait(1) do 
+                        if getgenv().moneyfarming == false or getgenv().loopsUnload == true then break end
+                        
+                        local currentryo = tonumber(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.Ryo.Amount.Text)
+                        if currentryo > 0 then 
+                            repeat task.wait(2)
+        
+                                local ohString1 = "DropItem"
+                                local ohNumber2 = tonumber(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.Ryo.Amount.Text)
+                                game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohNumber2)  
+                            
+                            until currentryo ~= tonumber(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.Ryo.Amount.Text)
+                        end
+                        currentryo = tonumber(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.Ryo.Amount.Text)
+                        task.wait(1)
+        
+                        t_DataEvent:FireServer("NewGame");
+                        task.wait(.1)
+                        t_DataFunction:InvokeServer("RequestReincarnation", "Female");
+        
+        
+                        repeat task.wait() 
+        
+                        until game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or getgenv().moneyfarming == false or getgenv().loopsUnload == true
+                        if checkifitem() then 
+                            repeat 
+                                task.wait(0.001)
+                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = findtopickup()
+                            until tonumber(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.Ryo.Amount.Text) > currentryo  
+                        else
+                            game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = findtopickup()
+                        end
+                        
+                        currentryo = tonumber(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.Ryo.Amount.Text)
+                        task.wait(.3)
+                        repeat task.wait(0.1)
+                            local inst = workspace:FindFirstChild('Training Bells')
+                            if inst then 
+                                
+                                local cd = inst:FindFirstChildWhichIsA('ClickDetector')
+                                fireclickdetector(inst:FindFirstChildWhichIsA('ClickDetector'))
+                                if inst:FindFirstChild('ID') then
+                                    local ohString1 = "PickUp"
+                                    local ohNumber2 =  inst:FindFirstChild('ID').Value
+                                    game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohNumber2)
+                                end
+                                local ohString1 = "StartQuest"
+                                local ohString2 = "Parkour Training"
+                                game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
+                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = workspace.trainingBellsSpawn.CFrame --inst.CFrame* CFrame.new(2,0,-7)
+                                local ohString1 = "GetQuestProgress"
+                                local ohString2 = "Parkour Training"
+                                local ohString3 = "DontComplete"
+                                game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2, ohString3)
+                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = workspace.trainingBellsSpawn.CFrame --CFrame.new(0, -169.61, 0)
+                                local ohString1 = "GetQuestProgress"
+                                local ohString2 = "Parkour Training"
+                                game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
+                            else
+                                --game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = pospickup
+                                game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = workspace.trainingBellsSpawn.CFrame --CFrame.new(0, -169.61, 0)
+                            end
+                        until tonumber(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.Ryo.Amount.Text) > currentryo or getgenv().moneyfarming == false or getgenv().loopsUnload == true
+        
+                        game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = findtopickup()
+                        task.wait(1)
+                    end
+                end)
+            end
         end)
 
         local ToggleBind = PremiumSector:AddToggle("Kamui", false, function(e) 
@@ -10320,7 +10490,63 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         end)
         sector:AddSeperator('-')
     end
+    sector:AddButton('Chakra Point Unlock',function()
+        t_DataFunction:InvokeServer("ChakraPointUnlock", workspace.ChakraPoints.ChakraPoint)
+    end)
+    getgenv().autoblock = false
+    getgenv().blockfunct = function(blox)
+        task.spawn(function()
+            t_DataFunction:InvokeServer('Block')
+            repeat task.wait(0.01) until blox.hb.Parent ~= blox.parent
+            task.wait(.1) -- until blox == nil
+            t_DataFunction:InvokeServer('EndBlock')
+        end)
+    end
+    getgenv().blockdistance = 25
+    sector:AddToggle('Auto Block',false,function(xstate)
+        getgenv().autoblock = xstate
+    end)
+    sector:AddSlider('Distance',0,25,100,1,function(xstate)
+        getgenv().blockdistance = xstate
+    end)
+    local addonworkspaceblock = workspace.ChildAdded:Connect(function(c)
+        if c.Name == 'Hitbox' and getgenv().autoblock == true and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+            local dist = (c.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+            if dist <= getgenv().blockdistance and dist > 1 then 
+                getgenv().blockfunct({hb = c,parent = c.Parent})
+                print('hb')
+            else
+                task.spawn(function()
+                    local tickss = 0
+                    local cfinish = false
+                    local cbreak = false
+                    local last_distance = dist
+                    -- last_distance = dist
+                    repeat 
+                        task.wait(0.01) 
+                        tickss += 0.01
+                        if c and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                            dist = (c.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                            if dist <= getgenv().blockdistance and dist > 1 then 
+                                cfinish = true
+                            -- elseif (last_distance - dist) > -10 then
+                            --     cfinish = true
+                            end
+                        else
+                            cbreak = true
+                        end
+                    until ticks == 4 or cfinish == true
 
+                end)
+            end
+        end
+    end)
+
+    for i,v in next, workspace:GetChildren() do 
+        if v:FindFirstChild('HumanoidRootPart') then 
+
+        end
+    end
     sector:AddButton('Notify All Uchiha',function()
         for i,v in pairs(game.ReplicatedStorage.Settings:GetChildren()) do 
             if v.Name ~= game.Players.LocalPlayer.Name and v:FindFirstChild('Bloodline') and game.Players:FindFirstChild(v.Name) then 
@@ -10550,6 +10776,16 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         game:GetService("ReplicatedStorage").Events.DataEvent:FireServer('KillMe')
     end)
     sector:AddSeperator()
+    sector:AddButton('Sell Bulk',function()
+        for i=1, 5000 do 
+            t_DataFunction:InvokeServer('SellingBulk',i,'Trinket')
+        end
+    end) 
+    sector:AddButton('Instant Wipe',function()
+        t_DataEvent:FireServer("NewGame");
+        task.wait(.1)
+        t_DataFunction:InvokeServer("RequestReincarnation", "Female");
+    end)
     getgenv().ServerHopToNonUsedServer = function()
         task.spawn(function()
             local teleportId = ''
@@ -10922,23 +11158,23 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
 
     end
-    getgenv().InnKeeper = function()
-        local ohString1 = "StartQuest"
-        local ohString2 = "InnKeeper's Reunion"
-        game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
-        -- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
-        local ohString1 = "GetQuestProgress"
-        local ohString2 = "InnKeeper's Reunion"
-        local ohString3 = "DontComplete"
-        game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2, ohString3)
-        -- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
-        local ohString1 = "GetQuestProgress"
-        local ohString2 = "InnKeeper's Reunion"
-        game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
-        local ohString1 = "GetQuestProgress"
-        local ohString2 = "InnKeeper's Reunion"
-        game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
-    end
+    -- getgenv().InnKeeper = function()
+    --     local ohString1 = "StartQuest"
+    --     local ohString2 = "InnKeeper's Reunion"
+    --     game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
+    --     -- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
+    --     local ohString1 = "GetQuestProgress"
+    --     local ohString2 = "InnKeeper's Reunion"
+    --     local ohString3 = "DontComplete"
+    --     game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2, ohString3)
+    --     -- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
+    --     local ohString1 = "GetQuestProgress"
+    --     local ohString2 = "InnKeeper's Reunion"
+    --     game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
+    --     local ohString1 = "GetQuestProgress"
+    --     local ohString2 = "InnKeeper's Reunion"
+    --     game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
+    -- end
     getgenv().Lavaroldy = function()
         local ohString1 = "GetQuestProgress"
         local ohString2 = "Humbling Lavarossa"
@@ -11713,6 +11949,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                     getgenv().connectiontochakra:Disconnect() 
                 end 
                 workspaceconnection:Disconnect()
+                addonworkspaceblock:Disconnect()
                 print('true break') 
                 break 
             end
@@ -12074,28 +12311,27 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     --     makeClickable()
     -- end)
 
-    task.spawn(function()
+
         for i,v in pairs(game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List'):GetChildren()) do 
             v.MouseButton1Down:Connect(function()
-                pcall(function()if game.Players:FindFirstChild(v.RealName.Value) then 
+                if game.Players:FindFirstChild(v.RealName.Value) and game.Players:FindFirstChild(v.RealName.Value).Character then 
                     local playerSave = game.Players:FindFirstChild(v.RealName.Value)
                     game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
                     --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
-                end end)
+                end
             end)
         end
     
         game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List').ChildAdded:Connect(function(child)
+            task.wait(1)
             child.MouseButton1Down:Connect(function()
-                pcall(function()if game.Players:FindFirstChild(child.RealName.Value) then 
+                if game.Players:FindFirstChild(child.RealName.Value) and game.Players:FindFirstChild(child.RealName.Value).Character then 
                     local playerSave = game.Players:FindFirstChild(child.RealName.Value)
-                    game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
+                    game.Workspace.Camera.CameraSubject = game.Players:FindFirstChild(child.RealName.Value).Character
                     --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
-                end end)
+                end
             end)
         end)
-    
-    end)
     
 
 
@@ -12115,14 +12351,16 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     -- end 
     getgenv().WaitForFruit()
     game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.ChildAdded:Connect(function()
+        game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List')
         for i,v in pairs(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.PlayerList.List:GetChildren()) do 
             v.MouseButton1Down:Connect(function()
-                pcall(function()if game.Players:FindFirstChild(v.RealName.Value) then 
+                if game.Players:FindFirstChild(v.RealName.Value) and game.Players:FindFirstChild(v.RealName.Value).Character then 
                     local playerSave = game.Players:FindFirstChild(v.RealName.Value)
                     game.Workspace.Camera.CameraSubject = workspace:FindFirstChild(playerSave.Name)
-                    task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
-                end end)
+                    --task.spawn(Notify("..", "Viewing, "..playerSave.Name, 2))
+                end
             end)
+        
             v.MouseEnter:Connect(function()
                 pcall(function() if v.RealName.Value == game.Players.LocalPlayer.Name then 
                     v.PlayerName.TextColor3 = Color3.fromRGB(0,255,0)
@@ -12535,6 +12773,55 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             
             game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
         end)
+        
+        local br = AdminSector:AddButton('Burrow', function()
+            local ohString1 = "UnlockSkill"
+            local ohString2 = 'Burrow'
+            
+            game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
+        end)
+        local br2 = AdminSector:AddButton('Burrow Teleport', function()
+            local ohString1 = "UnlockSkill"
+            local ohString2 = 'Burrow Teleport'
+            
+            game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
+        end)
+        local br4 = AdminSector:AddButton('Flicker Teleport', function()
+            local ohString1 = "UnlockSkill"
+            local ohString2 = 'Flicker Teleport'
+            
+            game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
+        end)
+        AdminSector:AddSeperator('will bug yo slot')
+        local br3 = AdminSector:AddButton('Chains Of The Wild', function()
+            local ohString1 = "UnlockSkill"
+            local ohString2 = 'Chains Of The Wild'
+            
+            game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
+        end)
+        -- br:ActivateKnowledge()
+        -- br:AddKnowledge('This Will BUG yo slot')
+        -- br2:ActivateKnowledge()
+        -- br2:AddKnowledge('This Will BUG yo slot')
+        br3:ActivateKnowledge()
+        br3:AddKnowledge('This Will BUG yo slot')
+        -- br4:ActivateKnowledge()
+        -- br4:AddKnowledge('This Will BUG yo slot')
+        -- AdminSector:AddButton('Water Region', function()
+        --     local ohString1 = "UnlockSkill"
+        --     local ohString2 = 'Water Region'
+            
+        --     game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
+        -- end)
+        -- AdminSector:AddButton('Lightning Drop', function()
+        --     local ohString1 = "UnlockSkill"
+        --     local ohString2 = 'Lightning Drop'
+            
+        --     game:GetService("ReplicatedStorage").Events.DataFunction:InvokeServer(ohString1, ohString2)
+        -- end)
+        
+        
+       
         -- AdminSector:AddButton('Protruding Chains', function()
         --     local ohString1 = "UnlockSkill"
         --     local ohString2 = 'Protruding Chains'
