@@ -9767,6 +9767,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             getgenv().tpToPoint()
         end)
         getgenv().moneyfarming = false
+        PremiumSector:AddSeperator('Auto Money Wipes you')
         PremiumSector:AddToggle('Auto Money',false,function(xstate)
             getgenv().moneyfarming = xstate
             if getgenv().moneyfarming == true then 
