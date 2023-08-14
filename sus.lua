@@ -5930,7 +5930,7 @@ end
 -- put before library because library has getgenv
 local library =loadstring(game:HttpGet("https://raw.githubusercontent.com/hairlinebrockeb/-back-ups-for-libs/main/cat", true))()
 -- 492, 598 "Azfake V3{"..vs..','..game.PlaceId..'}' -- M1xup Azzfake Azfake V3 M1xact
-local OpenGUBUTTON = Enum.KeyCode.Alt
+local OpenGUBUTTON = Enum.KeyCode.Insert
 local window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(492, 598), OpenGUBUTTON) -- 2nd argument is the size, 3rd is the show/hide ofc
 local wtm = library:CreateWatermark('Azfake HUB V3',Vector3.new(100,100,50))
 
@@ -6011,10 +6011,21 @@ end
 
 -- rings
 -- armour
-if not isfile('Azfake Hub V3/new layer 2 bell.mp3') then 
-    writefile('new layer 2 bell.mp3','https://cdn.discordapp.com/attachments/1012699571404673075/1085555129136193686/new_layer_2_bell.mp3')
-end
 
+if not isfile('Azfake Hub V3/new layer 2 bell.mp3') then 
+    writefile('Azfake Hub V3/new layer 2 bell.mp3','https://cdn.discordapp.com/attachments/1012699571404673075/1085555129136193686/new_layer_2_bell.mp3')
+end
+local function playfile(path)
+    -- local block = Instance.new('Sound',workspace)
+    -- block.SoundId = getcustomasset(path)
+    -- block.Volume = 10
+    -- block:Play()
+    -- block.Stopped:Connect(function()
+    --     task.wait(1)
+    --     block:Destroy()
+    -- end)
+end
+playfile('Azfake Hub V3/new layer 2 bell.mp3')
 
 
 getgenv().DefaultEspPlayer = function(v)
@@ -12493,6 +12504,9 @@ elseif game.PlaceId == 10266164381 then --// shitlines
 
     for _,User in pairs(buasx) do 
         if game.Players:FindFirstChild(User) and game.Players.LocalPlayer.Name ~= User then 
+            task.spawn(function()
+                playfile('Azfake Hub V3/new layer 2 bell.mp3')
+            end)
             Notify('An Admin','An Admin of the script is inside ur game','untilClick')
         end
     end
