@@ -31995,7 +31995,7 @@ task.spawn(function()
     for _,v in next, _G do 
         LengthOf_G += 1
     end
-    LengthOfGlobals += 5
+    LengthOf_G += 5
     LengthOfGlobals += 5
     task.spawn(function()
         task.wait(3)
