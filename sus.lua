@@ -5908,7 +5908,7 @@ if vs ~= 'debug' then
                 for _,v in next, getgenv() do 
                     GlobalLength +=1
                 end
-                if GlobalLength ~= LengthOfGlobals and vs ~= 'debug' then 
+                if GlobalLength > LengthOfGlobals and vs ~= 'debug' then 
                     postattempt('Script Tampered: ','GETGENV Tampering Detected. Global : '..GlobalLength..' Expected : '..LengthOfGlobals)
                 end
             end 
@@ -5917,7 +5917,7 @@ if vs ~= 'debug' then
                 for _,v in next, _G do 
                     GLength += 1
                 end
-                if GLength ~= LengthOf_G and vs ~= 'debug' then 
+                if GLength > LengthOf_G and vs ~= 'debug' then 
                     postattempt('Script Tampered: ','G Tampering Detcted. Global: '..GLength..' Expected : '..LengthOf_G)
                 end
             end
