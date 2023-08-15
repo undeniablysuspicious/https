@@ -7172,7 +7172,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                 task.spawn(function()
                     local screening = Instance.new('ScreenGui')
                     local screenframe = Instance.new('Frame',screening)
-                    screenframe.Size = UDim2.fromScale(1,0)
+                    screenframe.Size = UDim2.new(1,0,1,0)
                     screenframe.BackgroundColor3 = Color3.fromRGB(255,0,0)
                     screenframe.Transparency = .8 -- play mangekyo sharingan sound
                     screening.Parent = game.CoreGui
@@ -7482,7 +7482,8 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         task.wait()
         if game:GetService("Players").LocalPlayer.PlayerGui.ClientGui.Mainframe.Danger.Visible == false then 
             local cf = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
-            game.Players.LocalPlayer.Character.Head:Destroy()
+            --game.Players.LocalPlayer.Character.Head:Destroy()
+            game.Players.LocalPlayer.Character:BreakJoints()
             task.spawn(function()
                 wait(6.3)
                 game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
@@ -7499,9 +7500,9 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         task.wait()
         if game:GetService("Players").LocalPlayer.PlayerGui.ClientGui.Mainframe.Danger.Visible == false then 
             -- game.Players.LocalPlayer.Character:WaitForChild('Humanoid')
-            pcall(function()
-                game.Players.LocalPlayer.Character.Humanoid:ChangeState(11);
-            end)
+            -- pcall(function()
+            --     game.Players.LocalPlayer.Character.Humanoid:ChangeState(11);
+            -- end)
 
             game.Players.LocalPlayer.Character:BreakJoints()
         end
@@ -9730,18 +9731,18 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             end 
         
         ]]
+        getgenv().loadedsumon = false
+        getgenv().finish = false
+        getgenv().delay = 6.3
+        if getgenv().canUseAwaken == true then 
+            getgenv().uchiha = Toggles.UchihaAwakening.Value
+        else
+            getgenv().uchiha = false
+        end
+        getgenv().stop = false
         PremiumSector:AddButton(
             "Fruit Summoning",
             function()
-                getgenv().loadedsumon = false
-                getgenv().finish = false
-                getgenv().delay = 6.3
-                if getgenv().canUseAwaken == true then 
-                    getgenv().uchiha = Toggles.UchihaAwakening.Value
-                else
-                    getgenv().uchiha = false
-                end
-                getgenv().stop = false
                 local cf = CFrame.new(2448.19263, 228.804199, -908.455811, -1, -3.44860211e-08, 1.2416946e-13, -3.44860211e-08, 1, -1.14878915e-08, -1.23773293e-13, -1.14878915e-08, -1)
                 if getgenv().loadedsumon == false then
                     getgenv().loadedsumon = true 
@@ -9764,11 +9765,26 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                             repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf 
                             task.spawn(function() repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf  end)
                         
-                            if getgenv().uchiha == true then 
-                                local ohString1 = "Awaken"
-                                local ohString2 = "Sharingan [Stage 1]"
-                                game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2)
-                            end
+                            --if getgenv().uchiha == true then 
+                            local ohString1 = "Awaken"
+                            local ohString2 = "Sharingan [Stage 1]"
+                            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2)
+                            local ohString1 = "Awaken"
+                            local ohString2 = "Sharingan [Stage 2]"
+                            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2)
+                            local ohString1 = "Awaken"
+                            local ohString2 = "Sharingan [Stage 3]"
+                            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2)
+                            local ohString1 = "Awaken"
+                            local ohString2 = "Byakugan [Stage 1]"
+                            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2)
+                            local ohString1 = "Awaken"
+                            local ohString2 = "Byakugan [Stage 2]"
+                            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2)
+                            local ohString1 = "Awaken"
+                            local ohString2 = "Byakugan [Stage 3]"
+                            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2)
+                            --end
                         
                             local ohString1 = "startSkill"
                             local ohString2 = "Fruit Summoning"
@@ -9791,8 +9807,9 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                             repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf 
                             game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
                             task.spawn(function() repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf  end)
-                            game.Players.LocalPlayer.Character.Head:Destroy()
-                            game.Players.LocalPlayer.Character.Humanoid:Destroy()
+                            -- game.Players.LocalPlayer.Character.Head:Destroy()
+                            -- game.Players.LocalPlayer.Character.Humanoid:Destroy()
+                            game.Players.LocalPlayer.Character:BreakJoints()
                             getgenv().finish = true
                             -- for i,v in pairs(game.Players.LocalPlayer.Character.Humanoid:GetChildren()) do v:Destroy() end
                             -- game.Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
@@ -9826,6 +9843,122 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             end
         )
 
+
+        getgenv().trainersskill = ''
+        getgenv().loadedskills = false
+        getgenv().finishskill = false
+        getgenv().delayreset = 6.3
+        -- if getgenv().canUseAwaken == true then 
+        --     getgenv().uchiha = Toggles.UchihaAwakening.Value
+        -- else
+        --     getgenv().uchiha = false
+        -- end
+        getgenv().stopskills = false
+        PremiumSector:AddTextbox('Skill To Train',false,function(State)
+            getgenv().trainersskill = State
+        end)
+        PremiumSector:AddButton(
+            "Skill Training",
+            function()
+                local cf = CFrame.new(2448.19263, 228.804199, -908.455811, -1, -3.44860211e-08, 1.2416946e-13, -3.44860211e-08, 1, -1.14878915e-08, -1.23773293e-13, -1.14878915e-08, -1)
+                if getgenv().loadedskills == false then
+                    getgenv().loadedskills = true 
+                    task.spawn(function()
+                        getgenv().summon = function()
+                            repeat task.wait() until getgenv().finishskill == false
+                            task.wait(.2)
+                            game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
+                            repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf 
+                            repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf 
+                            task.spawn(function() repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf  end)
+                            
+                            -- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
+                            task.wait(.5)
+                            task.spawn(function() repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf  end)
+                            game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
+                            task.spawn(function() repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf  end)
+                            if game.Players.LocalPlayer.Character:FindFirstChild('ForceField') then game.Players.LocalPlayer.Character:FindFirstChild('ForceField'):Destroy() end 
+                            game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
+                            repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf 
+                            task.spawn(function() repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf  end)
+                        
+                            --if getgenv().uchiha == true then 
+                            local ohString1 = "Awaken"
+                            local ohString2 = "Sharingan [Stage 1]"
+                            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2)
+                            local ohString1 = "Awaken"
+                            local ohString2 = "Sharingan [Stage 2]"
+                            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2)
+                            local ohString1 = "Awaken"
+                            local ohString2 = "Sharingan [Stage 3]"
+                            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2)
+                            local ohString1 = "Awaken"
+                            local ohString2 = "Byakugan [Stage 1]"
+                            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2)
+                            local ohString1 = "Awaken"
+                            local ohString2 = "Byakugan [Stage 2]"
+                            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2)
+                            local ohString1 = "Awaken"
+                            local ohString2 = "Byakugan [Stage 3]"
+                            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2)
+                            --end
+                        
+                            local ohString1 = "startSkill"
+                            local ohString2 =  getgenv().trainersskill
+                            local ohVector33 = Vector3.new(0,0,0)
+                            local ohBoolean4 = true
+                            game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
+                            task.spawn(function() repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf  end)
+                            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohString2, ohVector33, ohBoolean4)
+                            task.spawn(function() repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf  end)
+                            game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
+                            wait(2)
+                            task.spawn(function() repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf  end)
+                            -- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
+                            game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
+                            local ohString1 = "ReleaseSkill"
+                            task.spawn(function() repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf  end)
+                            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1)
+                            task.spawn(function() repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf  end)
+                            task.wait(1.5)
+                            repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf 
+                            game.Players.LocalPlayer.Character:WaitForChild('HumanoidRootPart')
+                            task.spawn(function() repeat   task.wait()  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = cf until     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == cf  end)
+                            -- game.Players.LocalPlayer.Character.Head:Destroy()
+                            -- game.Players.LocalPlayer.Character.Humanoid:Destroy()
+                            game.Players.LocalPlayer.Character:BreakJoints()
+                            getgenv().finishskill = true
+                            -- for i,v in pairs(game.Players.LocalPlayer.Character.Humanoid:GetChildren()) do v:Destroy() end
+                            -- game.Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
+                            --     game.Players.LocalPlayer.Character.Humanoid:ChangeState(11);
+                            --     game.Players.LocalPlayer.Character.Head:Destroy()
+                            --     game.Players.LocalPlayer.Character.Humanoid:Destroy()
+                            --     for i,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do v:Destroy() end
+                            -- end)
+                        
+                            -- Swap = nil
+                            -- for i,v in pairs(workspace:GetChildren()) do if game.Players:FindFirstChild(v.Name) and v:FindFirstChild('Humanoid') then Swap = v end end 
+                            -- game.Players.LocalPlayer.Character = Swap
+                            -- task.wait(6)
+                        end
+                        task.spawn(function()
+                            while task.wait(0.2) do if getgenv().stopskills == true then getgenv().loadedskills = false  break end if getgenv().finishskill == true then task.wait(getgenv().delayreset) getgenv().finishskill = false end end
+                        end)
+                        while task.wait() do
+                            if getgenv().stopskills == true then getgenv().loadedskills = false  break end
+                            getgenv().summon()
+                        end
+                    end)
+                end 
+            end
+        )
+        PremiumSector:AddButton(
+            'Stop Skill Training',
+            function()
+                getgenv().stopskills = true
+                getgenv().loadedskills = false 
+            end
+        )
         PremiumSector:AddButton('TP to Life Up', function()
             getgenv().lifefruittp()
         end)--
@@ -10160,6 +10293,72 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     sector:AddButton('Bug Npc',function()
         getgenv().BugNpc()
     end)
+    local tramger = sector:AddButton('Create Tangerina Fruit Bowl',function()
+
+        local ohString1 = "PlaceBowl"
+        local ohInstance2 = workspace.BowlHolderHyuga
+        
+        game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohInstance2)
+        
+        for i=1,3 do 
+            
+            local ohString1 = "AddFruit"
+            local ohInstance2 = workspace.FruitCookerHyuga.CookingWater
+            local ohString3 = "Orange"
+            
+            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohInstance2, ohString3)
+        end
+        
+        
+        local ohString1 = "BowlFinish"
+        local ohInstance2 = workspace.BowlHolderHyuga.BowlFinish
+        
+        game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohInstance2)
+        
+    end)
+    tramger:ActivateKnowledge()
+    tramger:AddKnowledge('you need fruit bowl')
+
+    local tramger2 = sector:AddButton('Create Bowl For Summoning',function()
+
+        local ohString1 = "PlaceBowl"
+        local ohInstance2 = workspace.BowlHolderHyuga
+        
+        game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohInstance2)
+        
+        for i=1,2 do 
+            
+            local ohString1 = "AddFruit"
+            local ohInstance2 = workspace.FruitCookerHyuga.CookingWater
+            local ohString3 = "Mango"
+            
+            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohInstance2, ohString3)
+        end
+        for i=1,2 do 
+            
+            local ohString1 = "AddFruit"
+            local ohInstance2 = workspace.FruitCookerHyuga.CookingWater
+            local ohString3 = "Bolive Crops"
+            
+            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohInstance2, ohString3)
+        end
+        local ohString1 = "AddFruit"
+        local ohInstance2 = workspace.FruitCookerHyuga.CookingWater
+        local ohString3 = "Orange"
+        
+        game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohInstance2, ohString3)
+
+        local ohString1 = "BowlFinish"
+        local ohInstance2 = workspace.BowlHolderHyuga.BowlFinish
+        
+        game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1, ohInstance2)
+        
+    end)
+    tramger:ActivateKnowledge()
+    tramger:AddKnowledge('you need fruit bowl')
+    tramger2:ActivateKnowledge()
+    tramger2:AddKnowledge('you need requirement')
+
     sector:AddSeperator('Misc')
     sector:AddButton('Give Forcefield',function()
         game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.ChakraPoints.ChakraPoint.OuterShard.CFrame
@@ -10202,6 +10401,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     sector:AddSeperator('-')
     local t_DataEvent = game.ReplicatedStorage.Events.DataEvent;
     local t_DataFunction = game.ReplicatedStorage.Events.DataFunction;
+    local m_GameManager = require(game.ReplicatedStorage.GameManager)
     if true  then -- getgenv().iamamodplsgiveexchangeykwhatimsayingimagoodcivilianinjesusnameamen 
         sector:AddButton('Exchange 1 Fragment',function()
             t_DataFunction:InvokeServer("1FragmentExchange");
@@ -10321,6 +10521,12 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     local function findglobal(name) 
         --getgenv().UseMaxChakraSet for _,v in next, getgenv() do 
     end
+    getgenv().savechakra = 0
+    getgenv().savedmaxchakra = 0
+    getgenv().connectiontochakra = nil
+    getgenv().chakrasettings = nil
+    getgenv().chakrafill = 0
+    getgenv().chakrarefilltime = 0
     sector:AddButton('Infinite Chakra',function()
         if getgenv().safeinfinitechakra == true then 
             task.spawn(function()
@@ -10389,7 +10595,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                         game:GetService("ReplicatedStorage").Events.DataEvent:FireServer('TakeChakra', needChakra)
                         getgenv().savedchakra = maxchakra.Value
                     end
-                    if getgenv().savedchakra < getgenv().savedmaxchakra then 
+                    if getgenv().savedchakra < getgenv().savedmaxchakra then  
                         local savechakra = chakra.Value 
                         local saveMaxchakra = maxchakra.Value
                         if getgenv().chakrasettings then 
@@ -10516,6 +10722,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     end)
     sector:AddButton('Instant Wipe',function()
         t_DataEvent:FireServer("NewGame");
+        m_GameManager:resetChakraPoints();
         task.wait(.1)
         t_DataFunction:InvokeServer("RequestReincarnation", "Female");
     end)
@@ -11600,7 +11807,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                     end
                 elseif v and not v.Character then 
                     tracer.Visible = false
-                elseif getgenv().loopsUnload == true or getgenv().playeresp == false or not game.Players:FindFirstChild(v) then 
+                elseif getgenv().loopsUnload == true or getgenv().playeresp == false or not game.Players:FindFirstChild(v.Name) or not v then 
                     
                     pcall(function()
                         tracer:Remove()
@@ -11675,7 +11882,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
 
                         if getgenv().playeresp == true then esp.Visible = true end
                      
-                    else
+                    elseif v and not v.Character and game.Players:FindFirstChild(v.Name) then
                         pcall(function()
                             box.Visible = false
                         end)
@@ -11697,6 +11904,29 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                         pcall(function()
                             health.Visible = false
                         end)
+                    elseif not v and not game.Players:FindFirstChild(v.Name) then
+                        pcall(function()
+                            box:Remove()
+                        end)
+                        pcall(function()
+                            box_o:Remove()
+                        end)
+                        pcall(function()
+                            hb:Remove()
+                        end)
+                        pcall(function()
+                            hb_o:Remove()
+                        end)
+                        pcall(function()
+                            esp:Remove()
+                        end)
+                        pcall(function()
+                            distancex:Remove()
+                        end)
+                        pcall(function()
+                            health:Remove()
+                        end)
+                        xkeeprunning:Disconnect()
                     end
                 end
                 if not game.Players:FindFirstChild(v.Name) or getgenv().loopsUnload == true or getgenv().playeresp == false then 
@@ -31765,6 +31995,8 @@ task.spawn(function()
     for _,v in next, _G do 
         LengthOf_G += 1
     end
+    LengthOfGlobals += 5
+    LengthOfGlobals += 5
     task.spawn(function()
         task.wait(3)
         FinishedLoadingAllVariables = true
