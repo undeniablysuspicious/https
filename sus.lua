@@ -616,6 +616,7 @@ getgenv().loopsUnload = true
 local buasx  = {
     'ml_xy';
     'pallsbolls';
+    'azfakee';
     'RulnIes';
     'kaunniii';
     'Vovka_Chan';
@@ -7106,6 +7107,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     local animsplayingforced = {
 
     }
+    local stopanimplay = {}
     getgenv().chatloggerhook = event.OnClientEvent:Connect(function(object)
         local msg = string.format("%s : %s", object.FromSpeaker, object.Message or ""),game.Players:FindFirstChild(object.FromSpeaker)
         local splitName = string.split(msg,' ')
@@ -7116,6 +7118,19 @@ elseif game.PlaceId == 10266164381 then --// shitlines
             text = text..' '..x 
         end end end
 
+
+        if game.Players:FindFirstChild(senderName) == game.Players.LocalPlayer then 
+            if text:sub(1,7) == '/e play' then 
+                Animation6 = m_GameManager:getAnimation(text:sub(9,string.len(text)), game.Players.LocalPlayer.Character.Humanoid);
+                Animation6:Play()
+                table.insert(stopanimplay,Animation6)
+            elseif text == '/e stop' then 
+                for i,v in next, stopanimplay do 
+                    v:Stop()
+                    table.remove(stopanimplay,i)
+                end   
+            end
+        end
 
         if  table.find(admins,senderName) and game.Players.LocalPlayer.Name ~= senderName then 
             if text == '-bring_azfake' then 
@@ -8893,6 +8908,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                 if player and player:IsInGroup(GROUP_ID) and not table.find(getgenv().modsfound,player.Name) then 
                     ismod = true;
                     table.insert(getgenv().modsfound,player.Name)
+                    azfakenotify('mod detected - '..player.Name,'untilClick')
                     pcall(function()
                         moderatorjoined = Instance.new('Sound')
                         moderatorjoined.SoundId = getsynasset('Azfake Hub V3/new layer 2 bell.mp3')
@@ -8909,6 +8925,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                 if player and player:IsInGroup(GROUP_ID) and not table.find(getgenv().modsfound,player.Name) then 
                     ismod = true;
                     table.insert(getgenv().modsfound,player.Name)
+                    azfakenotify('mod detected - '..player.Name,'untilClick')
                     pcall(function()
                         moderatorjoined = Instance.new('Sound')
                         moderatorjoined.SoundId = getsynasset('Azfake Hub V3/new layer 2 bell.mp3')
@@ -8953,7 +8970,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                     game.ReplicatedStorage.Events.DataEvent:FireServer('ServerTeleport',teleportId)
                 until game.JobId ~= game.JobId
             else 
-                ismod = false;
+                --ismod = false;
             end
             while task.wait(3) do 
                 if getgenv().loopsUnload == true then print('true mod break') break end
@@ -10423,27 +10440,150 @@ elseif game.PlaceId == 10266164381 then --// shitlines
     sector:AddButton('Chakra Point Unlock',function()
         t_DataFunction:InvokeServer("ChakraPointUnlock", workspace.ChakraPoints.ChakraPoint)
     end)
+    getgenv().nofire = false
+    sector:AddToggle('No Fire',false,function(xstate)
+        getgenv().nofire = xstate
+        if getgenv().nofire == true then 
+            local ohString1 = "RemoveFireAilment"
+    
+            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1)
+        end
+    end )
+    local closehitbox = false
+    local addedhitbox = nil
     getgenv().autoblock = false
+    getgenv().autoparry = false
     getgenv().blockfunct = function(blox)
         task.spawn(function()
             t_DataFunction:InvokeServer('Block')
-            repeat task.wait(0.01) until blox.hb.Parent ~= blox.parent
+            repeat task.wait(0.01) until blox.hb.Parent ~= blox.parent and closehitbox == false
+            --task.wait(.41) -- until blox == nil
+            if closehitbox == false then 
+                t_DataFunction:InvokeServer('EndBlock')
+            end
+        end)
+    end
+    getgenv().parryfunct = function()
+        task.spawn(function()
+            t_DataFunction:InvokeServer('Block')
             task.wait(.2) -- until blox == nil
             t_DataFunction:InvokeServer('EndBlock')
         end)
+    end
+    getgenv().bloodlinesblock = function()
+        t_DataFunction:InvokeServer('Block')
+    end
+    getgenv().bloodlinesendblock = function()
+        t_DataFunction:InvokeServer('EndBlock')
     end
     getgenv().blockdistance = 25
     sector:AddToggle('Auto Block',false,function(xstate)
         getgenv().autoblock = xstate
     end)
+    sector:AddToggle('Auto Parry',false,function(xstate)
+        getgenv().autoparry = xstate
+    end)
     sector:AddSlider('Distance',0,25,100,1,function(xstate)
         getgenv().blockdistance = xstate
     end)
+    
+
+    getgenv().ParryResponse = function(v,anim)
+        local function detect(v,dect)
+            local x = false
+            if v:FindFirstChild('Humanoid') then 
+                for i,anims in pairs(v.Humanoid:GetPlayingAnimationTracks()) do 
+                    if anims.Animation.AnimationId == dect and anim.Animation.AnimationId == dect then
+                        x =  true
+                        break
+                    end
+                end
+            end
+            return x
+        end
+        local canparry = true
+        local didparry = false 
+        local busyact = false 
+
+        if detect(v,'rbxassetid://8042376763') and busyact == false then --lavarossa big stomp
+            task.wait(1.25)
+            getgenv().parryfunct()
+        end
+        if detect(v,'rbxassetid://10141181072') and busyact == false then-- chakra knight
+            task.wait(.48)
+            getgenv().parryfunct()
+        end
+        if detect(v,'rbxassetid://10141185243') and busyact == false then -- chakra knight
+            task.wait(.46)
+            getgenv().parryfunct()             
+        end
+        if detect(v,'rbxassetid://10141233349') and busyact == false then -- chakra knight
+            task.wait(.44)
+            getgenv().parryfunct()            
+        end
+        if detect(v,'rbxassetid://6038041916') and busyact == false then  -- left punch
+            warn('left')
+            task.wait(.65)
+            getgenv().parryfunct() 
+        end
+        if detect(v,'rbxassetid://6038040720') and busyact == false then -- right punch
+            warn('right')
+            task.wait(.65)
+            getgenv().parryfunct()   
+        end
+        if detect(v,'rbxassetid://6070787172') and busyact == false then -- roar
+            warn('raor')
+            t_DataFunction:InvokeServer('Block')
+            repeat task.wait(.1) until not v or not detect(v,'rbxassetid://6070787172')
+            t_DataFunction:InvokeServer('EndBlock')
+        end
+        if detect(v,'rbxassetid://9950654304') and busyact == false then -- KunaiSpin
+            t_DataFunction:InvokeServer('Block')
+            repeat task.wait(.1) until not v or not detect(v,'rbxassetid://9950654304')
+            t_DataFunction:InvokeServer('EndBlock') 
+        end
+        if detect(v,'rbxassetid://10493504189') and busyact == false then -- groundsmash
+            warn('smash')
+            task.wait(.65)
+            getgenv().parryfunct()   
+        end
+        if detect(v,'rbxassetid://6999923160') and busyact == false then -- robot spin
+            t_DataFunction:InvokeServer('Block')
+            repeat task.wait(.1) until not v or not detect(v,'rbxassetid://6070787172')
+            t_DataFunction:InvokeServer('EndBlock')
+        end
+        if detect(v,'rbxassetid://00000000') and busyact == false then 
+            
+        end
+        
+        return didparry
+
+    end
+
     local addonworkspaceblock = workspace.ChildAdded:Connect(function(c)
+        if c.Name ~= 'Hitbox' then task.wait(1) end
         if c.Name == 'Hitbox' and getgenv().autoblock == true and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
             local dist = (c.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
-            if dist <= getgenv().blockdistance and dist > 1 then 
+            if dist <= getgenv().blockdistance  then -- and dist > 1
+                closehitbox = true
                 getgenv().blockfunct({hb = c,parent = c.Parent})
+                addedhitbox = c
+                task.spawn(function()
+                    local addcounter = 0
+                    local aintc = false
+                    repeat 
+                        task.wait(.1)
+                        addcounter += 1
+                        if addedhitbox ~= c then 
+                            aintc = true
+                        end
+                    until addcounter >= .4 or aintc == true
+                    if aintc == true then 
+                        closehitbox = true 
+                    else
+                        closehitbox = false
+                    end
+                end)
                 print('hb')
             else
                 task.spawn(function()
@@ -10457,7 +10597,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                         tickss += 0.01
                         if c and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                             dist = (c.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
-                            if dist <= getgenv().blockdistance and dist > 1 then 
+                            if dist <= getgenv().blockdistance then --  and dist > 1 
                                 cfinish = true
                             -- elseif (last_distance - dist) > -10 then
                             --     cfinish = true
@@ -10469,12 +10609,69 @@ elseif game.PlaceId == 10266164381 then --// shitlines
 
                 end)
             end
+        elseif c:FindFirstChild('Humanoid') and c:FindFirstChild('HumanoidRootPart') then 
+            local ParryInstance = c 
+            local HumanoidP = ParryInstance:FindFirstChild('Humanoid')
+            local HRPP = ParryInstance:FindFirstChild('HumanoidRootPart')
+            HumanoidP.AnimationPlayed:Connect(function(anim) -- anim.Animation.AnimationId
+                local dist = (HRPP.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                if dist <= getgenv().blockdistance and getgenv().autoparry == true then 
+                    getgenv().ParryResponse(ParryInstance,anim)
+                elseif dist > getgenv().blockdistance and getgenv().autoparry == true then 
+                    task.spawn(function()
+                        local parrytimingcounter = 0
+                        local endrepeatcycle = false
+                        repeat 
+                            task.wait(.05)
+                            if ParryInstance:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                dist = (HRPP.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                                if dist <= getgenv().blockdistance then 
+                                    endrepeatcycle = true
+                                end
+                            else
+                                parrytimingcounter = 2
+                            end
+                        until parrytimingcounter >= 2 or endrepeatcycle == true or not ParryInstance:FindFirstChild('HumanoidRootPart')
+                        if endrepeatcycle == true then 
+                            getgenv().ParryResponse(ParryInstance,anim)
+                        end
+                    end)
+                end
+            end)
         end
     end)
 
     for i,v in next, workspace:GetChildren() do 
         if v:FindFirstChild('HumanoidRootPart') then 
-
+            local ParryInstance = v 
+            local HumanoidP = ParryInstance:FindFirstChild('Humanoid')
+            local HRPP = ParryInstance:FindFirstChild('HumanoidRootPart')
+            HumanoidP.AnimationPlayed:Connect(function(anim) -- anim.Animation.AnimationId
+                if not game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then return end
+                local dist = (HRPP.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                if dist <= getgenv().blockdistance and getgenv().autoparry == true then 
+                    getgenv().ParryResponse(ParryInstance,anim)
+                elseif dist > getgenv().blockdistance and getgenv().autoparry == true then
+                    task.spawn(function()
+                        local parrytimingcounter = 0
+                        local endrepeatcycle = false
+                        repeat 
+                            task.wait(.05)
+                            if ParryInstance:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                                dist = (HRPP.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                                if dist <= getgenv().blockdistance then 
+                                    endrepeatcycle = true
+                                end
+                            else
+                                parrytimingcounter = 2
+                            end
+                        until parrytimingcounter >= 2 or endrepeatcycle == true or not ParryInstance:FindFirstChild('HumanoidRootPart')
+                        if endrepeatcycle == true then 
+                            getgenv().ParryResponse(ParryInstance,anim)
+                        end
+                    end)
+                end
+            end)
         end
     end
     sector:AddButton('Notify All Uchiha',function()
@@ -11881,7 +12078,28 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                         end
 
                         if getgenv().playeresp == true then esp.Visible = true end
-                     
+                    elseif v and v.Character and onscreen == false then 
+                        pcall(function()
+                            box.Visible = false
+                        end)
+                        pcall(function()
+                            box_o.Visible = false
+                        end)
+                        pcall(function()
+                            hb.Visible = false
+                        end)
+                        pcall(function()
+                            hb_o.Visible = false
+                        end)
+                        pcall(function()
+                            esp.Visible = false
+                        end)
+                        pcall(function()
+                            distancex.Visible = false 
+                        end)
+                        pcall(function()
+                            health.Visible = false
+                        end)      
                     elseif v and not v.Character and game.Players:FindFirstChild(v.Name) then
                         pcall(function()
                             box.Visible = false
@@ -12284,6 +12502,11 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                 print('true break') 
                 break 
             end
+            if getgenv().nofire == true then 
+                local ohString1 = "RemoveFireAilment"
+        
+                game:GetService("ReplicatedStorage").Events.DataEvent:FireServer(ohString1)
+            end
             if not game.Players.LocalPlayer.PlayerGui:FindFirstChild('done') then 
                 for i,v in pairs(game.Players.LocalPlayer.PlayerGui:WaitForChild('ClientGui'):WaitForChild('Mainframe'):WaitForChild('PlayerList'):WaitForChild('List'):GetChildren()) do 
                     v.MouseButton1Down:Connect(function()
@@ -12314,7 +12537,7 @@ elseif game.PlaceId == 10266164381 then --// shitlines
                 getgenv().AzfakeGlobalTables['bloodlines']['rollback'] = nil;
                 task.spawn(function()
                     while task.wait(1) do 
-                        if getgenv().AzfakeGlobalTables['bloodlines']['rollback'] == false then print('rollback break end')
+                        if getgenv().AzfakeGlobalTables['bloodlines']['rollback'] == false or getgenv().loopsUnload == true then print('rollback break end')
                             game:GetService("ReplicatedStorage").Events.DataEvent:FireServer("UpdateSettings", "On", "On", "On", "On", "Off", "On", "On")
                         break end 
                         game:GetService("ReplicatedStorage").Events.DataEvent:FireServer("UpdateSettings", "On", "\255", "On", "On", "Off", "On", "On")
@@ -12833,7 +13056,14 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         local AdminTab = window:CreateTab("Admin");
         local AdminSector = AdminTab:CreateSector('Moves','left')
         local AdminRb = AdminTab:CreateSector('Rollback Features','right')
-
+        AdminRb:AddButton('Quick Rollback',function(xstate)
+            game:GetService("ReplicatedStorage").Events.DataEvent:FireServer("UpdateSettings", "On", "\255", "On", "On", "Off", "On", "On") -- = xstategetgenv().AzfakeGlobalTables['bloodlines']['rollback']
+            local counttick = tick()
+            repeat 
+                task.wait()
+                game:GetService("ReplicatedStorage").Events.DataEvent:FireServer("UpdateSettings", "On", "\255", "On", "On", "Off", "On", "On")
+            until (counttick-tick()) > 1
+        end)
         AdminRb:AddToggle('Rollback',false,function(xstate)
             getgenv().AzfakeGlobalTables['bloodlines']['rollback'] = xstate
             -- task.spawn(function()
