@@ -14909,11 +14909,14 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         until amount >2
 
     end
+    getgenv().JUSTROLLEDFW = false
     getgenv().parry = function()-- check roll on next attack because feinted
-        if getgenv().fw3localFw3['parryhasfeintedsonoparry'] == true then 
+        print('called parry')
+        if getgenv().fw3localFw3['parryhasfeintedsonoparry'] == true then  -- and getgenv().fw3localFw3['rollnotparry'] == false
             print('parry so no parry')
-            getgenv().fw3localFw3['parryhasfeintedsonoparry'] = false    
+            getgenv().fw3localFw3['parryhasfeintedsonoparry'] = false   
         return end
+        print('parry stage 2')
         -- task.spawn(function()
         --     local ping_adjustment = 0
         --     local getping = getgenv().Ping; if getping == 0 then ping_adjustment = 1 else ping_adjustment = getping end; 
@@ -14933,7 +14936,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         -- end)
         task.spawn(function()
             pcall(function(  )
-                if getgenv().fw3localFw3['rollnotparry'] == false then 
+                if getgenv().fw3localFw3['rollnotparry'] == false then --  or getgenv().fw3localFw3['rollnotparry'] == true and ourfolder:FindFirstChild('Cooldowns'):FindFirstChild('RollCD')  or getgenv().fw3localFw3['rollnotparry'] == true and getgenv().JUSTROLLEDFW == true
                     print('supposed to parry')
                     local ping_adjustment = 0
                     local getping = getgenv().Ping; if getping == 0 then ping_adjustment = 1 else ping_adjustment = getping end; 
@@ -14945,8 +14948,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     elseif getgenv().UsePing == false then 
                         task.wait(0.107)
                     end
-                    if getgenv().fw3localFw3['parryhasfeintedsonoparry'] == true then 
-                        print('parry so no parry')
+                    if getgenv().fw3localFw3['parryhasfeintedsonoparry'] == true then  -- and getgenv().fw3localFw3['rollnotparry'] == false 
+                        print('parry so no parry START BREAK')
                         getgenv().fw3localFw3['parryhasfeintedsonoparry'] = false    
                     return end
                     local args = {
@@ -14965,8 +14968,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     --task.wait(0.2)--// pingwait
 
                     task.wait(0.1)
-                    if getgenv().fw3localFw3['parryhasfeintedsonoparry'] == true then 
-                        print('parry so no parry')
+                    if getgenv().fw3localFw3['parryhasfeintedsonoparry'] == true then  --  and getgenv().fw3localFw3['rollnotparry'] == false 
+                        print('parry so no parry GO UP')
                         getgenv().fw3localFw3['parryhasfeintedsonoparry'] = false    
                         local args = {
                             [1] = "Up"
@@ -14979,8 +14982,15 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                         [1] = "Up"
                     }
                     game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
-                else
+                else -- if getgenv().fw3localFw3['rollnotparry'] == true then   and not ourfolder:FindFirstChild('Cooldowns'):FindFirstChild('RollCD') and getgenv().JUSTROLLEDFW  == false  
+                    -- getgenv().JUSTROLLEDFW  = true 
+                    -- task.delay(1,function()
+                    --     getgenv().JUSTROLLEDFW  = false
+                    -- end)
                     getgenv().fw3localFw3['rollnotparry'] = false;
+                    pcall(function()
+                        print('found rollcd result: '..tostring(ourfolder:FindFirstChild('Cooldowns'):FindFirstChild('RollCD')))
+                    end)
                     -- if ourfolder:FindFirstChild('Cooldowns'):FindFirstChild('RollCD') then 
                     --     local args = {
                     --         [1] = "Up"
@@ -15026,7 +15036,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                         
                     }
                     local cooldown_folder_rollcheckstuns  ={
-                        'RollCD';
+                       -- 'RollCD';
                         
                     }
                     local character_rollcheckstuns = {
@@ -15302,6 +15312,27 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             game:GetService("Players").LocalPlayer.Backpack["Strong Left"].RemoteEvent:FireServer('Activate')
         end)
     end
+
+    getgenv().holdparry = function()
+        local args = {
+            [1] = "Down"
+        }
+        game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+        local args = {
+            [1] = "Hold"
+        }
+        game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
+        
+    end
+
+    getgenv().releaseparry = function()
+        local args = {
+            [1] = "Up"
+        }
+        game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))   
+    end
+
+
     getgenv().buttonUp = false
     game.Players.LocalPlayer:GetMouse().Button1Down:Connect(function()
         getgenv().buttonUp = true
@@ -15416,6 +15447,18 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             Whitelist:Set(getgenv().WhitelistMode)
         end
     end)
+
+    local function findanimation(v,dect)
+        local x = false
+        if v:FindFirstChild('Humanoid') then 
+            for i,anim in pairs(v.Humanoid:GetPlayingAnimationTracks()) do 
+                if anim.Animation.AnimationId == dect then
+                    x = true
+                end
+            end
+        end
+        return x
+    end
 
     getgenv().ParryAct = function(v)--,hiting value;
         -- aztup detects the maximum range you can get hit in
@@ -15648,7 +15691,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 Excluded = true 
             end
         end
-        if v:FindFirstChild('Torso') and Excluded == false then 
+        if v:FindFirstChild('Torso')  then -- and Excluded == false
             if v:FindFirstChild('Right Arm') and v:FindFirstChild('Right Arm'):FindFirstChild('ManaTrail') or v:FindFirstChild('Torso'):FindFirstChild('Critical') or v:FindFirstChild('Torso'):FindFirstChild('Critical2') or v:FindFirstChild('Torso'):FindFirstChild('Critical1') then 
                 removeStuns()
                 print('ye')
@@ -15665,14 +15708,15 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 end
                 dontparry = true
                 cancelAll = true
-                print('trying to parry')
+                if Excluded == true then cancelAll = false; dontparry = false; end
+                print('trying to parry crit')
                 if detect(v,'rbxassetid://8787495611') and Excluded == false then -- i think it depends on the sword so i might do a sword check  -- excluded it
                     task.wait(.2) -- .2
                     getgenv().parry()
                 elseif detect(v,'rbxassetid://10022838306') and Excluded == false or detect(v,'rbxassetid://10876826705') and Excluded == false then 
                     task.wait(.3)
                     getgenv().parry()
-                elseif detect(v,'rbxassetid://11859752490') and Excluded == false then 
+                elseif detect(v,'rbxassetid://11859752490')  then  -- and Excluded == false
                     print('spin crit log')
                     task.wait(.3)
                     getgenv().parry()
@@ -15685,21 +15729,24 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     task.wait(.2)
                     getgenv().parry()
                 elseif detect(v,'rbxassetid://10234795108') and Excluded == false  then 
-                    task.wait(.1)
-                    getgenv().fastparry()
-                    getgenv().quickfinishparry()
-                    task.wait(.1)
-                    getgenv().fastparry()
-                    getgenv().quickfinishparry()
-                    task.wait(.1)
-                    getgenv().fastparry()
-                    getgenv().quickfinishparry()
-                    task.wait(.1)
-                    getgenv().fastparry()
-                    getgenv().quickfinishparry()
-                    task.wait(.1)
-                    getgenv().fastparry()
-                    getgenv().quickfinishparry()
+                    repeat 
+                        task.wait(.5)
+                        getgenv().fastparry()
+                        getgenv().quickfinishparry()
+                        -- task.wait(.5)
+                        -- getgenv().fastparry()
+                        -- getgenv().quickfinishparry()
+                        -- task.wait(.5)
+                        -- getgenv().fastparry()
+                        -- getgenv().quickfinishparry()
+                        -- task.wait(.5)
+                        -- getgenv().fastparry()
+                        -- getgenv().quickfinishparry()
+                        -- task.wait(.5)
+                        -- getgenv().fastparry()
+                        -- getgenv().quickfinishparry()
+                    until not detect(v,'rbxassetid://10234795108')
+
                 -- elseif detect(v,'rbxassetid://13047366938') then -- jus karita
                 --     task.wait(1)
                 --     getgenv().parry()
@@ -15715,7 +15762,9 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                         getgenv().parry()
                     end
                 end
-                getgenv().quickfinishparry()
+                if Excluded == false then 
+                    getgenv().quickfinishparry()
+                end
                 task.wait()
             end
         end
@@ -15963,7 +16012,22 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 end)
             end
         end)
-
+        local statusconnection = enemyfolder:FindFirstChild('StatusFolder').ChildAdded:Connect(function(coolchild) -- mobs
+            if coolchild.Name == 'FeintCD' then 
+                feintedattack = true
+                cancelAll = true
+                getgenv().fw3localFw3['parryhasfeintedsonoparry'] = true
+                print('FeintCD detected')
+                getgenv().quickfinishparry ()
+                getgenv().M2()
+                if getgenv().fw3localFw3['rollonfeint'] == true then
+                    getgenv().fw3localFw3['set_to_roll_before_parry'] = true
+                end
+                pcall(function()
+                    statusconnection:Disconnect()
+                end)
+            end
+        end)
 
 
         removeStuns()
@@ -16243,7 +16307,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             cancelAll = true
         end
         if detect(v,'rbxassetid://10022838306') and cancelAll == false then -- axe crit
-            task.wait(.5)
+            print('DOING AXE CRIT')
+            task.wait(.3)
             getgenv().parry()
             cancelAll = true
         end
@@ -16466,9 +16531,9 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         -- sword crit
 
         if detect(v,'rbxassetid://8787495611') and cancelAll == false  then 
-            task.wait(.35)
-            getgenv().parry()
+            task.wait(.23)
             cancelAll = true 
+            getgenv().parry()
             print('sword crit')
         end
 
@@ -16549,9 +16614,10 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         end  
         
         -- rbxassetid://8917108290 swing 2
-        if detect(v,'rbxassetid://8917904390') then 
-            task.wait(.2)
-            getgenv().parry()
+        if detect(v,'rbxassetid://8917904390') then --  or detect(v,'rbxassetid://11859752490')
+            print('vortex')
+            task.wait(.8)
+            --getgenv().parry()
             -- if checkStun() then getgenv().roll()
             -- else
             --     getgenv().roll()
@@ -16565,11 +16631,13 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             -- getgenv().parry()
             -- cancelAll = true
             repeat 
-                getgenv().fastparry()
-                getgenv().quickfinishparry()
-                removeStuns()
-                task.wait(0.001)
-            until detect(v,'rbxassetid://8917904390') == false
+                -- print(findanimation(v,'rbxassetid://8917904390'))
+                -- print(detect(v,'rbxassetid://11859752490'))
+                getgenv().parry()
+                -- getgenv().quickfinishparry()
+                -- removeStuns()
+                task.wait(0.01)
+            until findanimation(v,'rbxassetid://8917904390') == false
         end  
 
 
@@ -16776,9 +16844,45 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             cancelAll = true
         end
 
-        -- HARDCODED GUNS
+        if detect(v,'rbxassetid://9890788066') then -- fist anims from 1 to 4 cuz i never actually hardcoded them :skull: (1)
+            task.wait(.1)
+            getgenv().parry()
+            cancelAll = true
+        end
 
-        if detect(v,'rbxassetid://10206784771') then -- gun shoot 1
+        if detect(v,'rbxassetid://9890790186') then -- fist anims from 1 to 4 cuz i never actually hardcoded them :skull: (1)
+            task.wait(.1)
+            getgenv().parry()
+            cancelAll = true
+        end
+        
+        if detect(v,'rbxassetid://9890792365') then -- fist anims from 1 to 4 cuz i never actually hardcoded them :skull: (1)
+            task.wait(.1)
+            getgenv().parry()
+            cancelAll = true
+        end
+        
+        if detect(v,'rbxassetid://9890796934') then -- fist anims from 1 to 4 cuz i never actually hardcoded them :skull: (1)
+            task.wait(.1)
+            getgenv().parry()
+            cancelAll = true
+        end
+
+        if detect(v,'rbxassetid://9891303051') then -- fist anims from 1 to 4 cuz i never actually hardcoded them :skull: (1)
+            task.wait(.2)
+            getgenv().parry()
+            cancelAll = true
+        end
+        -- fist 1 rbxassetid://9890788066
+        -- fist 2 rbxassetid://9890790186
+        -- fist 3 rbxassetid://9890792365
+        -- fist 4 rbxassetid://9890796934
+        -- fist run punch rbxassetid://9891303051
+
+
+        -- HARDCODED GUNS/ NEED TO DO OFFHAND GUNS NEXT CUZ ITS NOT HARDCODED TIMINGS : forgot to do offhand b
+
+        if detect(v,'rbxassetid://10206784771') then -- gun shoot 1 
             task.wait(.05)
             getgenv().parry()
             cancelAll = true
@@ -16853,7 +16957,10 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             print('Act couldnt be confirmed. Status: ROLLING - '..tostring(rolling)..' IF WAS ABLE TO PARRY - '..tostring(cantParry)..' but did nothing is cancel value - '..tostring(cancelAll).. '?')
         end
 
-        cooldownconnection:Disconnect()
+        task.delay(1,function()
+            cooldownconnection:Disconnect()
+            statusconnection:Disconnect()
+        end)
 
     end
 
@@ -17171,6 +17278,17 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     getgenv().parrybullet = {}
     getgenv().parryslash = {}
     getgenv().allparryobjects = {}
+
+    local DEBRISADDEDCONNECTION  = game:GetService('Workspace').DebrisParts.ChildAdded:Connect(function(child)
+        -- task.wait(.01)
+        -- if child:FindFirstChild('Zap') and child:FindFirstChild('Spark') then 
+        --     getgenv().holdparry()
+        --     task.wait(1)
+        --     getgenv().releaseparry()
+        -- end
+    end)
+
+
     task.spawn(function()
         while task.wait() do 
             if getgenv().loopsUnload == true then 
@@ -17183,6 +17301,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 end
                 childAddedConnection:Disconnect()
                 MOUSEDOWNCONNECTION:Disconnect()
+                DEBRISADDEDCONNECTION:Disconnect()
                 break 
             end 
             
@@ -19086,14 +19205,15 @@ elseif game.PlaceId == 10371908957 or game.PlaceId == 10495850838 then  --- deep
                 for i,anim in pairs(v.Humanoid:GetPlayingAnimationTracks()) do 
                     if anim.Animation.AnimationId == dect and animx.Animation.AnimationId == dect then
                         -- rconsoleprint('\ndetected '..anim.Animation.AnimationId)
-                        x =  true
+                        x = true
                         break
+                    elseif anim.Animation.AnimationId == dect then 
+                        x = true
                     end
                 end
             end
             return x
         end
-
         --[[
             we detect the animation
             another animation could run while the animation is still playing
@@ -23018,7 +23138,6 @@ elseif game.PlaceId == 6678877691 then -- zo
             end
             return x
         end
-
         if detect(v,'rbxassetid://6678919174') then -- sword swing 1
             print('swung')
             task.wait(.35)
