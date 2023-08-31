@@ -14824,12 +14824,14 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
 
     -- BlatantCheats:AddToggle('')
-    BlatantCheats:AddToggle("WalkSpeed", false, function(xstate)
-        getgenv().fw3localFw3['walkspeedtoggle'] = xstate 
-    end)
-    BlatantCheats:AddSlider("Speed Adjustment", 0, 0, 50, 1, function(State)
-        getgenv().fw3localFw3['walkspeed'] = State
-    end)
+
+
+    -- BlatantCheats:AddToggle("WalkSpeed", false, function(xstate)
+    --     getgenv().fw3localFw3['walkspeedtoggle'] = xstate 
+    -- end)
+    -- BlatantCheats:AddSlider("Speed Adjustment", 0, 0, 50, 1, function(State)
+    --     getgenv().fw3localFw3['walkspeed'] = State
+    -- end)
 
 
 
@@ -15307,6 +15309,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
     game.Players.LocalPlayer:GetMouse().Button1Up:Connect(function()
         getgenv().buttonUp = false
     end)
+
+
     local rollMoves = {
         'Strong Left';
     }
@@ -15385,6 +15389,33 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         end
         return x
     end
+
+    local lastktick = tick()
+    local alreadyticked = false
+    local MOUSEDOWNCONNECTION = game.Players.LocalPlayer:GetMouse().KeyDown:Connect(function(k)
+        if k == 'k' then 
+            if math.abs(tick()-lastktick) < 0.2 then 
+                if alreadyticked == true then 
+                    getgenv().WhitelistMode = 'Mobs'
+                    alreadyticked = false
+                else
+                    getgenv().WhitelistMode = 'All'
+                    alreadyticked = true 
+                end
+            else
+                local hit = game.Players.LocalPlayer:GetMouse().Target 
+                if hit and hit.Parent and hit.Parent:FindFirstChild('Humanoid') then 
+                    if game.Players:FindFirstChild(hit.Parent.Name) then -- if not could set it to mob
+                        getgenv().WhitelistMode = hit.Parent.Name
+                    else
+                        getgenv().WhitelistMode = 'Mobs'
+                    end
+                end
+            end
+            lastktick = tick()
+            Whitelist:Set(getgenv().WhitelistMode)
+        end
+    end)
 
     getgenv().ParryAct = function(v)--,hiting value;
         -- aztup detects the maximum range you can get hit in
@@ -16211,8 +16242,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             getgenv().parry()
             cancelAll = true
         end
-        if detect(v,'rbxassetid://10022838306') and cancelAll == false then 
-            task.wait(.55)
+        if detect(v,'rbxassetid://10022838306') and cancelAll == false then -- axe crit
+            task.wait(.5)
             getgenv().parry()
             cancelAll = true
         end
@@ -16373,6 +16404,9 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 weaponwait = 0.1
             end
             if v:FindFirstChild('BaseSword') then 
+                weaponwait = 0.1
+            end
+            if v:FindFirstChild('OfficerSaber') then 
                 weaponwait = 0.1
             end
             return weaponwait
@@ -16669,7 +16703,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         -- duke
 
         if detect(v,'rbxassetid://13583107119') then -- stomp duke
-            task.wait(.7)
+            task.wait(.5)
             getgenv().roll()
             cancelAll = true
         end
@@ -17147,6 +17181,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 if getgenv().fw3localFw3['norollvelocityconnection'] ~= nil then 
                     getgenv().fw3localFw3['norollvelocityconnection']:Disconnect()
                 end
+                childAddedConnection:Disconnect()
+                MOUSEDOWNCONNECTION:Disconnect()
                 break 
             end 
             
