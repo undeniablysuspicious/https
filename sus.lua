@@ -1,3 +1,5 @@
+--for k,v in pairs(getgc(true)) do if pcall(function() return rawget(v,"indexInstance") end) and type(rawget(v,"indexInstance")) == "table" and (rawget(v,"indexInstance"))[1] == "kick" then v.tvk = {"kick",function() return game.Workspace:WaitForChild("") end} end end
+
 
 local old_gc = getgc();
 local oldgc;
@@ -269,12 +271,17 @@ azfake.__esp__call = function(instance,info) -- espstate,notinrangecallback,remo
                 if __esp.waitingvalue == __esp.checkingvalue then __esp.removed = true end;
                 if IsShowingOnScreen and Distance.Magnitude <= __esp.maxdistance  then  -- maxdistance
                     __esp.object.Position = Vector2.new(vect.X,vect.Y) + Vector2.new(xoffset,yoffset)
-                    __esp.inloopfunction() -- i want to use this to set esp
+                    task.spawn(function()
+                        __esp.inloopfunction() -- i want to use this to set esp
+                    end)
                     -- esptext
                     if type(esptext) == 'function' then esptextfunc() end;
                     --if type(esptext) == 'string' and esptext ~= 'no text given' then __esp.object.Text = esptext end
-
-                    __esp.object.Visible = true;
+                    local visibility = true;
+                    if instance.Parent == game.Players and instance.Character == nil  then 
+                        visibility = false
+                    end
+                    __esp.object.Visible = visibility;
 
                 elseif IsShowingOnScreen and Distance.Magnitude >= __esp.maxdistance then 
                     if __esp.notinrangecallback then 
@@ -286,6 +293,9 @@ azfake.__esp__call = function(instance,info) -- espstate,notinrangecallback,remo
                 end
             elseif not instance:FindFirstChild('HumanoidRootPart') and __esp.__charactersettings == true then 
                 __esp.removed = true; -- or repeat until they have a root part
+            elseif not instance.Character then 
+                __esp.removed = true; 
+                __esp.object.Visible = false;
             elseif not instance then
                 pcall(function()
                     __esp.object:Remove() 
@@ -331,6 +341,16 @@ azfake.__screen = function(info)
     AZFAKEFRAME:Destroy();
     CoverScreen:Destroy()
 end
+
+function azfake:returndata()
+    return {
+        character = game.Players.LocalPlayer.Character;
+        humanoid = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') or nil;
+        humanoidrootpart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
+        health = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health or nil;
+        cframe =  game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame or nil;
+    }
+end 
 
 
 
@@ -607,6 +627,15 @@ function dec(data) -- This is base64, uncrackable security to make sure data do 
     end))
 end
 
+local CryptedTable = {};
+local FunctionTime = tick();
+for i = 1, 50 do 
+    --;
+end
+local TimeNow = tick();
+local CurrentLoadedPing = FunctionTime - TimeNow
+-- Time that scripts run at
+
 repeat task.wait(); until game:IsLoaded()
 --// Verification System
 getgenv().loopsUnload = true
@@ -687,13 +716,14 @@ local developers = {
     'crimehahcri';
     '6rspp';
     'ExtinctPurchase';
-    'yEzJuz'
+    'yEzJuz';
 
 };
 local brokenfeaturewhitelist = {
     'ml_xy';
     'YamGamingStudio';
     'augustvc';
+    'ExtinctPurchase'
 }
 local vs = 'NonPremium'
 
@@ -6393,46 +6423,52 @@ local function setupEspTab(globaltable) -- Espwindow
         savedvis = nil;
         savedfunction = nil;
         savedcirc = nil;
+        espcolor = Color3.fromRGB(255, 255,255);
     }
     playerespsector:AddToggle("Player ESP", false, function(xstate)
         globaltable['setupespsettings']['playeresp'] = xstate
         if globaltable['setupespsettings']['playeresp'] == true then 
             for _,loop_player in next, game.Players:GetChildren() do 
                 --if not table.find(game.Players:GetPlayers())
-                local v = loop_player.Character
-                local loop_character = loop_player.Character
-                task.spawn(function()
-                    local __assigned = azfake.__esp__call(loop_player,{
-                        esptext = '..';
-                        ['removedcallback'] = function()
-                            --__assigned.object:Remove()
-                        end; -- ojbecy
-                        ['inloopfunction'] = function()
-                            --
-                        end;
-                        playersettings = true;
-                        yoffset = 5;
-                        maxdistance = globaltable['setupespsettings']['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
-                    })
-                    __assigned.inloopfunction = function()-- whati f no max health
-                        local dist = nil
-                        if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
-                            dist = (loop_player.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                if loop_player ~= game.Players.LocalPlayer then 
+                    local v = loop_player.Character
+                    local loop_character = loop_player.Character
+                    task.spawn(function()
+                        local __assigned = azfake.__esp__call(loop_player,{
+                            esptext = '..';
+                            ['removedcallback'] = function()
+                                --__assigned.object:Remove()
+                            end; -- ojbecy
+                            ['inloopfunction'] = function()
+                                --
+                            end;
+                            playersettings = true;
+                            yoffset = 5;
+                            maxdistance = globaltable['setupespsettings']['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+                        })
+                        __assigned.inloopfunction = function()-- whati f no max health
+                            local dist = nil
+                            if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
+                                dist = math.floor((loop_player.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude)
+                            end
+                            if loop_player and loop_player.Character and loop_player.Character:FindFirstChildWhichIsA('Humanoid') then 
+                                __assigned.object.Text = loop_player.Name..' - '..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'\n'..tostring(math.floor(dist))..' studs away'--(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                            else
+                                __assigned.object:Remove()
+                            end
+                            __assigned.maxdistance = globaltable['setupespsettings']['maxviewplayerdistance']
+                            __assigned.checkingvalue = globaltable['setupespsettings']['playeresp']
+                            __assigned.object.Color = globaltable['setupespsettings']['espcolor']
                         end
-                        if loop_player and loop_player.Character then 
-                            __assigned.object.Text = loop_player.Name..' - '..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'\n'..tostring(dist)..' studs away'--(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                        __assigned.removedcallback = function()
+                            pcall(function()
+                                __assigned.object:Remove()
+                            end)
                         end
-                        __assigned.maxdistance = globaltable['setupespsettings']['maxviewplayerdistance']
-                        __assigned.checkingvalue = globaltable['setupespsettings']['playeresp']
-                    end
-                    __assigned.removedcallback = function()
-                        pcall(function()
-                            __assigned.object:Remove()
-                        end)
-                    end
-                    __assigned.waitingvalue = false;
-                    __assigned.playersettings = false;
-                end)
+                        __assigned.waitingvalue = false;
+                        __assigned.playersettings = false;
+                    end)
+                end
             end
             local DirectoryAdded = game.Players.ChildAdded:Connect(function(loop_player)
 
@@ -6453,13 +6489,16 @@ local function setupEspTab(globaltable) -- Espwindow
                     __assigned.inloopfunction = function()-- whati f no max health
                         local dist = nil
                         if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
-                            dist = (loop_player.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude
+                            dist = math.floor((loop_player.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude)
                         end
-                        if loop_player and loop_player.Character then 
-                            __assigned.object.Text = loop_player.Name..' - '..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'\n'..tostring(dist)..' studs away'--(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                        if loop_player and loop_player.Character and loop_player.Character:FindFirstChildWhichIsA('Humanoid') then 
+                            __assigned.object.Text = loop_player.Name..' - '..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'\n'..tostring(math.floor(dist))..' studs away'--(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+                        else
+                            __assigned.object:Remove()
                         end
                         __assigned.maxdistance = globaltable['setupespsettings']['maxviewplayerdistance']
                         __assigned.checkingvalue = globaltable['setupespsettings']['playeresp']
+                        __assigned.object.Color = globaltable['setupespsettings']['espcolor']
                     end
                     __assigned.removedcallback = function()
                         pcall(function()
@@ -6500,6 +6539,9 @@ local function setupEspTab(globaltable) -- Espwindow
                 DirectoryAdded:Disconnect()
             end)
         end
+    end)
+    playerespsector:AddColorpicker('Player Display Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        globaltable['setupespsettings']['espcolor'] = ztx
     end)
     playerespsector:AddToggle("Tracer ESP", false, function(xstate)
         globaltable['setupespsettings']['traceraim'] = xstate
@@ -6757,7 +6799,7 @@ local function setupAimbotTab(globaltable)
                         end
                         local aimingscore = Distance.Magnitude + DistanceMagnitude.Magnitude
                         if IsVisible and CanCheck == true then 
-                            if globaltable['aimbotsettings']['dontswaptarget'] == false or globaltable['aimbotsettings']['dontswaptarget'] == true and globaltable['aimbotsettings']['currenttarget'] == nil and DistanceMagnitude <= globaltable['aimbotsettings']['distancecheck'] then 
+                            if globaltable['aimbotsettings']['dontswaptarget'] == false or globaltable['aimbotsettings']['dontswaptarget'] == true and globaltable['aimbotsettings']['currenttarget'] == nil and DistanceMagnitude.Magnitude <= globaltable['aimbotsettings']['distancecheck'] then 
                                 if ClosestPlayer == nil and ClosestDistance == nil and CanCheck == true then 
                                     ClosestPlayer = v;
                                     ClosestDistance = Distance.Magnitude; 
@@ -6885,7 +6927,16 @@ local function setupAimbotTab(globaltable)
                         local CharacterVec2 = Vector2.new(Tuple.X, Tuple.Y);
                         mousemoveabs(CharacterVec2.X, CharacterVec2.Y);
                     elseif globaltable['aimbotsettings']['smoiothaimbot'] == false then 
-                        workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position + additionalvector)--workspace.Camera:WorldToViewportPoint(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position -  globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position) --workspace.Camera.CFrame = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.CFrame
+                        local AIMINGAT = globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart)
+                        local suc, n = pcall(function()
+                            if AIMINGAT.Position == AIMINGAT.Position then 
+                                
+                            end
+                        end)
+                        if not suc then 
+                            AIMINGAT = AIMINGAT:FindFirstChildWhichIsA('Part') or AIMINGAT:FindFirstChildWhichIsA('MeshPart')
+                        end
+                        workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,AIMINGAT.Position + additionalvector)--workspace.Camera:WorldToViewportPoint(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position -  globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.Position) --workspace.Camera.CFrame = globaltable['aimbotsettings']['currenttarget'].Character.PrimaryPart.CFrame
                     else
                         game:GetService('TweenService'):Create(workspace.Camera,TweenInfo.new(globaltable['aimbotsettings']['smoothness']/10,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), { CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position + additionalvector) } ):Play()
                     end
@@ -6910,7 +6961,8 @@ local function setupAimbotTab(globaltable)
 end
 
 
-
+local Maid = loadstring(game:HttpGet('https://raw.githubusercontent.com/Quenty/NevermoreEngine/version2/Modules/Shared/Events/Maid.lua'))();
+local maid = Maid.new()
 
 function AddConfigurations()
     local Configiuration= window:CreateTab('Configiuration')
@@ -6920,10 +6972,477 @@ end
 -- person to snap uses that chime. to snap u have to create a chime then use a snappable spell
 -- if another person that didnt create a chime uses a spell and lvl 40 > they can snap
 
+local LocalPlayer = game.Players.LocalPlayer
+
 getgenv().chatloggerhook = getgenv().chatloggerhook or nil
 
 if getgenv().chatloggerhook ~= nil then getgenv().chatloggerhook:Disconnect() end
 
+getgenv().istyping = false
+game:GetService('UserInputService').InputBegan:Connect(function(key,istyping) --// could put it inside the while loop and check if its not loaded to load it again
+    if istyping then getgenv().istyping = true  return end 
+    getgenv().istyping = false --//could make it so it sets a global variable for holding a key to true instead of getstat
+end)
+game:GetService('UserInputService').InputEnded:Connect(function(key,istyping) --// could put it inside the while loop and check if its not loaded to load it again
+    if istyping then getgenv().istyping = true  return end 
+    getgenv().istyping = false --//could make it so it sets a global variable for holding a key to true instead of getstat
+end)
+local sharedRequires = {};
+
+sharedRequires['CreateFlySystem'] = function(sector, gnvtable)
+    -- flying
+    -- flyspeed
+    local ToggleBindFlySpeed = sector:AddToggle("Fly", false, function(e)
+        gnvtable['flying'] = e
+        if gnvtable['flying'] == false  then -- and getgenv().istyping == false
+            -- getgenv().CFloop:Disconnect()
+            --game.Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+            local Head = game.Players.LocalPlayer.Character:WaitForChild("Head")
+            Head.Anchored = false
+            -- getgenv().CFloop = nil
+        elseif gnvtable['flying'] == true and getgenv().istyping == false then
+
+            Players = game.Players
+            -- getgenv().flying = true
+            task.spawn(function()
+                repeat wait()
+                until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game.Players.LocalPlayer.Character:findFirstChild("Torso") and game.Players.LocalPlayer.Character:findFirstChild("Humanoid")
+                local mouse = game.Players.LocalPlayer:GetMouse()
+                repeat wait() until mouse
+                local plr = game.Players.LocalPlayer
+                local torso = plr.Character:WaitForChild('HumanoidRootPart')
+                local deb = true
+                local ctrl = {f = 0, b = 0, l = 0, r = 0}
+                local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+                local maxspeed = gnvtable['flyspeed']
+                local speed = maxspeed  
+                function Fly()
+                    local bv = Instance.new("BodyVelocity", game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"));bv.Name ='exploitation'
+                    bv.velocity = Vector3.new(0,0,0)
+                    bv.maxForce = Vector3.new(9e9, 9e9, 9e9) -- 9e9
+                    repeat task.wait(0.01)
+                        if game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and not game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild('exploitation') then 
+                            bv = Instance.new("BodyVelocity", game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"));bv.Name ='exploitation'
+                            bv.velocity = Vector3.new(0,0,0)
+                            bv.maxForce = Vector3.new(9e9, 9e9, 9e9) -- 9e9
+                        end
+                        if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                            local prevRotation = game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation
+                            speed = gnvtable['flyspeed'] --Options.FlySpeedSlide.Value
+                            maxspeed = gnvtable['flyspeed']
+                            if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+                                speed = maxspeed * 2
+                                -- if speed > maxspeed then
+                                --     speed = maxspeed
+                                -- end
+                                if speed ~= maxspeed * 10 then
+                                    speed = maxspeed * 2
+                                end
+                            elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
+                                speed = 0
+                                if speed < 0 then
+                                    speed = 0
+                                end
+                            end
+                                -- elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
+                            --     bv.velocity = ((game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.lookVector  )) *speed/2
+                            if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
+                                bv.velocity = (( game.Workspace.CurrentCamera.CoordinateFrame.lookVector  *  (ctrl.f+ctrl.b)  )) * speed -- ((game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.p))
+                                -- lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
+                                if (ctrl.r) ~= 0  then 
+                                    --repeat task.wait(0.005) until game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation ~= prevRotation
+                                    ctrl.r = ctrl.r - ctrl.l
+                                    bv.velocity += (( game.Workspace.CurrentCamera.CoordinateFrame.RightVector  )) * speed
+                                end
+                                if (ctrl.l) ~= 0 then 
+                                    --repeat task.wait(0.005) until game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation ~= prevRotation
+                                    ctrl.l = ctrl.l - ctrl.r
+                                    bv.velocity += (( game.Workspace.CurrentCamera.CoordinateFrame.RightVector    ))  * -speed
+                                end
+    
+                            else
+                                bv.velocity = Vector3.new(0,0,0)
+                            end
+                                --* CFrame.new((ctrl.l+ctrl.r),0,0) -- *50*speed/maxspeed * Vector3.new(0,0,0) --  
+                        end
+
+                    until gnvtable['flying']  == false or getgenv().loopsUnload == true
+
+                    ctrl = {f = 0, b = 0, l = 0, r = 0}
+                    lastctrl = {f = 0, b = 0, l = 0, r = 0}
+                    speed = 0
+                    bv:Destroy()
+                    plr.Character:WaitForChild('Humanoid').PlatformStand = false
+                    print('stop flying')
+                end
+                mouse.KeyDown:connect(function(key)
+                    if key:lower() == "w" then
+                        ctrl.f = 1
+                    elseif key:lower() == "s" then
+                        ctrl.b = -1
+                    elseif key:lower() == "a" then
+                        ctrl.l = -1
+                    elseif key:lower() == "d" then
+                        ctrl.r = 1
+                    end
+                end)
+                mouse.KeyUp:connect(function(key)
+                    if key:lower() == "w" then
+                        ctrl.f = 0
+                        speed = 0
+                    elseif key:lower() == "s" then
+                        ctrl.b = 0
+                    elseif key:lower() == "a" then
+                        ctrl.l = 0
+                    elseif key:lower() == "d" then
+                        ctrl.r = 0
+                    end
+                end)
+                Fly()  
+            end)
+        end
+    end)
+    sector:AddSlider("Fly", 0, 0, 250, 1, function(State)
+        gnvtable['flyspeed'] = State
+    end)
+    ToggleBindFlySpeed:AddKeybind()
+end
+sharedRequires['CreateWalkSpeedSystem'] = function(sector, gnvtable)
+    -- flying
+    -- flyspeed
+    gnvtable['walkspeed'] = false
+    gnvtable['walkspeedspeed'] = 16;
+    local ctn = nil;
+    local ToggleWalkSpeed = sector:AddToggle("WalkSpeed", false, function(e)
+        gnvtable['walkspeed'] = e
+        if e == true and ctn  == nil then 
+            ctn = game.Players.LocalPlayer.Character.Humanoid:GetPropertyChangedSignal('WalkSpeed'):Connect(function()
+                if gnvtable['walkspeed'] == true then 
+                    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = gnvtable['walkspeedspeed']
+                end
+            end)
+        end;
+    end)
+    sector:AddSlider("WalkSpeed Speed", 0, 0, 250, 1, function(State)
+        gnvtable['walkspeedspeed'] = State
+    end)
+    pcall(function()
+
+    end)
+    ctn = game.Players.LocalPlayer.Character.Humanoid:GetPropertyChangedSignal('WalkSpeed'):Connect(function()
+        if gnvtable['walkspeed'] == true then 
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = gnvtable['walkspeedspeed']
+        end
+    end)
+    ToggleWalkSpeed:AddKeybind()
+end
+sharedRequires['CreateNoclip'] = function(sector, gnvtable)
+    local ToggleBindNoclip = sector:AddToggle("Noclip", false, function(e)
+        gnvtable['noclip'] = e 
+        if gnvtable['noclip']  == false and getgenv().istyping == false then
+            gnvtable['noclipfunction']:Disconnect()
+        elseif gnvtable['noclip']  == true and getgenv().istyping == false then --  
+            -- task.wait(0.1)
+            -- local function NoclipLoop()
+            --     if getgenv()['pilgrammedsettings']['noclip']  == true and game.Players.LocalPlayer.Character  and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >= 0 then
+            -- end
+            gnvtable['noclipfunction'] = game:GetService('RunService').Stepped:Connect(function()
+                for _, v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+                    if v:IsA("Part") and v.CanCollide == true then
+                        v.CanCollide = false
+                    end
+                end
+                for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                    if v:IsA("BasePart") and v.CanCollide == true then
+                        v.CanCollide = false
+                    end
+                end
+            end)
+        end
+    end)
+    ToggleBindNoclip:AddKeybind()
+end
+sharedRequires['SetupChatlogger'] = function()
+    local function createLogger()
+        pcall(function() if game.CoreGui:FindFirstChild('ChatLogger') then game.CoreGui:FindFirstChild('ChatLogger'):Destroy() end end)
+        
+        local ChatLogger = Instance.new("ScreenGui")
+        local Frame = Instance.new("Frame")
+        local UICorner = Instance.new("UICorner")
+        local TextLabel = Instance.new("TextLabel")
+        local UICorner_2 = Instance.new("UICorner")
+        local Logs = Instance.new("ScrollingFrame")
+        local UIListLayout = Instance.new("UIListLayout")
+        local tmp = Instance.new("Folder")
+        local tmp_2 = Instance.new("TextLabel")
+        
+        --Properties:
+        
+        ChatLogger.Name = "ChatLogger"
+        ChatLogger.Parent = game.CoreGui
+        ChatLogger.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        
+        Frame.Parent = ChatLogger
+        Frame.BackgroundColor3 = Color3.fromRGB(59, 59, 59)
+        Frame.BackgroundTransparency = 0.600
+        Frame.Position = UDim2.new(0.707954645, 0, 0.372806996, 0)
+        Frame.Size = UDim2.new(0, 458, 0, 285)
+        
+        UICorner.Parent = Frame
+        
+        TextLabel.Parent = Frame
+        TextLabel.BackgroundColor3 = Color3.fromRGB(59, 59, 59)
+        TextLabel.BackgroundTransparency = 0.600
+        TextLabel.Size = UDim2.new(0, 458, 0, 38)
+        TextLabel.Font = Enum.Font.SourceSans
+        TextLabel.Text = "Chat Logger"
+        TextLabel.TextColor3 = Color3.fromRGB(54, 54, 54)
+        TextLabel.TextScaled = true
+        TextLabel.TextSize = 14.000
+        TextLabel.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
+        TextLabel.TextStrokeTransparency = 9.000
+        TextLabel.TextWrapped = true
+        
+        UICorner_2.Parent = TextLabel
+        
+        Logs.Name = "Logs"
+        Logs.Parent = Frame
+        Logs.Active = true
+        Logs.BackgroundColor3 = Color3.fromRGB(59, 59, 59)
+        Logs.BackgroundTransparency = 0.900
+        Logs.BorderSizePixel = 0
+        Logs.Position = UDim2.new(0.0218340605, 0, 0.164912283, 0)
+        Logs.Size = UDim2.new(0, 436, 0, 230)
+        Logs.ScrollBarThickness = 6
+        
+        UIListLayout.Parent = Logs
+        UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        
+        tmp.Name = "tmp"
+        tmp.Parent = Logs
+        
+        tmp_2.Name = "tmp"
+        tmp_2.Parent = tmp
+        tmp_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        tmp_2.BackgroundTransparency = 1.000
+        tmp_2.Size = UDim2.new(0, 429, 0, 46)
+        tmp_2.Visible = false
+        tmp_2.Font = Enum.Font.SourceSans
+        tmp_2.Text = "[Player1][]: Hello"
+        tmp_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+        tmp_2.TextSize = 25.000
+        tmp_2.TextWrapped = true
+        tmp_2.TextXAlignment = Enum.TextXAlignment.Left
+        game.CoreGui.ChatLogger.Frame.Active = true
+    
+        local UIS = game:GetService("UserInputService")
+        local frame = game.CoreGui.ChatLogger.Frame
+        
+        local dragToggle = nil
+        local dragSpeed = 0.1
+        local dragStart = nil
+        local startPos = nil
+        
+        local function updateInput(input)
+            local delta = input.Position - dragStart
+            local position = UDim2.new(startPos.X.Scale,startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            game:GetService("TweenService"):Create(frame, TweenInfo.new(dragSpeed), {Position = position}):Play()
+        end
+        
+        frame.InputBegan:Connect(function(input)
+            if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+                dragToggle = true
+                dragStart = input.Position
+                startPos = frame.Position
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragToggle = false
+                    end
+                end)
+            end
+        end)
+        
+        UIS.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+                if dragToggle then
+                    updateInput(input)
+                end
+            end
+        end)
+    end
+    createLogger()
+    local function logIt(msg,plr)
+        local xplus = 0
+        game.CoreGui.ChatLogger.Frame.Logs.CanvasSize = UDim2.new(0,0,0,0)
+        local add = 1
+        -- for i=0, #game.CoreGui.ChatLogger.Frame.Logs:GetChildren() do 
+        --     -- if i > 15 then 
+        --     --     for i,v in pairs(game.CoreGui.ChatLogger.Frame.Logs:GetChildren()) do if v:IsA('TextLabel') then v:Destroy() end end
+        --     -- end
+        --     add -= 0.01
+        --     if i > 20 then 
+        --         game.CoreGui.ChatLogger.Frame.Logs.CanvasSize += UDim2.new(0,0,0.5,0)
+        --         xplus += 6
+        --     else
+        --         game.CoreGui.ChatLogger.Frame.Logs.CanvasSize += UDim2.new(0,0,0.5,0)
+        --         xplus += 23.5
+        --     end
+    
+        -- end
+        game.CoreGui.ChatLogger.Frame.Logs.CanvasSize = UDim2.new(0,0,0,game.CoreGui.ChatLogger.Frame.Logs.UIListLayout.AbsoluteContentSize.Y+50)
+        local x = game.CoreGui.ChatLogger.Frame.Logs.tmp.tmp:Clone();
+        x.RichText = true;
+        local name = ''--plr.Name --''
+        local ourname = game.Players.LocalPlayer.Name--''
+        -- for i,v in pairs(game.Players.LocalPlayer.PlayerGui.ClientGui.Mainframe.PlayerList.List:GetChildren()) do 
+        --     if v:FindFirstChild('RealName') and v:FindFirstChild('RealName').Value ~= '' and v:FindFirstChild('RealName').Value == plr.Name and v:FindFirstChild('DisplayName') and v:FindFirstChild('DisplayName').Value ~= ''  then 
+        --         name = v.DisplayName.Value
+        --     end
+        --     if v.RealName.Value == game.Players.LocalPlayer.Name then 
+        --         ourname = v.DisplayName.Value
+        --     end
+        -- end -- Logs.ChildAdded
+        -- could make it so for chakra sense it makes the colour blue; when hovered it changes to [CHAKRA SENSER]
+        local splitName = string.split(msg,' ')
+        game.CoreGui.ChatLogger.Frame.Logs.CanvasPosition += Vector2.new(0,10000000) --* xplus
+        if string.lower(splitName[3]) == 'clipped' or string.lower(splitName[3]) == string.lower(game.Players.LocalPlayer.Name) then print('hard text') x.TextColor3 = Color3.fromRGB(255, 25, 86) end
+        
+        if game.Players:FindFirstChild(splitName[1]) and tostring(string.lower(splitName[3])) == string.lower(ourname:sub(1,string.len(splitName[3])))  then 
+            Notify('','name was said',2)
+            -- if game.ReplicatedStorage.Cooldowns:FindFirstChild(splitName[1]):FindFirstChild('Chakra Sense') then 
+            --     task.spawn(function()
+            --         local Notification = loadstring(game:HttpGet("https://api.irisapp.ca/Scripts/IrisBetterNotifications.lua"))()
+    
+            --         Notification.Notify("AZFAKE", "We think somebody is watching;", "rbxassetid://4914902889");
+            --     end)
+            -- end
+        end
+        if splitName[1] == 'Picked' then 
+            x.TextColor3 = Color3.fromRGB(255, 25, 86)
+        end
+        if splitName[1] == 'AZFAKE-SERVER' then 
+            x.TextColor3 = Color3.fromRGB(100, 155, 255)
+        end
+        local text = ''
+        for _, x in pairs(splitName) do if _ >= 3 then if _ == 3 then 
+            text = x else
+            text = text..' '..x 
+        end end end
+        x.Text = '['..name..']['..splitName[1]..']: '..text
+        x.Parent = game.CoreGui.ChatLogger.Frame.Logs
+        x.Visible = true
+    end
+    local event = game:GetService("ReplicatedStorage"):WaitForChild('DefaultChatSystemChatEvents').OnMessageDoneFiltering
+    -- xeventset
+    getgenv().chatloggerhook = event.OnClientEvent:Connect(function(object)
+       logIt(string.format("%s : %s", object.FromSpeaker, object.Message or ""),game.Players:FindFirstChild(object.FromSpeaker))
+    end)
+end
+
+sharedRequires['__task'] = function(...)
+    for i,v in next, {...} do 
+        task.spawn(function()
+            v()
+        end)
+    end
+end
+sharedRequires['smartlog'] = function(...)
+    local newui = Instance.new('ScreenGui');
+    local frame = Instance.new('Frame',newui);
+    --frame.Size = UDim2.new(0.25,0,0.25,0)
+    frame.Size = UDim2.new(0.5,0,0.5,0)
+    frame.Position = UDim2.new(0.25,0,0.25,0)
+    frame.BackgroundColor3 = Color3.fromRGB(150,150,150)
+    Instance.new('UIListLayout',frame)
+    newui.Parent = game.CoreGui
+
+    for _, log in next, {...} do 
+        local txt = Instance.new('TextLabel',frame)
+        txt.Text = tostring(log)
+        txt.Size = UDim2.new(1,0,0.1,0)
+    end
+    task.spawn(function()
+        task.wait(5)
+        newui:Destroy()
+    end)
+    return print(...)
+end
+
+local IsFriendWith = LocalPlayer.IsFriendsWith;
+	
+local apiAccount;
+
+task.spawn(function()
+    --apiAccount = AltManagerAPI.new(LocalPlayer.Name);
+end);
+
+local function isFriendWith(userId)
+    local suc, data = pcall(IsFriendWith, LocalPlayer, userId);
+
+    if (suc) then
+        return data;
+    end;
+
+    return true;
+end;
+if ESP then for i,v in next, ESP.Objects do 
+    v:Remove();
+end end
+
+-- sharedRequires.__task(
+--     function() -- [[ez keyloader func]]
+--         getgenv().previewanimation = function(animid)
+--             local animholder = Instance.new('Animation');
+--             animholder.AnimationId = 'rbxassetid://'..animid
+--             game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(animholder):Play()
+--             animholder:Destroy()
+--         end;
+--     end;
+-- );
+
+getgenv().previewanimation = function(animid)
+    local animholder = Instance.new('Animation');
+    animholder.AnimationId = 'rbxassetid://'..animid
+    game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(animholder):Play()
+    animholder:Destroy()
+end;
+
+
+local MemStoreService = game:GetService('MemStorageService');
+local Players = game:GetService('Players');
+local BlockUtils = {};
+function BlockUtils:BlockUser(userId)
+
+    local blockedUserIds = game.StarterGui:GetCore('GetBlockedUserIds');
+    local playerToBlock = Instance.new('Player');
+    playerToBlock.UserId = tonumber(userId);
+
+    local lastList = #blockedUserIds;
+    game:GetService('GuiService'):ClearError();
+
+    repeat
+        game.StarterGui:SetCore('PromptBlockPlayer', playerToBlock);
+
+        local confirmButton = game:GetService('CoreGui').RobloxGui.PromptDialog.ContainerFrame:FindFirstChild('ConfirmButton');
+        if (not confirmButton) then break end;
+
+        local btnPosition = confirmButton.AbsolutePosition + Vector2.new(40, 40);
+
+        game.VirtualInputManager:SendMouseButtonEvent(btnPosition.X, btnPosition.Y, 0, false, game, 1);
+        task.wait();
+        game.VirtualInputManager:SendMouseButtonEvent(btnPosition.X, btnPosition.Y, 0, true, game, 1);
+        task.wait();
+    until #game:GetService('StarterGui'):GetCore('GetBlockedUserIds') ~= lastList;
+
+end;
+function BlockUtils:BlockRandomUser()
+    for _, v in next, Players:GetPlayers() do
+        if (v ~= LocalPlayer and not isFriendWith(v.UserId)) then
+            BlockUtils:BlockUser(v.UserId);
+            break;
+        end;
+    end;
+end;
 
 
 if game.PlaceId == 0 then 
@@ -14213,19 +14732,19 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         local ping_adjustment = 0
         local getping = getgenv().Ping; if getping == 0 then ping_adjustment = 1 else ping_adjustment = getping end; 
         --// smaller = larger wait time, higher = smaller
-        local pingwait = getping/1484*(getping/10)-- 0.107 = ping adjust 40 or ->  40/1484*40/10
+        local _taskwait = getping/1484*(getping/10)-- 0.107 = ping adjust 40 or ->  40/1484*40/10
 
 
-        Notify('','AutoParry Delay: '..pingwait,5)
+        Notify('','AutoParry Delay: '.._taskwait,5)
         local normalWait = 0.087
-        pingwait = getping/1784*(getping/1250) + normalWait-- 0.107 = ping adjust 40 or ->  40/1484*40/10
-        Notify('','AutoParry Manager Delay: '..pingwait,5)
+        _taskwait = getping/1784*(getping/1250) + normalWait-- 0.107 = ping adjust 40 or ->  40/1484*40/10
+        Notify('','AutoParry Manager Delay: '.._taskwait,5)
 
         warn('\n')
         for ping =20,100,10 do
             getping = ping      
-            pingwait = getping/1784*(getping/1250) + 0.087
-            warn(ping..' ping: '..pingwait..' wait time to detect parry')
+            _taskwait = getping/1784*(getping/1250) + 0.087
+            warn(ping..' ping: '.._taskwait..' wait time to detect parry')
         end
             
     end)
@@ -14941,10 +15460,10 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     local ping_adjustment = 0
                     local getping = getgenv().Ping; if getping == 0 then ping_adjustment = 1 else ping_adjustment = getping end; 
                     --// smaller = larger wait time, higher = smaller
-                    local pingwait = getping/1484*(getping/10)-- 0.107 = ping adjust 40 or ->  40/1484*40/10
+                    local _taskwait = getping/1484*(getping/10)-- 0.107 = ping adjust 40 or ->  40/1484*40/10
                     --task.wait(.107)
                     if getgenv().UsePing == true then 
-                        task.wait(pingwait)
+                        task.wait(_taskwait)
                     elseif getgenv().UsePing == false then 
                         task.wait(0.107)
                     end
@@ -14965,7 +15484,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     }
                     game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
                     
-                    --task.wait(0.2)--// pingwait
+                    --task.wait(0.2)--// _taskwait
 
                     task.wait(0.1)
                     if getgenv().fw3localFw3['parryhasfeintedsonoparry'] == true then  --  and getgenv().fw3localFw3['rollnotparry'] == false 
@@ -15005,7 +15524,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     --     }
                     --     game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
                         
-                    --     task.wait(0.2)--// pingwait
+                    --     task.wait(0.2)--// _taskwait
                     --     local args = {
                     --         [1] = "Up"
                     --     }
@@ -15143,10 +15662,10 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             local ping_adjustment = 0
             local getping = getgenv().Ping; if getping == 0 then ping_adjustment = 1 else ping_adjustment = getping end; 
             --// smaller = larger wait time, higher = smaller
-            local pingwait = getping/1584*(getping/10)
+            local _taskwait = getping/1584*(getping/10)
             --task.wait(.107)
             if getgenv().UsePing == true then 
-                task.wait(pingwait)
+                task.wait(_taskwait)
             elseif getgenv().UsePing == false then 
                 task.wait(0.095)
             end
@@ -15159,7 +15678,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             }
             game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
             
-            task.wait(0.22)--// pingwait
+            task.wait(0.22)--// _taskwait
             local args = {
                 [1] = "Up"
             }
@@ -15254,7 +15773,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 --     }
                 --     game:GetService("Players").LocalPlayer.Character.CharacterHandler.F:FireServer(unpack(args))
                     
-                --     task.wait(0.2)--// pingwait
+                --     task.wait(0.2)--// _taskwait
                 --     local args = {
                 --         [1] = "Up"
                 --     }
@@ -15473,7 +15992,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         local getping = getgenv().Ping; if getping == 0 then ping_adjustment = 1 else ping_adjustment = getping end; 
         --// smaller = larger wait time, higher = smaller
         local normalWait = 0.087
-        local pingwait = getping/1784*(getping/1250) + normalWait-- 0.107 = ping adjust 40 or ->  40/1484*40/10
+        local _taskwait = getping/1784*(getping/1250) + normalWait-- 0.107 = ping adjust 40 or ->  40/1484*40/10
 
         local IsBehindPlayer =false;
 
@@ -15532,7 +16051,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         if IsBehindPlayer == true then return end
 
         if getgenv().fw3localFw3['delayManager'] == true then 
-            task.wait(pingwait)
+            task.wait(_taskwait)
         else
             task.wait(0.087)
         end
@@ -15683,7 +16202,8 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         local ParryCritExlusions = {-- the anims we will parry ourselves
             'rbxassetid://13047366938';
             'rbxassetid://8787495611';
-            'rbxassetid://10022838306'
+            'rbxassetid://10022838306';
+            'rbxassetid://11859752490';
         }
         local Excluded = false
         for i,anims in next, ParryCritExlusions do 
@@ -15713,21 +16233,28 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 if detect(v,'rbxassetid://8787495611') and Excluded == false then -- i think it depends on the sword so i might do a sword check  -- excluded it
                     task.wait(.2) -- .2
                     getgenv().parry()
-                elseif detect(v,'rbxassetid://10022838306') and Excluded == false or detect(v,'rbxassetid://10876826705') and Excluded == false then 
+                elseif detect(v,'rbxassetid://10022838306') and Excluded == false then  --  or detect(v,'rbxassetid://10876826705') and Excluded == false
                     task.wait(.3)
                     getgenv().parry()
-                elseif detect(v,'rbxassetid://11859752490')  then  -- and Excluded == false
+                elseif detect(v,'rbxassetid://10876826705') then --greatsword crit
+                    task.wait(.8)
+                    getgenv().parry()
+                elseif detect(v,'rbxassetid://11859752490   X')  then  -- and Excluded == false COULD MAKE IT SHARE THE SAME FOR ENFORCER ILL TRY IT RYNNNN
                     print('spin crit log')
                     task.wait(.3)
                     getgenv().parry()
-                    task.wait(.2)
-                    getgenv().parry()
-                    task.wait(.2)
-                    getgenv().parry()
-                    task.wait(.2)
-                    getgenv().parry()
-                    task.wait(.2)
-                    getgenv().parry()
+                    repeat 
+                        task.wait(.2)
+                        getgenv().parry()
+                    until not findanimation(v,'rbxassetid://11859752490')
+                    -- task.wait(.2)
+                    -- getgenv().parry()
+                    -- task.wait(.2)
+                    -- getgenv().parry()
+                    -- task.wait(.2)
+                    -- getgenv().parry()
+                    -- task.wait(.2)
+                    -- getgenv().parry()
                 elseif detect(v,'rbxassetid://10234795108') and Excluded == false  then 
                     repeat 
                         task.wait(.5)
@@ -15745,7 +16272,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                         -- task.wait(.5)
                         -- getgenv().fastparry()
                         -- getgenv().quickfinishparry()
-                    until not detect(v,'rbxassetid://10234795108')
+                    until not findanimation(v,'rbxassetid://10234795108')
 
                 -- elseif detect(v,'rbxassetid://13047366938') then -- jus karita
                 --     task.wait(1)
@@ -16614,7 +17141,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         end  
         
         -- rbxassetid://8917108290 swing 2
-        if detect(v,'rbxassetid://8917904390') then --  or detect(v,'rbxassetid://11859752490')
+        if detect(v,'rbxassetid://8917904390') or detect(v,'rbxassetid://11859752490') then --  or detect(v,'rbxassetid://11859752490')
             print('vortex')
             task.wait(.8)
             --getgenv().parry()
@@ -16637,7 +17164,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                 -- getgenv().quickfinishparry()
                 -- removeStuns()
                 task.wait(0.01)
-            until findanimation(v,'rbxassetid://8917904390') == false
+            until findanimation(v,'rbxassetid://8917904390') == false and findanimation(v,'rbxassetid://11859752490') == false
         end  
 
 
@@ -16814,6 +17341,11 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             getgenv().parry()
             cancelAll = true 
         end
+        if detect(v,'rbxassetid://13234414776') then -- way of navae stomp
+            task.wait(.5)
+            getgenv().parry()
+            cancelAll = true 
+        end
         -- rbxassetid://9891303051
 
 
@@ -16838,10 +17370,20 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             getgenv().parry()
             cancelAll = true
         end
-        if detect(v,'rbxassetid://13047366938') then -- legon kata crit
-            task.wait(.1)
-            getgenv().parry()
-            cancelAll = true
+        if detect(v,'rbxassetid://13047366938') then -- legon kata crit rbxassetid://13047366938
+            --print('legion crit')
+            if is_mob == false then 
+                task.wait(.1)
+                print('legion parry')
+                getgenv().parry()
+                cancelAll = true
+            else
+                task.wait(.01)
+                print('legion roll')
+                getgenv().roll()
+                cancelAll = true
+            end
+
         end
 
         if detect(v,'rbxassetid://9890788066') then -- fist anims from 1 to 4 cuz i never actually hardcoded them :skull: (1)
@@ -17421,7 +17963,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     if (v:FindFirstChild('HumanoidRootPart')) and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                         local dist = (v:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
                         if dist.Magnitude <= getgenv().Distance then 
-                            if game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name) and not game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('StatusFolder'):FindFirstChild('Hitting') and  v.Name ~= game.Players.LocalPlayer.Name then 
+                            if v and game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name) and game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('StatusFolder') and not game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('StatusFolder'):FindFirstChild('Hitting') and  v.Name ~= game.Players.LocalPlayer.Name then 
                                 if game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('StatusFolder') then
                                     local ffound = game.ReplicatedStorage.CharacterData:FindFirstChild(v.Name):FindFirstChild('StatusFolder') 
                                     if ffound:FindFirstChild('Stun') or ffound:FindFirstChild('Stun1') and not game.Players.LocalPlayer.Character:FindFirstChildWhichIsA('ForceField') then 
@@ -17500,14 +18042,45 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                     for _,v in pairs(workspace:FindFirstChild('DebrisParts'):GetChildren()) do 
                         if v.Name == 'Part' then
                             local dist = (v.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
-                            if dist.Magnitude < 3 then 
+                            if dist.Magnitude <= 5 then 
                                 getgenv().roll()
                             end
                         end
                     end
                 end
 
+                if workspace:FindFirstChild('DebrisParts'):FindFirstChild('Javelin') and getgenv().AutoParryingFW == true and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                    for _,v in pairs(workspace:FindFirstChild('DebrisParts'):GetChildren()) do 
+                        if v.Name == 'Javelin' then
+                            local closestToSlash = false 
 
+                            function checkClosestSlash()
+                                local xreturn = false
+                                for _,v in pairs(workspace:FindFirstChild('DebrisParts'):GetChildren()) do 
+                                    if v.Name == 'Javelin' then
+                                        local dist = (v.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                                        if dist.Magnitude <= 30 then 
+                                            xreturn = true
+                                        end
+                                        task.wait(0.1)
+                                    end
+                                end
+                                return xreturn
+                            end
+                            local dist = (v.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
+                                
+                            if checkClosestSlash() and not table.find(getgenv().parryslash,v) and dist.Magnitude <= 30  then -- check if particle,  and v:FindFirstChild('Explosion').Enabled == true
+                                table.insert(getgenv().parrybullet,v)
+                                task.spawn(function()
+                                    -- task.wait(.01)--task.wait(.05)
+                                    getgenv().roll()
+                                    -- getgenv().quickfinishparry()
+                                    print'DEBRIS Javelin'
+                                end)
+                            end
+                        end
+                    end
+                end
 
                 if workspace:FindFirstChild('DebrisParts'):FindFirstChild('Slash') and getgenv().AutoParryingFW == true and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
                     for _,v in pairs(workspace:FindFirstChild('DebrisParts'):GetChildren()) do 
@@ -17533,9 +18106,9 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                                 table.insert(getgenv().parrybullet,v)
                                 task.spawn(function()
                                     -- task.wait(.01)--task.wait(.05)
-                                    getgenv().fastparry()
-                                    getgenv().quickfinishparry()
-                                    print'Slash'
+                                    getgenv().roll()
+                                    -- getgenv().quickfinishparry()
+                                    print'DEBRIS Slash'
                                 end)
                             end
                         end
@@ -17604,7 +18177,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                                     -- task.wait(.01)--task.wait(.05)
                                     getgenv().fastparry()
                                     getgenv().quickfinishparry()
-                                    print'Bullet'
+                                    print'DEBRIS Bullet'
                                 end)
                             end
                         end
@@ -17632,7 +18205,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                                 task.spawn(function()
                                     task.wait(.2)--task.wait(.05)
                                     getgenv().parry()
-                                    print'Parry Angel'
+                                    print'DEBRIS Parry Angel'
                                     -- repeat 
                                     --     task.wait(0.1)
                                     --     getgenv().fastparry()
@@ -17661,7 +18234,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
                             end
                             local dist = (v.Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position)
                             if dist.Magnitude <= 7 then 
-
+                                print('DEBRIS ARROW')
                                 task.spawn(function()
                                     task.wait(.1)
                                     getgenv().fastparry()
@@ -29282,7 +29855,7 @@ elseif game.PlaceId == 8568266872 then  -- kill to save princess
             end
         end
     end)
-elseif azfake.findintable_i(dungeon_quest_games,gameName) then 
+elseif azfake.findintable_i(dungeon_quest_games,gameName) and dungeon_quest_games[gameName] == game.PlaceId  then 
     local tab = window:CreateTab(gameName)
     local sector = tab:CreateSector('Cheats','left')
     local botsector = tab:CreateSector('Cheats','right')
@@ -31641,7 +32214,7 @@ elseif game.PlaceId == 13190091082 or game.PlaceId == 11513105086 or game.PlaceI
     local sector = tab:CreateSector('Cheats','left')
     local farmingsector = tab:CreateSector('Cheats','right')
     local othersector = tab:CreateSector('Cheats','right')
-
+    sharedRequires['SetupChatlogger']()
     getgenv().wisteriasettings = {
         rollback = false;
         autospin = false;
@@ -32455,6 +33028,2159 @@ elseif table.find(shindogames,tostring(game.PlaceId)) then
             --if getgenv()
         end
     end)
+elseif table.find({'11567929685','11564374799'},tostring(game.PlaceId)) then -- fromdon war
+    sharedRequires['SetupChatlogger']() 
+    local tab = window:CreateTab(gameName)
+    local sector = tab:CreateSector('Cheats','left')
+    local weirdsector = tab:CreateSector('Cheats','right')
+    local Mouse = game.Players.LocalPlayer:GetMouse()
+    local Player = game.Players.LocalPlayer
+    Player.Chatted:Connect(function(msg)
+        if msg == '!showwarriors' or msg == '!pnum' then 
+            -- for i,v in next, game.Players:GetChildren() do 
+            --     if tostring(v.Team) == 'Warriors' then 
+            --         warn(`{v.Name} is a warrior`)
+            --     end
+            -- end
+            for i,v in next, game.Players:GetChildren() do 
+                if tostring(v.Team) == 'Warriors' then 
+                    warn(`{tostring(v.Team)} {v.Name} is a warrior`)
+                end
+                if v.Character and v.Character.Humanoid.Shifting:FindFirstChild('CanShift') and v.Character.Humanoid.Shifting:FindFirstChild('CanShift').Value == true then
+                    warn(`{tostring(v.Team)} {v.Name} is a warrior`)
+                end
+            end
+        end
+    end)
+    getgenv().aotfreedomwar = {
+        infinitegas = false;
+        infiniteblades = false;
+        titannapehitbox = false;
+        titannapesize = {
+            x = 5;
+            y = 5;
+            z = 5;
+        };
+        shifternapehitbox = false;
+        shifternapesize = {
+            x = 5;
+            y = 5;
+            z = 5;
+        };
+        shifternapetransparency = 1;
+        titannapetransparency = 1;
+        nocooldown = false;
+        nostun = false;
+        titanaimbotkeybind = 't';
+        titanmouthaimkeybind = 'g';
+        instakillkeybind = 'j';
+        titannapecolor = Color3.fromRGB(255,255,255);
+        shifternapecolor = Color3.fromRGB(255,255,255);
+        getallskills = false;
+        notitanattack = false;
+        autoreload = false;
+        titanesp = false;
+        titanespcolor = Color3.fromRGB(255, 255,255);
+        playeresp = false;
+        playerespcolor = Color3.fromRGB(255, 255,255);
+        autoattackwhennearenemy = false;
+        autom1 = false;
+        autohood = false;
+        nohooktension = false;
+        autocounter = false;
+        dontlosehood = false;
+    } -- add m1 when next to enemy shifter
+    
+    local function changeSize(titan)
+        pcall(function()
+            titan.Nape.Size = Vector3.new(getgenv().aotfreedomwar['titannapesize']['x'],getgenv().aotfreedomwar['titannapesize']['y'],getgenv().aotfreedomwar['titannapesize']['z'])
+            titan.Nape.Transparency = getgenv().aotfreedomwar['titannapetransparency']
+            titan.Nape.Color = getgenv().aotfreedomwar['titannapecolor']
+            --titan.Nape.CanCollide = false;
+        
+            titan.DamageRegion.Size = Vector3.new(10,5,10)
+            titan.DamageRegion.Transparency = getgenv().aotfreedomwar['titannapetransparency']
+            titan.DamageRegion.Color = getgenv().aotfreedomwar['titannapecolor']
+           -- titan.DamageRegion.CanCollide = false;
+        end)
+    end
+    local function adjustNape(v)
+        for _, x in next, v:GetChildren() do 
+            if x.Name:find('Nape') and not x:IsA('RemoteEvent') and not x:IsA('RemoteFunction') then 
+                --x.CanCollide = false;
+                x.Size = Vector3.new(getgenv().aotfreedomwar['shifternapesize']['x'],getgenv().aotfreedomwar['shifternapesize']['y'],getgenv().aotfreedomwar['shifternapesize']['z'])
+                x.Transparency = getgenv().aotfreedomwar['shifternapetransparency']
+                x.Color = getgenv().aotfreedomwar['shifternapecolor']
+            end
+        end
+    end
+    local function updateTitanNapes()
+        for i,v in next, workspace.OnGameTitans:GetChildren() do 
+            if getgenv().aotfreedomwar['titannapehitbox'] then 
+                changeSize(v)
+            end
+        end
+    end
+
+
+    local function updateShifterNapes()
+        for i,v in next, workspace:GetChildren() do 
+            if v.Name:find('Titan') and getgenv().aotfreedomwar['shifternapehitbox'] then 
+                adjustNape(v)
+            end
+        end
+    end
+    
+    setupAimbotTab(getgenv().aotfreedomwar)
+    setupEspTab(getgenv().aotfreedomwar)
+    getgenv().AddPlayerList(weirdsector) -- make nape cancollide off?
+
+    weirdsector:AddButton('Rejoin',function()
+        game:GetService('TeleportService'):teleport(game.PlaceId)
+    end)
+    weirdsector:AddButton('Rejoin Same Server',function()
+        game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, game.JobId)
+    end)
+    local autom1tgl = sector:AddToggle('Auto M1',false,function(xstate)
+        getgenv().aotfreedomwar['autom1'] = xstate -- autom12
+    end)
+    sector:AddToggle('Auto Counter',false,function(xstate)
+        getgenv().aotfreedomwar['autocounter'] = xstate -- autom12
+        if xstate == false then 
+            maid.walkspeedchange = nil;
+        else
+            maid.walkspeedchange = azfake:returndata().humanoid:GetPropertyChangedSignal('WalkSpeed'):Connect(function()
+                azfake:returndata().humanoid.WalkSpeed = 25;
+            end);
+        end;
+    end)
+    -- sector:AddToggle('Auto Hood',false,function(xstate)
+    --     getgenv().aotfreedomwar['autohood'] = xstate -- autom12
+    --     if xstate == true then -- game:GetService("Players").LocalPlayer.PlayerGui.MenuGui.MenuLocalSript
+    --         local btn = game:GetService("Players").LocalPlayer.PlayerGui.MenuGui.CustomizationScreen.CloakButton
+    --         firesignal(btn.MouseButton1Click)
+    --         firesignal(btn.MouseButton1Up)
+    --     end
+    -- end)
+    sector:AddToggle('Dont Lose Hood',false,function(xstate) -- LoseHoodEvent
+        getgenv().aotfreedomwar['dontlosehood'] = xstate -- dontloosehood
+    end)
+    sector:AddToggle('No Tension',false,function(xstate)
+        getgenv().aotfreedomwar['nohooktension'] = xstate -- autom12
+    end)
+    sector:AddToggle('Infinite Gas',false,function(xstate)
+        getgenv().aotfreedomwar['infinitegas'] = xstate
+    end)
+    sector:AddToggle('Infinite Blades',false,function(xstate)
+        getgenv().aotfreedomwar['infiniteblades'] = xstate
+    end)
+    sector:AddToggle('No Cooldown',false,function(xstate)
+        getgenv().aotfreedomwar['nocooldown'] = xstate
+    end)
+    sector:AddToggle('Auto Reload',false,function(xstate)
+        getgenv().aotfreedomwar['autoreload'] = xstate
+    end)
+    sector:AddToggle('Auto Kill Insub',false,function(xstate)
+        getgenv().aotfreedomwar['autoattackwhennearenemy'] = xstate
+    end)
+    local ifn = sector:AddButton('Start Inf Healing',function()
+        -- for i=1, 3 do 
+        --     game:GetService("Players").LocalPlayer.Backpack:WaitForChild('Granada').Eat:FireServer();
+        -- end;
+        task.spawn(function()
+            game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100);
+            while task.wait() do 
+                --game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0);
+                if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada') then 
+                    game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada').Eat:FireServer();
+                else
+                    game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0)
+                end
+            end;
+        end);
+    end,{
+        ask = 'Stops when you die, click button twice until granada disappears on equip'; -- granola
+        accept = 'Yes';
+        reject = 'No';
+    })
+    ifn:ActivateKnowledge()
+    ifn:AddKnowledge('click again if granoda doesnt disappear')
+    sector:AddButton('Inf Spike Nets',function()
+        game:GetService("ReplicatedStorage").BuyEvent:FireServer('SpikeNet',500);
+        -- for i=1, 3 do 
+        --     game:GetService("Players").LocalPlayer.Backpack:WaitForChild('Granada').Eat:FireServer();
+        -- end;
+        task.spawn(function()
+            while task.wait(0.1) do 
+                --game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0);
+                game:GetService("ReplicatedStorage").BuyEvent:FireServer('SpikeNet',0);
+            end
+        end);
+    end)
+    sector:AddButton('Fix Spike Nets',function()
+        for i,v in next, game.Players.LocalPlayer.Backpack:GetChildren() do 
+            if v.Name == 'SpikeNet' then v:Destroy() end
+        end
+    end)
+    sector:AddToggle('Get All Skills',false,function(xstate)
+        getgenv().aotfreedomwar['getallskills'] = xstate
+    end)
+    sector:AddToggle('No Titan Attack',false,function(xstate)
+        getgenv().aotfreedomwar['notitanattack'] = xstate
+        if getgenv().aotfreedomwar['notitanattack'] == false then 
+            if game.Players.LocalPlayer.Character ~= nil then 
+                if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                    game.Players.LocalPlayer.Character.Humanoid.Invinsible.Value = false;
+                end
+            end
+        end
+    end)
+    sector:AddToggle('Titan Nape Hitbox',false,function(xstate)
+        getgenv().aotfreedomwar['titannapehitbox'] = xstate
+        updateTitanNapes()
+    end)
+    sector:AddColorpicker('Titan Nape Color',Color3.fromRGB(255, 255,255), function(ztx)
+        getgenv().aotfreedomwar['titannapecolor'] = ztx
+        updateTitanNapes()
+    end)
+    sector:AddSlider('Titan Nape Transparency',0,1,1,10,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['titannapetransparency'] = xstate
+        updateTitanNapes()
+    end)
+    sector:AddSlider('Titan Nape Size X',0,5,100,100,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['titannapesize']['x'] = xstate
+        updateTitanNapes()
+    end)
+    sector:AddSlider('Titan Nape Size Y',0,5,100,100,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['titannapesize']['y'] = xstate
+        updateTitanNapes()
+    end)
+    sector:AddSlider('Titan Nape Size Z',0,5,100,100,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['titannapesize']['z'] = xstate
+        updateTitanNapes()
+    end)
+    sector:AddSeperator('-')
+    sector:AddToggle('Shifter Nape Hitbox',false,function(xstate)
+        getgenv().aotfreedomwar['shifternapehitbox'] = xstate
+        updateShifterNapes()
+    end)
+    sector:AddColorpicker('Shifter Nape Color',Color3.fromRGB(255, 255,255), function(ztx)
+        getgenv().aotfreedomwar['shifternapecolor'] = ztx
+        updateShifterNapes()
+    end)
+    sector:AddSlider('Shifter Nape Transparency',0,1,1,10,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['shifternapetransparency'] = xstate
+        updateShifterNapes()
+    end)
+    sector:AddSlider('Shifter Nape Size X',0,5,100,100,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['shifternapesize']['x'] = xstate
+        updateShifterNapes()
+    end)
+    sector:AddSlider('Shifter Nape Size Y',0,5,100,100,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['shifternapesize']['y'] = xstate
+        updateShifterNapes()
+    end)
+    sector:AddSlider('Shifter Nape Size Z',0,5,100,100,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['shifternapesize']['z'] = xstate
+        updateShifterNapes()
+    end)
+
+    weirdsector:AddTextbox('Titan Aimbot Keybind','t',function(xstate)
+        getgenv().aotfreedomwar['titanaimbotkeybind'] = xstate
+    end)
+    weirdsector:AddTextbox('Titan Mouth Aimbot Keybind','g',function(xstate)
+        getgenv().aotfreedomwar['titanmouthaimkeybind'] = xstate
+    end)
+    weirdsector:AddTextbox('Insta Kill Titan Keybind','j',function(xstate)
+        getgenv().aotfreedomwar['instakillkeybind'] = xstate
+    end)
+    weirdsector:AddButton('Hook Everyone',function()
+        game.RunService.RenderStepped:Connect(function()
+            for i,v in next, game.Players:GetPlayers() do 
+                if v.Character then 
+                    local obj = v.Character.Head
+                    if obj:FindFirstChildWhichIsA('Part') or obj:FindFirstChildWhichIsA('MeshPart') then 
+                        -- check if obj is a model
+                        obj = obj:FindFirstChildWhichIsA('Part') or obj:FindFirstChildWhichIsA('MeshPart')
+                    end
+                    local args = {
+                        [1] = obj,
+                        [2] = CFrame.new(100, 100, 100) * CFrame.Angles(-3.1415927410125732, 0.8258955478668213, -3.1415927410125732),
+                        [3] = CFrame.new(155, -54.0802001953125, -158515625) * CFrame.Angles(-0.5150448083877563, 1.0880918502807617, 0.46471184492111206),
+                        [4] = Vector3.new(830.6765747070312, 1184.00244140625, -585.1898803710938),
+                        [5] = Vector3.new(33, -141.49099731445312, 15)
+                    }
+                    game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.CastEKey:FireServer(unpack(args))    
+                end
+            end
+        end)
+    end)
+
+    local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
+    esp_lib.Players = false;
+    esp_lib.Boxes = false;
+    esp_lib.Names = true;
+    esp_lib.AutoRemove = false;
+    esp_lib:Toggle(true)
+    local titanespsave = esp_lib:AddObjectListener(workspace.OnGameTitans, {
+        --Name = 'Titan';
+        CustomName = 'Titan';
+        Color = Color3.fromRGB(0,255,0);
+        IsEnabled = 'titanesp';
+        PrimaryPart = 'HumanoidRootPart';
+    })
+    esp_lib.titanesp = false;
+    weirdsector:AddToggle('Titan Esp',false,function(xstate)
+        getgenv().aotfreedomwar['titanesp'] = xstate
+        esp_lib.titanesp = xstate
+    end)
+    weirdsector:AddToggle('Player Esp',false,function(xstate)
+        getgenv().aotfreedomwar['playeresp'] = xstate
+        esp_lib.Players = xstate
+    end)
+    weirdsector:AddColorpicker('Titan Esp Color',Color3.fromRGB(255, 255,255), function(ztx)
+        getgenv().aotfreedomwar['titanespcolor'] = ztx
+        esp_lib.titanesp.Color = getgenv().aotfreedomwar['titanespcolor']
+        titanespsave.Color = getgenv().aotfreedomwar['titanespcolor']
+    end)
+    local boxes = {}
+    weirdsector:AddButton('Show Shifters', function()
+        for i,v in next, boxes do 
+            v:Remove()
+        end
+        local shifters = {}
+        for i,v in next, game.Players:GetChildren() do 
+            -- if tostring(v.Team) == 'Warriors' then 
+            --     warn(`{tostring(v.Team)} {v.Name} is a warrior`)
+            --     if not shifters[v.Name] then shifters[v.Name] = v.Character end
+            -- end
+            if v.Character and v.Character:FindFirstChild('ShifterHolder') then --v.Character.Humanoid.Shifting:FindFirstChild('CanShift') and v.Character.Humanoid.Shifting:FindFirstChild('CanShift').Value == true then
+                warn(`{tostring(v.Team)} {v.Name} is a warrior {v.Character:FindFirstChild('ShifterHolder').Value}`)
+                if not shifters[v.Name] then shifters[v.Name] = {
+                    --col = v.Character:FindFirstChild('COLocal')
+                    Character = v.Character;
+                    shiftval =  v.Character:FindFirstChild('ShifterHolder').Value;
+                } end
+                azfakenotify(`{v.Name} is {v.Character:FindFirstChild('ShifterHolder').Value}`,5)
+            end
+        end
+        for i,v in next, shifters do 
+            print(i)
+            local plrshift = game.Players:GetPlayerFromCharacter(v.Character)
+            local HeadPart = v.Character.Head
+            local suc, nosuc = pcall(function() -- nosc
+                if HeadPart.Position == HeadPart.Position then 
+
+                end
+            end)
+            if not suc then 
+                HeadPart = v.Character.Head:FindFirstChildWhichIsA('Part') or v.Character.Head:FindFirstChildWhichIsA('MeshPart')
+            end
+            local box = esp_lib:Add(v.Character, {
+                --PrimaryPart = type(options.PrimaryPart) == "string" and c:WaitForChild(options.PrimaryPart) or type(options.PrimaryPart) == "function" and options.PrimaryPart(c),
+                --Name = plrshift.Name,
+                --Player = plrshift,
+                PrimaryPart = v.Character.Head;
+                Name = `{v.Character:FindFirstChild('ShifterHolder').Value} Titan`;
+                CustomName = 'Shifter';
+                Player = plrshift;
+                Color = Color3.fromRGB(75,0,130), --(255,50,50),
+                offset = Vector2.new(0,30)
+                -- ColorDynamic = false;,
+                --Name = 'Shifter',
+                --IsEnabled = 'Shifter'..i,
+                --RenderInNil = options.RenderInNil
+            })
+            --esp_lib['Shifter'..i] = true;
+            table.insert(boxes,box)
+        end
+    end)
+
+    local aimbot = false;
+    local mouthaimbot = false;
+    Mouse.KeyDown:Connect(function(key)
+        if key:lower() == getgenv().aotfreedomwar['titanaimbotkeybind'] then 
+            aimbot = not aimbot
+        elseif key:lower() == getgenv().aotfreedomwar['titanmouthaimkeybind'] then 
+            mouthaimbot = not mouthaimbot
+        elseif key:lower() == getgenv().aotfreedomwar['instakillkeybind'] then 
+            for i,v in next, workspace.OnGameTitans:GetDescendants() do 
+                if v:IsA('Part') and isnetworkowner(v) or v:IsA('MeshPart') and isnetworkowner(v) then 
+                    warn(`network {v.Parent.Name}`)
+                    v.Parent.Humanoid.Health = 0
+                end
+            end        
+        end
+    end)
+
+    game.RunService.RenderStepped:Connect(function()
+        if aimbot then 
+            pcall(function()
+                local Character = game.Players.LocalPlayer.Character
+                local closestdist = nil
+                local closesttitan = nil
+                for i,v in next, workspace.OnGameTitans:GetChildren() do 
+                    if v:FindFirstChild('HumanoidRootPart') and v:FindFirstChild('Humanoid') and v:FindFirstChild('Humanoid').Health > 0  then 
+                        local dist = (v:FindFirstChild('HumanoidRootPart').Position - Character.HumanoidRootPart.Position).Magnitude
+                        if dist <= 100 then -- hooksrange
+                            if closestdist == nil then 
+                                closestdist = dist;
+                                closesttitan = v
+                            else
+                                if closestdist > dist then 
+                                    closestdist = dist;
+                                    closesttitan = v
+                                end
+                            end
+                        end
+                    end
+                end
+                if closesttitan then  -- + additionalvector
+                    local additionalvector = Vector3.new(0,-0.5,0)
+                    workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,closesttitan.Nape.Position + additionalvector )
+                end
+            end)
+        elseif mouthaimbot then 
+            pcall(function()
+                local Character = game.Players.LocalPlayer.Character
+                local closestdist = nil
+                local closesttitan = nil
+                for i,v in next, workspace.OnGameTitans:GetChildren() do 
+                    if v:FindFirstChild('HumanoidRootPart') and v:FindFirstChild('Humanoid') and v:FindFirstChild('Humanoid').Health > 0  then 
+                        local dist = (v:FindFirstChild('HumanoidRootPart').Position - Character.HumanoidRootPart.Position).Magnitude
+                        if dist <= 100 then -- hooksrange
+                            if closestdist == nil then 
+                                closestdist = dist;
+                                closesttitan = v
+                            else
+                                if closestdist > dist then 
+                                    closestdist = dist;
+                                    closesttitan = v
+                                end
+                            end
+                        end
+                    end
+                end
+                if closesttitan then  -- + additionalvector
+                    local additionalvector = Vector3.new(0,0.5,0)
+                    workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,closesttitan.Mouth.Position + additionalvector )
+                end
+            end)
+        end
+    end)
+
+    local metahook;
+    metahook = hookmetamethod(game,'__namecall',function(self,...)
+        local args = {...}
+        local call_type = getnamecallmethod();
+        if call_type == 'FireServer'  and tostring(self) == 'LoseHoodEvent' and getgenv().aotfreedomwar.dontlosehood then 
+            return 
+        end
+        return metahook(self,...)
+    end)
+
+
+    for i,v in next, workspace.OnGameTitans:GetChildren() do 
+        if getgenv().aotfreedomwar['titannapehitbox'] then 
+            changeSize(v)
+        end
+    end
+
+    -- workspace.OnGameTitans.ChildAdded:Connect(function(x)
+    --     changeSize(x)
+    -- end)
+    workspace.OnGameTitans.ChildAdded:Connect(function(x)
+        task.spawn(function()
+            if getgenv().aotfreedomwar['titannapehitbox'] then 
+                x:WaitForChild('Nape')
+                x:WaitForChild('DamageRegion')
+                changeSize(x)
+            end
+        end)
+    end)
+
+    for i,v in next, workspace:GetChildren() do 
+        if v.Name:find('Titan') and getgenv().aotfreedomwar['shifternapehitbox'] then 
+            adjustNape(v)
+        end
+    end
+    workspace.ChildAdded:Connect(function(v)
+        if v.Name:find('Titan') and getgenv().aotfreedomwar['shifternapehitbox'] then 
+            task.spawn(function()
+                task.wait(2)
+                adjustNape(v)
+            end)
+
+        elseif v.Name == 'CutArea' then 
+            v.CanCollide = false;
+        end
+    end)
+
+    local function findchildwithproperty(x,b) 
+        for i,v in next, x:GetChildren() do 
+            if v.Name:find(b) then 
+
+            end
+        end
+    end
+
+    local Player = game.Players.LocalPlayer
+    task.spawn(function()
+        while task.wait() do 
+            if getgenv().loopsUnload == true then print('fw break end') break end
+            pcall(function()
+                Character = Player.Character
+                Humanoid = Character.Humanoid
+                gearfolder = Humanoid:FindFirstChild('Gear')
+                if aotfreedomwar.autom1 == true then 
+                    game:GetService("Players").LocalPlayer.Character.Gear.Events.AttackingEvent:FireServer(1)
+                end;
+                if aotfreedomwar.autohood == true then
+                    --aotfreedomwar.autohood = nil
+
+                    -- for i,v in next, game.Players.LocalPlayer.Character:GetDescendants() do 
+                    --     if v.Name == 'HoodOn' and v.Transparency == 1 then 
+                    --         -- could remove losehoodevent
+                    --         local btn = game:GetService("Players").LocalPlayer.PlayerGui.MenuGui.CustomizationScreen.HoodButton
+                    --         firesignal(btn.MouseButton1Click)
+                    --     end
+                    -- end
+                    -- local args = {
+                    --     [1] = "Hood",
+                    --     [3] = true
+                    -- }
+                    -- game:GetService("Players").LocalPlayer.PlayerGui.MenuGui.ClothesChange:InvokeServer(unpack(args))
+                end
+                if aotfreedomwar.autocounter == true then 
+                   -- print('counta')
+                    if Humanoid.Counter.Value == false then
+                        if aotfreedomwar.autom1 == true then aotfreedomwar.autom1 = false end
+                        task.spawn(function()
+                            repeat 
+                                task.wait()
+                                pcall(function()
+                                    game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.Counter:InvokeServer(unpack({[1] = false}))
+                                end)
+                            until Humanoid.Counter.Value == true
+                            if autom1tgl:Get() == true then 
+                                aotfreedomwar.autom1 = true
+                            end
+                        end)
+                    end
+                
+                end
+                if aotfreedomwar.nohooktension == true then 
+                    Humanoid.Gear.HookTensionL.Value = 0
+                    Humanoid.Gear.HookTensionR.Value = 0
+                end
+                if getgenv().aotfreedomwar['autoattackwhennearenemy'] == true then 
+                    for i,v in next, game.Players:GetPlayers() do 
+                        if v ~= game.Players.LocalPlayer and v.Character ~= nil and v.Character:FindFirstChild('Gear') then
+                            local canteamkill = false
+                            if tostring(v.Team) == 'Rogue' or v.Team ~= game.Players.LocalPlayer.Team then 
+                                canteamkill = true
+                            end
+                            if canteamkill and (v.Character.HumanoidRootPart.Position - Character.HumanoidRootPart.Position).Magnitude <= 20 then 
+                                task.spawn(function()
+                                    for i=1, 5 do 
+                                        task.wait(0.05)
+                                        local inputManager = game:GetService('VirtualInputManager')
+                                        local m = game.Players.LocalPlayer:GetMouse();
+                                        inputManager:SendMouseButtonEvent(m.X,m.Y,0,true,game,0)
+                                        inputManager:SendMouseButtonEvent(m.X,m.Y,0,false,game,0)
+                                    end
+                                end)
+                            end
+                        end
+                    end
+                end
+                
+                if Player.PlayerGui.SkillsGui:FindFirstChild('Dodge').Enabled == false and getgenv().aotfreedomwar['getallskills'] then 
+                    for i,v in next, gearfolder.Skills:GetChildren() do 
+                        v.Value = true;
+                        warn(`set {v.Name}`)
+                    end
+                    for i,v in next, Player.PlayerGui.SkillsGui:GetChildren() do 
+                        v.Enabled = true;
+                    end
+                end
+                if gearfolder.Skills.Dodge.Value == false and getgenv().aotfreedomwar['getallskills']  then 
+                    for i,v in next, gearfolder.Skills:GetChildren() do 
+                        v.Value = true;
+                        warn(`set {v.Name}`)
+                    end
+                end
+                if Humanoid.Gear.BladesOut.Value == false and getgenv().aotfreedomwar['autoreload'] then 
+                    game:GetService("Players").LocalPlayer.Character.Gear.Events.SafeBlades:FireServer()
+                    local args = {
+                        [1] = game:GetService("Players").LocalPlayer.Character.Humanoid.Gear.Upgrades.BladesEfficiency
+                    }
+                    game:GetService("Players").LocalPlayer.Character.Gear.Events.BladeReload:FireServer(unpack(args))
+                    local inputManager = game:GetService('VirtualInputManager')
+                    inputManager:SendKeyEvent(true,Enum.KeyCode.R,false,game)
+                    inputManager:SendKeyEvent(false,Enum.KeyCode.R,false,game)
+                end
+                if gearfolder == nil then 
+                    Character = Player.Character
+                    Humanoid = Character.Humanoid
+                    gearfolder = Humanoid:FindFirstChild('Gear')
+                    if getgenv().aotfreedomwar['getallskills'] then 
+                        for i,v in next, gearfolder.Skills:GetChildren() do 
+                            v.Value = true;
+                            warn(`set {v.Name}`)
+                        end
+                    end
+                end
+        
+                if getgenv().aotfreedomwar['infinitegas'] then 
+                    gearfolder.Gas.Value = 2000
+                    gearfolder.Upgrades.GasEfficiency.Value = -80
+                end
+                if getgenv().aotfreedomwar['infiniteblades'] then 
+                    gearfolder.Blades.Value = 2000
+                    gearfolder.Upgrades.BladesEfficiency.Value = -80
+                end
+                if getgenv().aotfreedomwar['nostun'] then 
+                    gearfolder.Upgrades.MentalStrength.Value = 80
+                    Humanoid.Stunned.Value = false;
+                    Humanoid.Ragdolling.Value = false;
+                    Humanoid.BladeAttacking.Value = false;
+                    Humanoid.Grabbed.Value = false;
+                    Humanoid.Handcuffed.Value = false;
+                    Humanoid.Handcuffed.Timer.Value = 0
+                end
+                if getgenv().aotfreedomwar['notitanattack'] then 
+                    Humanoid.Invinsible.Value = true;
+                end
+
+                if getgenv().aotfreedomwar['nocooldown'] then 
+                    Player.PlayerGui.SkillsGui.Dodge.Cooldown.Value = 25
+                    Player.PlayerGui.SkillsGui.SuperJump.Cooldown.Value = 150
+                    Player.PlayerGui.SkillsGui.Impulse.Cooldown.Value = 100
+                    Player.PlayerGui.SkillsGui.HandCutMk2.Cooldown.Value = 3000
+                    Player.PlayerGui.SkillsGui.HandCut.Cooldown.Value = 3000
+                    Player.PlayerGui.SkillsGui.Counter.Cooldown.Value = 2000
+                    Player.PlayerGui.SkillsGui.BladeThrow.Cooldown.Value = 100
+                    Player.Backpack.Medkit.Cooldown.Value = 2.8
+                    humanoid.HorseStamina.Value = 2800
+                end
+                --workspace.PlayersDataFolder:FindFirstChild(Player.Name).Rank.Value = 5
+                --workspace.PlayersDataFolder:FindFirstChild(Player.Name).GamePoints.Value = 50000
+            end)
+        end
+    end)
+    AddConfigurations()
+elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId)) and vs == 'debug' then 
+    sharedRequires['SetupChatlogger']()
+    local effectReplicator = require(game:GetService('ReplicatedStorage'):WaitForChild('EffectReplicator', math.huge));
+	local LocalPlayer = game.Players.LocalPlayer
+
+
+    local functions = {}
+    function functions.serverHop(bypass)
+        if(bypass) then --  or library:ShowConfirm('Are you sure you want to switch server?')
+            --library:UpdateConfig();
+            local dataSlot = LocalPlayer:GetAttribute('DataSlot');
+            MemStoreService:SetItem('DataSlot', dataSlot);
+
+            BlockUtils:BlockRandomUser();
+            game.TeleportService:Teleport(4111023553);
+        end;
+    end;
+    
+
+    local tab = window:CreateTab(gameName)
+    local esptab = window:CreateTab('ESP Tab')
+    local sector = tab:CreateSector('Cheats','left')
+    local rightsect = tab:CreateSector('Cheats', 'right')
+    local espsector = esptab:CreateSector('Cheats','left')
+    local Stats = game:GetService("Stats")
+
+    local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
+    esp_lib.Players = false;
+    esp_lib.Boxes = false;
+    esp_lib.Names = false;
+    esp_lib.AutoRemove = true;
+    esp_lib:Toggle(true)
+
+    getgenv().deepwokensettings = {
+        autoparrydistance = 15; --autoparryrange = 15;
+        autoparry = false;
+        usecustomwaitdelay = false;
+        customwaitdelay = 0;
+        playeresp = false;
+        boxesp = false;
+        tracers = false;
+        espnames = false;
+        ingredientesp = false;
+        ingredientespcolor = Color3.fromRGB(255,255,255);
+        artifactesp = false;
+        whitelist = {'All', 'Mobs'};
+        whitelistmode = 'All';
+        mobesp = false;
+        autovoidmobs = false;
+        nofalldamage = false;
+        knockedownership = false;
+        nojumpcooldown = false;
+        nostun = false;
+        infinitejump = false;
+        infiniteJumpHeight = 0;
+        nokillbricks = false;
+        nowind = false;
+        antiacid = false;
+        rollwhencantparry = false;
+        rollcantparrystatus = false;
+        blatantroll = false;
+        rollcancel = false;
+    }
+
+    -- local ingredientesp = esp_lib:AddObjectListener(game:GetService("Workspace").Ingredients, {
+    --     SelfName = true;
+    --     TableReceiveColor = deepwokensettings;
+    --     Color = function()
+    --         return deepwokensettings.ingredientespcolor; --Color3.fromRGB(255,255,255); --Color3.fromRGB(0,70,70);
+    --     end;
+    --     IsEnabled = 'IngredientEsp';
+    --     --PrimaryPart = 'HumanoidRootPart';
+    --     flag = 'ingredient';
+    -- }) 
+
+    -- MOBESP CHANGING VISIBLITY DOESNT WORK (if i never tested that the system worked i wouldve typed "MOBESP DOESNT WORK")
+    -- AUTOPARRY DOESNT WORK
+    
+    -- sharedRequires['CreateFlySystem'](sector,deepwokensettings)
+    -- sharedRequires['CreateWalkSpeedSystem'](sector,deepwokensettings)
+
+	local mathFloor = clonefunction(math.floor)
+	local isDescendantOf = clonefunction(game.IsDescendantOf);
+	local ffcisa = clonefunction(game.FindFirstChildWhichIsA);
+	local ffc = clonefunction(game.FindFirstChild); -- ffs
+
+   -- local keyhandler = require(game.ReplicatedStorage:WaitForChild("Modules", math.huge):WaitForChild("ClientManager", math.huge):WaitForChild("KeyHandler", math.huge))
+
+    --local stack = debug.getupvalue(getrawmetatable(debug.getupvalue(keyhandler, 8)).__index, 1)[1][1]
+    --local GetKey = stack[89]
+
+
+    local function setupNoStun()
+        effectReplicator.EffectAdded:connect(function(effect)
+            if (effect.Class == 'Knocked' and LocalPlayer.Character) then
+                local humanoid = LocalPlayer.Character:FindFirstChildWhichIsA('Humanoid');
+                local handle = LocalPlayer.Backpack:FindFirstChild('Handle', true) and LocalPlayer.Backpack:FindFirstChild('Handle', true).Parent;
+                local weapon = LocalPlayer.Backpack:FindFirstChild('Weapon') or LocalPlayer.Character:FindFirstChild('Weapon');
+
+                local tool = weapon; -- not library.flags.useWeaponForKnockedOwnership and handle or
+
+                if (not humanoid) then return end;
+
+                local bone = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild('Head') and LocalPlayer.Character.Head:WaitForChild('Bone', 5);
+                while bone and bone.Parent do
+                    if (not library.flags.knockedownership) then task.wait(); continue; end;
+
+                    tool.Parent = LocalPlayer.Character;
+                    task.wait(tool == weapon and 0.15 or 0.05);
+                    tool.Parent = LocalPlayer.Backpack;
+                    task.wait(tool == weapon and 0.15 or 0.05);
+                end;
+
+                task.wait(0.1);
+
+                if (library.flags.knockedownership) then
+                    if (weapon.Parent ~= LocalPlayer.Character) then
+                        weapon.Parent = LocalPlayer.Character;
+                    end;
+
+                    handle.Parent = LocalPlayer.Backpack;
+                end;
+            end;
+
+
+            if (effect.Class == 'Dodge') then
+                task.wait(3);
+                canDodge = true;
+            end;
+
+            if (deepwokensettings.nostun and table.find(stunEffects, effect.Class)) then
+                task.defer(function()
+                    effect:Remove(true);
+                end);
+            end;
+
+            if (deepwokensettings.nojumpcooldown and effect.Class == "OverrideJumpPower") then
+                task.defer(function()
+                    effect:Remove(true);
+                end);
+            end;
+
+            if (deepwokensettings.noStunLessBlatant and table.find(fastSwingEffects, effect.Class)) then
+                task.defer(function()
+                    effect:Remove(true);
+                end);
+            end;
+        end);
+    end;
+
+    setupNoStun()
+
+
+
+
+
+    local function updateESP(tag, property, options)
+        --print('called')
+        for i,v in next, esp_lib.Objects do 
+            if v['tag'] ~= nil then 
+               -- print('flaggy waggy')
+            end
+            if v['tag'] and tostring(v['tag']) == tag then 
+                --v.Color = options.color
+                --sharedRequires.smartlog('(REMOVE THIS AFTER)','MATCHES TAG DOESNT CHANGE PROPERTY BRO WYD')
+                --warn(v[property])
+                if property == 'destroy' then 
+                    -- couldve returned
+                    v:Remove()
+                else
+                    v[property] = options
+                end
+            end
+            if property == 'streamermode-on' then 
+                if v.Player then 
+                    local chooserandomtexts = {
+                        'pinapple';
+                        'sugarplum';
+                        'azfakeian';
+                        'nig-';
+                    }
+                    v.Name = chooserandomtexts[math.random(1,#chooserandomtexts)]..tostring(math.random(1,999999999))
+                end;
+            elseif property == 'streamermode-off' then 
+                if v.Player then 
+                    v.Name = v.Object.Name-- if nto v.Options.name (== nil)
+                end
+            end;
+        end
+    end
+    local setscriptes = function() end
+    local getKey;
+    local inputClient = game.Players.LocalPlayer.Character:FindFirstChild('CharacterHandler'):WaitForChild('InputClient', math.huge);
+
+    local function returnKeyhandler()
+        setscriptes(inputClient);
+        setthreadidentity(2);
+
+        local keyhandler = require(game:GetService("ReplicatedStorage").Modules.ClientManager.KeyHandler)
+        local stack = getupvalue(getrawmetatable(getupvalue(keyhandler, 8)).__index, 1)[1][1]
+        local GetKey = stack[89]
+        local key = stack[64]
+        getupvalue(GetKey, 2)[0][1][2][4] = "HtttpGet"
+        
+        --GetKey("Dodge", key):FireServer("roll",nil,nil,false) -- example how to use
+        setthreadidentity(7);
+        setscriptes();
+
+
+        getKey = GetKey
+        return key
+    end
+
+    local function safeGetKey(x)
+        return getKey(x,key) -- if r == plum then
+    end
+
+    repeat task.wait(1); returnKeyhandler(); until getKey ~= nil;
+    warn('got key')
+    local key = returnKeyhandler()
+    if not getKey then game.Players.LocalPlayer:Kick('[azfake kick] no key handler') end
+
+    fallRemote = getKey('FallDamage', key);
+    dialogueRemote = getKey('SendDialogue', key);
+    blockRemote = getKey('Block', key);
+    unblockRemote = getKey('Unblock', key);
+    dodgeRemote = getKey('Dodge', key);
+    leftClickRemote = getKey('LeftClick', key);
+    rightClickRemote = getKey('RightClick', key);
+    stopDodgeRemote = getKey('StopDodge', key);
+    dropToolRemote = getKey('DropTool', key);
+    serverSwimRemote = getKey('ServerSwim',key);
+
+    getgenv().remotes = {
+        fallRemote = fallRemote,
+        dialogueRemote = dialogueRemote,
+        leftClickRemote = leftClickRemote,
+        blockRemote = blockRemote,
+        dodgeRemote = dodgeRemote,
+        rightClickRemote = rightClickRemote,
+        stopDodgeRemote = stopDodgeRemote,
+        unblockRemote = unblockRemote,
+        dropToolRemote = dropToolRemote,
+        serverSwimRemote = serverSwimRemote
+    };
+
+
+    local function roll()
+        if deepwokensettings.blatantroll == false then 
+            game.VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Q, false, game);
+            game.VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Q, false, game);
+        else
+            dodgeRemote:FireServer('roll', nil, nil, false);
+	
+            local humanoid = azfake:returndata().humanoid;
+            if (not humanoid) then return end;
+
+            local cancelRight = game.ReplicatedStorage.Assets.Anims.Movement.Roll.CancelRight
+            local track = humanoid:LoadAnimation(cancelRight);
+            track:Play();
+        end;   
+    end;
+
+
+    
+    local killBricks = {};
+    local killBricksObjects = {};
+
+    local killBricksNames = {'KillPlane', 'ChasmBrick', 'ThronePart', 'KillBrick', 'SuperWall'};
+
+
+    local Whitelist = sector:AddDropdown("AutoParry Whitelist", deepwokensettings.whitelist, "All", false, function(dropdownv)
+        deepwokensettings.whitelistmode = dropdownv;
+    end)
+    for i,v in pairs(game:GetService('Players'):GetChildren()) do 
+        if v:IsA('Player') then 
+            table.insert(deepwokensettings.whitelist,v.Name)
+            Whitelist:Add(v.Name)
+        end
+    end
+    game.Players.PlayerAdded:Connect(function(player)
+        table.insert(deepwokensettings.whitelist,player.Name)
+        Whitelist:Add(player.Name)
+    end)
+    sharedRequires.__task(function()
+        print()
+    end);
+    game.Players.PlayerRemoving:Connect(function(player)
+        for i,v in next, deepwokensettings.whitelist do 
+            if v == player.Name then table.remove(deepwokensettings.whitelist,i); end;
+        end
+        Whitelist:Remove(player.Name);
+    end)
+    sector:AddToggle("No Fall Damage", false, function(e)
+        deepwokensettings['nofalldamage'] = e;
+    end)
+    sector:AddToggle("Knocked Ownership", false, function(e)
+        deepwokensettings['knockedownership'] = e;
+    end)
+    sector:AddToggle("No Jump Cooldown", false, function(e)
+        deepwokensettings['nojumpcooldown'] = e;
+    end)
+    sector:AddToggle("No stun", false, function(e)
+        deepwokensettings['nostun'] = e;
+    end)
+    sector:AddToggle("Infinite Jump", false, function(e)
+        deepwokensettings['infinitejump'] = e;
+        repeat
+            local rootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild('HumanoidRootPart');
+            if(rootPart and game.UserInputService:IsKeyDown(Enum.KeyCode.Space)) then
+                rootPart.Velocity = Vector3.new(rootPart.Velocity.X, deepwokensettings.infiniteJumpHeight, rootPart.Velocity.Z);
+            end;
+            task.wait(0.1);
+        until not deepwokensettings.infinitejump;
+    end)
+    sector:AddSlider("Infinite Jump Height", 0, 0, 250, 1, function(State)
+        deepwokensettings['infiniteJumpHeight'] = State
+    end)
+    sector:AddToggle("Anti Acid", false, function(e)
+        deepwokensettings['antiacid'] = e;
+    end)
+    -- sector:AddToggle("No Kill Bricks", false, function(e)
+    --     deepwokensettings['nokillbricks'] = e;
+    -- end)
+    sector:AddToggle("Auto Void Mobs", false, function(e)
+        deepwokensettings['autovoidmobs'] = e;
+    end)
+    sector:AddToggle("Auto Parry", false, function(e)
+        deepwokensettings['autoparry'] = e;
+    end)
+    sector:AddSlider("Auto Parry Distance", 0, 0, 250, 1, function(State)
+        deepwokensettings['autoparrydistance'] = State
+    end)
+    sector:AddToggle("Blatant Roll", false, function(e)
+        deepwokensettings['blatantroll'] = e;
+    end)
+    sector:AddToggle("Roll Cancel", false, function(e)
+        deepwokensettings['rollcancel'] = e;
+    end)
+    sector:AddToggle("Custom Auto Parry Wait", false, function(e)
+        deepwokensettings['usecustomwaitdelay'] = e;
+    end)
+    sector:AddSlider("Custom Wait Time", 0, 0, 250, 1, function(State)
+        deepwokensettings['customwaitdelay'] = State
+    end)
+
+    sharedRequires['CreateFlySystem'](sector,deepwokensettings)
+    sharedRequires['CreateWalkSpeedSystem'](sector,deepwokensettings)
+    sharedRequires['CreateNoclip'](sector,deepwokensettings)
+    rightsect:AddButton('Serverhop',function()
+        Notify('','Serverhopping... ',1)
+        functions.serverHop(true)
+    end)
+    espsector:AddToggle('Use Names', false, function(xstate)
+        deepwokensettings.espnames = xstate;
+        esp_lib.Names = xstate
+    end)
+    espsector:AddToggle('Use Boxes', false, function(xstate)
+        deepwokensettings.boxesp = xstate;
+        esp_lib.Boxes = xstate
+    end)
+    espsector:AddToggle('Use Tracers', false, function(xstate)
+        deepwokensettings.tracers = xstate;
+        esp_lib.Tracers = xstate
+    end)
+    espsector:AddToggle('Player Esp', false, function(xstate)
+        deepwokensettings.playeresp = xstate;
+        esp_lib.Players = xstate
+    end)
+    espsector:AddToggle('Mob Esp', false, function(xstate)
+        deepwokensettings.mobesp = xstate;
+        esp_lib.mobesp = xstate;
+        updateESP('mobesp', 'Visible', xstate)
+    end)
+    espsector:AddToggle('Ingredient Esp', false, function(xstate)
+        deepwokensettings.ingredientesp = xstate;
+        esp_lib.IngredientEsp = xstate
+        if xstate == true then 
+            local ingredientesp = esp_lib:AddObjectListener(game:GetService("Workspace").Ingredients, {
+                SelfName = true;
+                TableReceiveColor = deepwokensettings;
+                Color = function()
+                    return deepwokensettings.ingredientespcolor; --Color3.fromRGB(255,255,255); --Color3.fromRGB(0,70,70);
+                end;
+                IsEnabled = 'IngredientEsp';
+                --PrimaryPart = 'HumanoidRootPart';
+                flag = 'ingredient';
+            }) 
+        else
+            updateEsp('ingredient','destroy')
+        end
+    end)
+    espsector:AddColorpicker('Ingredient Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        deepwokensettings['ingredientespcolor'] = ztx
+        updateESP('ingredient', 'Color', ztx)
+    end)
+
+    espsector:AddToggle('Artifact Esp', false, function(xstate)
+        deepwokensettings.artifactesp = xstate;
+        esp_lib.artifactesp = xstate
+    end)
+    --AddListen
+    --["Gathered Wheat"]
+
+    --[[
+
+    -- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
+    local prt = workspace.Live.ExtinctPurchase.CharacterHandler.Requests;
+    local dirname = 'FdhjclofbfOmkj';
+
+    for i, v in next, prt:GetChildren() do
+        if v.Name == dirname then print(i) end
+    end
+
+
+    ]]
+
+
+
+    -- Namecall
+
+    local metahook;
+    metahook = hookmetamethod(game,'__namecall',function(self,...)
+        local args = {...}
+        local call_type = getnamecallmethod();
+        if self == remotes.fallRemote and deepwokensettings.nofalldamage == true then 
+            return
+        elseif self.Name == 'AcidCheck' and deepwokensettings.antiacid == true then 
+            return
+        end
+        return metahook(self,...)
+    end)
+
+
+    local function blockAttack()
+        local blockrem = game.Players.LocalPlayer.Character.CharacterHandler.Requests:GetChildren()[2]
+        blockrem:FireServer(nil)
+    end
+    local function unblockAttack()
+        local blockrem = game.Players.LocalPlayer.Character.CharacterHandler.Requests:GetChildren()[3]
+        blockrem:FireServer(nil)
+    end
+
+    local function parryfunc()
+        task.spawn(function()
+            blockAttack()
+            task.wait()
+            unblockAttack()
+        end)
+    end
+    local function parryAttack(timings,rootPart,animationTrack,maxRange,useAnimSpeed)
+        local convertedWait = 0;
+        local waited = 0;
+        local offset = 0;
+
+        _G.canAttack = false;
+        for i,timing in next, timings do
+            convertedWait = calculate_taskwait(timing/(useAnimSpeed and animationTrack.Speed or 1));
+            waited = 0; --parry(convertedWait-offset,rootPart,animationTrack,maxRange,i);
+            --offset = waited-convertedWait;
+            task.wait(timing)
+            parryfunc()
+        end
+
+        _G.canAttack = true;
+    end
+    local function dodgeAttack(cancel) 
+
+    end
+    local function detect(v,dect)
+        local x = false
+        if v:FindFirstChild('Humanoid') then 
+            for i,anim in pairs(v.Humanoid:GetPlayingAnimationTracks()) do 
+                if anim.Animation.AnimationId == dect and animx.Animation.AnimationId == dect then
+                    -- rconsoleprint('\ndetected '..anim.Animation.AnimationId)
+                    x =  true
+                    break
+                end
+            end
+        end
+        return x
+    end
+
+    local function getswingspeed(mob)
+        local swingspeed = 1;
+        local myRootPart = game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
+        local function checkRange(range, part)
+			if (not myRootPart or not part) then
+				return false;
+			end;
+	
+			range += deepwokensettings['autoparrydistance'];
+	
+			if (typeof(part) == 'Vector3') then
+				part = {Position = part}; -- Vector3.new() = {Position = Vector3.new()} -- make x the subject
+			end;
+	
+			return (myRootPart.Position - part.Position).Magnitude <= range;
+		end;
+    end
+    local function calculateSwing(mob)
+        local timing = 1;
+        if mob:FindFirstChild('RightHand') then 
+            if mob.RightHand:FindFirstChild('HandWeapon') then 
+                if mob.RightHand.HandWeapon.Stats.SwingSpeed then 
+                    timing = mob.RightHand.HandWeapon.Stats.SwingSpeed.Value
+                end
+            end
+        else
+            print('idk wtf went on buddy')
+        end
+        return timing
+    end
+    local function _taskwait(n)
+        if deepwokensettings.usecustomwaitdelay then -- library.flags.useCustomDelay then
+            n+=deepwokensettings.customwaitdelay/1000;
+        else
+            local playerPing = Stats.PerformanceStats.Ping:GetValue()/1000;
+            n -= (playerPing*(deepwokensettings.customwaitdelay/100));
+        end
+
+        return task.wait(n);
+    end;
+    local function makeDelayBlockWithRange(range, time)
+        return {
+            waitTime = time,
+            maxRange = range
+        };
+    end;
+
+    local parryAnimTables = {}
+
+    -- Timings: 
+    parryAnimTables['9236066780'] = function(_, mob) -- Shard Bow
+        local distance = (mob.HumanoidRootPart.Position - myRootPart.Position).Magnitude;
+        if (distance > 200) then return end;
+
+        _taskwait(0.5);
+
+        if (distance > 15) then
+            for _, v in next, workspace.Thrown:GetChildren() do
+                if (v.Name ~= 'Clip') then continue; end
+                if not IsA(v,'BasePart') then continue; end
+                task.spawn(function()
+                    repeat
+                        task.wait();
+                    until not v.Parent or checkRange(15,v);
+
+                    if not v.Parent then return; end
+                    parryfunc()
+                end)
+            end;
+        else
+            blockAttack();
+            unblockAttack();
+        end;
+    end;
+
+    -- Physical Mantras
+
+    parryAnimTables['8066909599'] = 0.47; -- Revenge
+    parryAnimTables['7608490737'] = 0.6; -- HeavenlyWind (Need to be checked)
+    parryAnimTables['12706574441'] = 0.45; -- Prominence Draw
+    parryAnimTables['6510127521'] = 0.6; -- Prominence Draw 2nd part
+
+    parryAnimTables['8085349676'] = 0.37; -- Strong Left
+    parryAnimTables['8198492537'] = 0.3; --Exhaustion Strike
+
+    parryAnimTables['8375086403'] = makeDelayBlockWithRange(40, 0.24); -- Masters Flourish
+    parryAnimTables['8379406836'] = makeDelayBlockWithRange(35,0.4); --Rapid Slashes (timing is a big wrong)
+
+    parryAnimTables['8150828674'] = function(_, mob) -- Rapid Punches
+        local mobRoot = mob:FindFirstChild('HumanoidRootPart');
+        if (not mobRoot and not checkRange(100, mobRoot)) then return end;
+        _taskwait(0.4);
+
+        if (checkRange(10, mobRoot)) then
+            blockAttack();
+            unblockAttack();
+            return;
+        end;
+
+        local didAt, lastParryAt = tick(), 0;
+
+        repeat
+            RunService.Stepped:Wait();
+
+            if (checkRange(20, mobRoot) and tick() - lastParryAt > 0.2) then
+                lastParryAt = tick();
+                parryfunc()
+            end;
+        until tick() - didAt > 1.1;
+        if (tick() - didAt > 1.1) then return print('timed out') end;
+    end;
+
+    --Flame Mantra
+    parryAnimTables['8378263543'] = 0.3; --Fire Eruption
+    parryAnimTables['5953326460'] = 0.35; --Rising Flame
+
+    parryAnimTables['8199600822'] = function(_, mob) --Ash Slam
+        task.wait(.3)
+        parryfunc()
+        --parryAttack({0.3,0.3},mob.PrimaryPart,_,30)
+    end
+
+    parryAnimTables['5963021481'] =  function(_, mob) --Meteor Slam (Rising Flame Pt2)
+        if (not checkRange(10, mob.PrimaryPart)) then return end;
+
+        _taskwait(0.3);
+        parryfunc()
+    end
+
+    parryAnimTables['7693947084'] = makeDelayBlockWithRange(10,0.3); --Flame Grab Close
+    parryAnimTables['5750353585'] = function(animationTrack, mob) -- Flame Grab Further
+        repeat
+            task.wait();
+        until not animationTrack.IsPlaying or checkRange(15, mob.PrimaryPart);
+        parryfunc()
+    end;
+
+    parryAnimTables['7608480718'] = function(_, mob) --Fire Forge
+        if (not checkRange(30, mob.PrimaryPart) or not myRootPart) then return end;
+        local mobRoot = mob:FindFirstChild('HumanoidRootPart');
+        if (not mobRoot) then return end;
+
+        local distance = (myRootPart.Position - mobRoot.Position).Magnitude;
+        _taskwait(0.05*distance-0.05);
+
+        parryfunc()
+    end;
+
+    parryAnimTables['7542502881'] = function(_, mob) --Flame Leap
+        if (not checkRange(15, mob.PrimaryPart) or not myRootPart) then return end;
+
+        local mobRoot = mob:FindFirstChild('HumanoidRootPart');
+        if (not mobRoot) then return end;
+        _taskwait(0.3);
+        roll();
+    end;
+
+    parryAnimTables['5769343416'] = function(_, mob) --Burning Servants
+        if (not checkRange(10, mob.PrimaryPart) or not myRootPart) then return end;
+        local originalPos = mob.PrimaryPart.Position;
+        local distance;
+        _taskwait(0.3);
+        task.spawn(function()
+            distance = (originalPos - myRootPart.Position).Magnitude;
+            if distance > 10 then return; end
+
+            blockAttack();
+            unblockAttack();
+        end)
+        _taskwait(1.8);
+        distance = (originalPos - myRootPart.Position).Magnitude;
+        if distance > 10 then return; end
+
+        blockAttack();
+        unblockAttack();
+    end;
+
+    parryAnimTables['7585268054'] = function(_, mob) -- Flame Blind
+        if (not checkRange(30, mob.PrimaryPart)) then return end;
+
+        _taskwait(0.7);
+        roll();
+    end;
+
+    --Thunder Mantra
+    parryAnimTables['7599168630'] = 0.2; --Lightning Blade
+    parryAnimTables['8183996606'] = makeDelayBlockWithRange(35, 0.4); -- Grand Javelin Small Range
+    parryAnimTables['7617742471'] = makeDelayBlockWithRange(60,0.2); --Lightning Beam
+
+    parryAnimTables['5750296638'] = function(_, mob) -- Jolt Grab
+        _taskwait(0.3);
+        if (not checkRange(35, mob.PrimaryPart)) then return end;
+
+        table.foreach(mob:GetChildren(), warn);
+
+        if (not mob:FindFirstChild('ShadowHand')) then
+            print('we use other');
+            _taskwait(0.2);
+        end;
+
+        blockAttack();
+        unblockAttack();
+    end;
+
+    parryAnimTables['5968282214'] = function(_, mob) -- Lightning Assault (The tp move)
+        local target = mob:FindFirstChild('Target');
+        if (target or not checkRange(85, mob.PrimaryPart)) then return end;
+
+        _taskwait(0.4);
+        blockAttack();
+        unblockAttack();
+    end;
+
+    parryAnimTables['7861127585'] = 0.45; -- Thunder Kick
+    parryAnimTables['12333753799'] = 0.3; -- Thunder Rising windup
+
+    parryAnimTables['12333759044'] = function(_, mob) -- Thunder Rising Cast
+        _taskwait(0.3);
+
+        repeat
+            task.wait();
+        until checkRange(30, mob.PrimaryPart) or not _.IsPlaying;
+        if (not _.IsPlaying and not checkRange(30, mob.PrimaryPart)) then return print('stopped'); end;
+        print('he close');
+
+        blockAttack();
+        unblockAttack();
+    end;
+
+    parryAnimTables['5968796999'] = function(_, mob) -- Lightning Stream
+        local distance = (mob.HumanoidRootPart.Position - myRootPart.Position).Magnitude;
+        if (distance > 200) then return end;
+
+        _taskwait(0.4);
+        local ranAt = tick();
+
+        if (distance > 15) then
+            repeat
+                for _, v in next, workspace.Thrown:GetChildren() do
+                    if (v.Name == 'STREAMPART' and IsA(v, 'BasePart')) then
+                        local rocket = v:FindFirstChild('RocketPropulsion');
+                        local rocketTarget = rocket and rocket.Target;
+                        if (rocketTarget ~= myRootPart) then continue end;
+                        if(not checkRangeFromPing(v, 20, 30)) then continue end;
+
+                        blockAttack();
+                        unblockAttack();
+                        break;
+                    end;
+                end;
+
+                task.wait();
+            until tick() - ranAt > 3.5;
+        else
+            blockAttack();
+            unblockAttack();
+        end;
+    end;
+
+    -- Silent Heart
+    parryAnimTables['12564120372'] = 0.3; -- Silent heart slide m1
+
+    -- Dawn Walker
+    parryAnimTables['10622235550'] = function(anim,mob) -- Blinding Dawn
+        _taskwait(0.5);
+        local start = tick();
+        repeat
+            if checkRange(37,mob.PrimaryPart) then
+                blockAttack();
+                unblockAttack();
+            end
+            task.wait(0.1);
+        until not anim.IsPlaying or tick()-start >= 2;
+        print("FINISHED")
+    end
+
+    -- Link Strider
+    parryAnimTables['10104294736'] = 0.3; -- Symbiotic Link
+
+    -- Arc Warder
+    parryAnimTables['9481400792'] = makeDelayBlockWithRange(20,0.3); -- Arc Beam
+    parryAnimTables['9536688585'] = makeDelayBlockWithRange(30,0.4); -- Arc Wave
+
+    -- Star Kindered (No element)
+    parryAnimTables['9941118927'] = 0.3; -- Celestial Assault
+
+    parryAnimTables['9461513613'] = function(anim,mob) -- Ascension
+        repeat task.wait() until checkRange(25,mob.HumanoidRootPart) or not anim.IsPlaying
+        if not anim.IsPlaying then return; end
+
+        roll();
+    end;
+
+    -- Star Kindered Fire
+    parryAnimTables['9717753391'] = function(anim,mob) -- Celestial Fireblade
+        _taskwait(1);
+        local start = tick();
+        repeat
+            if (checkRange(50, mob.PrimaryPart)) then
+                blockAttack();
+                unblockAttack();
+            end;
+            task.wait(0.1);
+        until not anim.IsPlaying or tick() - start >= 2;
+    end
+
+    parryAnimTables['9919986614'] = function(anim,mob) -- Sinister Halo
+        _taskwait(0.4);
+
+        if not checkRange(25,mob.PrimaryPart) or not anim.IsPlaying then return; end
+        blockAttack();
+        unblockAttack();
+        _taskwait(0.6);
+        if not checkRange(25,mob.PrimaryPart) then return; end;
+
+        for i = 1,5 do
+            blockAttack();
+            unblockAttack();
+        end;
+    end;
+
+    -- Contractor
+    parryAnimTables['9726608174'] = makeDelayBlockWithRange(50, 0.5); -- Contractor Judgement
+    parryAnimTables['11862841821'] = 0.3; -- Contractor Equalizer
+    parryAnimTables['11328614766'] = function(_, mob) -- Contractor Pull
+        _taskwait(0.4);
+        repeat task.wait(); until checkRange(20, mob.PrimaryPart) or not _.IsPlaying;
+        if (not _.IsPlaying) then return print('timed out'); end;
+        blockAttack();
+        unblockAttack();
+    end;
+
+    --Monster Mantra
+    parryAnimTables['11219902982'] = function(anim,mob) -- Dread Breath
+        _taskwait(0.5);
+        local start = tick();
+        repeat
+            if checkRange(40,mob.PrimaryPart) then
+                blockAttack();
+                unblockAttack();
+            end
+            task.wait(0.1);
+        until not anim.IsPlaying or tick()-start >= 2;
+    end
+
+    --Ice Mantra
+    parryAnimTables['7598898608'] = 0.45; --Ice Smash
+    parryAnimTables['6396523003'] = 0.3; -- Crystal Knee
+    parryAnimTables['7616100008'] = function(animTrack, mob) -- Ice Beam
+        if (not checkRange(85, mob.PrimaryPart)) then return end;
+
+        local t = 0.00142*(mob.PrimaryPart.Position - myRootPart.Position).Magnitude + 0.58;
+        task.wait(t)
+        blockAttack()
+        task.wait(.1)
+        unblockAttack()
+        --parryAttack({t}, mob.PrimaryPart, animTrack, 85);
+    end;
+
+    parryAnimTables['5786525661'] = function(_,mob) -- Warden Blades
+        local elapsedAt = tick();
+        _taskwait(0.45);
+
+        if (checkRange(25, mob.PrimaryPart)) then
+            blockAttack();
+            unblockAttack();
+        end;
+
+        repeat
+            if (not checkRange(25, mob.PrimaryPart)) then task.wait() continue end;
+            _taskwait(0.8);
+            task.spawn(function()
+                blockAttack();
+                unblockAttack();
+            end);
+        until tick() - elapsedAt > 3;
+    end;
+
+    parryAnimTables['8018953639'] = function() -- Ice Chains
+        _taskwait(1.1);
+        local chainPortalIce = workspace.Thrown:FindFirstChild('ChainPortalIce');
+        if (not checkRange(20, chainPortalIce)) then return end;
+        roll();
+    end;
+
+	parryAnimTables['8265980703'] = function(_, mob) --Ice Lance
+        if (not checkRange(50, mob.PrimaryPart) or not myRootPart) then return end;
+        local mobRoot = mob:FindFirstChild('HumanoidRootPart');
+        if (not mobRoot) then return end;
+
+        local distance = (myRootPart.Position - mobRoot.Position).Magnitude;
+
+        if (distance < 15) then
+            print('melee');
+            _taskwait(0.3);
+        elseif (distance < 20) then
+            print('far melee');
+            _taskwait(0.8);
+        elseif (distance < 30) then
+            print('far');
+            _taskwait(0.9);
+        elseif (distance < 40) then
+            print('rly far');
+            _taskwait(1);
+        end;
+
+        blockAttack();
+        unblockAttack();
+	end;
+    -- Wind Mantra
+    parryAnimTables['7618754583'] = makeDelayBlockWithRange(40, 0.3); -- Gale Punch/Flame Palm
+    parryAnimTables['6470684331'] = makeDelayBlockWithRange(40, 0.45); -- Astral Wind
+    parryAnimTables['8310877920'] = makeDelayBlockWithRange(20, 0.4) -- Wind Gun
+    parryAnimTables['5828315760'] = makeDelayBlockWithRange(50, 0.3); -- Air Force
+
+    parryAnimTables['6466993564'] = 0.38; -- Wind Carve
+    parryAnimTables['9629695751'] = 0.35; --Champions Whirl Throw
+    parryAnimTables['10357806593'] = makeDelayBlockWithRange(15, 0.3); -- Tornado Kick
+
+    parryAnimTables['6030770341'] = function(_, mob) --Heavenly Wind
+        _taskwait(0.2);
+        if (not checkRange(50, mob.PrimaryPart)) then return end;
+        blockAttack();
+        unblockAttack();
+    end;
+
+    parryAnimTables['7794260173'] = function(_, mob) -- Wind Rising
+        if (not checkRange(15, mob.PrimaryPart)) then return end;
+        _taskwait(0.4);
+        blockAttack();
+        unblockAttack();
+    end;
+
+    parryAnimTables['9400896040'] = function(_, mob) -- Shoulder Bash
+        local startedAt = tick();
+        _taskwait(0.3);
+
+        repeat
+            task.wait();
+        until tick() - startedAt >= 5 or checkRange(20, mob.PrimaryPart);
+        blockAttack();
+        unblockAttack();
+    end;
+    
+    -- entity that comes into range of our autoparry would loop through all animations
+    -- checking if its paryyable
+
+    --parryAnimTables['6017393708'] = makeDelayBlockWithRange(15, 0.3); -- Gale Lunge
+    parryAnimTables['6017418456'] = function(_, mob) -- Gale Lunge Launch Anim
+        local mobRoot = mob:FindFirstChild('HumanoidRootPart');
+        task.spawn(function()
+            repeat task.wait() until checkRange(6, mobRoot)
+            parryfunc()
+        end)
+        -- if (not mobRoot or not checkRange(35, mobRoot)) then return end;
+        -- local distance = (mobRoot.Position - myRootPart.Position).Magnitude;
+        -- _taskwait(0.01*distance + 0.25);
+
+        -- blockAttack();
+        -- unblockAttack();
+    end;
+
+    parryAnimTables['8375571405'] = function(animationTrack, mob) -- Pressure Blast
+        if (not checkRange(40, mob.PrimaryPart)) then return end;
+        _taskwait(0.5);
+        blockAttack();
+        repeat
+            task.wait();
+        until not animationTrack.IsPlaying or not checkRange(40, mob.PrimaryPart);
+        unblockAttack();
+    end;
+
+    -- Uppercut
+    parryAnimTables['11887898774'] = 0.3;
+    parryAnimTables['11887938902'] = 0.3;
+    parryAnimTables['11887876811'] = 0.3;
+    parryAnimTables['11887887621'] = 0.3;
+    parryAnimTables['11887892548'] = 0.3;
+    parryAnimTables['11887901212'] = 0.3;
+    parryAnimTables['11887874227'] = 0.3;
+
+    -- Scythe
+    parryAnimTables['11493920418'] = 0.3; -- Slash 1
+    parryAnimTables['11493923277'] = 0.3; -- Slash 2
+    parryAnimTables['9597289518'] = 0.3; -- Slash 3
+    parryAnimTables['11493924588'] = 0.4; -- Running Attack
+
+	-- Railblade
+    parryAnimTables['9832721746'] = 0.4; -- Slash1
+    parryAnimTables['9832724876'] = 0.4; -- Slash2
+    parryAnimTables['9832727905'] = 0.4; -- Slash3
+    parryAnimTables['9597289518'] = 0.3; -- Slash4
+    parryAnimTables['9893133020'] = 0.4; -- Air Critical
+
+    -- Dagger
+    do 
+        local function getSpeed(x)
+            return -0.5*x + 1.275;
+        end;
+    
+        local function f(animTrack, mob)
+            local swingSpeed = calculateSwing(mob) or 1;
+    
+            --parryAttack({getSpeed(swingSpeed)},mob.PrimaryPart,animTrack,15);
+            task.wait(swingSpeed-0.5)
+            parryfunc()
+        end;
+    
+        parryAnimTables['7627854272'] = f; -- Slash1
+        parryAnimTables['7627889074'] = f; -- Slash2
+        parryAnimTables['5950080662'] = 0.3; -- Slash4 (Kick)
+        parryAnimTables['5063313656'] = 0.39; -- Running Attack
+        parryAnimTables['7576614609'] = 0.39; -- Aerial Stab
+    end;
+
+
+	
+    --Spear Timings
+    do 
+        local function getSpeed(x)
+            return -1*x+2.07;
+        end;
+    
+        local function f(animTrack, mob)
+            local swingSpeed = calculateSwing(mob) or 1;
+    
+            --parryAttack({getSpeed(swingSpeed)},mob.PrimaryPart,animTrack,15);
+            task.wait(swingSpeed-0.3)
+            parryfunc()
+        end;
+    
+        parryAnimTables['7626771915'] = 0.4; -- One Hand Slash 3
+        parryAnimTables['7627049402'] = 0.4; -- One Hand Slash 4
+    
+        parryAnimTables['7627558238'] = 0.4; -- Two Hand Slash 2
+        parryAnimTables['7627372304'] = 0.4; -- Two Hand Slash 3
+    end
+    parryAnimTables['5827250000'] = 0.35; -- Running Attack One Handed
+    parryAnimTables['5827423063'] = 0.35; -- Slash1
+
+    parryAnimTables['7576748728'] = 0.35; -- Aerial Stab
+
+    do -- Great Axe
+        local function getSpeed(x)
+            return -1*x+2.05;
+        end;
+
+        local function f(animTrack, mob)
+
+            local ignoreHeavyHand = false;
+            for i,v in next, mob.Humanoid:GetPlayingAnimationTracks() do
+                if v.Animation.AnimationId ~= 'rbxassetid://5971953898' or not v.IsPlaying then continue; end
+
+                ignoreHeavyHand = true;
+            end
+            --local swingSpeed = getSwingSpeed(mob,ignoreHeavyHand) or 1;
+            --parryAttack({getSpeed(swingSpeed)},mob.PrimaryPart,animTrack,15);
+            local animspeed = calculateSwing(mob)
+            warn('swing speed '..tostring(animspeed))
+            task.wait(animspeed - 0.4)
+            parryfunc()
+        end;
+
+        parryAnimTables['5064195992'] = f; -- Slash1
+        parryAnimTables['5067105317'] = f; -- Slash2
+        parryAnimTables['5067090007'] = f; -- Slash3 Also running attack
+        parryAnimTables['9484850093'] = 0.3; -- Slash4 (Kick)
+
+        parryAnimTables['7388133473'] = 0.65; -- Critical
+        parryAnimTables['10768748584'] = 0.6; -- Enforcer Axe Critical
+
+        parryAnimTables['11363599835'] = function(_, mob) -- Heavy Aerial
+            _taskwait(0.4);
+
+            repeat
+                task.wait();
+            until checkRange(20, mob.PrimaryPart) or not _.IsPlaying;
+            if (not _.IsPlaying) then return end;
+
+            parryfunc()
+        end;
+    end;
+
+    parryAnimTables['5805138186'] = 0.38;
+    parryAnimTables['4880830128'] = 0.35;
+    parryAnimTables['4880833465'] = 0.35;
+
+
+    -- Crazy Slot
+    parryAnimTables['7004327185'] = 0.3; --Crazy Slot Sword Mantra
+    parryAnimTables['7003448248'] = 0.6; --Crazy Slot Greatsword Mantra
+    parryAnimTables['7007372121'] = 1.8; --Crazy Slot Greataxe Mantra
+
+    parryAnimTables['7007974914'] = function(_,mob)--Crazy Slot Gun Mantra
+        parryAttack({0.2,0.4,0.4},mob.PrimaryPart,_,20)
+    end;
+    parryAnimTables['7005236296'] = makeDelayBlockWithRange(35,0.5); --Crazy Slot Dagger Mantra
+
+    do -- Greatsword
+        local function getSpeed(x)
+            return -1*x+2.05;
+        end;
+
+        local function f(animTrack, mob)
+            local swingSpeed = calculateSwing(mob) or 1;
+    
+            --parryAttack({getSpeed(swingSpeed)},mob.PrimaryPart,animTrack,15);
+            task.wait(swingSpeed)
+            parryfunc()
+        end;
+
+        parryAnimTables['12071495751'] = makeDelayBlockWithRange(10,0.5); --Petra Crit Start
+
+        parryAnimTables['12071557016'] = function(_, mob) -- Petra Critical
+            repeat
+                task.wait();
+            until not _.IsPlaying or checkRange(20, mob.PrimaryPart);
+            if (not _.IsPlaying) then return print('timed out not playing') end;
+            blockAttack();
+            unblockAttack();
+        end;
+
+        parryAnimTables['12071942369'] = 0.6; -- Petra Critical (Pt2)
+
+        parryAnimTables['6675698010'] = f;
+        parryAnimTables['6675703249'] = f;
+
+        parryAnimTables['10258479464'] = 0.65; -- DarkSteel Critical
+        parryAnimTables['10053070573'] = function(animTrack, mob) --Crescent Cleaver (Timing is a little bit better but still inaccurate due to range)
+            local root = mob:FindFirstChild('HumanoidRootPart');
+            if (not root) then return end;
+
+            local distance = (myRootPart.Position - root.Position).Magnitude;
+            local t = math.max(0.7, 0.03*distance + 0.5);
+
+            _taskwait(t);
+            if (not checkRange(20, root)) then return end;
+
+            blockAttack();
+            unblockAttack();
+        end;
+
+        -- Firstlight
+
+        parryAnimTables['13241958217'] = f;
+        parryAnimTables['13242083070'] = f;
+    end;
+
+    -- Sword
+    do
+        local function getSpeed(x)
+            return -1*x+2.1;
+        end;
+
+        local function f(animTrack, mob)
+            local swingSpeed = calculateSwing(mob) or 1;
+    
+            --parryAttack({getSpeed(swingSpeed)},mob.PrimaryPart,animTrack,15);
+            task.wait(swingSpeed - 0.3)
+            parryfunc()
+        end;
+
+        parryAnimTables['7600450739'] = f; -- Slash1
+        parryAnimTables['7600485223'] = f; -- Slash2
+        parryAnimTables['7600160919'] = f; -- Slash3
+        parryAnimTables['7600224169'] = f; -- Slash4
+    end;
+
+    parryAnimTables['8095864854'] = 0.55; -- Special Critical (Serpent's Edge)
+
+    -- Curve Blade Of Winds
+    parryAnimTables['12106091136'] = 0.3; -- Slash1
+    parryAnimTables['12106093579'] = 0.3; -- Slash2
+    parryAnimTables['12106095892'] = 0.3; -- Slash3
+
+    -- running attack (we use db)
+    parryAnimTables['4699358112'] = 0.36;
+
+    parryAnimTables['7827886914'] = 0.47; -- Katana critical
+    parryAnimTables['7351158603'] = 0.35; -- Spear critical
+    parryAnimTables['7318254065'] = 0.67; -- Sword critical
+    parryAnimTables['7350770431'] = 0.45; -- Dagger critical
+    parryAnimTables['7367818208'] = 0.73; -- Hammer critical
+    parryAnimTables['12921226261'] = 0.5; -- Sacred Hammer Crit
+    parryAnimTables['9209255758'] = 0.3; -- Whailing Knife Critical
+
+    -- Karate (Way of Navae)
+    do
+        local function f(animTrack, mob)
+            --parryAttack({0.225}, mob.PrimaryPart, animTrack, 15, true);
+            task.wait(0.225)
+            parryfunc()
+        end;
+
+        parryAnimTables['6063188218'] = f; -- Slash 1
+        parryAnimTables['7616407967'] = f; -- Slash 2
+        parryAnimTables['6063195211'] = f; -- Slash 3
+    end;
+
+    -- Jus Karita
+    parryAnimTables['8278926990'] = 0.25; -- Slash1
+    parryAnimTables['8278929677'] = 0.25; -- Slash2
+    parryAnimTables['8278931393'] = 0.25; -- Slash3
+    parryAnimTables['9597289518'] = 0.3; -- Slash4 (Kick)
+    parryAnimTables['8278933540'] = 0.25; -- Slash4 (Kick)
+
+    parryAnimTables['7391446645'] = 0.5; -- Kick
+    parryAnimTables['8295145565'] = 0.4; -- Kick Ground?
+    parryAnimTables['8367730650'] = 0.3; -- Running Attack
+    parryAnimTables['8194213529'] = 0.3; -- Aerial Stab
+    parryAnimTables['10168663111'] = function(animationTrack,mob) --Tacet Drop Kick
+        parryAttack({0.3},mob.PrimaryPart,animationTrack,30);
+    end
+
+    -- Legion Kata
+    do
+        local function f(animTrack, mob)
+            --parryAttack({0.2}, mob.PrimaryPart, animTrack, 20, true);
+            task.wait(0.2)
+            parryfunc()
+        end;
+
+        parryAnimTables['8161039359'] = f; -- Slash 1
+        parryAnimTables['8161043368'] = f; -- Slash 2
+        parryAnimTables['8161044711'] = f; -- Slash 3
+        parryAnimTables['8161094751'] = 0.3; -- Slash4 (Kick)
+        parryAnimTables['8169914770'] = 0.25; --This timing is prob wrong prob ius 0.3 but idk for duke
+    end;
+
+    -- Lantern Kata
+    parryAnimTables['11186652658'] = 0.3; -- Slash 1
+    parryAnimTables['11186654931'] = 0.3; -- Slash 2
+    parryAnimTables['11186656574'] = 0.3; -- Slash 3
+    parryAnimTables['9597289518'] = 0.3; -- Slash 4
+
+    -- Mace/Club (we use db)
+    parryAnimTables['5805183957'] = 0.36; -- Slash1
+    parryAnimTables['5805191624'] = 0.41; -- Slash2
+    parryAnimTables['5805194816'] = 0.4; -- Slash3
+    parryAnimTables['7599410106'] = 0.52; -- Club critical
+
+    -- Rapier
+    parryAnimTables['8249175106'] = 0.32; -- Slash
+    parryAnimTables['8249177669'] = 0.32; -- Slash
+    parryAnimTables['8249271040'] = 0.32; -- Critical
+
+    -- Enforcer Blade (we use db)
+    parryAnimTables['6607519294'] = 0.45;
+    parryAnimTables['6607538047'] = 0.49;
+    parryAnimTables['6669352471'] = 0.39;
+
+    -- Widow
+    parryAnimTables['6428519131'] = function(anim, mob) -- Widow Left Swing
+        parryAttack({0.43}, mob.PrimaryPart, anim, 100, true);
+    end;
+
+    parryAnimTables['6428525211'] = function(anim, mob) -- Widow Doublestab
+        parryAttack({0.3}, mob.PrimaryPart, anim, 100);
+    end;
+
+    parryAnimTables['6428514850'] = function(anim, mob) -- Widow RightSwing
+        parryAttack({0.43}, mob.PrimaryPart, anim, 100, true);
+    end;
+
+    parryAnimTables['6428530032'] = function(_, mob) -- Widow Spit
+        if (not checkRange(100, mob.PrimaryPart)) then return end;
+        _taskwait(0.6);
+        roll();
+    end;
+
+    parryAnimTables['6428533082'] = function(_, mob) -- Widow Bite
+        if (not checkRange(100, mob.PrimaryPart)) then return end;
+        _taskwait(0.4);
+        roll();
+    end;
+
+    -- Primadon
+    parryAnimTables['8940731625'] = function(_, mob) --Scream
+        if (not checkRange(100, mob.PrimaryPart)) then return end;
+        _taskwait(0.75);
+        roll();
+    end;
+
+    parryAnimTables['8365199156'] = function(_, mob) -- Mid Swipe (Punch)
+        if (not checkRange(100, mob.PrimaryPart)) then return end
+        _taskwait(0.5/_.Speed);
+
+        blockAttack();
+        task.wait();
+        unblockAttack();
+    end;
+
+    parryAnimTables['9225081967']  = function(_, mob) -- Swipe
+        if (not checkRange(100, mob.PrimaryPart)) then return end
+        _taskwait(0.6 / _.Speed)
+
+        blockAttack();
+        task.wait();
+        unblockAttack();
+    end;
+
+    parryAnimTables['9225086332'] = function(_, mob) -- Grab
+        if (not checkRange(100, mob.PrimaryPart)) then return end
+        _taskwait(0.6 / _.Speed);
+        print('we dodge', _.TimePosition, _.Speed);
+
+        roll(true);
+    end;
+
+    parryAnimTables['6438111139'] = function(_, mob) -- Punt
+        if (not checkRange(100, mob.PrimaryPart)) then return end
+        _taskwait(0.75 / _.Speed);
+        roll();
+    end;
+
+    parryAnimTables['9225098544'] = function(_, mob) --Stomp
+        parryAttack({0.75}, mob.PrimaryPart, _, 100, true);
+    end;
+
+    parryAnimTables['6432260013'] = function(anim, mob) -- Triple Stomp
+        parryAttack({0.8, 0.775, 0.75}, mob.PrimaryPart, anim, 100, true);
+    end;
+
+    -- Avatar (Ethiron)
+    parryAnimTables['11508725111'] = function(_, mob)
+        parryAttack({1.5}, mob.PrimaryPart, _, 400, true);
+    end;
+	
+    local function parry(oppcharacter, animationid, supposedfunc, animation)
+        if deepwokensettings.whitelistmode ~= 'All' and deepwokensettings.whitelistmode ~= 'Mobs' and oppcharacter.Name ~= deepwokensettings.whitelistmode then 
+            print('parry not whitelsited')
+            return
+        end
+        if deepwokensettings.whitelistmode == 'Mobs' and game.Players:FindFirstChild(oppcharacter.Name) then 
+            return print('parry not a mob')
+        end
+        print('parry called')
+        if type(parryAnimTables[animationid]) ~= 'function' then 
+            print('parry number timing')
+            task.wait(parryAnimTables[animationid])
+            parryfunc()
+        elseif type(parryAnimTables[animationid]) == 'table' then 
+            local data = parryAnimTables[animationid]
+            if checkRange(data.maxRange,oppcharacter.PrimaryPart) then 
+                task.wait(data.waitTime)
+                parryfunc()
+            end
+        else
+            print('parry func1')
+            parryAnimTables[animationid](animation, oppcharacter)
+        end
+    end
+
+
+
+    local function attachAnimationPlayed(char,hum)
+        print('attached')
+        hum.AnimationPlayed:Connect(function(anim)
+            --print('animation played')
+            -- parryAnimTables[anim.Animation.AnimationId]:split('')[2]
+            local AnimationMainID = string.split(anim.Animation.AnimationId,'//')[2]
+            if parryAnimTables[AnimationMainID] and deepwokensettings['autoparry'] == true then 
+                print('parry found anim')
+                if char:FindFirstChild('HumanoidRootPart') then 
+                    if parryAnimTables[AnimationMainID] ~= table then
+                        if (char:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character.Position).Magnitude > deepwokensettings.autoparrydistance then 
+                            return
+                        end
+                    end
+                    parry(char,AnimationMainID, parryAnimTables[AnimationMainID], anim)
+                end
+            end
+        end)
+    end
+
+    local function attachMobEsp(char) -- deepwokensettings.mobesp == true and
+        if not game.Players:FindFirstChild(char.Name) then 
+            task.spawn(function()
+                repeat task.wait(); until char:FindFirstChild('HumanoidRootPart');
+                esp_lib:Add(char, {
+                    SelfName = true;
+                    PrimaryPart = char.PrimaryPart;
+                    flag = 'mobesp';
+                    tag = 'mobesp';
+                    IsEnabled = 'mobesp';
+                    entity = true;
+                });
+            end)
+        end;
+    end;
+
+    for i,char in next, workspace.Live:GetChildren() do 
+        if char ~= game.Players.LocalPlayer.Character then 
+            task.spawn(function()
+                -- char:WaitForChild('Humanoid');
+                -- char:WaitForChild('HumanoidRootPart');
+                --print('starting ctn;');
+                if char:FindFirstChildWhichIsA('Humanoid') then 
+                    -- if deepwokensettings.mobesp == true then 
+                    --     esp_lib:Add(char, {
+                    --         SelfName = true;
+                    --         PrimaryPart = char.PrimaryPart;
+                    --         flag = 'mobesp';
+                    --         tag = 'mobesp';
+                    --     })
+                    -- end;
+                    attachMobEsp(char);
+                    attachAnimationPlayed(char,char:FindFirstChildWhichIsA('Humanoid'));
+                else
+                    local ctn; ctn = char.ChildAdded:Connect(function(x)
+                        task.wait(0.1);
+                        if x:IsA('Humanoid') then 
+                            attachAnimationPlayed(char,x);
+                            attachMobEsp(char);
+                            -- if not game.Players:FindFirstChild(char.Name) then 
+                            --     if deepwokensettings.mobesp == true then 
+                            --         esp_lib:Add(char, {
+                            --             SelfName = true;
+                            --             PrimaryPart = char.PrimaryPart;
+                            --             tag = 'mobesp';
+                            --             flag = 'mobesp';
+                            --         })
+                            --     end;
+                            -- end;
+                            ctn:Disconnect();
+                        end
+                    end);
+                end
+            end)
+        end
+    end
+
+    workspace.Live.ChildAdded:Connect(function(char)
+        local canstop = false;
+        pcall(function()
+            if char == game.Players.LocalPlayer.Character then canstop = true; end
+        end)
+        if canstop == true then return end;
+        task.spawn(function()
+          --  char:WaitForChild('Humanoid');
+          --  char:WaitForChild('HumanoidRootPart');
+            --print('starting ctn;');
+            --attachAnimationPlayed(char,char:FindFirstChildWhichIsA('Humanoid'))
+            if char:FindFirstChildWhichIsA('Humanoid') then 
+                -- if deepwokensettings.mobesp == true then 
+                --     esp_lib:Add(char, {
+                --         SelfName = true;
+                --         PrimaryPart = char.PrimaryPart;
+                --         flag = 'mobesp';
+                --         tag = 'mobesp';
+                --     })
+                -- end;
+                attachAnimationPlayed(char,char:FindFirstChildWhichIsA('Humanoid'));
+            else
+                local ctn; ctn = char.ChildAdded:Connect(function(x)
+                    task.wait(0.1);
+                    if x:IsA('Humanoid') then 
+                        attachAnimationPlayed(char,x);
+                        attachMobEsp(char);
+                        -- if not game.Players:FindFirstChild(char.Name) then 
+                        --     if deepwokensettings.mobesp == true then 
+                        --         esp_lib:Add(char, {
+                        --             SelfName = true;
+                        --             PrimaryPart = char.PrimaryPart;
+                        --             flag = 'mobesp';
+                        --             tag = 'mobesp';
+                        --         })
+                        --     end;
+                        -- end;
+                        ctn:Disconnect();
+                    end
+                end);
+            end
+        end)
+    end)
+    for i,v in next, workspace:GetChildren() do 
+        if v.Name == 'PieceofForge' then
+            esp_lib:Add(v, {
+                SelfName = true;
+                IsEnabled = 'artifactesp';
+                flag = 'artifact';
+                tag = 'artifact';
+            });
+        end;
+    end;
+    workspace.ChildAdded:Connect(function(child)
+        if child.Name == 'PieceofForge' then -- or :find('forge')
+            esp_lib:Add(child, {
+                SelfName = true;
+                IsEnabled = 'artifactesp';
+                tag = 'artifact';
+            });
+        end;
+    end);
+    --game.Players.L
+    setsimulationradius(1000)
+    task.spawn(function()
+        while task.wait() do 
+            if deepwokensettings.autovoidmobs == true then 
+                -- for i,v in next, workspace.Live:GetDescendants() do 
+                --     if not v:GetFullName():find(game.Players.LocalPlayer.Character.Name) and not game.Players:FindFirstChild(v.Parent).Name and not game.Players:FindFirstChild(v.Parent.Parent).Name and not game.Players:FindFirstChild(v.Parent.Parent.Parent).Name then 
+                --         -- not our characters belongings;
+                --         if v:IsA('Part') or v:IsA('MeshPart') then 
+                --             -- unionpart
+                --             if isnetworkowner(v) then 
+                --                 print('isNetworkowner, '..v:GetFullName())
+                --                 if v.Parent:FindFirstChildWhichIsA('Humanoid') then 
+                --                     v.Parent:FindFirstChildWhichIsA('Humanoid').Health = 0
+                --                 end
+                --             end
+                --         end;
+                --     end;
+                -- end;
+                for i,v in next, workspace.Live:GetChildren() do 
+                    if not game.Players:FindFirstChild(v.Name) and v.PrimaryPart then
+                        if isnetworkowner(v.PrimaryPart) then -- or isnetworkowner(v.HumanoidRootPart)
+                            print('isNetworkowner, '..v:GetFullName())
+                            if v.Parent:FindFirstChildWhichIsA('Humanoid') then 
+                                v.Parent:FindFirstChildWhichIsA('Humanoid').Health = 0
+                            end
+                        end
+                    end;
+                end;
+            end;   
+        end;    
+    end)
+
+    AddConfigurations()
 else
 
     -- PlayerExperience
