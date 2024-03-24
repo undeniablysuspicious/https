@@ -1,3 +1,4 @@
+getfenv().LPH_NO_VIRTUALIZE = function(f) return f end;
 for k,v in pairs(getgc(true)) do if pcall(function() return rawget(v,"indexInstance") end) and type(rawget(v,"indexInstance")) == "table" and (rawget(v,"indexInstance"))[1] == "kick" then v.tvk = {"kick",function() return game.Workspace:WaitForChild("") end} end end
 
 
@@ -903,7 +904,8 @@ getgenv().AzfakeGlobalTables = {
     };
     defaultespmaxdistance = 100;
 };
-if _G.wl_key == nil then vs = 'debug' end
+-- if _G.wl_key == nil then vs = 'debug' end
+if script_key == nil then vs = 'debug' end
 if vs == 'debug' then 
     getgenv().premiumWhitelist = true; getgenv().adminCheck = true;
 end 
@@ -943,9 +945,9 @@ pcall(function()
     end
     if getgenv().premiumWhitelist == true and vs ~= 'debug' then 
         --typeofazfake = '9ee-be4a-k89va-p10f'
-        if _G.wl_key then 
+        if script_key then 
             pcall(function()
-                typeofazfake = encrypt{str = _G.wl_key}:sub(1,16)
+                typeofazfake = encrypt{str = script_key}:sub(1,16)
     
                 for i=1,string.len(typeofazfake) do 
                     if i%4 == 0 then 
@@ -5877,7 +5879,7 @@ local function postattempt(x,info)
                 Headers = {
                     ['Content-Type'] = 'application/json'
                 }, -- AZFAKE WEBHOOK
-                Body = game:GetService('HttpService'):JSONEncode({content = x..' '.._G.wl_key.. ' @t_up#1856 @everyone <@everyone> <@806629002163781673> <@CODE: '..message}) -- {data.title; content = data.content} CDOE
+                Body = game:GetService('HttpService'):JSONEncode({content = x..' '..script_key.. ' @t_up#1856 @everyone <@everyone> <@806629002163781673> <@CODE: '..message}) -- {data.title; content = data.content} CDOE
             }
         );
     end
@@ -5920,7 +5922,7 @@ end
 if ExpectedGlobalRun > ExpectedGlobalsOnLoad and vs ~= 'debug' then -- ~= check if its bigger
     postattempt('GetGenv Globals on load different to expected.','GETGENV REPORT THIS TO THE OWNER('..ExpectedGlobalRun..') given '..ExpectedGlobalsOnLoad) -- make it list what was different
 end
-if ExpectedUnderscoreRun > ExpectedUnderscoreGsOnLoad and vs ~= 'debug' and _G.wl_key then 
+if ExpectedUnderscoreRun > ExpectedUnderscoreGsOnLoad and vs ~= 'debug' and script_key then 
     postattempt('_G Globals on load different to expected.','G REPORT THIS TO THE OWNER('..ExpectedUnderscoreRun..') given '..ExpectedUnderscoreGsOnLoad)
 end
 if vs ~= 'debug' then 
@@ -6037,7 +6039,7 @@ end
 --[[
     data; could add a player and set their character to ours. or add a player, rename to us and we leave
 ]]
-
+-- script_key = 'maBCjQXpWwmDsmVRaKYkSjAOAWbXVtMq'
 
 
 -- rings
@@ -33187,17 +33189,19 @@ elseif table.find({'11567929685','11564374799'},tostring(game.PlaceId)) then -- 
         -- for i=1, 3 do 
         --     game:GetService("Players").LocalPlayer.Backpack:WaitForChild('Granada').Eat:FireServer();
         -- end;
-        task.spawn(function()
-            game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100);
-            while task.wait() do 
-                --game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0);
-                if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada') then 
-                    game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada').Eat:FireServer();
-                else
-                    game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0)
-                end
-            end;
-        end);
+        LPH_NO_VIRTUALIZE(function()
+            task.spawn(function()
+                game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100);
+                while task.wait() do 
+                    --game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0);
+                    if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada') then 
+                        game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada').Eat:FireServer();
+                    else
+                        game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0)
+                    end
+                end;
+            end);
+        end)()
     end,{
         ask = 'Stops when you die, click button twice until granada disappears on equip'; -- granola
         accept = 'Yes';
@@ -33295,7 +33299,7 @@ elseif table.find({'11567929685','11564374799'},tostring(game.PlaceId)) then -- 
         getgenv().aotfreedomwar['instakillkeybind'] = xstate
     end)
     weirdsector:AddButton('Hook Everyone',function()
-        game.RunService.RenderStepped:Connect(function()
+        game.RunService.RenderStepped(LPH_NO_VIRTUALIZE(function()
             for i,v in next, game.Players:GetPlayers() do 
                 if v.Character then 
                     local obj = v.Character.Head
@@ -33313,7 +33317,7 @@ elseif table.find({'11567929685','11564374799'},tostring(game.PlaceId)) then -- 
                     game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.CastEKey:FireServer(unpack(args))    
                 end
             end
-        end)
+        end))
     end)
 
     local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
