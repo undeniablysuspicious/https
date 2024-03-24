@@ -33088,6 +33088,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
 
 
 
+
     sharedRequires['SetupChatlogger']() 
     local tab = window:CreateTab(gameName)
     local sector = tab:CreateSector('Cheats','left')
@@ -33112,6 +33113,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end
     end)
     getgenv().aotfreedomwar = {
+        functions = {};
         infinitegas = false;
         infiniteblades = false;
         titannapehitbox = false;
@@ -33150,6 +33152,8 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         dontlosehood = false;
         spoofdamage = false;
         spoofdamagenumber = 670;
+        walkspeed = false;
+        walkspeedspeed = 0;
     } -- add m1 when next to enemy shifter
     
     local function changeSize(titan)
@@ -33357,32 +33361,86 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     weirdsector:AddTextbox('Insta Kill Titan Keybind','j',function(xstate)
         getgenv().aotfreedomwar['instakillkeybind'] = xstate
     end)
-    weirdsector:AddButton('Hook Everyone',function()
-        game.RunService.RenderStepped(LPH_NO_VIRTUALIZE(function()
-            for i,v in next, game.Players:GetPlayers() do 
-                if v.Character then 
-                    local obj = v.Character.Head
-                    if obj:FindFirstChildWhichIsA('Part') or obj:FindFirstChildWhichIsA('MeshPart') then 
-                        -- check if obj is a model
-                        obj = obj:FindFirstChildWhichIsA('Part') or obj:FindFirstChildWhichIsA('MeshPart')
-                    end
+    weirdsector:AddButton('Hook Everyone',function() -- they nerfed my shit
+        -- game.RunService.RenderStepped(LPH_NO_VIRTUALIZE(function()
+        --     for i,v in next, game.Players:GetPlayers() do 
+        --         if v.Character then 
+        --             local obj = v.Character.Head
+        --             if obj:FindFirstChildWhichIsA('Part') or obj:FindFirstChildWhichIsA('MeshPart') then 
+        --                 -- check if obj is a model
+        --                 obj = obj:FindFirstChildWhichIsA('Part') or obj:FindFirstChildWhichIsA('MeshPart')
+        --             end
+        --             local args = {
+        --                 [1] = obj,
+        --                 [2] = CFrame.new(100, 100, 100) * CFrame.Angles(-3.1415927410125732, 0.8258955478668213, -3.1415927410125732),
+        --                 [3] = CFrame.new(155, -54.0802001953125, -158515625) * CFrame.Angles(-0.5150448083877563, 1.0880918502807617, 0.46471184492111206),
+        --                 [4] = Vector3.new(830.6765747070312, 1184.00244140625, -585.1898803710938),
+        --                 [5] = Vector3.new(33, -141.49099731445312, 15)
+        --             }
+        --             game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.CastEKey:FireServer(unpack(args))    
+        --         end
+        --     end
+        -- end))
+        local origincf = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        for i,v in next, game.Players:GetPlayers() do 
+            if v.Character and v ~= game.Players.LocalPlayer then
+                task.wait(.25) 
+                local obj = v.Character.Head
+                if obj:FindFirstChildWhichIsA('Part') or obj:FindFirstChildWhichIsA('MeshPart') then 
+                    -- check if obj is a model
+                    obj = obj:FindFirstChildWhichIsA('Part') or obj:FindFirstChildWhichIsA('MeshPart')
+                end
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = obj.CFrame * CFrame.new(0,-15,0)
+                local xt = 0
+                repeat task.wait(.05)
+                    xt += 0.05
+                    -- local args = {
+                    --     [1] = obj,
+                    --     [2] = CFrame.new(100, 100, 100) * CFrame.Angles(-34.1415927410125732, 0.8258955478668213, -3.1415927410125732),
+                    --     [3] = CFrame.new(155, -54.0802001953125, -158515625) * CFrame.Angles(-4.5150448083877563, 6.0880918502807617, 43.46471184492111206),
+                    --     [4] = Vector3.new(830.6765747070312, 1184.00244140625, -585.1898803710938),
+                    --     [5] = Vector3.new(100, -141.49099731445312, 15)
+                    -- }
                     local args = {
                         [1] = obj,
-                        [2] = CFrame.new(100, 100, 100) * CFrame.Angles(-3.1415927410125732, 0.8258955478668213, -3.1415927410125732),
-                        [3] = CFrame.new(155, -54.0802001953125, -158515625) * CFrame.Angles(-0.5150448083877563, 1.0880918502807617, 0.46471184492111206),
+                        [2] = CFrame.new(3.90576171875, 54.0802001953125, 3.13983154296875) * CFrame.Angles(-3.1415927410125732, 0.8258955478668213, -3.1415927410125732),
+                        [3] = CFrame.new(4.955963134765625, -54.0802001953125, -0.7427978515625) * CFrame.Angles(-0.5150448083877563, 1.0880918502807617, 0.46471184492111206),
                         [4] = Vector3.new(830.6765747070312, 1184.00244140625, -585.1898803710938),
-                        [5] = Vector3.new(33, -141.49099731445312, 15)
+                        [5] = Vector3.new(11.006999969482422, -131.49099731445312, 0)
                     }
-                    game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.CastEKey:FireServer(unpack(args))    
-                end
+                    game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.CastEKey:FireServer(unpack(args))  
+                    game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack(args))  
+                    game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.NoEKey:FireServer(true)  
+                  -- -- game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.NoQKey:FireServer(true) 
+                until xt >= 0.5 
+                task.wait(.25) 
             end
-        end))
+        end
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = origincf
     end)
     weirdsector:AddToggle('Use Spoof Damage',false,function(xstate)
         getgenv().aotfreedomwar['spoofdamage'] = xstate
     end)
     weirdsector:AddSlider('Spoof Damage',0,670,1170,1,function(xstate) -- min def max dec
         getgenv().aotfreedomwar['spoofdamagenumber'] = xstate
+    end)
+    weirdsector:AddToggle('Use Walkspeed',false,function(xstate)
+        getgenv().aotfreedomwar['walkspeed'] = xstate
+        if xstate == false then 
+            maid.walkspeedcon = nil;
+            return;
+        end;
+        if azfake:returndata().humanoid then 
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = getgenv().aotfreedomwar['walkspeedspeed']
+        end
+        maid.walkspeedcon = game.Players.LocalPlayer.Character.Humanoid:GetPropertyChangedSignal('WalkSpeed'):Connect(function()
+            if azfake:returndata().humanoid then 
+                game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = getgenv().aotfreedomwar['walkspeedspeed']
+            end
+        end)
+    end)
+    weirdsector:AddSlider('Walkspeed',0,670,1170,1,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['walkspeedspeed'] = xstate
     end)
     local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
     esp_lib.Players = false;
@@ -33463,7 +33521,87 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             table.insert(boxes,box)
         end
     end)
-
+    weirdsector:AddSeperator('Shifters Only')
+    weirdsector:AddToggle('Auto M1 Shifter',false,function(xstate)
+        if (xstate == false) then 
+            maid.shifterautom1 = nil;
+            return;
+        end;
+        maid.shifterautom1 = game.RunService.RenderStepped:Connect(function()
+            if game.Players.LocalPlayer.Character then 
+                print('ok')
+                if game.Players.LocalPlayer.Character.Name == 'AttackTitan' then 
+                    --print('atk')
+                    local ohString1 = "MediumAttack"
+                    game.Players.LocalPlayer.Character.ATLocal.Events.AttackEvent:FireServer(ohString1)
+                elseif game.Players.LocalPlayer.Character.Name == 'FemaleTitan' then 
+                    local ohString1 = "MediumAttack"
+                    game.Players.LocalPlayer.Character.ATLocal.Events.AttackEvent:FireServer(ohString1)
+                elseif game.Players.LocalPlayer.Character.Name == 'ArmoredTitan' then 
+                    local ohString1 = "MediumAttack"
+                    game.Players.LocalPlayer.Character.ARLocal.Events.AttackEvent:FireServer(ohString1)
+                end
+            end
+        end)-- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
+    end)
+    weirdsector:AddToggle('Auto M2 Shifter',false,function(xstate)
+        if (xstate == false) then 
+            maid.shifterautom2 = nil;
+            return;
+        end;
+        maid.shifterautom2 = game.RunService.RenderStepped:Connect(function()
+            print('attack')
+            if game.Players.LocalPlayer.Character then 
+                if game.Players.LocalPlayer.Character.Name == 'AttackTitan' then 
+                    local ohString1 = "HeavyAttack"
+                    game.Players.LocalPlayer.Character.ATLocal.Events.AttackEvent:FireServer(ohString1)
+                elseif game.Players.LocalPlayer.Character.Name == 'FemaleTitan' then 
+                    local ohString1 = "HeavyAttack"
+                    game.Players.LocalPlayer.Character.ATLocal.Events.AttackEvent:FireServer(ohString1)
+                elseif game.Players.LocalPlayer.Character.Name == 'ArmoredTitan' then 
+                    local ohString1 = "HeavyAttack"
+                    game.Players.LocalPlayer.Character.ARLocal.Events.AttackEvent:FireServer(ohString1)
+                end
+            end
+        end)-- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
+    end)
+    weirdsector:AddToggle('Auto Block Shifter',false,function(xstate)
+        if (xstate == false) then 
+            maid.shifterautoblock = nil;
+            return;
+        end;
+        maid.shifterautoblock = game.RunService.RenderStepped:Connect(function()
+            if game.Players.LocalPlayer.Character then 
+                if game.Players.LocalPlayer.Character.Name == 'AttackTitan' then 
+                    local ohString1 = true
+                    game.Players.LocalPlayer.Character.ATLocal.Events.BlockEvent:FireServer(ohString1)
+                elseif game.Players.LocalPlayer.Character.Name == 'FemaleTitan' then 
+                    local ohString1 = true
+                    game.Players.LocalPlayer.Character.FELocal.Events.BlockEvent:FireServer(ohBoolean1)
+                elseif game.Players.LocalPlayer.Character.Name == 'ArmoredTitan' then 
+                    local ohString1 = true
+                    game.Players.LocalPlayer.Character.ARLocal.Events.BlockEvent:FireServer(ohBoolean1)
+                end
+            end
+        end)-- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
+    end)
+    weirdsector:AddToggle('No Stun Shifter',false,function(xstate)
+        if (xstate == false) then 
+            maid.nostunshifter = nil;
+            return;
+        end;
+        maid.nostunshifter = game.RunService.RenderStepped:Connect(function()
+            if game.Players.LocalPlayer.Character then 
+                if game.Players.LocalPlayer.Character.Name == 'AttackTitan' then 
+                    game.Players.LocalPlayer.Character.ATLocal.Events.UnstunnedEvent:FireServer()
+                elseif game.Players.LocalPlayer.Character.Name == 'FemaleTitan' then 
+                    game.Players.LocalPlayer.Character.FELocal.Events.UnstunnedEvent:FireServer()
+                elseif game.Players.LocalPlayer.Character.Name == 'ArmoredTitan' then 
+                    game.Players.LocalPlayer.Character.ARLocal.Events.UnstunnedEvent:FireServer()
+                end
+            end
+        end)-- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
+    end)
     local aimbot = false;
     local mouthaimbot = false;
     Mouse.KeyDown:Connect(function(key)
@@ -33634,7 +33772,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                                 pcall(function()
                                     game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.Counter:InvokeServer(unpack({[1] = false}))
                                 end)
-                            until Humanoid.Counter.Value == true
+                            until Humanoid.Counter.Value == true or aotfreedomwar.autocounter == false
                             if autom1tgl:Get() == true then 
                                 aotfreedomwar.autom1 = true
                             end
