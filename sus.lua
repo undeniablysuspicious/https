@@ -55,7 +55,7 @@ local Old; Old = hookfunction(getrenv().debug.info, newcclosure(function(...)
     
     return Old(...)
 end))
-
+setthreadidentity(8)
 local old_gc = getgc();
 local oldgc;
 oldgc = hookfunction(getgc, function(...)
