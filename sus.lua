@@ -33166,6 +33166,8 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         stunlegsfirst = false;
         spawnontitans = false;
         spawnonplayers = false;
+        watermark = true;
+        chatlogger = true;
     } -- add m1 when next to enemy shifter
     
     local function changeSize(titan)
@@ -33248,6 +33250,24 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end)
     weirdsector:AddButton('Rejoin Same Server',function()
         game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, game.JobId)
+    end)
+
+    weirdsector:AddToggle('Watermark',true,function(x)
+        aotfreedomwar.watermark = x
+        if x == true then 
+            wtm:SetState('Active')
+        else
+            wtm:SetState('Disable')
+        end
+    end)
+    weirdsector:AddToggle('Chatlogger',true,function(x)
+        aotfreedomwar.chatlogger = x
+        if x == true then 
+            if game.CoreGui:FindFirstChild('ChatLogger') then game.CoreGui:FindFirstChild('ChatLogger').Enabled = true end
+        else
+            if game.CoreGui:FindFirstChild('ChatLogger') then game.CoreGui:FindFirstChild('ChatLogger').Enabled = false end
+        end
+        -- chatlogger could return table so chatlogger:disable()
     end)
     local playerlooking = ''
     local Servers = sector:AddDropdown("Look At", {'none'}, "", false, function(dropdownv)
@@ -33693,7 +33713,6 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             return;
         end;
         maid.shifterautom2 = game.RunService.RenderStepped:Connect(function()
-            print('attack')
             if game.Players.LocalPlayer.Character then 
                 if game.Players.LocalPlayer.Character.Name == 'AttackTitan' then 
                     local ohString1 = "HeavyAttack"
@@ -33923,17 +33942,18 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         while task.wait() do 
             if getgenv().loopsUnload == true then aimbotctn:Disconnect(); print('fw break end')  
                 maid.lookatcon = nil; maid.nostunshifter = nil; maid.shifterautoblock = nil;
-                maid.shifterautom1 = nil; maid.walkspeedcon = nil; break
+                maid.shifterautom1 = nil; maid.walkspeedcon = nil; maid.shifterautom2 = nil; break 
             end
-            pcall(function()
+            --pcall(function()
                 Character = Player.Character
-                Humanoid = Character.Humanoid
-                gearfolder = Humanoid:FindFirstChild('Gear')
+                Humanoid = Character and Character:FindFirstChild('Humanoid') or nil
+                gearfolder = Humanoid and Humanoid:FindFirstChild('Gear') or nil
                 local gearname = 'Gear'
                 if not Character:FindFirstChild('Gear') and Character:FindFirstChild('APGear') then 
                     gearname = 'APGear'
                 end
-                if aotfreedomwar.spawnnets == true then 
+                local gearscript = Character and Character:FindFirstChild(gearname)
+                if aotfreedomwar.spawnnets == true and Character then 
                     local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position
                     game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
                     local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position + Vector3.new(15,0,0)
@@ -33959,16 +33979,16 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                         end
                     end
                 end
-                if aotfreedomwar['adjusthookrange'] == true then 
+                if aotfreedomwar['adjusthookrange'] == true and Character and Humanoid and gearfolder then 
                     gearfolder.Upgrades.HooksRange.Value = getgenv().aotfreedomwar['hookrange'] 
                 end
-                if aotfreedomwar['adjustattackspeed'] == true then 
+                if aotfreedomwar['adjustattackspeed'] == true and Character and Humanoid and gearfolder then 
                     gearfolder.Upgrades.AttackSpeed.Value = getgenv().aotfreedomwar['attackspeed'] 
                 end
-                if aotfreedomwar.autom1 == true then 
+                if aotfreedomwar.autom1 == true and Character and Humanoid and gearfolder and gearscript then 
                     game:GetService("Players").LocalPlayer.Character[gearname].Events.AttackingEvent:FireServer(1)
                 end;
-                if aotfreedomwar.autohood == true then
+                if aotfreedomwar.autohood == true and Character and Humanoid and gearfolder then
                     --aotfreedomwar.autohood = nil
 
                     -- for i,v in next, game.Players.LocalPlayer.Character:GetDescendants() do 
@@ -33984,7 +34004,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     -- }
                     -- game:GetService("Players").LocalPlayer.PlayerGui.MenuGui.ClothesChange:InvokeServer(unpack(args))
                 end
-                if aotfreedomwar.autocounter == true then 
+                if aotfreedomwar.autocounter == true and Character and Humanoid and gearfolder and gearscript then 
                    -- print('counta')
                     if Humanoid.Counter.Value == false then
                         if aotfreedomwar.autom1 == true then aotfreedomwar.autom1 = false end
@@ -34002,11 +34022,11 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     end
                 
                 end
-                if aotfreedomwar.nohooktension == true then 
+                if aotfreedomwar.nohooktension == true and Character and Humanoid and gearfolder then 
                     Humanoid.Gear.HookTensionL.Value = 0
                     Humanoid.Gear.HookTensionR.Value = 0
                 end
-                if getgenv().aotfreedomwar['autoattackwhennearenemy'] == true then 
+                if getgenv().aotfreedomwar['autoattackwhennearenemy'] == true and Character and Humanoid and gearfolder then 
                     for i,v in next, game.Players:GetPlayers() do 
                         if v ~= game.Players.LocalPlayer and v.Character ~= nil and v.Character:FindFirstChild('Gear') then
                             local canteamkill = false
@@ -34028,7 +34048,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     end
                 end
                 
-                if Player.PlayerGui.SkillsGui:FindFirstChild('Dodge').Enabled == false and getgenv().aotfreedomwar['getallskills'] then 
+                if Player.PlayerGui:FindFirstChild('SkillsGui') and Player.PlayerGui:FindFirstChild('SkillsGui'):FindFirstChild('Dodge').Enabled == false and getgenv().aotfreedomwar['getallskills'] and Character and Humanoid and gearfolder then 
                     for i,v in next, gearfolder.Skills:GetChildren() do 
                         v.Value = true;
                         warn(`set {v.Name}`)
@@ -34037,13 +34057,13 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                         v.Enabled = true;
                     end
                 end
-                if gearfolder.Skills.Dodge.Value == false and getgenv().aotfreedomwar['getallskills']  then 
+                if gearfolder and gearfolder.Skills.Dodge.Value == false and getgenv().aotfreedomwar['getallskills'] and Character and Humanoid and gearfolder  then 
                     for i,v in next, gearfolder.Skills:GetChildren() do 
                         v.Value = true;
                         warn(`set {v.Name}`)
                     end
                 end
-                if Humanoid.Gear.BladesOut.Value == false and getgenv().aotfreedomwar['autoreload'] then 
+                if gearfolder and Humanoid.Gear.BladesOut.Value == false and getgenv().aotfreedomwar['autoreload'] and Character and Humanoid and gearfolder then 
                     game:GetService("Players").LocalPlayer.Character[gearname].Events.SafeBlades:FireServer()
                     local args = {
                         [1] = game:GetService("Players").LocalPlayer.Character.Humanoid.Gear.Upgrades.BladesEfficiency
@@ -34053,27 +34073,27 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     inputManager:SendKeyEvent(true,Enum.KeyCode.R,false,game)
                     inputManager:SendKeyEvent(false,Enum.KeyCode.R,false,game)
                 end
-                if gearfolder == nil then 
-                    Character = Player.Character
-                    Humanoid = Character.Humanoid
-                    gearfolder = Humanoid:FindFirstChild('Gear')
-                    if getgenv().aotfreedomwar['getallskills'] then 
-                        for i,v in next, gearfolder.Skills:GetChildren() do 
-                            v.Value = true;
-                            warn(`set {v.Name}`)
-                        end
-                    end
-                end
+                -- if gearfolder == nil and Character and Humanoid  then 
+                --     Character = Player.Character
+                --     Humanoid = Character.Humanoid
+                --     gearfolder = Humanoid:FindFirstChild('Gear')
+                --     if getgenv().aotfreedomwar['getallskills'] then 
+                --         for i,v in next, gearfolder.Skills:GetChildren() do 
+                --             v.Value = true;
+                --             warn(`set {v.Name}`)
+                --         end
+                --     end
+                -- end
         
-                if getgenv().aotfreedomwar['infinitegas'] then 
+                if getgenv().aotfreedomwar['infinitegas'] and Character and Humanoid and gearfolder then 
                     gearfolder.Gas.Value = 2000
                     gearfolder.Upgrades.GasEfficiency.Value = -80
                 end
-                if getgenv().aotfreedomwar['infiniteblades'] then 
+                if getgenv().aotfreedomwar['infiniteblades'] and Character and Humanoid and gearfolder then 
                     gearfolder.Blades.Value = 2000
                     gearfolder.Upgrades.BladesEfficiency.Value = -80
                 end
-                if getgenv().aotfreedomwar['nostun'] then 
+                if getgenv().aotfreedomwar['nostun'] and Character and Humanoid and gearfolder then 
                     gearfolder.Upgrades.MentalStrength.Value = 80
                     Humanoid.Stunned.Value = false;
                     Humanoid.Ragdolling.Value = false;
@@ -34082,11 +34102,11 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     Humanoid.Handcuffed.Value = false;
                     Humanoid.Handcuffed.Timer.Value = 0
                 end
-                if getgenv().aotfreedomwar['notitanattack'] then 
+                if getgenv().aotfreedomwar['notitanattack'] and Character and Humanoid and gearfolder then 
                     Humanoid.Invinsible.Value = true;
                 end
 
-                if getgenv().aotfreedomwar['nocooldown'] then 
+                if getgenv().aotfreedomwar['nocooldown'] and Character and Humanoid and gearfolder and Player.PlayerGui:FindFirstChild('SkillsGui') then 
                     Player.PlayerGui.SkillsGui.Dodge.Cooldown.Value = 25
                     Player.PlayerGui.SkillsGui.SuperJump.Cooldown.Value = 150
                     Player.PlayerGui.SkillsGui.Impulse.Cooldown.Value = 100
@@ -34094,12 +34114,16 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     Player.PlayerGui.SkillsGui.HandCut.Cooldown.Value = 3000
                     Player.PlayerGui.SkillsGui.Counter.Cooldown.Value = 2000
                     Player.PlayerGui.SkillsGui.BladeThrow.Cooldown.Value = 100
-                    Player.Backpack.Medkit.Cooldown.Value = 2.8
-                    humanoid.HorseStamina.Value = 2800
+                    --Player.Backpack.Medkit.Cooldown.Value = 2.8
+                    Humanoid.HorseStamina.Value = 2800
+                    Character[gearname].SkillsSpamLimit.Impulse.Value = 0
+                    Character[gearname].SkillsSpamLimit.Dodge.Value = 0
+                    Character[gearname].SkillsSpamLimit.BladeThrow.Value = 0
+                    Character[gearname].SkillsSpamLimit.HandCutMk2.Value = 0
                 end
                 --workspace.PlayersDataFolder:FindFirstChild(Player.Name).Rank.Value = 5
                 --workspace.PlayersDataFolder:FindFirstChild(Player.Name).GamePoints.Value = 50000
-            end)
+            --end)
         end
     end)
     AddConfigurations()
