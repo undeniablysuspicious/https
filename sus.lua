@@ -33249,6 +33249,31 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     weirdsector:AddButton('Rejoin Same Server',function()
         game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, game.JobId)
     end)
+    local playerlooking = ''
+    local Servers = sector:AddDropdown("Look At", {'none'}, "", false, function(dropdownv)
+        playerlooking = dropdownv;
+        if dropdownv == 'none' then 
+            maid.lookatcon = nil;
+            workspace.Camera.CameraSubject = game.Players.LocalPlayer.Character
+        else
+            maid.lookatcon = nil;
+            maid.lookatcon = workspace.Camera:GetPropertyChangedSignal('CameraSubject'):Connect(function()
+                local obj = workspace:FindFirstChild(playerlooking)
+                --if not obj then obj = game.Players:FindFirstChild(playerlooking.Character) end
+                workspace.Camera.CameraSubject = game.Players:FindFirstChild(playerlooking).Character --workspace:FindFirstChild(playerlooking)
+            end) -- table insert the connection into global so we can disconnect it later;
+            workspace.Camera.CameraSubject = game.Players:FindFirstChild(playerlooking).Character --workspace:FindFirstChild(playerlooking)
+        end
+    end)
+    for i,v in next, game.Players:GetPlayers() do 
+        if v ~= game.Players.LocalPlayer then Servers:Add(v.Name) end 
+    end
+    game.Players.PlayerAdded:Connect(function(v)
+        Servers:Add(v.Name)
+    end)
+    game.Players.PlayerRemoving:Connect(function(v)
+        Servers:Remove(v.Name)
+    end)
     local autom1tgl = sector:AddToggle('Auto M1',false,function(xstate)
         getgenv().aotfreedomwar['autom1'] = xstate -- autom12
     end)
@@ -33335,6 +33360,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             end);
         end
     end)
+    sector:AddSeperator('Spike Nets')
     sector:AddToggle('Spawn SpikeNets on Body',false,function(x)
         aotfreedomwar.spawnnets = x
     end)
@@ -33344,6 +33370,38 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     sector:AddToggle('Spawn SpikeNets on Players',false,function(x)
         aotfreedomwar.spawnonplayers = x
     end)
+    sector:AddButton('Spawn SpikeNets on Body',function(x)
+        local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position
+        game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
+        local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position + Vector3.new(15,0,0)
+        game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
+        local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position + Vector3.new(-15,0,0)
+        game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
+        local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position + Vector3.new(0,0,15)
+        game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
+        local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position + Vector3.new(0,0,-15)
+        game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
+    end)
+    sector:AddButton('Spawn SpikeNets on Titans',function(x)
+        for i,v in next, workspace:GetChildren() do
+            if v.Name:find('Titan') and v:FindFirstChild('LeftLowerLeg') and v.Name ~= 'AttackTitan' and v.Name ~= 'ColossalTitan' and game.Players.LocalPlayer.Character ~= v then 
+                game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(v.LeftLowerLeg.Position)
+                game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(v.LeftLowerLeg.Position + Vector3.new(15,0,0))
+                game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(v.LeftLowerLeg.Position + Vector3.new(-15,0,0))
+                game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(v.LeftLowerLeg.Position + Vector3.new(0,0,15))
+                game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(v.LeftLowerLeg.Position + Vector3.new(0,0,-15))
+            end
+        end
+    end)
+    sector:AddButton('Spawn SpikeNets on Players',function(x)
+        for i,v in next, game.Players:GetChildren() do
+            if game.Players.LocalPlayer ~= v then 
+                game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(v.Character.LeftLowerLeg.Position)
+            end
+        end
+    end)
+    sector:AddSeperator('Spike Nets')
+
     sector:AddButton('Fix Spike Nets',function()
         for i,v in next, game.Players.LocalPlayer.Backpack:GetChildren() do 
             if v.Name == 'SpikeNet' then v:Destroy() end
@@ -33863,7 +33921,10 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     local Player = game.Players.LocalPlayer
     task.spawn(function()
         while task.wait() do 
-            if getgenv().loopsUnload == true then aimbotctn:Disconnect(); print('fw break end') break end
+            if getgenv().loopsUnload == true then aimbotctn:Disconnect(); print('fw break end')  
+                maid.lookatcon = nil; maid.nostunshifter = nil; maid.shifterautoblock = nil;
+                maid.shifterautom1 = nil; maid.walkspeedcon = nil; break
+            end
             pcall(function()
                 Character = Player.Character
                 Humanoid = Character.Humanoid
