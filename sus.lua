@@ -34170,7 +34170,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     end
                 end
                 
-                if gearscript and Character and Humanoid and gearfolder Player.PlayerGui:FindFirstChild('SkillsGui') and Player.PlayerGui:FindFirstChild('SkillsGui'):FindFirstChild('Dodge').Enabled == false and getgenv().aotfreedomwar['getallskills'] then 
+                if gearscript and Character and Humanoid and gearfolder and Player.PlayerGui:FindFirstChild('SkillsGui') and Player.PlayerGui:FindFirstChild('SkillsGui'):FindFirstChild('Dodge').Enabled == false and getgenv().aotfreedomwar['getallskills'] then 
                     for i,v in next, gearfolder.Skills:GetChildren() do 
                         v.Value = true;
                         warn(`set {v.Name}`)
