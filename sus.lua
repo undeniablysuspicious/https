@@ -33305,7 +33305,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         until br > 1
 
         local _chosen = workspace.OnGameTitans
-        for i,v in next, _chosen do 
+        for i,v in next, _chosen:GetChildren() do 
             if v.Humanoid.Health >0 then
                 _chosen = v
                 break
