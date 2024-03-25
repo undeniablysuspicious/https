@@ -33165,6 +33165,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         spawnnets = false;
         stunlegsfirst = false;
         spawnontitans = false;
+        spawnonplayers = false;
     } -- add m1 when next to enemy shifter
     
     local function changeSize(titan)
@@ -33210,6 +33211,37 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     setupAimbotTab(getgenv().aotfreedomwar)
     setupEspTab(getgenv().aotfreedomwar)
     getgenv().AddPlayerList(weirdsector) -- make nape cancollide off?
+
+    if game.PlaceId == 11860234207 then --.P{la}
+        weirdsector:AddButton('Auto Finish',function()
+        
+            local ohString1 = "Event"
+    
+            game:GetService("Players").LocalPlayer.PlayerGui.DialogueGui.DialogueEvent:FireServer(ohString1)
+    
+            task.wait(1)
+            for i,v in next, game:GetService("Workspace").TutorialForest.TrainingDummies:GetChildren() do 
+                if v:FindFirstChild('DummyNape') then 
+                    local savedColor = v.DummyNape.Color
+                    repeat 
+                        task.wait()
+                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.DummyNape.CFrame;
+                        task.spawn(function()
+                            local inputManager = game:GetService('VirtualInputManager')
+                            local m = game.Players.LocalPlayer:GetMouse();
+                            inputManager:SendMouseButtonEvent(m.X,m.Y,0,true,game,0)
+                            task.wait(.1)
+                            inputManager:SendMouseButtonEvent(m.X,m.Y,0,false,game,0)
+                        end)
+                    until v:FindFirstChild('DummyNape').Cutted.Value == true -- ~= savedColor
+                end
+            end
+            local ohString1 = "Event"
+    
+            game:GetService("Players").LocalPlayer.PlayerGui.DialogueGui.DialogueEvent:FireServer(ohString1)
+        end)
+    end
+
 
     weirdsector:AddButton('Rejoin',function()
         game:GetService('TeleportService'):teleport(game.PlaceId)
@@ -33308,6 +33340,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end)
     sector:AddToggle('Spawn SpikeNets on Titans',false,function(x)
         aotfreedomwar.spawnontitans = x
+    end)
+    sector:AddToggle('Spawn SpikeNets on Players',false,function(x)
+        aotfreedomwar.spawnonplayers = x
     end)
     sector:AddButton('Fix Spike Nets',function()
         for i,v in next, game.Players.LocalPlayer.Backpack:GetChildren() do 
@@ -33853,6 +33888,13 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     for i,v in next, workspace:GetChildren() do
                         if v.Name:find('Titan') and v:FindFirstChild('LeftLowerLeg') and v.Name ~= 'AttackTitan' and v.Name ~= 'ColossalTitan' and game.Players.LocalPlayer.Character ~= v then 
                             game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(v.LeftLowerLeg.Position)
+                        end
+                    end
+                end
+                if aotfreedomwar.spawnonplayers == true then 
+                    for i,v in next, game.Players:GetChildren() do
+                        if game.Players.LocalPlayer ~= v then 
+                            game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(v.Character.LeftLowerLeg.Position)
                         end
                     end
                 end
