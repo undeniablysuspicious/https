@@ -33168,6 +33168,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         spawnonplayers = false;
         watermark = true;
         chatlogger = true;
+        superjumpmidair = false;
     } -- add m1 when next to enemy shifter
     
     local function changeSize(titan)
@@ -33177,7 +33178,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             titan.Nape.Color = getgenv().aotfreedomwar['titannapecolor']
             --titan.Nape.CanCollide = false;
         
-            titan.DamageRegion.Size = Vector3.new(10,5,10)
+            titan.DamageRegion.Size = Vector3.new(10,8,10)
             titan.DamageRegion.Transparency = getgenv().aotfreedomwar['titannapetransparency']
             titan.DamageRegion.Color = getgenv().aotfreedomwar['titannapecolor']
            -- titan.DamageRegion.CanCollide = false;
@@ -33269,12 +33270,104 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end
         -- chatlogger could return table so chatlogger:disable()
     end)
+    weirdsector:AddButton('Kill Nearest Player', function()
+        local inputManager = game:GetService('VirtualInputManager')
+        local timeplacetaken = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+        -- could tp back but using safer opt
+        local xtable = {}
+        for i,v in next, game.Players:GetPlayers() do 
+            if v ~= game.Players.LocalPlayer and v.Character then 
+                table.insert(xtable,v.Name) -- check ifnottitan
+            end
+        end
+        xtable = game.Players:FindFirstChild(xtable[math.random(1,#xtable)])
+        xtable.Character.HumanoidRootPart.GToGrabPrompt.Enabled = true;
+        br = 0
+        repeat task.wait()
+            br += 0.1
+            inputManager:SendKeyEvent(true,Enum.KeyCode.G,false,game)
+            inputManager:SendKeyEvent(false,Enum.KeyCode.G,false,game)
+        until br > 1
+
+        local _chosen = workspace.OnGameTitans
+        for i,v in next, _chosen do 
+            if v.Humanoid.Health >0 then
+                _chosen = v
+                break
+            end
+        end
+        repeat 
+            task.wait()
+            game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(_chosen.LeftUpperArm)
+        until (_chosen.LeftUpperArm.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 6
+
+        b = 0
+        repeat task.wait()
+            b += 0.1
+            inputManager:SendKeyEvent(true,Enum.KeyCode.T,false,game)
+            inputManager:SendKeyEvent(false,Enum.KeyCode.T,false,game)
+        until b > 1
+
+        local victims = {}
+        for i,v in next, game.Players:GetPlayers() do 
+            if v ~= game.Players.LocalPlayer and v ~= xtable then table.insert(victims,v.Name) end
+        end
+        victims = nil;
+        pcall(function() victims = game.Players:FindFirstChild(victims[math.random(1,#victims)]) end)
+        if victims then 
+            sp = victims.Character.HumanoidRootPart
+            game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(sp)
+        else
+            local done = false;
+            local savest = nil;
+            local savestdist = nil;
+            for i,v in next, workspace:GetDescendants() do 
+                if done == true then break end 
+
+                pcall(function()
+                    local dist = (v.Position - timeplacetaken).Magnitude
+                    if dist <= 15 and not v.Name:find(xtable.Name) then 
+                        if savest == nil then 
+                            savest = v;
+                            savestdist =dist
+                        else
+                            if savestdist > dist then 
+                                savest = v;
+                                savestdist = dist 
+                            end
+                        end
+                        if dist <= 5 then 
+                            done = true;
+                        end
+                    end
+                end)
+            end
+            if savest then 
+                print('tping back  to '..savest.Name) -- Nmame
+                repeat 
+                    task.wait()
+                    game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(savest)
+                until (savest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 10
+                repeat 
+                    task.wait()
+                    game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(savest)
+                until (savest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 10
+                repeat 
+                    task.wait()
+                    game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(savest)
+                until (savest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 10
+                game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(savest)
+            end
+        end
+    end)
     local playerlooking = ''
     local Servers = sector:AddDropdown("Look At", {'none'}, "", false, function(dropdownv)
         playerlooking = dropdownv;
         if dropdownv == 'none' then 
             maid.lookatcon = nil;
-            workspace.Camera.CameraSubject = game.Players.LocalPlayer.Character
+            if game.Players.LocalPlayer.Character then 
+                workspace.Camera.CameraSubject = game.Players.LocalPlayer.Character
+            end
         else
             maid.lookatcon = nil;
             maid.lookatcon = workspace.Camera:GetPropertyChangedSignal('CameraSubject'):Connect(function()
@@ -33326,6 +33419,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end)
     sector:AddToggle('Infinite Blades',false,function(xstate)
         getgenv().aotfreedomwar['infiniteblades'] = xstate
+    end)
+    sector:AddToggle('Super Jump Midair',false,function(xstate)
+        getgenv().aotfreedomwar['superjumpmidair'] = xstate
     end)
     sector:AddToggle('No Cooldown',false,function(xstate)
         getgenv().aotfreedomwar['nocooldown'] = xstate
@@ -33888,10 +33984,19 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         elseif call_type == 'FireServer'  and tostring(self) == 'HitEvent' and aotfreedomwar.spoofdamage  then 
             args[2] = aotfreedomwar.spoofdamagenumber
             return metahook(self,unpack(args))
+        elseif call_type == 'GetState'  and aotfreedomwar['superjumpmidair'] then 
+            return Enum.HumanoidStateType.Running
         end
         return metahook(self,...)
     end)
 
+    -- local metaindex;
+    -- metaindex = hookmetamethod(game,'__index',function(self,reading)
+    --     if tostring(self) == 'Humanoid' and tostring(reading) == 'Value' and getgenv().fightlocalgame['superjumpmidair'] == true then 
+    --         return false
+    --     end
+    --     return metaindex(self,reading)
+    -- end)
 
     for i,v in next, workspace.OnGameTitans:GetChildren() do 
         if getgenv().aotfreedomwar['titannapehitbox'] then 
@@ -34106,7 +34211,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     Humanoid.Invinsible.Value = true;
                 end
 
-                if getgenv().aotfreedomwar['nocooldown'] and Character and Humanoid and gearfolder and Player.PlayerGui:FindFirstChild('SkillsGui') then 
+                if getgenv().aotfreedomwar['nocooldown'] and Character and Humanoid and gearfolder and Player.PlayerGui:FindFirstChild('SkillsGui') and gearscript then 
                     Player.PlayerGui.SkillsGui.Dodge.Cooldown.Value = 25
                     Player.PlayerGui.SkillsGui.SuperJump.Cooldown.Value = 150
                     Player.PlayerGui.SkillsGui.Impulse.Cooldown.Value = 100
