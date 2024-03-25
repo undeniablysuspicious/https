@@ -33154,6 +33154,8 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         spoofdamagenumber = 670;
         walkspeed = false;
         walkspeedspeed = 0;
+        hookrange = 100;
+        adjusthookrange = false;
     } -- add m1 when next to enemy shifter
     
     local function changeSize(titan)
@@ -33439,8 +33441,14 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             end
         end)
     end)
-    weirdsector:AddSlider('Walkspeed',0,670,1170,1,function(xstate) -- min def max dec
+    weirdsector:AddSlider('Walkspeed',0,8,1170,1,function(xstate) -- min def max dec
         getgenv().aotfreedomwar['walkspeedspeed'] = xstate
+    end)
+    weirdsector:AddToggle('Adjust Hook Range',false,function(xstate)
+        getgenv().aotfreedomwar['adjusthookrange'] = xstate
+    end)
+    weirdsector:AddSlider('Hook Range',0,160,1170,1,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['hookrange'] = xstate
     end)
     local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
     esp_lib.Players = false;
@@ -33743,6 +33751,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 Character = Player.Character
                 Humanoid = Character.Humanoid
                 gearfolder = Humanoid:FindFirstChild('Gear')
+                if aotfreedomwar['adjusthookrange'] == true then 
+                    gearfolder.Upgrades.HooksRange.Value = getgenv().aotfreedomwar['hookrange'] 
+                end
                 if aotfreedomwar.autom1 == true then 
                     game:GetService("Players").LocalPlayer.Character.Gear.Events.AttackingEvent:FireServer(1)
                 end;
