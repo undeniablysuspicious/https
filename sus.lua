@@ -33163,6 +33163,8 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         infhealth = false;
         spiketrap = false;
         spawnnets = false;
+        stunlegsfirst = false;
+        spawnontitans = false;
     } -- add m1 when next to enemy shifter
     
     local function changeSize(titan)
@@ -33283,8 +33285,8 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         accept = 'Yes';
         reject = 'No';
     })
-    ifn:ActivateKnowledge()
-    ifn:AddKnowledge('click again if granoda doesnt disappear')
+    -- ifn:ActivateKnowledge()
+    -- ifn:AddKnowledge('click again if granoda doesnt disappear')
     sector:AddToggle('Inf Spike Nets',false,function(x)
         aotfreedomwar.spiketrap = x
         if x == true then 
@@ -33303,6 +33305,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end)
     sector:AddToggle('Spawn SpikeNets on Body',false,function(x)
         aotfreedomwar.spawnnets = x
+    end)
+    sector:AddToggle('Spawn SpikeNets on Titans',false,function(x)
+        aotfreedomwar.spawnontitans = x
     end)
     sector:AddButton('Fix Spike Nets',function()
         for i,v in next, game.Players.LocalPlayer.Backpack:GetChildren() do 
@@ -33376,6 +33381,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end)
     weirdsector:AddToggle('Aim Up If Behind Titan Wall',false,function(xstate) -- min def max dec
         getgenv().aotfreedomwar['aimuptitanwall'] = xstate -- add knowledge (needs shiftlock)
+    end)
+    weirdsector:AddToggle('Aimbot Stun Legs',false,function(xstate)
+        getgenv().aotfreedomwar['stunlegsfirst'] = xstate
     end)
     weirdsector:AddTextbox('Titan Aimbot Keybind','t',function(xstate)
         getgenv().aotfreedomwar['titanaimbotkeybind'] = xstate
@@ -33694,9 +33702,24 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     if not wallcheck and aotfreedomwar.aimuptitanwall then 
                         workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,Vector3.new(0,10000000,0) )
                     else
-                        local additionalvector = Vector3.new(0,-0.5,0)
-                        workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,closesttitan.Nape.Position + additionalvector )
-                    
+                        local function tally(titanf) -- talaly taally --fucntion 
+                            local num = 0
+                            if titanf.LLDebounce.Value == true then 
+                                num += 1
+                            end
+                            if titanf.RLDebounce.Value == true then 
+                                num += 1
+                            end
+                            return num
+                        end
+                        if aotfreedomwar.stunlegsfirst and tally(closesttitan) ~= 2 then -- closesttitan.Stun.Value == false then 
+                            local additionalvector = Vector3.new(0,-2,0)
+                            workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,closesttitan.DamageRegion.Position + additionalvector )    
+                        else
+                            local additionalvector = Vector3.new(0,-0.5,0)
+                            workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,closesttitan.Nape.Position + additionalvector )    
+                        end
+
                     end
                 end
             end)
@@ -33817,6 +33840,21 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 if aotfreedomwar.spawnnets == true then 
                     local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position
                     game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
+                    local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position + Vector3.new(15,0,0)
+                    game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
+                    local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position + Vector3.new(-15,0,0)
+                    game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
+                    local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position + Vector3.new(0,0,15)
+                    game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
+                    local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position + Vector3.new(0,0,-15)
+                    game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
+                end
+                if aotfreedomwar.spawnontitans == true then 
+                    for i,v in next, workspace:GetChildren() do
+                        if v.Name:find('Titan') and v:FindFirstChild('LeftLowerLeg') and v.Name ~= 'AttackTitan' and v.Name ~= 'ColossalTitan' and game.Players.LocalPlayer.Character ~= v then 
+                            game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(v.LeftLowerLeg.Position)
+                        end
+                    end
                 end
                 if aotfreedomwar['adjusthookrange'] == true then 
                     gearfolder.Upgrades.HooksRange.Value = getgenv().aotfreedomwar['hookrange'] 
@@ -33962,6 +34000,43 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end
     end)
     AddConfigurations()
+elseif game.PlaceId == 11534222714 then -- aot freedom war main menu
+    local tab = window:CreateTab(gameName)
+    local sector = tab:CreateSector('Cheats','left')
+    local FolderDir = game:GetService("ReplicatedStorage").ServersStore
+
+    local ServerList = {}
+    local ServerChosen = '';
+    local bum = false;
+    for i,v in pairs(FolderDir:GetChildren()) do 
+        table.insert(ServerList,v.Value)
+    end
+
+    local Servers = sector:AddDropdown("Spam Join Server", ServerList, "", false, function(dropdownv)
+        ServerChosen = dropdownv;
+    end)
+    sector:AddToggle('Spam Join',false,function(x)
+        bum  = x;
+        if x then 
+            azfakenotify('joining.. '..x:sub(1,5),10)
+        end
+    end)
+    sector:AddButton('Refresh',function()
+        for i,v in next, Servers:Get() do 
+            v:Remove()
+        end
+        for i,v in pairs(FolderDir:GetChildren()) do 
+            Servers:Add(v.Value)
+        end
+    end)
+    task.spawn(function()
+        while task.wait() do 
+            if bum and ServerChosen then 
+                -- click button cuz the remote isnt fired wth
+            end
+        end
+    end)
+
 elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId)) and vs == 'debug' then 
     sharedRequires['SetupChatlogger']()
     local effectReplicator = require(game:GetService('ReplicatedStorage'):WaitForChild('EffectReplicator', math.huge));
