@@ -33275,12 +33275,27 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         local timeplacetaken = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
         -- could tp back but using safer opt
         local xtable = {}
+        local closestplayer = nil;
+        local closestdist = nil;
         for i,v in next, game.Players:GetPlayers() do 
             if v ~= game.Players.LocalPlayer and v.Character then 
+                local dist = (v.Character.HumanoidRootPart.Position - timeplacetaken).Magnitude
+                if dist <= 15 then 
+                    if closestplayer == nil then 
+                        closestplayer = v;
+                        closestdist = dist;
+                    else
+                        if closestdist > dist then 
+                            closestplayer = v;
+                            closestdist = dist;
+                        end
+                    end
+                end
                 table.insert(xtable,v.Name) -- check ifnottitan
             end
         end
-        xtable = game.Players:FindFirstChild(xtable[math.random(1,#xtable)])
+        if not closestplayer then return end
+        xtable = closestplayer -- game.Players:FindFirstChild(xtable[math.random(1,#xtable)])
         xtable.Character.HumanoidRootPart.GToGrabPrompt.Enabled = true;
         br = 0
         repeat task.wait()
