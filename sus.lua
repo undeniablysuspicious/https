@@ -33156,6 +33156,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         walkspeedspeed = 0;
         hookrange = 100;
         adjusthookrange = false;
+        adjustattackspeed = false;
+        attackspeed = 0.6;
+        titanaimbotrange = 100;
     } -- add m1 when next to enemy shifter
     
     local function changeSize(titan)
@@ -33353,7 +33356,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         getgenv().aotfreedomwar['shifternapesize']['z'] = xstate
         updateShifterNapes()
     end)
-
+    weirdsector:AddSlider('Titan Aimbot Range',0,100,1000,1,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['titanaimbotrange'] = xstate
+    end)
     weirdsector:AddTextbox('Titan Aimbot Keybind','t',function(xstate)
         getgenv().aotfreedomwar['titanaimbotkeybind'] = xstate
     end)
@@ -33383,6 +33388,10 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         --         end
         --     end
         -- end))
+        local gearname = 'Gear'
+        if not game.Players.LocalPlayer.Character:FindFirstChild('Gear') and game.Players.LocalPlayer.Character:FindFirstChild('APGear') then 
+            gearname = 'APGear'
+        end
         local origincf = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
         for i,v in next, game.Players:GetPlayers() do 
             if v.Character and v ~= game.Players.LocalPlayer then
@@ -33410,9 +33419,10 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                         [4] = Vector3.new(830.6765747070312, 1184.00244140625, -585.1898803710938),
                         [5] = Vector3.new(11.006999969482422, -131.49099731445312, 0)
                     }
-                    game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.CastEKey:FireServer(unpack(args))  
-                    game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack(args))  
-                    game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.NoEKey:FireServer(true)  
+
+                    game:GetService("Players").LocalPlayer.Character[gearname].Events.MoreEvents.CastEKey:FireServer(unpack(args))  
+                    game:GetService("Players").LocalPlayer.Character[gearname].Events.MoreEvents.CastQKey:FireServer(unpack(args))  
+                    game:GetService("Players").LocalPlayer.Character[gearname].Events.MoreEvents.NoEKey:FireServer(true)  
                   -- -- game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.NoQKey:FireServer(true) 
                 until xt >= 0.5 
                 task.wait(.25) 
@@ -33449,6 +33459,12 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end)
     weirdsector:AddSlider('Hook Range',0,160,1170,1,function(xstate) -- min def max dec
         getgenv().aotfreedomwar['hookrange'] = xstate
+    end)
+    weirdsector:AddToggle('Adjust Attack Speed',false,function(xstate)
+        getgenv().aotfreedomwar['adjustattackspeed'] = xstate
+    end)
+    weirdsector:AddSlider('Attack Speed',0,0.6,0.6,10,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['attackspeed'] = xstate
     end)
     local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
     esp_lib.Players = false;
@@ -33627,7 +33643,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end
     end)
 
-    game.RunService.RenderStepped:Connect(function()
+    game.RunService.RenderStepped:Connect(function() -- couldve done ainmbot or mouthaimbot then distinguish it in the fucntion
         if aimbot then 
             pcall(function()
                 local Character = game.Players.LocalPlayer.Character
@@ -33636,7 +33652,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 for i,v in next, workspace.OnGameTitans:GetChildren() do 
                     if v:FindFirstChild('HumanoidRootPart') and v:FindFirstChild('Humanoid') and v:FindFirstChild('Humanoid').Health > 0  then 
                         local dist = (v:FindFirstChild('HumanoidRootPart').Position - Character.HumanoidRootPart.Position).Magnitude
-                        if dist <= 100 then -- hooksrange
+                        if dist <= aotfreedomwar.titanaimbotrange then -- hooksrange
                             if closestdist == nil then 
                                 closestdist = dist;
                                 closesttitan = v
@@ -33662,7 +33678,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 for i,v in next, workspace.OnGameTitans:GetChildren() do 
                     if v:FindFirstChild('HumanoidRootPart') and v:FindFirstChild('Humanoid') and v:FindFirstChild('Humanoid').Health > 0  then 
                         local dist = (v:FindFirstChild('HumanoidRootPart').Position - Character.HumanoidRootPart.Position).Magnitude
-                        if dist <= 100 then -- hooksrange
+                        if dist <= aotfreedomwar.titanaimbotrange then -- hooksrange
                             if closestdist == nil then 
                                 closestdist = dist;
                                 closesttitan = v
@@ -33751,11 +33767,18 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 Character = Player.Character
                 Humanoid = Character.Humanoid
                 gearfolder = Humanoid:FindFirstChild('Gear')
+                local gearname = 'Gear'
+                if not Character:FindFirstChild('Gear') and Character:FindFirstChild('APGear') then 
+                    gearname = 'APGear'
+                end
                 if aotfreedomwar['adjusthookrange'] == true then 
                     gearfolder.Upgrades.HooksRange.Value = getgenv().aotfreedomwar['hookrange'] 
                 end
+                if aotfreedomwar['adjustattackspeed'] == true then 
+                    gearfolder.Upgrades.AttackSpeed.Value = getgenv().aotfreedomwar['attackspeed'] 
+                end
                 if aotfreedomwar.autom1 == true then 
-                    game:GetService("Players").LocalPlayer.Character.Gear.Events.AttackingEvent:FireServer(1)
+                    game:GetService("Players").LocalPlayer.Character[gearname].Events.AttackingEvent:FireServer(1)
                 end;
                 if aotfreedomwar.autohood == true then
                     --aotfreedomwar.autohood = nil
@@ -33781,7 +33804,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                             repeat 
                                 task.wait()
                                 pcall(function()
-                                    game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.Counter:InvokeServer(unpack({[1] = false}))
+                                    game:GetService("Players").LocalPlayer.Character[gearname].Events.MoreEvents.Counter:InvokeServer(unpack({[1] = false}))
                                 end)
                             until Humanoid.Counter.Value == true or aotfreedomwar.autocounter == false
                             if autom1tgl:Get() == true then 
@@ -33833,11 +33856,11 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     end
                 end
                 if Humanoid.Gear.BladesOut.Value == false and getgenv().aotfreedomwar['autoreload'] then 
-                    game:GetService("Players").LocalPlayer.Character.Gear.Events.SafeBlades:FireServer()
+                    game:GetService("Players").LocalPlayer.Character[gearname].Events.SafeBlades:FireServer()
                     local args = {
                         [1] = game:GetService("Players").LocalPlayer.Character.Humanoid.Gear.Upgrades.BladesEfficiency
                     }
-                    game:GetService("Players").LocalPlayer.Character.Gear.Events.BladeReload:FireServer(unpack(args))
+                    game:GetService("Players").LocalPlayer.Character[gearname].Events.BladeReload:FireServer(unpack(args))
                     local inputManager = game:GetService('VirtualInputManager')
                     inputManager:SendKeyEvent(true,Enum.KeyCode.R,false,game)
                     inputManager:SendKeyEvent(false,Enum.KeyCode.R,false,game)
