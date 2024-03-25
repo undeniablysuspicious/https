@@ -33159,6 +33159,10 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         adjustattackspeed = false;
         attackspeed = 0.6;
         titanaimbotrange = 100;
+        aimuptitanwall = false;
+        infhealth = false;
+        spiketrap = false;
+        spawnnets = false;
     } -- add m1 when next to enemy shifter
     
     local function changeSize(titan)
@@ -33253,23 +33257,27 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     sector:AddToggle('Auto Kill Insub',false,function(xstate)
         getgenv().aotfreedomwar['autoattackwhennearenemy'] = xstate
     end)
-    local ifn = sector:AddButton('Start Inf Healing',function()
+    local ifn = sector:AddToggle('Start Inf Healing',false,function(x)
         -- for i=1, 3 do 
         --     game:GetService("Players").LocalPlayer.Backpack:WaitForChild('Granada').Eat:FireServer();
         -- end;
-        LPH_NO_VIRTUALIZE(function()
-            task.spawn(function()
-                game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100);
-                while task.wait() do 
-                    --game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0);
-                    if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada') then 
-                        game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada').Eat:FireServer();
-                    else
-                        game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0)
-                    end
-                end;
-            end);
-        end)()
+        aotfreedomwar.infhealth = x;
+        if x == true then 
+            LPH_NO_VIRTUALIZE(function()
+                task.spawn(function()
+                    game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100);
+                    while task.wait() do 
+                        if aotfreedomwar.infhealth == false or getgenv().loopsUnload == true then break end
+                        --game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0);
+                        if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada') then 
+                            game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada').Eat:FireServer();
+                        else
+                            game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0)
+                        end
+                    end;
+                end);
+            end)()
+        end
     end,{
         ask = 'Stops when you die, click button twice until granada disappears on equip'; -- granola
         accept = 'Yes';
@@ -33277,17 +33285,24 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     })
     ifn:ActivateKnowledge()
     ifn:AddKnowledge('click again if granoda doesnt disappear')
-    sector:AddButton('Inf Spike Nets',function()
-        game:GetService("ReplicatedStorage").BuyEvent:FireServer('SpikeNet',500);
-        -- for i=1, 3 do 
-        --     game:GetService("Players").LocalPlayer.Backpack:WaitForChild('Granada').Eat:FireServer();
-        -- end;
-        task.spawn(function()
-            while task.wait(0.1) do 
-                --game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0);
-                game:GetService("ReplicatedStorage").BuyEvent:FireServer('SpikeNet',0);
-            end
-        end);
+    sector:AddToggle('Inf Spike Nets',false,function(x)
+        aotfreedomwar.spiketrap = x
+        if x == true then 
+            game:GetService("ReplicatedStorage").BuyEvent:FireServer('SpikeNet',500);
+            -- for i=1, 3 do 
+            --     game:GetService("Players").LocalPlayer.Backpack:WaitForChild('Granada').Eat:FireServer();
+            -- end;
+            task.spawn(function()
+                while task.wait(0.1) do 
+                    if aotfreedomwar.spiketrap == false or getgenv().loopsUnload == true then break end
+                    --game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0);
+                    game:GetService("ReplicatedStorage").BuyEvent:FireServer('SpikeNet',0);
+                end
+            end);
+        end
+    end)
+    sector:AddToggle('Spawn SpikeNets on Body',false,function(x)
+        aotfreedomwar.spawnnets = x
     end)
     sector:AddButton('Fix Spike Nets',function()
         for i,v in next, game.Players.LocalPlayer.Backpack:GetChildren() do 
@@ -33358,6 +33373,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end)
     weirdsector:AddSlider('Titan Aimbot Range',0,100,1000,1,function(xstate) -- min def max dec
         getgenv().aotfreedomwar['titanaimbotrange'] = xstate
+    end)
+    weirdsector:AddToggle('Aim Up If Behind Titan Wall',false,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['aimuptitanwall'] = xstate -- add knowledge (needs shiftlock)
     end)
     weirdsector:AddTextbox('Titan Aimbot Keybind','t',function(xstate)
         getgenv().aotfreedomwar['titanaimbotkeybind'] = xstate
@@ -33643,7 +33661,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end
     end)
 
-    game.RunService.RenderStepped:Connect(function() -- couldve done ainmbot or mouthaimbot then distinguish it in the fucntion
+    local aimbotctn; aimbotctn = game.RunService.RenderStepped:Connect(function() -- couldve done ainmbot or mouthaimbot then distinguish it in the fucntion
         if aimbot then 
             pcall(function()
                 local Character = game.Players.LocalPlayer.Character
@@ -33666,8 +33684,20 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     end
                 end
                 if closesttitan then  -- + additionalvector
-                    local additionalvector = Vector3.new(0,-0.5,0)
-                    workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,closesttitan.Nape.Position + additionalvector )
+                    local wallcheck = true
+                    local Parts = workspace.Camera:GetPartsObscuringTarget({game.Players.LocalPlayer.Character.Head.Position, closesttitan.Nape.Position}, {workspace.Camera, game.Players.LocalPlayer.Character})
+                    for i2, v2 in pairs(Parts) do
+                        if v2:IsDescendantOf(closesttitan) == false and v2.Transparency == 0 then
+                            wallcheck = false
+                        end
+                    end
+                    if not wallcheck and aotfreedomwar.aimuptitanwall then 
+                        workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,Vector3.new(0,10000000,0) )
+                    else
+                        local additionalvector = Vector3.new(0,-0.5,0)
+                        workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,closesttitan.Nape.Position + additionalvector )
+                    
+                    end
                 end
             end)
         elseif mouthaimbot then 
@@ -33692,12 +33722,25 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     end
                 end
                 if closesttitan then  -- + additionalvector
-                    local additionalvector = Vector3.new(0,0.5,0)
-                    workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,closesttitan.Mouth.Position + additionalvector )
+                    local wallcheck = true
+                    local Parts = workspace.Camera:GetPartsObscuringTarget({game.Players.LocalPlayer.Character.Head.Position, closesttitan.Nape.Position}, {workspace.Camera, game.Players.LocalPlayer.Character})
+                    for i2, v2 in pairs(Parts) do
+                        if v2:IsDescendantOf(closesttitan) == false and v2.Transparency == 0 then
+                            wallcheck = false
+                        end
+                    end
+                    if not wallcheck and aotfreedomwar.aimuptitanwall then 
+                        workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,Vector3.new(0,10000000,0) )
+                    else
+                        local additionalvector = Vector3.new(0,0.5,0)
+                        workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,closesttitan.Mouth.Position + additionalvector )    
+                    end
                 end
             end)
         end
     end)
+
+
 
     local metahook;
     metahook = hookmetamethod(game,'__namecall',function(self,...)
@@ -33762,7 +33805,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     local Player = game.Players.LocalPlayer
     task.spawn(function()
         while task.wait() do 
-            if getgenv().loopsUnload == true then print('fw break end') break end
+            if getgenv().loopsUnload == true then aimbotctn:Disconnect(); print('fw break end') break end
             pcall(function()
                 Character = Player.Character
                 Humanoid = Character.Humanoid
@@ -33770,6 +33813,10 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 local gearname = 'Gear'
                 if not Character:FindFirstChild('Gear') and Character:FindFirstChild('APGear') then 
                     gearname = 'APGear'
+                end
+                if aotfreedomwar.spawnnets == true then 
+                    local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position
+                    game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
                 end
                 if aotfreedomwar['adjusthookrange'] == true then 
                     gearfolder.Upgrades.HooksRange.Value = getgenv().aotfreedomwar['hookrange'] 
