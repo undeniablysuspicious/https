@@ -55,7 +55,9 @@ local Old; Old = hookfunction(getrenv().debug.info, newcclosure(function(...)
     
     return Old(...)
 end))
-setthreadidentity(8)
+-- setthreadidentity(9)
+setthreadidentity(7)
+
 local old_gc = getgc();
 local oldgc;
 oldgc = hookfunction(getgc, function(...)
@@ -5963,6 +5965,9 @@ end
 if (IsElectron) then 
     ExpectedGlobalsOnLoad = 287 + 7 --261 without hub loaded
 end
+if (identifyexecutor() and identifyexecutor():find('Codex')) then
+    ExpectedGlobalsOnLoad = 213 
+end
 local ExpectedGlobalRun = 0
 local ExpectedUnderscoreRun = 0
 
@@ -5972,7 +5977,7 @@ end
 for _,v in next, _G do 
     ExpectedUnderscoreRun += 1
 end
-
+-- ExpectedGlobalsOnLoad > expectedglobalrun
 if ExpectedGlobalRun > ExpectedGlobalsOnLoad and vs ~= 'debug' then -- ~= check if its bigger
     postattempt('GetGenv Globals on load different to expected.','GETGENV REPORT THIS TO THE OWNER('..ExpectedGlobalRun..') given '..ExpectedGlobalsOnLoad) -- make it list what was different
 end
@@ -6015,8 +6020,9 @@ else
 end
 
 -- put before library because library has getgenv
-local library =loadstring(game:HttpGet("https://raw.githubusercontent.com/hairlinebrockeb/-back-ups-for-libs/main/cat", true))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/hairlinebrockeb/-back-ups-for-libs/main/cat", true))()
 -- 492, 598 "Azfake V3{"..vs..','..game.PlaceId..'}' -- M1xup Azzfake Azfake V3 M1xact
+
 local OpenGUBUTTON = Enum.KeyCode.Insert
 local window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(492, 598), OpenGUBUTTON) -- 2nd argument is the size, 3rd is the show/hide ofc
 local wtm = library:CreateWatermark('Azfake HUB V3',Vector3.new(100,100,50))
@@ -34455,6 +34461,19 @@ elseif game.PlaceId == 11534222714 then -- aot freedom war main menu
 elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId)) and vs == 'debug' then 
     sharedRequires['SetupChatlogger']()
     local effectReplicator = require(game:GetService('ReplicatedStorage'):WaitForChild('EffectReplicator', math.huge));
+    warn('id',getthreadidentity())
+    local setscriptes = function() end
+    local getKey;
+    local keyhandler = require(game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild('ClientManager'):WaitForChild('KeyHandler'))
+    local stack = getupvalue(getrawmetatable(getupvalue(keyhandler, 8)).__index, 1)[1][1]
+    local GetKey = stack[89]
+    local key = stack[64]
+    getupvalue(GetKey, 2)[0][1][2][4] = "HtttpGet"
+    warn('id',getthreadidentity())
+    setthreadidentity(7)
+
+    getKey = GetKey
+
 	local LocalPlayer = game.Players.LocalPlayer
 
 
@@ -34469,7 +34488,6 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
             game.TeleportService:Teleport(4111023553);
         end;
     end;
-    
 
     local tab = window:CreateTab(gameName)
     local esptab = window:CreateTab('ESP Tab')
@@ -34557,7 +34575,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
 
                 local bone = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild('Head') and LocalPlayer.Character.Head:WaitForChild('Bone', 5);
                 while bone and bone.Parent do
-                    if (not library.flags.knockedownership) then task.wait(); continue; end;
+                    if (not deepwokensettings.knockedownership) then task.wait(); continue; end;
 
                     tool.Parent = LocalPlayer.Character;
                     task.wait(tool == weapon and 0.15 or 0.05);
@@ -34567,7 +34585,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
 
                 task.wait(0.1);
 
-                if (library.flags.knockedownership) then
+                if (deepwokensettings.knockedownership) then
                     if (weapon.Parent ~= LocalPlayer.Character) then
                         weapon.Parent = LocalPlayer.Character;
                     end;
@@ -34642,11 +34660,19 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
             end;
         end
     end
-    local setscriptes = function() end
-    local getKey;
+    --local setscriptes = function() end
     local inputClient = game.Players.LocalPlayer.Character:FindFirstChild('CharacterHandler'):WaitForChild('InputClient', math.huge);
 
     local function returnKeyhandler()
+      --  setscriptes(inputClient);
+     --   setthreadidentity(2);
+
+
+        
+        --GetKey("Dodge", key):FireServer("roll",nil,nil,false) -- example how to use
+       -- setthreadidentity(8);
+      --  setscriptes();
+        inputClient = game.Players.LocalPlayer.Character:FindFirstChild('CharacterHandler'):WaitForChild('InputClient', math.huge);
         setscriptes(inputClient);
         setthreadidentity(2);
 
@@ -34655,11 +34681,9 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         local GetKey = stack[89]
         local key = stack[64]
         getupvalue(GetKey, 2)[0][1][2][4] = "HtttpGet"
-        
-        --GetKey("Dodge", key):FireServer("roll",nil,nil,false) -- example how to use
+
         setthreadidentity(7);
         setscriptes();
-
 
         getKey = GetKey
         return key
@@ -34669,11 +34693,12 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         return getKey(x,key) -- if r == plum then
     end
 
-    repeat task.wait(1); returnKeyhandler(); until getKey ~= nil;
+    --local key = nil;
+    --repeat task.wait(1); key = returnKeyhandler(); until getKey ~= nil and key ~= nil;
     warn('got key')
-    local key = returnKeyhandler()
+    --local key = returnKeyhandler()
     if not getKey then game.Players.LocalPlayer:Kick('[azfake kick] no key handler') end
-
+    -- GetKey("Dodge", key)
     fallRemote = getKey('FallDamage', key);
     dialogueRemote = getKey('SendDialogue', key);
     blockRemote = getKey('Block', key);
@@ -34698,6 +34723,61 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         serverSwimRemote = serverSwimRemote
     };
 
+    --setthreadidentity(8);
+
+    local function onCharacterAdded(character)
+        local inputClient = game.Players.LocalPlayer.Character:FindFirstChild('CharacterHandler'):WaitForChild('InputClient', math.huge);
+        if (not getKey) then
+            repeat
+                print('Waiting for get getkey func');
+                RetKey = returnKeyhandler();
+                key = RetKey
+                task.wait(1);
+            until getKey;
+            print('Got Keyfunc')
+        end;
+        if not key then game.Players.LocalPlayer:Kick('[azfake kick] no key') end
+        --key = 
+
+        -- GetKey("Dodge", key)
+        fallRemote = getKey('FallDamage', key);
+        dialogueRemote = getKey('SendDialogue', key);
+        blockRemote = getKey('Block', key);
+        unblockRemote = getKey('Unblock', key);
+        dodgeRemote = getKey('Dodge', key);
+        leftClickRemote = getKey('LeftClick', key);
+        rightClickRemote = getKey('RightClick', key);
+        stopDodgeRemote = getKey('StopDodge', key);
+        dropToolRemote = getKey('DropTool', key);
+        serverSwimRemote = getKey('ServerSwim',key);
+    
+        getgenv().remotes = {
+            fallRemote = fallRemote,
+            dialogueRemote = dialogueRemote,
+            leftClickRemote = leftClickRemote,
+            blockRemote = blockRemote,
+            dodgeRemote = dodgeRemote,
+            rightClickRemote = rightClickRemote,
+            stopDodgeRemote = stopDodgeRemote,
+            unblockRemote = unblockRemote,
+            dropToolRemote = dropToolRemote,
+            serverSwimRemote = serverSwimRemote
+        };
+
+    end
+
+    -- game.Players.LocalPlayer.CharacterAdded:Connect(function(x)
+    --     onCharacterAdded(x)
+    -- end)
+
+
+    if (game.Players.LocalPlayer.Character) then
+        task.spawn(onCharacterAdded, game.Players.LocalPlayer.Character);
+    end;
+
+    game.Players.LocalPlayer.CharacterAdded:Connect(onCharacterAdded);
+
+
 
     local function roll()
         if deepwokensettings.blatantroll == false then 
@@ -34715,14 +34795,14 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end;   
     end;
 
-
+    setthreadidentity(7)
     
     local killBricks = {};
     local killBricksObjects = {};
 
     local killBricksNames = {'KillPlane', 'ChasmBrick', 'ThronePart', 'KillBrick', 'SuperWall'};
 
-
+    warn('id',getthreadidentity())
     local Whitelist = sector:AddDropdown("AutoParry Whitelist", deepwokensettings.whitelist, "All", false, function(dropdownv)
         deepwokensettings.whitelistmode = dropdownv;
     end)
