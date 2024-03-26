@@ -33174,6 +33174,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         voidplayer = false;
         diewithem = false;
         incrementdeath = 15;
+        voidcframe = false;
     } -- add m1 when next to enemy shifter
 
     aotfreedomwar.functions.instakillplayer = function(xtable,void)
@@ -33216,9 +33217,13 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             until game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == originalpos
             return
         end
-        
+        --
         if aotfreedomwar.voidplayer then 
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame *= CFrame.new(0,-70,0)
+            if aotfreedomwar.voidcframe then 
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0,600,0) --game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0,-60,0)
+            else
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame *= CFrame.new(0,-60,0) -- - 120
+            end
             if aotfreedomwar.diewithem then 
                 repeat 
                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame *= CFrame.new(0,-aotfreedomwar.incrementdeath,0) -- -15
@@ -33434,6 +33439,17 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             aotfreedomwar.functions.instakillplayer(game.Players:FindFirstChild(voidfor))
         end
     end)
+    weirdsector:AddToggle('Void CFrame',false,function(x)
+        aotfreedomwar.voidcframe = x
+        -- chatlogger could return table so chatlogger:disable()
+    end)
+    weirdsector:AddToggle('Die with Them',false,function(x)
+        aotfreedomwar.diewithem = x
+        -- chatlogger could return table so chatlogger:disable()
+    end)
+    weirdsector:AddSlider('Drag Death CFrame',0,15,50,10,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['incrementdeath'] = xstate
+    end)
     weirdsector:AddButton('Just Grab',function()
         if game.Players:FindFirstChild(voidfor) then 
             aotfreedomwar.functions.instakillplayer(game.Players:FindFirstChild(voidfor),'grab')
@@ -33455,13 +33471,6 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     weirdsector:AddToggle('Void Instead',false,function(x)
         aotfreedomwar.voidplayer = x
         -- chatlogger could return table so chatlogger:disable()
-    end)
-    weirdsector:AddToggle('Die with Them',false,function(x)
-        aotfreedomwar.diewithem = x
-        -- chatlogger could return table so chatlogger:disable()
-    end)
-    weirdsector:AddSlider('Drag Death CFrame',0,15,50,10,function(xstate) -- min def max dec
-        getgenv().aotfreedomwar['incrementdeath'] = xstate
     end)
     weirdsector:AddButton('Kill Nearest Player', function()
         local xtable = {}
