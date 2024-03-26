@@ -33169,7 +33169,121 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         watermark = true;
         chatlogger = true;
         superjumpmidair = false;
+        titans = {'AttackTitan','FemaleTitan','ColossalTitan','ArmoredTitan'}
     } -- add m1 when next to enemy shifter
+
+    aotfreedomwar.functions.instakillplayer = function(xtable)
+        local inputManager = game:GetService('VirtualInputManager')
+        local timeplacetaken = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+        -- could tp back but using safer opt
+        repeat 
+            task.wait()
+            xtable.Character.HumanoidRootPart.TToUngrabPrompt.Enabled = false;
+            xtable.Character.HumanoidRootPart.GToGrabPrompt.Enabled = true;
+            inputManager:SendKeyEvent(true,Enum.KeyCode.G,false,game)
+            inputManager:SendKeyEvent(false,Enum.KeyCode.G,false,game)
+            if (xtable.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude >= 15 then 
+                game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(xtable.Character.HumanoidRootPart)
+            else
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = xtable.Character.HumanoidRootPart.CFrame
+            end
+            
+        until game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value == true -- (xtable.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 3
+        task.wait(.1)
+
+        --task.wait(0.1)
+        xtable.Character.HumanoidRootPart.GToGrabPrompt.Enabled = true;
+        inputManager:SendKeyEvent(true,Enum.KeyCode.G,false,game)
+        inputManager:SendKeyEvent(false,Enum.KeyCode.G,false,game)
+        br = 0
+        repeat task.wait()
+            br += 0.1
+            inputManager:SendKeyEvent(true,Enum.KeyCode.G,false,game)
+            inputManager:SendKeyEvent(false,Enum.KeyCode.G,false,game)
+        until br > 1
+        xtable.Character.HumanoidRootPart.GToGrabPrompt.Enabled = false;
+        xtable.Character.HumanoidRootPart.TToUngrabPrompt.Enabled = true;
+        
+
+        local _chosen = workspace.OnGameTitans
+        for i,v in next, _chosen:GetChildren() do 
+            if v.Humanoid.Health >0 then
+                _chosen = v
+                break
+            end
+        end
+        repeat 
+            task.wait()
+            game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(_chosen.LeftUpperArm)
+        until (_chosen.LeftUpperArm.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 6
+        task.wait(.1)
+        b = 0
+        repeat task.wait(.1)
+            b += 0.1
+            inputManager:SendKeyEvent(true,Enum.KeyCode.T,false,game)
+            inputManager:SendKeyEvent(false,Enum.KeyCode.T,false,game)
+        until b > 1
+
+        local victims = {}
+        for i,v in next, game.Players:GetPlayers() do 
+            if v ~= game.Players.LocalPlayer and v ~= xtable then table.insert(victims,v.Name) end
+        end
+        victims = nil;
+        pcall(function() victims = game.Players:FindFirstChild(victims[math.random(1,#victims)]) end)
+        if victims then 
+            sp = victims.Character.HumanoidRootPart
+            game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(sp)
+        else
+            local done = false;
+            local savest = nil;
+            local savestdist = nil;
+            for i,v in next, workspace:GetDescendants() do 
+                if done == true then break end 
+
+                pcall(function()
+                    local dist = (v.Position - timeplacetaken).Magnitude
+                    if dist <= 15 and not v.Name:find(xtable.Name) then 
+                        if savest == nil then 
+                            savest = v;
+                            savestdist =dist
+                        else
+                            if savestdist > dist then 
+                                savest = v;
+                                savestdist = dist 
+                            end
+                        end
+                        if dist <= 5 then 
+                            done = true;
+                        end
+                    end
+                end)
+            end
+            if savest then 
+                print('tping back  to '..savest.Name) -- Nmame
+                repeat 
+                    task.wait()
+                    game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(savest)
+                until (savest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 25
+                repeat 
+                    task.wait()
+                    game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(savest)
+                until (savest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 25
+                repeat 
+                    task.wait()
+                    game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(savest)
+                until (savest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 25
+                game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(savest)
+            end
+            xtable.Character.HumanoidRootPart.TToUngrabPrompt.Enabled = false;
+        end
+    end
+    aotfreedomwar.functions.checkiftitan = function(x) -- notatitan
+        local b = false;
+        if table.find(aotfreedomwar.titans,x.Name) then 
+            b = true
+        end
+        return b
+    end
     
     local function changeSize(titan)
         pcall(function()
@@ -33271,16 +33385,13 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         -- chatlogger could return table so chatlogger:disable()
     end)
     weirdsector:AddButton('Kill Nearest Player', function()
-        local inputManager = game:GetService('VirtualInputManager')
-        local timeplacetaken = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
-        -- could tp back but using safer opt
         local xtable = {}
         local closestplayer = nil;
         local closestdist = nil;
         for i,v in next, game.Players:GetPlayers() do 
-            if v ~= game.Players.LocalPlayer and v.Character then 
-                local dist = (v.Character.HumanoidRootPart.Position - timeplacetaken).Magnitude
-                if dist <= 15 then 
+            if v ~= game.Players.LocalPlayer and v.Character and aotfreedomwar.functions.checkiftitan(v.Character) == false then 
+                local dist = (v.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                if dist <= 25 then 
                     if closestplayer == nil then 
                         closestplayer = v;
                         closestdist = dist;
@@ -33296,84 +33407,17 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end
         if not closestplayer then return end
         xtable = closestplayer -- game.Players:FindFirstChild(xtable[math.random(1,#xtable)])
-        xtable.Character.HumanoidRootPart.GToGrabPrompt.Enabled = true;
-        br = 0
-        repeat task.wait()
-            br += 0.1
-            inputManager:SendKeyEvent(true,Enum.KeyCode.G,false,game)
-            inputManager:SendKeyEvent(false,Enum.KeyCode.G,false,game)
-        until br > 1
-
-        local _chosen = workspace.OnGameTitans
-        for i,v in next, _chosen:GetChildren() do 
-            if v.Humanoid.Health >0 then
-                _chosen = v
-                break
-            end
-        end
-        repeat 
-            task.wait()
-            game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(_chosen.LeftUpperArm)
-        until (_chosen.LeftUpperArm.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 6
-
-        b = 0
-        repeat task.wait()
-            b += 0.1
-            inputManager:SendKeyEvent(true,Enum.KeyCode.T,false,game)
-            inputManager:SendKeyEvent(false,Enum.KeyCode.T,false,game)
-        until b > 1
-
-        local victims = {}
+        aotfreedomwar.functions.instakillplayer(xtable)
+    end)
+    weirdsector:AddButton('Kill Anyone', function()
+        local xtable = {}
         for i,v in next, game.Players:GetPlayers() do 
-            if v ~= game.Players.LocalPlayer and v ~= xtable then table.insert(victims,v.Name) end
-        end
-        victims = nil;
-        pcall(function() victims = game.Players:FindFirstChild(victims[math.random(1,#victims)]) end)
-        if victims then 
-            sp = victims.Character.HumanoidRootPart
-            game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(sp)
-        else
-            local done = false;
-            local savest = nil;
-            local savestdist = nil;
-            for i,v in next, workspace:GetDescendants() do 
-                if done == true then break end 
-
-                pcall(function()
-                    local dist = (v.Position - timeplacetaken).Magnitude
-                    if dist <= 15 and not v.Name:find(xtable.Name) then 
-                        if savest == nil then 
-                            savest = v;
-                            savestdist =dist
-                        else
-                            if savestdist > dist then 
-                                savest = v;
-                                savestdist = dist 
-                            end
-                        end
-                        if dist <= 5 then 
-                            done = true;
-                        end
-                    end
-                end)
-            end
-            if savest then 
-                print('tping back  to '..savest.Name) -- Nmame
-                repeat 
-                    task.wait()
-                    game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(savest)
-                until (savest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 10
-                repeat 
-                    task.wait()
-                    game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(savest)
-                until (savest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 10
-                repeat 
-                    task.wait()
-                    game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(savest)
-                until (savest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 10
-                game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(savest)
+            if v ~= game.Players.LocalPlayer and v.Character and aotfreedomwar.functions.checkiftitan(v.Character) == false then 
+                table.insert(xtable,v.Name) -- check ifnottitan
             end
         end
+        xtable = game.Players:FindFirstChild(xtable[math.random(1,#xtable)])
+        aotfreedomwar.functions.instakillplayer(xtable)
     end)
     local playerlooking = ''
     local Servers = sector:AddDropdown("Look At", {'none'}, "", false, function(dropdownv)
