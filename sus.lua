@@ -33460,7 +33460,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         aotfreedomwar.diewithem = x
         -- chatlogger could return table so chatlogger:disable()
     end)
-    sector:AddSlider('Drag Death CFrame',0,15,50,10,function(xstate) -- min def max dec
+    weirdsector:AddSlider('Drag Death CFrame',0,15,50,10,function(xstate) -- min def max dec
         getgenv().aotfreedomwar['incrementdeath'] = xstate
     end)
     weirdsector:AddButton('Kill Nearest Player', function()
