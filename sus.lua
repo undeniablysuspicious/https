@@ -33175,6 +33175,8 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         diewithem = false;
         incrementdeath = 15;
         voidcframe = false;
+        accelerateodm = false;
+        acceleration = 5;
     } -- add m1 when next to enemy shifter
 
     aotfreedomwar.functions.instakillplayer = function(xtable,void)
@@ -33569,6 +33571,21 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     sector:AddToggle('No Tension',false,function(xstate)
         getgenv().aotfreedomwar['nohooktension'] = xstate -- autom12
     end)
+    sector:AddSlider('Acceleration',0,5,100,10,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['acceleration']['x'] = xstate
+    end)
+    sector:AddToggle('Accelerate ODM',false,function(xstate)
+        getgenv().aotfreedomwar['accelerateodm'] = xstate -- autom12
+        if xstate then 
+            maid.accelerateodm = game.RunService.RenderStepped:Connect(function()
+                if azfake:returndata().humanoidrootpart then 
+                    azfake:returndata().humanoidrootpart:FindFirstChild('Velocity').Velocity *= aotfreedomwar.acceleration
+                    azfake:returndata().humanoidrootpart:FindFirstChild('Velocity').MaxForce *= 2
+                end
+            end)
+        end
+    end)
+
     sector:AddToggle('Infinite Gas',false,function(xstate)
         getgenv().aotfreedomwar['infinitegas'] = xstate
     end)
@@ -33612,7 +33629,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         ask = 'Stops when you die, click button twice until granada disappears on equip'; -- granola
         accept = 'Yes';
         reject = 'No';
-    })
+    }):AddKeybind()
     -- ifn:ActivateKnowledge()
     -- ifn:AddKnowledge('click again if granoda doesnt disappear')
     sector:AddToggle('Inf Spike Nets',false,function(x)
