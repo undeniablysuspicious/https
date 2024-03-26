@@ -5966,7 +5966,7 @@ if (IsElectron) then
     ExpectedGlobalsOnLoad = 287 + 7 --261 without hub loaded
 end
 if (identifyexecutor() and identifyexecutor():find('Codex')) then
-    ExpectedGlobalsOnLoad = 213 
+    ExpectedGlobalsOnLoad = 270 
 end
 local ExpectedGlobalRun = 0
 local ExpectedUnderscoreRun = 0
@@ -34470,7 +34470,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     local key = stack[64]
     getupvalue(GetKey, 2)[0][1][2][4] = "HtttpGet"
     warn('id',getthreadidentity())
-    setthreadidentity(7)
+    setthreadcaps(7)
 
     getKey = GetKey
 
@@ -34556,7 +34556,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
 	local ffcisa = clonefunction(game.FindFirstChildWhichIsA);
 	local ffc = clonefunction(game.FindFirstChild); -- ffs
 
-   -- local keyhandler = require(game.ReplicatedStorage:WaitForChild("Modules", math.huge):WaitForChild("ClientManager", math.huge):WaitForChild("KeyHandler", math.huge))
+    -- local keyhandler = require(game.ReplicatedStorage:WaitForChild("Modules", math.huge):WaitForChild("ClientManager", math.huge):WaitForChild("KeyHandler", math.huge))
 
     --local stack = debug.getupvalue(getrawmetatable(debug.getupvalue(keyhandler, 8)).__index, 1)[1][1]
     --local GetKey = stack[89]
@@ -34795,7 +34795,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end;   
     end;
 
-    setthreadidentity(7)
+    setthreadcaps(7)
     
     local killBricks = {};
     local killBricksObjects = {};
@@ -34825,19 +34825,22 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end
         Whitelist:Remove(player.Name);
     end)
-    sector:AddToggle("No Fall Damage", false, function(e)
+    rightsect:AddToggle("No Fall Damage", false, function(e)
         deepwokensettings['nofalldamage'] = e;
     end)
-    sector:AddToggle("Knocked Ownership", false, function(e)
+    sharedRequires['CreateFlySystem'](rightsect,deepwokensettings)
+    sharedRequires['CreateWalkSpeedSystem'](rightsect,deepwokensettings)
+    sharedRequires['CreateNoclip'](rightsect,deepwokensettings)
+    rightsect:AddToggle("Knocked Ownership", false, function(e)
         deepwokensettings['knockedownership'] = e;
     end)
-    sector:AddToggle("No Jump Cooldown", false, function(e)
+    rightsect:AddToggle("No Jump Cooldown", false, function(e)
         deepwokensettings['nojumpcooldown'] = e;
     end)
-    sector:AddToggle("No stun", false, function(e)
+    rightsect:AddToggle("No stun", false, function(e)
         deepwokensettings['nostun'] = e;
     end)
-    sector:AddToggle("Infinite Jump", false, function(e)
+    rightsect:AddToggle("Infinite Jump", false, function(e)
         deepwokensettings['infinitejump'] = e;
         repeat
             local rootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild('HumanoidRootPart');
@@ -34847,16 +34850,16 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
             task.wait(0.1);
         until not deepwokensettings.infinitejump;
     end)
-    sector:AddSlider("Infinite Jump Height", 0, 0, 250, 1, function(State)
+    rightsect:AddSlider("Infinite Jump Height", 0, 0, 250, 1, function(State)
         deepwokensettings['infiniteJumpHeight'] = State
     end)
-    sector:AddToggle("Anti Acid", false, function(e)
+    rightsect:AddToggle("Anti Acid", false, function(e)
         deepwokensettings['antiacid'] = e;
     end)
     -- sector:AddToggle("No Kill Bricks", false, function(e)
     --     deepwokensettings['nokillbricks'] = e;
     -- end)
-    sector:AddToggle("Auto Void Mobs", false, function(e)
+    rightsect:AddToggle("Auto Void Mobs", false, function(e)
         deepwokensettings['autovoidmobs'] = e;
     end)
     sector:AddToggle("Auto Parry", false, function(e)
@@ -34878,9 +34881,6 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         deepwokensettings['customwaitdelay'] = State
     end)
 
-    sharedRequires['CreateFlySystem'](sector,deepwokensettings)
-    sharedRequires['CreateWalkSpeedSystem'](sector,deepwokensettings)
-    sharedRequires['CreateNoclip'](sector,deepwokensettings)
     rightsect:AddButton('Serverhop',function()
         Notify('','Serverhopping... ',1)
         functions.serverHop(true)
@@ -35880,7 +35880,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
                 print('parry found anim')
                 if char:FindFirstChild('HumanoidRootPart') then 
                     if parryAnimTables[AnimationMainID] ~= table then
-                        if (char:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character.Position).Magnitude > deepwokensettings.autoparrydistance then 
+                        if (char:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > deepwokensettings.autoparrydistance then 
                             return
                         end
                     end
