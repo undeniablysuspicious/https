@@ -34351,10 +34351,12 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     Player.PlayerGui.SkillsGui.BladeThrow.Cooldown.Value = 100
                     --Player.Backpack.Medkit.Cooldown.Value = 2.8
                     Humanoid.HorseStamina.Value = 2800
-                    Character[gearname].SkillsSpamLimit.Impulse.Value = 0
-                    Character[gearname].SkillsSpamLimit.Dodge.Value = 0
-                    Character[gearname].SkillsSpamLimit.BladeThrow.Value = 0
-                    Character[gearname].SkillsSpamLimit.HandCutMk2.Value = 0
+                    if Character[gearname]:FindFirstChild('SkillsSpamLimit') then 
+                        Character[gearname].SkillsSpamLimit.Impulse.Value = 0
+                        Character[gearname].SkillsSpamLimit.Dodge.Value = 0
+                        Character[gearname].SkillsSpamLimit.BladeThrow.Value = 0
+                        Character[gearname].SkillsSpamLimit.HandCutMk2.Value = 0
+                    end
                 end
                 --workspace.PlayersDataFolder:FindFirstChild(Player.Name).Rank.Value = 5
                 --workspace.PlayersDataFolder:FindFirstChild(Player.Name).GamePoints.Value = 50000
