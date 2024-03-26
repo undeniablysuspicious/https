@@ -33169,12 +33169,15 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         watermark = true;
         chatlogger = true;
         superjumpmidair = false;
-        titans = {'AttackTitan','FemaleTitan','ColossalTitan','ArmoredTitan'}
+        titans = {'AttackTitan','FemaleTitan','ColossalTitan','ArmoredTitan'};
+        tptooriginalpos = false;
+        voidplayer = false;
     } -- add m1 when next to enemy shifter
 
-    aotfreedomwar.functions.instakillplayer = function(xtable)
+    aotfreedomwar.functions.instakillplayer = function(xtable,void)
         local inputManager = game:GetService('VirtualInputManager')
         local timeplacetaken = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+        local originalpos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
         -- could tp back but using safer opt
         repeat 
             task.wait()
@@ -33204,19 +33207,26 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         xtable.Character.HumanoidRootPart.GToGrabPrompt.Enabled = false;
         xtable.Character.HumanoidRootPart.TToUngrabPrompt.Enabled = true;
         
-
-        local _chosen = workspace.OnGameTitans
-        for i,v in next, _chosen:GetChildren() do 
-            if v.Humanoid.Health >0 then
-                _chosen = v
-                break
+        if aotfreedomwar.voidplayer then 
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame *= CFrame.new(0,-70,0)
+        else
+            local _chosen = workspace.OnGameTitans
+            for i,v in next, _chosen:GetChildren() do 
+                if v.Humanoid.Health > 0 then
+                    _chosen = v
+                    break
+                end
             end
+            repeat 
+                task.wait()
+                if (_chosen.LeftLowerLeg.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude >= 15 then 
+                    game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(_chosen.LeftLowerLeg)
+                else
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = _chosen.LeftLowerLeg.CFrame
+                end
+            until (_chosen.LeftLowerLeg.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 6
         end
-        repeat 
-            task.wait()
-            game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(_chosen.LeftUpperArm)
-        until (_chosen.LeftUpperArm.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 6
-        task.wait(.1)
+
         b = 0
         repeat task.wait(.1)
             b += 0.1
@@ -33228,8 +33238,12 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         for i,v in next, game.Players:GetPlayers() do 
             if v ~= game.Players.LocalPlayer and v ~= xtable then table.insert(victims,v.Name) end
         end
-        victims = nil;
+        --victims = nil;
         pcall(function() victims = game.Players:FindFirstChild(victims[math.random(1,#victims)]) end)
+        if aotfreedomwar.tptooriginalpos == true then 
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = originalpos
+            return
+        end
         if victims then 
             sp = victims.Character.HumanoidRootPart
             game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(sp)
@@ -33237,27 +33251,27 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             local done = false;
             local savest = nil;
             local savestdist = nil;
-            for i,v in next, workspace:GetDescendants() do 
-                if done == true then break end 
+            -- for i,v in next, workspace:GetDescendants() do 
+            --     if done == true then break end 
 
-                pcall(function()
-                    local dist = (v.Position - timeplacetaken).Magnitude
-                    if dist <= 15 and not v.Name:find(xtable.Name) then 
-                        if savest == nil then 
-                            savest = v;
-                            savestdist =dist
-                        else
-                            if savestdist > dist then 
-                                savest = v;
-                                savestdist = dist 
-                            end
-                        end
-                        if dist <= 5 then 
-                            done = true;
-                        end
-                    end
-                end)
-            end
+            --     pcall(function()
+            --         local dist = (v.Position - timeplacetaken).Magnitude
+            --         if dist <= 15 and not v.Name:find(xtable.Name) then 
+            --             if savest == nil then 
+            --                 savest = v;
+            --                 savestdist =dist
+            --             else
+            --                 if savestdist > dist then 
+            --                     savest = v;
+            --                     savestdist = dist 
+            --                 end
+            --             end
+            --             if dist <= 5 then 
+            --                 done = true;
+            --             end
+            --         end
+            --     end)
+            -- end
             if savest then 
                 print('tping back  to '..savest.Name) -- Nmame
                 repeat 
@@ -33276,6 +33290,8 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             end
             xtable.Character.HumanoidRootPart.TToUngrabPrompt.Enabled = false;
         end
+        xtable.Character.HumanoidRootPart.GToGrabPrompt.Enabled = false;
+        xtable.Character.HumanoidRootPart.TToUngrabPrompt.Enabled = false;
     end
     aotfreedomwar.functions.checkiftitan = function(x) -- notatitan
         local b = false;
@@ -33332,9 +33348,16 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     if game.PlaceId == 11860234207 then --.P{la}
         weirdsector:AddButton('Auto Finish',function()
         
-            local ohString1 = "Event"
+            -- local ohString1 = "Event"
     
-            game:GetService("Players").LocalPlayer.PlayerGui.DialogueGui.DialogueEvent:FireServer(ohString1)
+            -- game:GetService("Players").LocalPlayer.PlayerGui.DialogueGui.DialogueEvent:FireServer(ohString1)
+
+            for i=1,4 do 
+                local ohString1 = "Event"
+    
+                game:GetService("Players").LocalPlayer.PlayerGui.DialogueGui.DialogueEvent:FireServer(ohString1)
+                task.wait(.1)
+            end
     
             task.wait(1)
             for i,v in next, game:GetService("Workspace").TutorialForest.TrainingDummies:GetChildren() do 
@@ -33359,6 +33382,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end)
     end
 
+    -- if a captain dies make u say packwatch alert
 
     weirdsector:AddButton('Rejoin',function()
         game:GetService('TeleportService'):teleport(game.PlaceId)
@@ -33382,6 +33406,32 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         else
             if game.CoreGui:FindFirstChild('ChatLogger') then game.CoreGui:FindFirstChild('ChatLogger').Enabled = false end
         end
+        -- chatlogger could return table so chatlogger:disable()
+    end)
+    local voidfor = ''
+    local specificvoid = weirdsector:AddDropdown("Specific Void", {'none'}, "", false, function(dropdownv)
+        voidfor = dropdownv;
+    end)
+    weirdsector:AddButton('Void Person',function()
+        if game.Players:FindFirstChild(voidfor) then 
+            aotfreedomwar.functions.instakillplayer(game.Players:FindFirstChild(voidfor))
+        end
+    end)
+    for i,v in next, game.Players:GetPlayers() do 
+        if v ~= game.Players.LocalPlayer then specificvoid:Add(v.Name) end 
+    end
+    game.Players.PlayerAdded:Connect(function(v)
+        specificvoid:Add(v.Name)
+    end)
+    game.Players.PlayerRemoving:Connect(function(v)
+        specificvoid:Remove(v.Name)
+    end)
+    weirdsector:AddToggle('TP Original Pos',false,function(x)
+        aotfreedomwar.tptooriginalpos = x
+        -- chatlogger could return table so chatlogger:disable()
+    end)
+    weirdsector:AddToggle('Void Instead',false,function(x)
+        aotfreedomwar.voidplayer = x
         -- chatlogger could return table so chatlogger:disable()
     end)
     weirdsector:AddButton('Kill Nearest Player', function()
@@ -33418,6 +33468,12 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end
         xtable = game.Players:FindFirstChild(xtable[math.random(1,#xtable)])
         aotfreedomwar.functions.instakillplayer(xtable)
+    end)
+    weirdsector:AddButton('Fix Insta Kill', function()
+      --  game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = true; -- could check if true;
+        game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = true;
+        task.wait(1)
+        game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = false;
     end)
     local playerlooking = ''
     local Servers = sector:AddDropdown("Look At", {'none'}, "", false, function(dropdownv)
@@ -34309,9 +34365,10 @@ elseif game.PlaceId == 11534222714 then -- aot freedom war main menu
         ServerChosen = dropdownv;
     end)
     sector:AddToggle('Spam Join',false,function(x)
-        bum  = x;
+        bum = x;
         if x then 
-            azfakenotify('joining.. '..x:sub(1,5),10)
+            print('joining')
+            azfakenotify('joining.. '..ServerChosen:sub(1,5),10)
         end
     end)
     sector:AddButton('Refresh',function()
@@ -34324,8 +34381,16 @@ elseif game.PlaceId == 11534222714 then -- aot freedom war main menu
     end)
     task.spawn(function()
         while task.wait() do 
+            if getgenv().loopsUnload == true then print('lobbyu bobyb') break end
             if bum and ServerChosen then 
                 -- click button cuz the remote isnt fired wth
+                for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui.MainMenuGui.ServerList.ScrollingFrame:GetChildren() do 
+                    if v:FindFirstChild('IdValue') and v:FindFirstChild('IdValue').Text == ServerChosen then -- joinbutton
+                        print('ye')
+                        firesignal(v.JoinButton.MouseButton1Click)
+                        firesignal(v.JoinButton.MouseButton1Down)
+                    end
+                end
             end
         end
     end)
