@@ -33172,6 +33172,8 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         titans = {'AttackTitan','FemaleTitan','ColossalTitan','ArmoredTitan'};
         tptooriginalpos = false;
         voidplayer = false;
+        diewithem = false;
+        incrementdeath = 15;
     } -- add m1 when next to enemy shifter
 
     aotfreedomwar.functions.instakillplayer = function(xtable,void)
@@ -33217,6 +33219,13 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         
         if aotfreedomwar.voidplayer then 
             game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame *= CFrame.new(0,-70,0)
+            if aotfreedomwar.diewithem then 
+                repeat 
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame *= CFrame.new(0,-aotfreedomwar.incrementdeath,0) -- -15
+                    task.wait()
+                until not game.Players.LocalPlayer.Character or game.Players.LocalPlayer.Character.Humanoid.Health == 0
+                return
+            end
         else
             local _chosen = workspace.OnGameTitans
             for i,v in next, _chosen:GetChildren() do 
@@ -33446,6 +33455,13 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     weirdsector:AddToggle('Void Instead',false,function(x)
         aotfreedomwar.voidplayer = x
         -- chatlogger could return table so chatlogger:disable()
+    end)
+    weirdsector:AddToggle('Die with Them',false,function(x)
+        aotfreedomwar.diewithem = x
+        -- chatlogger could return table so chatlogger:disable()
+    end)
+    sector:AddSlider('Drag Death CFrame',0,15,50,10,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['incrementdeath'] = xstate
     end)
     weirdsector:AddButton('Kill Nearest Player', function()
         local xtable = {}
