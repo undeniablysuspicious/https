@@ -33206,6 +33206,14 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         until br > 1
         xtable.Character.HumanoidRootPart.GToGrabPrompt.Enabled = false;
         xtable.Character.HumanoidRootPart.TToUngrabPrompt.Enabled = true;
+
+        if void == 'grab' then 
+            repeat
+                task.wait()
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = originalpos
+            until game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame == originalpos
+            return
+        end
         
         if aotfreedomwar.voidplayer then 
             game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame *= CFrame.new(0,-70,0)
@@ -33359,7 +33367,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 task.wait(.1)
             end
     
-            task.wait(1)
+            task.wait(4)
             for i,v in next, game:GetService("Workspace").TutorialForest.TrainingDummies:GetChildren() do 
                 if v:FindFirstChild('DummyNape') then 
                     local savedColor = v.DummyNape.Color
@@ -33415,6 +33423,11 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     weirdsector:AddButton('Void Person',function()
         if game.Players:FindFirstChild(voidfor) then 
             aotfreedomwar.functions.instakillplayer(game.Players:FindFirstChild(voidfor))
+        end
+    end)
+    weirdsector:AddButton('Just Grab',function()
+        if game.Players:FindFirstChild(voidfor) then 
+            aotfreedomwar.functions.instakillplayer(game.Players:FindFirstChild(voidfor),'grab')
         end
     end)
     for i,v in next, game.Players:GetPlayers() do 
