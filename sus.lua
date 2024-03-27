@@ -7511,6 +7511,7 @@ end;
 
 local MemStoreService = game:GetService('MemStorageService');
 local Players = game:GetService('Players');
+local RunService = game:GetService('RunService')
 local BlockUtils = {};
 function BlockUtils:BlockUser(userId)
 
@@ -34346,8 +34347,10 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                         end
                     end
                 end
-                if aotfreedomwar['adjusthookrange'] == true and Character and Humanoid and gearfolder then 
-                    gearfolder.Upgrades.HooksRange.Value = getgenv().aotfreedomwar['hookrange'] 
+                if aotfreedomwar['adjusthookrange'] == true and Character and Humanoid and gearfolder and gearfolder:FindFirstChild('Upgrades') then 
+                    if gearfolder.Upgrades:FindFirstChild('HooksRange') then 
+                        gearfolder.Upgrades.HooksRange.Value = getgenv().aotfreedomwar['hookrange'] 
+                    end
                 end
                 if aotfreedomwar['adjustattackspeed'] == true and Character and Humanoid and gearfolder then 
                     gearfolder.Upgrades.AttackSpeed.Value = getgenv().aotfreedomwar['attackspeed'] 
@@ -34665,7 +34668,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         ingredientespdistance = 100;
         chestespdistance = 5000;
     }
-
+    
     -- local ingredientesp = esp_lib:AddObjectListener(game:GetService("Workspace").Ingredients, {
     --     SelfName = true;
     --     TableReceiveColor = deepwokensettings;
@@ -34789,7 +34792,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end
     end
     --local setscriptes = function() end
-    local inputClient = game.Players.LocalPlayer.Character:FindFirstChild('CharacterHandler'):WaitForChild('InputClient', math.huge);
+    local inputClient = game.Players.LocalPlayer.Character:FindFirstChild('CharacterHandler'):WaitForChild('InputClient');
 
     local function returnKeyhandler()
       --  setscriptes(inputClient);
@@ -34892,7 +34895,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
             dropToolRemote = dropToolRemote,
             serverSwimRemote = serverSwimRemote
         };
-
+        setupNoStun()
     end
 
     -- game.Players.LocalPlayer.CharacterAdded:Connect(function(x)
@@ -35118,6 +35121,8 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
             end
         end)
     end);
+    lastUsedMantra = ''
+    lastUsedMantraAt = tick()
     local autoparrytoggle = sector:AddToggle("Auto Parry", false, function(e)
         deepwokensettings['autoparry'] = e;
         if e == false then 
@@ -35142,6 +35147,150 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
                         break;
                     end;
                 end;
+            end;
+        end);
+        maid.autoParrySlotBall = workspace.Thrown.ChildAdded:Connect(function(obj)
+            task.wait();
+            if (not myRootPart) then return end;
+
+            if (obj.Name == 'SlotBall') then
+                repeat
+                    task.wait();
+                until (obj.Position - myRootPart.Position).Magnitude <= 20 or not obj.Parent;
+
+                if (not obj.Parent) then
+                    return warn('Object got destroyed');
+                end;
+
+                blockAttack();
+                unblockAttack();
+            elseif (obj.Name == 'BoulderProjectile' and (myRootPart.Position - obj.Position).Magnitude < 500) then
+                repeat
+                    task.wait()
+                until (obj.Position - myRootPart.Position).Magnitude <= 30 or not obj.Parent;
+                if (not obj.Parent) then return end;
+                dodgeAttack();
+            elseif (obj.Name == 'SpearPart' and (myRootPart.Position - obj.Position).Magnitude < 600) then
+                -- Grand Javelin Long Range
+                if (myRootPart.Position - obj.Position).Magnitude <= 35 then return; end
+                repeat
+                    task.wait()
+                until (obj.Position - myRootPart.Position).Magnitude <= 80 or not obj.Parent;
+                if (not obj.Parent) then return end;
+                blockAttack();
+                unblockAttack();
+            elseif (obj.Name == 'StrikeIndicator' and (myRootPart.Position - obj.Position).Magnitude < 10) then
+                _taskwait(0.2);
+                blockAttack();
+                unblockAttack();
+            elseif (obj.Name == 'WindSlashProjectile' and (myRootPart.Position - obj.Position).Magnitude < 200) then
+                if (myRootPart.Position - obj.Position).Magnitude <= 10 then return; end
+                repeat
+                    task.wait()
+                until checkRange(30, obj) or not obj.Parent;
+                if (not obj.Parent) then return end;
+                blockAttack();
+                unblockAttack();
+            elseif (obj.Name == 'IceShuriken' and checkRange(300, obj) and not (lastUsedMantra == 'ForgeIce' and tick() - lastUsedMantraAt < 1)) then
+                print(tick() - lastUsedMantraAt, lastUsedMantra);
+                repeat
+                    task.wait();
+                until not obj.Parent or checkRange(20, obj);
+                if (not obj.Parent) then return end;
+                print('parry');
+                blockAttack();
+                unblockAttack();
+            elseif (obj.Name == 'IceDagger' and not checkRange(20, obj)) then
+                local rocketPropulsion = obj:WaitForChild('RocketPropulsion', 10);
+                if (not rocketPropulsion or rocketPropulsion.Target ~= myRootPart) then return end;
+
+                repeat
+                    task.wait();
+                until not obj.Parent or checkRange(20, obj);
+                if (not obj.Parent) then return end;
+
+                blockAttack();
+                unblockAttack();
+            elseif (obj.Name == 'WindProjectile' and not checkRange(20, obj)) then
+                repeat
+                    task.wait();
+                until checkRange(80, obj) or not obj.Parent;
+                if (not obj.Parent) then return end;
+
+                blockAttack();
+                unblockAttack();
+            elseif (obj.Name == 'WindKickBrick' and not checkRange(15, obj)) then
+                -- Tornado Kick
+
+                repeat
+                    task.wait();
+                until checkRange(40, obj) or not obj.Parent;
+                if (not obj.Parent) then return end;
+                blockAttack();
+                unblockAttack();
+            elseif (obj.Name == 'SeekerOrb') then
+                -- Shadow Seeker
+                local rocketPropulsion = obj:WaitForChild('RocketPropulsion', 10);
+                if (not rocketPropulsion or rocketPropulsion.Target ~= myRootPart) then return end;
+                repeat
+                    task.wait();
+                until not obj.Parent or checkRange(2, obj);
+                if (checkRange(2, obj)) then
+                    blockAttack();
+                    unblockAttack();
+                end;
+            elseif (obj.Name == 'Beam') then
+                -- Arc Beam
+                local endPart = obj:WaitForChild('End', 10);
+                if (not endPart) then return; end;
+
+                repeat task.wait(); until checkRange(30, endPart) or not obj.Parent;
+                if (not obj.Parent) then print('Despawned') return; end;
+
+                blockAttack();
+                unblockAttack();
+            elseif (obj.Name == 'DiskPart' and checkRange(100, obj)) then
+                -- Sinister Halo
+                repeat task.wait(); until checkRange(20, obj) or not obj.Parent;
+                if (not obj.Parent) then print('Despawned') return; end;
+
+                _taskwait(0.3);
+                blockAttack();
+                unblockAttack();
+                task.wait(0.3);
+                if (not checkRange(15, obj)) then return end;
+                blockAttack();
+                unblockAttack();
+            elseif (obj.Name == 'BoneSpear') then -- Avatar Bone Throw
+                _taskwait(0.5);
+
+                if (isLayer2) then
+                    repeat
+                        task.wait();
+                    until not obj.Parent or checkRange(30, obj) checkRangeFromPing(obj, 30, 175);
+                else
+                    repeat
+                        task.wait();
+                    until not obj.Parent or checkRange(30, obj);
+                end;
+
+                if (not obj.Parent) then return end;
+                blockAttack();
+                unblockAttack();
+            elseif (obj.Name == 'Bullet' and not checkRange(10, obj)) then
+                repeat
+                    task.wait();
+                until checkRange(10,obj) or not obj.Parent;
+                if (not obj.Parent) then return end; -- checkRangeFromPing(obj, 20, 20)
+
+                blockAttack();
+                unblockAttack();
+            end;
+        end);
+        maid.autoParryOnEffectAddd = effectReplicator.EffectAdded:connect(function(effect)
+            if (effect.Class == 'UsingMove') then
+                lastUsedMantraAt = tick();
+                lastUsedMantra = effect.Value.Name:match('Mantra%:(.-)%p');
             end;
         end);
     end)
