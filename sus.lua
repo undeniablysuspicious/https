@@ -506,17 +506,32 @@ function azfakenotify(text, time)
         task.wait(0.1)
         --Main:TweenPosition(UDim2.new(1, -330, 0, 50), "Out", "Sine", 0.5)
         local TitleBarWait = false
-        if situtated == 'ifConnect' then 
-            TextButton.MouseButton1Down:Connect(function()
-                TitleBarWait = true
-            end)
-        else
-            wait(situtated)
-            TitleBarWait = true
-        end
         TextButton.MouseButton1Down:Connect(function()
             TitleBarWait = true
         end)
+        if situtated and type(situtated) ~= 'string' then 
+            task.spawn(function()
+                wait(situtated)
+                TitleBarWait = true
+            end)
+        end
+        -- if situtated == 'ifConnect' then 
+        --     -- TextButton.MouseButton1Down:Connect(function()
+        --     --     TitleBarWait = true
+        --     -- end)
+        -- else
+        --     -- task.spawn(function(
+
+        --     --     en
+        --     -- ))
+        --     task.spawn(function()
+        --         wait(situtated)
+        --         TitleBarWait = true
+        --     end)
+        -- end
+        -- TextButton.MouseButton1Down:Connect(function()
+        --     TitleBarWait = true
+        -- end)
         repeat task.wait() until TitleBarWait == true
         local bunda = Instance.new('Frame'); bunda.BackgroundTransparency = 1 bunda.Position = MainFrame.Position;bunda.Parent = notification;
         bunda.Size = UDim2.new(0, 200, 0, -150)
@@ -6747,7 +6762,7 @@ local function setupAimbotTab(globaltable)
         globaltable['aimbotsettings']['aimbot'] = xstate
     end)
     pvpsector:AddSeperator('')
-    local aimbotrigger = pvpsector:AddKeybindAttachment('Aimbot Button'):AddKeybind()
+    local aimbotrigger = pvpsector:AddKeybindAttachment('Aimbot Button'):AddKeybind(nil,'aimbotkeybind')
     aimbotbutton:AddKeybind()
     pvpsector:AddToggle('Movement Prediction',false,function(xstate)
         globaltable['aimbotsettings']['movementpredictions'] = xstate
@@ -17477,6 +17492,13 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             getgenv().parry()
             cancelAll = true
         end
+        if detect(v,'rbxassetid://9890800691') then -- fist anims crit cuz i never actually hardcoded them :skull: (1)
+            task.wait(.36)
+            getgenv().parry()
+            cancelAll = true
+        end
+
+        
         -- fist 1 rbxassetid://9890788066
         -- fist 2 rbxassetid://9890790186
         -- fist 3 rbxassetid://9890792365
@@ -33094,7 +33116,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
 
 
 
-
+    window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), OpenGUBUTTON)
     sharedRequires['SetupChatlogger']() 
     local tab = window:CreateTab(gameName)
     local sector = tab:CreateSector('Cheats','left')
@@ -33400,7 +33422,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                             local inputManager = game:GetService('VirtualInputManager')
                             local m = game.Players.LocalPlayer:GetMouse();
                             inputManager:SendMouseButtonEvent(m.X,m.Y,0,true,game,0)
-                            task.wait(.1)
+                            --task.wait(.1)
                             inputManager:SendMouseButtonEvent(m.X,m.Y,0,false,game,0)
                         end)
                     until v:FindFirstChild('DummyNape').Cutted.Value == true -- ~= savedColor
@@ -33438,90 +33460,82 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end
         -- chatlogger could return table so chatlogger:disable()
     end)
-    local voidfor = ''
-    local specificvoid = weirdsector:AddDropdown("Specific Void", {'none'}, "", false, function(dropdownv)
-        voidfor = dropdownv;
-    end)
-    weirdsector:AddButton('Void Person',function()
-        if game.Players:FindFirstChild(voidfor) then 
-            aotfreedomwar.functions.instakillplayer(game.Players:FindFirstChild(voidfor))
-        end
-    end)
-    weirdsector:AddToggle('Void CFrame',false,function(x)
-        aotfreedomwar.voidcframe = x
-        -- chatlogger could return table so chatlogger:disable()
-    end)
-    weirdsector:AddToggle('Die with Them',false,function(x)
-        aotfreedomwar.diewithem = x
-        -- chatlogger could return table so chatlogger:disable()
-    end)
-    weirdsector:AddSlider('Drag Death CFrame',0,15,50,10,function(xstate) -- min def max dec
-        getgenv().aotfreedomwar['incrementdeath'] = xstate
-    end)
-    weirdsector:AddButton('Just Grab',function()
-        if game.Players:FindFirstChild(voidfor) then 
-            aotfreedomwar.functions.instakillplayer(game.Players:FindFirstChild(voidfor),'grab')
-        end
-    end)
-    for i,v in next, game.Players:GetPlayers() do 
-        if v ~= game.Players.LocalPlayer then specificvoid:Add(v.Name) end 
-    end
-    game.Players.PlayerAdded:Connect(function(v)
-        specificvoid:Add(v.Name)
-    end)
-    game.Players.PlayerRemoving:Connect(function(v)
-        specificvoid:Remove(v.Name)
-    end)
-    weirdsector:AddToggle('TP Original Pos',false,function(x)
-        aotfreedomwar.tptooriginalpos = x
-        -- chatlogger could return table so chatlogger:disable()
-    end)
-    weirdsector:AddToggle('Void Instead',false,function(x)
-        aotfreedomwar.voidplayer = x
-        -- chatlogger could return table so chatlogger:disable()
-    end)
-    weirdsector:AddButton('Kill Nearest Player', function()
-        local xtable = {}
-        local closestplayer = nil;
-        local closestdist = nil;
-        for i,v in next, game.Players:GetPlayers() do 
-            if v ~= game.Players.LocalPlayer and v.Character and aotfreedomwar.functions.checkiftitan(v.Character) == false then 
-                local dist = (v.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
-                if dist <= 25 then 
-                    if closestplayer == nil then 
-                        closestplayer = v;
-                        closestdist = dist;
-                    else
-                        if closestdist > dist then 
-                            closestplayer = v;
-                            closestdist = dist;
-                        end
-                    end
-                end
-                table.insert(xtable,v.Name) -- check ifnottitan
-            end
-        end
-        if not closestplayer then return end
-        xtable = closestplayer -- game.Players:FindFirstChild(xtable[math.random(1,#xtable)])
-        aotfreedomwar.functions.instakillplayer(xtable)
-    end)
-    weirdsector:AddButton('Kill Anyone', function()
-        local xtable = {}
-        for i,v in next, game.Players:GetPlayers() do 
-            if v ~= game.Players.LocalPlayer and v.Character and aotfreedomwar.functions.checkiftitan(v.Character) == false then 
-                table.insert(xtable,v.Name) -- check ifnottitan
-            end
-        end
-        xtable = game.Players:FindFirstChild(xtable[math.random(1,#xtable)])
-        aotfreedomwar.functions.instakillplayer(xtable)
-    end)
-    weirdsector:AddButton('Fix Insta Kill', function()
-      --  game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = true; -- could check if true;
-        game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = true;
-        task.wait(1)
-        game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = false;
-    end)
+    -- local voidfor = ''
+    -- local specificvoid = weirdsector:AddDropdown("Specific Void", {'none'}, "", false, function(dropdownv)
+    --     voidfor = dropdownv;
+    -- end)
+    -- weirdsector:AddButton('Void Person',function()
+    --     if game.Players:FindFirstChild(voidfor) then 
+    --         aotfreedomwar.functions.instakillplayer(game.Players:FindFirstChild(voidfor))
+    --     end
+    -- end)
+    -- weirdsector:AddToggle('Void CFrame',false,function(x)
+    --     aotfreedomwar.voidcframe = x
+    --     -- chatlogger could return table so chatlogger:disable()
+    -- end)
+    -- weirdsector:AddToggle('Die with Them',false,function(x)
+    --     aotfreedomwar.diewithem = x
+    --     -- chatlogger could return table so chatlogger:disable()
+    -- end)
+    -- weirdsector:AddSlider('Drag Death CFrame',0,15,50,10,function(xstate) -- min def max dec
+    --     getgenv().aotfreedomwar['incrementdeath'] = xstate
+    -- end)
+    -- weirdsector:AddButton('Just Grab',function()
+    --     if game.Players:FindFirstChild(voidfor) then 
+    --         aotfreedomwar.functions.instakillplayer(game.Players:FindFirstChild(voidfor),'grab')
+    --     end
+    -- end)
+    -- weirdsector:AddToggle('TP Original Pos',false,function(x)
+    --     aotfreedomwar.tptooriginalpos = x
+    --     -- chatlogger could return table so chatlogger:disable()
+    -- end)
+    -- weirdsector:AddToggle('Void Instead',false,function(x)
+    --     aotfreedomwar.voidplayer = x
+    --     -- chatlogger could return table so chatlogger:disable()
+    -- end)
+    -- weirdsector:AddButton('Kill Nearest Player', function()
+    --     local xtable = {}
+    --     local closestplayer = nil;
+    --     local closestdist = nil;
+    --     for i,v in next, game.Players:GetPlayers() do 
+    --         if v ~= game.Players.LocalPlayer and v.Character and aotfreedomwar.functions.checkiftitan(v.Character) == false then 
+    --             local dist = (v.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+    --             if dist <= 25 then 
+    --                 if closestplayer == nil then 
+    --                     closestplayer = v;
+    --                     closestdist = dist;
+    --                 else
+    --                     if closestdist > dist then 
+    --                         closestplayer = v;
+    --                         closestdist = dist;
+    --                     end
+    --                 end
+    --             end
+    --             table.insert(xtable,v.Name) -- check ifnottitan
+    --         end
+    --     end
+    --     if not closestplayer then return end
+    --     xtable = closestplayer -- game.Players:FindFirstChild(xtable[math.random(1,#xtable)])
+    --     aotfreedomwar.functions.instakillplayer(xtable)
+    -- end)
+    -- weirdsector:AddButton('Kill Anyone', function()
+    --     local xtable = {}
+    --     for i,v in next, game.Players:GetPlayers() do 
+    --         if v ~= game.Players.LocalPlayer and v.Character and aotfreedomwar.functions.checkiftitan(v.Character) == false then 
+    --             table.insert(xtable,v.Name) -- check ifnottitan
+    --         end
+    --     end
+    --     xtable = game.Players:FindFirstChild(xtable[math.random(1,#xtable)])
+    --     aotfreedomwar.functions.instakillplayer(xtable)
+    -- end)
+    -- weirdsector:AddButton('Fix Insta Kill', function()
+    --   --  game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = true; -- could check if true;
+    --     game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = true;
+    --     task.wait(1)
+    --     game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = false;
+    -- end)
     local playerlooking = ''
+    local hookingpvp = ''
     local Servers = sector:AddDropdown("Look At", {'none'}, "", false, function(dropdownv)
         playerlooking = dropdownv;
         if dropdownv == 'none' then 
@@ -33541,15 +33555,35 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             workspace.Camera.CameraSubject = game.Players:FindFirstChild(playerlooking).Character --workspace:FindFirstChild(playerlooking)
         end
     end)
+    local hookdrop = sector:AddDropdown("Hook At", {'none'}, "", false, function(dropdownv)
+        hookingpvp = dropdownv;
+    end)
+    --local HookSelect = sect:AddKeybindAttachment('Attach to back'):AddKeybind(); 
+    sector:AddLabel('Press K to Manually Assign\nPress 4 To Use') -- eybind
+    --game.Players.LocalPlayer:GetMouse().Key
     for i,v in next, game.Players:GetPlayers() do 
-        if v ~= game.Players.LocalPlayer then Servers:Add(v.Name) end 
+        if v ~= game.Players.LocalPlayer then 
+            Servers:Add(v.Name) 
+       --     specificvoid:Add(v.Name)
+            hookdrop:Add(v.Name)
+        end 
     end
     game.Players.PlayerAdded:Connect(function(v)
         Servers:Add(v.Name)
+     --   specificvoid:Add(v.Name)
+        hookdrop:Add(v.Name)
     end)
     game.Players.PlayerRemoving:Connect(function(v)
         Servers:Remove(v.Name)
+      --  specificvoid:Remove(v.Name)
+        hookdrop:Add(v.Name)
     end)
+    
+
+
+
+
+
     local autom1tgl = sector:AddToggle('Auto M1',false,function(xstate)
         getgenv().aotfreedomwar['autom1'] = xstate -- autom12
     end)
@@ -34040,7 +34074,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end)
     local aimbot = false;
     local mouthaimbot = false;
-    Mouse.KeyDown:Connect(function(key)
+    local MouseCon; MouseCon = Mouse.KeyDown:Connect(function(key)
         if key:lower() == getgenv().aotfreedomwar['titanaimbotkeybind'] then 
             aimbot = not aimbot
         elseif key:lower() == getgenv().aotfreedomwar['titanmouthaimkeybind'] then 
@@ -34051,7 +34085,31 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     warn(`network {v.Parent.Name}`)
                     v.Parent.Humanoid.Health = 0
                 end
-            end        
+            end  
+        elseif key:lower() == 'k' then 
+            for i,v in next, game.Players:GetPlayers() do
+                if v ~= game.Players.LocalPlayer and v.Character and aotfreedomwar.functions.checkiftitan(v.Character) == false then 
+                    local dist = (Mouse.hit.p - v.Character.PrimaryPart.Position).Magnitude
+                    if dist <= 6 then 
+                        hookdrop:Set(v.Name)
+                        azfakenotify('set hooking to {v.Name:sub(1,5)}',5)
+                    end
+                end
+            end
+        elseif key:lower() == '4' and hookingpvp ~= '' and game.Players:FindFirstChild(hookingpvp) then 
+            if game.Players:FindFirstChild(hookingpvp) and game.Players:FindFirstChild(hookingpvp).Character then 
+                local obj = game.Players:FindFirstChild(hookingpvp).Character.PrimaryPart
+                local args = {
+                    [1] = obj,
+                    [2] = game.Players.LocalPlayer.Character.PrimaryPart.CFrame, --CFrame.new(3.90576171875, 54.0802001953125, 3.13983154296875) * CFrame.Angles(-3.1415927410125732, 0.8258955478668213, -3.1415927410125732),
+                    [3] = game.Players.LocalPlayer.Character.PrimaryPart.CFrame, -- CFrame.new(4.955963134765625, -54.0802001953125, -0.7427978515625) * CFrame.Angles(-0.5150448083877563, 1.0880918502807617, 0.46471184492111206),
+                    [4] = game.Players.LocalPlayer.Character.PrimaryPart.Position, --Vector3.new(830.6765747070312, 1184.00244140625, -585.1898803710938),
+                    [5] = game.Players.LocalPlayer.Character.PrimaryPart.Position, --Vector3.new(11.006999969482422, -131.49099731445312, 0)
+                }
+                game:GetService("Players").LocalPlayer.Character.Gear.Events.MoreEvents.CastEKey:FireServer(unpack(args))   
+            end
+            -- task.spawn(function() 
+            -- end)
         end
     end)
 
@@ -34219,13 +34277,13 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             end
         end
     end
-
     local Player = game.Players.LocalPlayer
     task.spawn(function()
         while task.wait() do 
             if getgenv().loopsUnload == true then aimbotctn:Disconnect(); print('fw break end')  
                 maid.lookatcon = nil; maid.nostunshifter = nil; maid.shifterautoblock = nil;
-                maid.shifterautom1 = nil; maid.walkspeedcon = nil; maid.shifterautom2 = nil; break 
+                maid.shifterautom1 = nil; maid.walkspeedcon = nil; maid.shifterautom2 = nil;
+                MouseCon:Disconnect(); break 
             end
             --pcall(function()
                 Character = Player.Character
@@ -34235,7 +34293,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 if not Character:FindFirstChild('Gear') and Character:FindFirstChild('APGear') then 
                     gearname = 'APGear'
                 end
-                local gearscript = Character and Character:FindFirstChild(gearname)
+                local gearscript = Character and Character:FindFirstChild(gearname) and Character:FindFirstChild(gearname):FindFirstChild('Events')
                 if aotfreedomwar.spawnnets == true and Character then 
                     local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position
                     game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
@@ -34459,6 +34517,7 @@ elseif game.PlaceId == 11534222714 then -- aot freedom war main menu
     end)
 
 elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId)) and vs == 'debug' then 
+    window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), OpenGUBUTTON)
     sharedRequires['SetupChatlogger']()
     local effectReplicator = require(game:GetService('ReplicatedStorage'):WaitForChild('EffectReplicator', math.huge));
     warn('id',getthreadidentity())
@@ -34492,6 +34551,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     local tab = window:CreateTab(gameName)
     local esptab = window:CreateTab('ESP Tab')
     local sector = tab:CreateSector('Cheats','left')
+    local moresect = tab:CreateSector('Cheats','left')
     local rightsect = tab:CreateSector('Cheats', 'right')
     local espsector = esptab:CreateSector('Cheats','left')
     local Stats = game:GetService("Stats")
@@ -34504,6 +34564,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     esp_lib:Toggle(true)
 
     getgenv().deepwokensettings = {
+        functions = {};
         autoparrydistance = 15; --autoparryrange = 15;
         autoparry = false;
         usecustomwaitdelay = false;
@@ -34532,6 +34593,46 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         rollcantparrystatus = false;
         blatantroll = false;
         rollcancel = false;
+        talentsspoofable = {
+            "Talent:Speed Emission",
+            "Talent:Disbelief",
+            "Talent:Endurance Runner",
+            "Talent:Spinning Swordsman",
+            "Talent:Nightchild",
+            "Talent:Aerial Assault",
+            "Talent:Moving Fortress",
+            "Talent:Swift Rebound",
+            "Talent:Blade Dancer",
+            "Talent:Defiance",
+            "Talent:Triathlete",
+            "Talent:Graceful Landing",
+            "Talent:Fast Blade",
+            "Talent:Gale Leap",
+            "Talent:Heavy Haul",
+            "Talent:Kick Off",
+            "Talent:Scaredy Cat",
+            "Talent:Drifting Winds",
+            "Talent:Strong Hold",
+            "Talent:Tap Dancer",
+            "Talent:Navae's Guidance",
+            "Talent:Engage",
+            "Talent:Seaborne",
+        };
+        lootablevariety = {
+            ''
+        };
+        lootmedallion = false; -- lootmedallino
+        lootmythic = false;
+        lootenchant = false; --lootlegen = false;
+        lootrare = false;
+        lootcommon = false;
+        lootunc = false;
+        playerproximity = false;
+        proximityrange = 200;
+        proximitylabel = false;
+        hidetextwhenclear = false;
+        disableautoparryinproximity = false;
+        modnotifer = true;
     }
 
     -- local ingredientesp = esp_lib:AddObjectListener(game:GetService("Workspace").Ingredients, {
@@ -34621,10 +34722,6 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     end;
 
     setupNoStun()
-
-
-
-
 
     local function updateESP(tag, property, options)
         --print('called')
@@ -34778,6 +34875,77 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     game.Players.LocalPlayer.CharacterAdded:Connect(onCharacterAdded);
 
 
+    deepwokensettings.functions.autoloot = function(v)
+        --[[
+            Mythic = {Color3.fromRGB(),deepwokensettings.lootmythic}
+        ]]
+        local LootColors = {
+            ["Mythic"] = {
+                col = Color3.fromRGB(71, 204, 175); -- could make it a table and keep the color and the variable inside
+                val = deepwokensettings.lootmythic;
+            };
+            ["Common"] = {
+                col = Color3.fromRGB(64, 80, 76); -- could make it a table and keep the color and the variable inside
+                val = deepwokensettings.lootmythic;
+            };
+            ["Rare"] = {
+                col = CColor3.fromRGB(136, 83, 83); -- could make it a table and keep the color and the variable inside
+                val = deepwokensettings.lootmythic;
+            };
+            ["Uncommon"] = {
+                col = Color3.fromRGB(163, 142, 101); -- could make it a table and keep the color and the variable inside
+                val = deepwokensettings.lootmythic;
+            };
+            ["Enchant"] = {
+                col = Color3.fromRGB(226, 255, 231); -- could make it a table and keep the color and the variable inside
+                val = deepwokensettings.lootmythic;
+            };
+        };
+        warn(`[autoloot] [func] [BG Color: {v.BackgroundColor3}] [IMG Color: {v.ImageColor3}]`)
+        if v.Name:find('Medallion') and deepwokensettings.lootmedallion then 
+            warn(`[autoloot] ->? picking up medallion`)
+            return;
+        end;
+        for color, value in next, LootColors do 
+            if value['col'] == v.BackgroundColor3 and value['val'] == true then 
+                warn(`[autoloot] ->? picking up {color} [reason : {value['val']}]`)
+            end
+        end
+    end
+    game.Players.LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
+        if child.Name == 'ChoicePrompt' then 
+            local UiLocation = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('ChoicePrompt').ChoiceFrame.Options;
+            for i,v in next, UiLocation:GetChildren() do 
+                deepwokensettings.functions.autoloot(v);
+            end;
+        end;
+    end);
+
+    deepwokensettings.functions.getactivebloodjar = function()
+        local chaser = workspace.Live:FindFirstChild(".chaser")
+        if not chaser then
+            return nil
+        end
+        return chaser.HumanoidRootPart:FindFirstChild("BloodJar")
+    end
+    if game.CoreGui:FindFirstChild('AzfakeProximity') then 
+        game.CoreGui:FindFirstChild('AzfakeProximity'):Destroy()
+    end
+    local ProximityGUI = Instance.new('ScreenGui');
+    ProximityGUI.Name = 'AzfakeProximity'
+    local ProximityFrame = Instance.new('Frame');
+    ProximityFrame.Name = '_azfakeproximity';
+    ProximityFrame.Parent = ProximityGUI;
+    ProximityFrame.Position = UDim2.new(0.25,0,0.25,0)
+    ProximityFrame.Size = UDim2.new(0.25,0,0.25,0)
+    local ProximityLabel = Instance.new('TextLabel');
+    ProximityLabel.Size = UDim2.new(1,0,1,0);
+    ProximityLabel.Name = 'proximitylabel';
+    ProximityLabel.RichText = true;
+    ProximityLabel.TextSize = 20;
+    ProximityLabel.Text = ''
+    ProximityLabel.Parent = ProximityFrame;
+
 
     local function roll()
         if deepwokensettings.blatantroll == false then 
@@ -34796,6 +34964,15 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     end;
 
     setthreadcaps(7)
+
+
+    local moderatorIds = {}
+    local function isInGroup(player, groupId)
+        local suc, err = pcall(player.IsInGroup, player, groupId);
+
+        if(not suc) then return false end;
+        return err;
+    end;
     
     local killBricks = {};
     local killBricksObjects = {};
@@ -34815,6 +34992,9 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     game.Players.PlayerAdded:Connect(function(player)
         table.insert(deepwokensettings.whitelist,player.Name)
         Whitelist:Add(player.Name)
+        if deepwokensettings.modnotifer and (table.find(moderatorIds, tostring(userId)) or isInGroup(player, 5212858)) then
+            azfakenotify('A Moderator Has Joined Your Server','untilClick')
+        end
     end)
     sharedRequires.__task(function()
         print()
@@ -34824,6 +35004,9 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
             if v == player.Name then table.remove(deepwokensettings.whitelist,i); end;
         end
         Whitelist:Remove(player.Name);
+        if deepwokensettings.modnotifer and (table.find(moderatorIds, tostring(userId)) or isInGroup(player, 5212858)) then
+            azfakenotify('A Moderator Has Left The Game','untilClick')
+        end
     end)
     rightsect:AddToggle("No Fall Damage", false, function(e)
         deepwokensettings['nofalldamage'] = e;
@@ -34831,15 +35014,6 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     sharedRequires['CreateFlySystem'](rightsect,deepwokensettings)
     sharedRequires['CreateWalkSpeedSystem'](rightsect,deepwokensettings)
     sharedRequires['CreateNoclip'](rightsect,deepwokensettings)
-    rightsect:AddToggle("Knocked Ownership", false, function(e)
-        deepwokensettings['knockedownership'] = e;
-    end)
-    rightsect:AddToggle("No Jump Cooldown", false, function(e)
-        deepwokensettings['nojumpcooldown'] = e;
-    end)
-    rightsect:AddToggle("No stun", false, function(e)
-        deepwokensettings['nostun'] = e;
-    end)
     rightsect:AddToggle("Infinite Jump", false, function(e)
         deepwokensettings['infinitejump'] = e;
         repeat
@@ -34853,6 +35027,15 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     rightsect:AddSlider("Infinite Jump Height", 0, 0, 250, 1, function(State)
         deepwokensettings['infiniteJumpHeight'] = State
     end)
+    rightsect:AddToggle("Knocked Ownership", false, function(e)
+        deepwokensettings['knockedownership'] = e;
+    end)
+    rightsect:AddToggle("No Jump Cooldown", false, function(e)
+        deepwokensettings['nojumpcooldown'] = e;
+    end)
+    rightsect:AddToggle("No Stun", false, function(e)
+        deepwokensettings['nostun'] = e;
+    end)
     rightsect:AddToggle("Anti Acid", false, function(e)
         deepwokensettings['antiacid'] = e;
     end)
@@ -34861,8 +35044,39 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     -- end)
     rightsect:AddToggle("Auto Void Mobs", false, function(e)
         deepwokensettings['autovoidmobs'] = e;
-    end)
-    sector:AddToggle("Auto Parry", false, function(e)
+        if (e == false) then 
+            --print('ended')
+            maid.voidmobs = nil;
+            return;
+        end;
+        maid.voidmobs = game.RunService.Heartbeat:Connect(function()
+            --print('voiding')
+            sethiddenproperty(LocalPlayer, "MaxSimulationRadius", math.huge)
+            sethiddenproperty(LocalPlayer, "SimulationRadius", math.huge)
+    
+            for _, v in pairs(workspace.Live:GetChildren()) do
+                if
+                    v.PrimaryPart
+                    and v ~= LocalPlayer.Character
+                    and v:FindFirstChild("HumanoidRootPart")
+                    and not v.Name:find(".megalodaunt")
+                    and not v.Name:find(".chaser")
+                    and not v.Name:find("lionfish")
+                then
+                    if v.HumanoidRootPart.ReceiveAge == 0 then
+                        local cf = v.PrimaryPart.CFrame
+                        --v.PrimaryPart.Velocity = Vector3.new(14.465, 14.465, 14.465)
+                        --v.HumanoidRootPart.CFrame = CFrame.new(cf.X, -4980, cf.Z)
+                        v.Humanoid.Health = 0
+                        if sethiddenproperty then
+                            sethiddenproperty(v.HumanoidRootPart, "NetworkIsSleeping", false)
+                        end
+                    end
+                end
+            end
+        end)
+    end);
+    local autoparrytoggle = sector:AddToggle("Auto Parry", false, function(e)
         deepwokensettings['autoparry'] = e;
     end)
     sector:AddSlider("Auto Parry Distance", 0, 0, 250, 1, function(State)
@@ -34885,6 +35099,148 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         Notify('','Serverhopping... ',1)
         functions.serverHop(true)
     end)
+
+    local selectedTalent = ''
+    local selectionspoof = moresect:AddDropdown('Talents Spoofer', deepwokensettings.talentsspoofable, "" , false, function(e)
+        -- nothing turned into something
+        selectedTalent = e;
+    end); 
+    moresect:AddButton('Spoof Talent',function()
+        if selectedTalent ~= '' then 
+            if not LocalPlayer.Backpack:FindFirstChild(selectedTalent) then 
+                local talent = Instance.new("Folder")
+                talent.Name = selectedTalent
+                talent.Parent = LocalPlayer.Backpack
+                azfakenotify(`Gave Talent {string.split(selectedTalent,':')[2]}`,4)
+                print(`gave talent {selectedTalent}`)
+                --TalentSelect[selectedTalent] = talent
+            end
+        end
+    end)
+    local PlayersInProximity = {}
+    local HasBeenAround = false;
+    moresect:AddSlider("Proximity Range", 0, 200, 1000, 1, function(State)
+        deepwokensettings['proximityrange'] = State
+    end)
+    moresect:AddToggle("Player Proximity Label", false, function(e)
+        deepwokensettings['proximitylabel'] = e;
+        ProximityGUI.Enabled = e;
+        if e == false then 
+            ProximityLabel.Text = '' -- could make it check if proximity to set text
+        end;
+        if e == true then 
+            -- label.Visible = true;
+            --ProximityGUI.Enabled = e
+        end;
+    end)
+    moresect:AddToggle("Hide Text When Clear", false, function(e)
+        deepwokensettings['hidetextwhenclear'] = e;
+    end)
+    moresect:AddToggle("Disable AutoParry In Proximity", false, function(e)
+        deepwokensettings['disableautoparryinproximity'] = e;
+    end)
+    moresect:AddToggle("Player Proximity", false, function(e)
+        deepwokensettings['playerproximity'] = e;
+        if (e == false) then 
+            maid.playerproximitycon = nil;
+            return; 
+        end;
+        maid.playerproximitycon = game.RunService.Heartbeat:Connect(LPH_NO_VIRTUALIZE(function()
+            local HumanoidRootPart = azfake:returndata().humanoidrootpart
+            if not HumanoidRootPart then return end;
+            if #PlayersInProximity > 0 then 
+                local PluralText = 'PLAYER'
+                ProximityLabel.Text = `{#PlayersInProximity} {#PlayersInProximity==1 and 'PLAYER' or 'PLAYERS'} ARE IN PROXIMITY` -- `PLAYERS {#PlayersInProximity} ARE IN PROXIMITY`
+                if deepwokensettings.disableautoparryinproximity then 
+                    deepwokensettings.autoparry = false -- and autoparry == true()
+                end
+            else
+                if deepwokensettings.disableautoparryinproximity and autoparrytoggle:Get() == true then 
+                    deepwokensettings.autoparry = true;
+                end
+                if deepwokensettings.hidetextwhenclear == false then 
+                    ProximityLabel.Text = 'NO PLAYERS ARE IN PROXIMITY'
+                else
+                    ProximityLabel.Text = ''
+                end
+            end
+            local function cleanPlayersInProximity() -- could make a silder instead of 3
+                if #PlayersInProximity >= 3 and HasBeenAround == false then 
+                    print(`[azfake] -> starting proximity check`)
+                    HasBeenAround = nil;
+                    task.spawn(function()
+                        task.wait(120)
+                        if #PlayersInProximity >= 3 then
+                            print(`[azfake] -> proximity check been close for 2 minutes`)
+                            HasBeenAround = true;
+                        end
+                    end)
+                elseif #PlayersInProximity >= 3 and HasBeenAround == true then 
+                    for index, oldplayer in next, PlayersInProximity do 
+                        if oldplayer == nil then -- cleanup
+                            table.remove(PlayersInProximity,index) 
+                            print(`[azfake][cleanup] -> removed nil in player proximity , probably left`)
+                        end
+                    end
+                    HasBeenAround = false;
+                else
+                    -- do nothing
+                end
+            end;
+            cleanPlayersInProximity()
+            for i, opp_player in next, game.Players:GetPlayers() do 
+                if opp_player ~= game.Players.LocalPlayer and PlayersInProximity[opp_player] == nil and opp_player.Character ~= nil and opp_player.Character:FindFirstChild('HumanoidRootPart') then 
+                    local OppHumanoidRootPart = opp_player.Character:FindFirstChild('HumanoidRootPart');
+                    if (OppHumanoidRootPart.Position - HumanoidRootPart.Position).Magnitude <= deepwokensettings.proximityrange then 
+                        PlayersInProximity[opp_player] = true;
+                        azfakenotify(`{opp_player.Name} is in proximity`,'untilClick') -- could destroy after
+                    else
+                        if PlayersInProximity[opp_player] ~= nil then 
+                            azfakenotify(`{opp_player.Name} left the proximity`,'untilClick')
+                            for index, oldplayer in next, PlayersInProximity do 
+                                if oldplayer == nil then -- cleanup
+                                    table.remove(PlayersInProximity,index) 
+                                    print(`[azfake] -> removed nil in player proximity , probably left`)
+                                end
+                                if oldplayer == opp_player then 
+                                    table.remove(PlayersInProximity,i)
+                                end
+                            end
+                        end
+                    end
+                end
+            end;
+            -- (())
+        end))
+    end)
+    moresect:AddSeperator('-')
+    moresect:AddToggle('Auto Loot', false, function(xstate)
+        deepwokensettings.autoloot = xstate;
+    end)
+    moresect:AddToggle('Auto Loot Filter', false, function(xstate)
+        deepwokensettings.autolootfiler = xstate;
+    end)
+    moresect:AddToggle('Loot Medallions', false, function(xstate)
+        deepwokensettings.lootmedallion = xstate;
+    end)
+    moresect:AddToggle('Loot Mythic', false, function(xstate)
+        deepwokensettings.lootmythic = xstate;
+    end)
+    moresect:AddToggle('Loot Enchanted', false, function(xstate)
+        deepwokensettings.lootenchant = xstate;
+    end)
+    moresect:AddToggle('Loot Rare', false, function(xstate)
+        deepwokensettings.lootrare = xstate;
+    end)
+    moresect:AddToggle('Loot Common', false, function(xstate)
+        deepwokensettings.lootcommon = xstate;
+    end)
+    moresect:AddToggle('Loot Uncommon', false, function(xstate)
+        deepwokensettings.lootunc = xstate;
+    end)
+    -- local selectionspoof = moresect:AddDropdown('Loot', deepwokensettings.lootablevariety, "" , false, function(e)
+    --     selectedTalent = e;
+    -- end); 
     espsector:AddToggle('Use Names', false, function(xstate)
         deepwokensettings.espnames = xstate;
         esp_lib.Names = xstate
@@ -34949,7 +35305,20 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
 
     ]]
 
+    local function checkRange(range, part)
+        local myRootPart = azfake:returndata().humanoidrootpart
+        if (not myRootPart or not part) then
+            return false;
+        end;
 
+        range += deepwokensettings['autoparrydistance'];
+
+        if (typeof(part) == 'Vector3') then
+            part = {Position = part}; -- Vector3.new() = {Position = Vector3.new()} -- make x the subject
+        end;
+
+        return (myRootPart.Position - part.Position).Magnitude <= range;
+    end;
 
     -- Namecall
 
@@ -34983,6 +35352,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end)
     end
     local function parryAttack(timings,rootPart,animationTrack,maxRange,useAnimSpeed)
+        if not checkRange(maxRange,rootPart) then return print('didnt parry not in range ['..tostring(maxRange)..']') end
         local convertedWait = 0;
         local waited = 0;
         local offset = 0;
@@ -35014,23 +35384,9 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end
         return x
     end
-
     local function getswingspeed(mob)
         local swingspeed = 1;
         local myRootPart = game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
-        local function checkRange(range, part)
-			if (not myRootPart or not part) then
-				return false;
-			end;
-	
-			range += deepwokensettings['autoparrydistance'];
-	
-			if (typeof(part) == 'Vector3') then
-				part = {Position = part}; -- Vector3.new() = {Position = Vector3.new()} -- make x the subject
-			end;
-	
-			return (myRootPart.Position - part.Position).Magnitude <= range;
-		end;
     end
     local function calculateSwing(mob)
         local timing = 1;
@@ -35461,13 +35817,37 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     
     -- entity that comes into range of our autoparry would loop through all animations
     -- checking if its paryyable
+    local dealtwithgalelunge = false
+    parryAnimTables['6017393708'] = function(anim,mob) --makeDelayBlockWithRange(15, 0.3); -- Gale Lunge
+        dealtwithgalelunge = false;
+        local mobRoot = mob:FindFirstChild('HumanoidRootPart');
+        if checkRange(15, mobRoot) then 
+            task.wait(.2) --(.4)
+            if checkRange(9, mobRoot) then 
+                dealtwithgalelunge = true;
+                task.wait(.2)
+                parryfunc()
+            end
+        else
+            dealtwithgalelunge = false;
+            -- task.spawn(function()
+            --     repeat task.wait() until checkRange(9, mobRoot)
+            --     parryfunc()
+            --     print('parry gale lunge')
+            -- end)
+        end
 
-    --parryAnimTables['6017393708'] = makeDelayBlockWithRange(15, 0.3); -- Gale Lunge
+    end;
     parryAnimTables['6017418456'] = function(_, mob) -- Gale Lunge Launch Anim
+        if dealtwithgalelunge == true then 
+            dealtwithgalelunge = false;
+            return;
+        end
         local mobRoot = mob:FindFirstChild('HumanoidRootPart');
         task.spawn(function()
-            repeat task.wait() until checkRange(6, mobRoot)
+            repeat task.wait() until checkRange(9, mobRoot)
             parryfunc()
+            print('parry gale lunge')
         end)
         -- if (not mobRoot or not checkRange(35, mobRoot)) then return end;
         -- local distance = (mobRoot.Position - myRootPart.Position).Magnitude;
@@ -35516,6 +35896,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end;
     
         local function f(animTrack, mob)
+            if not checkRange(14,mob) then return end
             local swingSpeed = calculateSwing(mob) or 1;
     
             --parryAttack({getSpeed(swingSpeed)},mob.PrimaryPart,animTrack,15);
@@ -35539,6 +35920,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end;
     
         local function f(animTrack, mob)
+            if not checkRange(14,mob) then return end
             local swingSpeed = calculateSwing(mob) or 1;
     
             --parryAttack({getSpeed(swingSpeed)},mob.PrimaryPart,animTrack,15);
@@ -35563,6 +35945,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end;
 
         local function f(animTrack, mob)
+            if not checkRange(14,mob) then return end
 
             local ignoreHeavyHand = false;
             for i,v in next, mob.Humanoid:GetPlayingAnimationTracks() do
@@ -35574,7 +35957,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
             --parryAttack({getSpeed(swingSpeed)},mob.PrimaryPart,animTrack,15);
             local animspeed = calculateSwing(mob)
             warn('swing speed '..tostring(animspeed))
-            task.wait(animspeed - 0.4)
+            task.wait(animspeed - 0.35)
             parryfunc()
         end;
 
@@ -35670,10 +36053,11 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end;
 
         local function f(animTrack, mob)
+            if not checkRange(14,mob) then return end
             local swingSpeed = calculateSwing(mob) or 1;
     
             --parryAttack({getSpeed(swingSpeed)},mob.PrimaryPart,animTrack,15);
-            task.wait(swingSpeed - 0.3)
+            task.wait(swingSpeed - 0.45) -- 0.5
             parryfunc()
         end;
 
@@ -35879,7 +36263,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
             if parryAnimTables[AnimationMainID] and deepwokensettings['autoparry'] == true then 
                 print('parry found anim')
                 if char:FindFirstChild('HumanoidRootPart') then 
-                    if parryAnimTables[AnimationMainID] ~= table then
+                    if type(parryAnimTables[AnimationMainID]) ~= 'table' and type(parryAnimTables[AnimationMainID]) ~= 'function' then
                         if (char:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > deepwokensettings.autoparrydistance then 
                             return
                         end
