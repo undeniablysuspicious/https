@@ -81,37 +81,61 @@ getgenv().azfake_version = 'v3 '..getgenv().versioncode
 
 if not (rconsoleprint) then rconsoleprint = print end
 
-
 local dungeon_quest_games = {
-    ["Dungeon Quest!"]=2414851778;
-    ["Desert Temple"]=2606294912;
-    ["Winter Outpost"]=2743806150;
-    ["Trading Post"]=2779073290;
-    ["testingArea"]=2886606697;
-    ["Pirate Island"]=2988891534;
-    ["King's Castle"]=3041739550;
-    ["The Underworld"]=3119903031;
-    ["Lobby 2"]=3220968688;
-    ["Wave Defence"]=3220974599;
-    ["Samurai Palace"]=3277965370;
-    ["The Canals"]=3488584454;
-    ["Ghastly Harbor"]=3737465474;
-    ["Tutorial"]=3896361983;
-    ["Steampunk Sewers"]=4113459044;
-    ["raids"]=4286254333;
-    ["Orbital Outpost"]=4628698373;
-    ["EI hehe"]=4865331948;
-    ["Volcanic"]=5281215714;
-    ["Data Recovery Center"]=5829413559;
-    ["Asset Holder"]=5990944244;
-    ["Aquatic Temple"]=6216785535;
-    ["Enchanted Forest"]=6878973814;
-    ["vCaffy's Place Number: 227"]=7852284392;
-    ["Halloween Boss"]=7852317824;
-    ["Northern Lands"]=8376888496;
-    ["Gilded Skies"]=11663047386;
-    ["Krampus"]=11926349271;
+    ["[HUNT] Dungeon Quest! âš”ï¸ RPG Adventure"] = 2414851778;
+    ["Level"] = 14363263080;
+    ["100+"] = 14363264964;
 }
+--[[
+
+local x = game:GetService("AssetService"):GetGamePlacesAsync()
+
+local str = ""
+
+while true do
+	for _, place in x:GetCurrentPage() do
+		print("Name:", place.Name)
+		print("PlaceId:", place.PlaceId)
+		str = str..`["{place.Name}"] = {place.PlaceId};\n`
+	end
+	if x.IsFinished then
+		break
+	end
+	x:AdvanceToNextPageAsync()
+end
+setclipboard(str)
+]]
+
+-- local dungeon_quest_games = {
+--     ["Dungeon Quest!"]=2414851778;
+--     ["Desert Temple"]=2606294912;
+--     ["Winter Outpost"]=2743806150;
+--     ["Trading Post"]=2779073290;
+--     ["testingArea"]=2886606697;
+--     ["Pirate Island"]=2988891534;
+--     ["King's Castle"]=3041739550;
+--     ["The Underworld"]=3119903031;
+--     ["Lobby 2"]=3220968688;
+--     ["Wave Defence"]=3220974599;
+--     ["Samurai Palace"]=3277965370;
+--     ["The Canals"]=3488584454;
+--     ["Ghastly Harbor"]=3737465474;
+--     ["Tutorial"]=3896361983;
+--     ["Steampunk Sewers"]=4113459044;
+--     ["raids"]=4286254333;
+--     ["Orbital Outpost"]=4628698373;
+--     ["EI hehe"]=4865331948;
+--     ["Volcanic"]=5281215714;
+--     ["Data Recovery Center"]=5829413559;
+--     ["Asset Holder"]=5990944244;
+--     ["Aquatic Temple"]=6216785535;
+--     ["Enchanted Forest"]=6878973814;
+--     ["vCaffy's Place Number: 227"]=7852284392;
+--     ["Halloween Boss"]=7852317824;
+--     ["Northern Lands"]=8376888496;
+--     ["Gilded Skies"]=11663047386;
+--     ["Krampus"]=11926349271;
+-- }
 
 local shindogames = {
     "7214033433",
@@ -30007,6 +30031,8 @@ elseif azfake.findintable_i(dungeon_quest_games,gameName) and dungeon_quest_game
             game:GetService("VirtualUser"):ClickButton2(Vector2.new())
         end
     end)
+    sethiddenproperty(LocalPlayer, "MaxSimulationRadius", math.huge)
+    sethiddenproperty(LocalPlayer, "SimulationRadius", math.huge)
     -- check if txt isnt there
     -- add a toggle so you dont have to type extension name
     -- add a textbox for the extension ending it wants to add if the toggle for no extension name is on but the default is .txt
@@ -34621,6 +34647,8 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         lootablevariety = {
             ''
         };
+        autoloot = false;
+        autolootfilter = false;
         lootmedallion = false; -- lootmedallino
         lootmythic = false;
         lootenchant = false; --lootlegen = false;
@@ -34633,6 +34661,9 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         hidetextwhenclear = false;
         disableautoparryinproximity = false;
         modnotifer = true;
+        chestesp = false;
+        ingredientespdistance = 100;
+        chestespdistance = 5000;
     }
 
     -- local ingredientesp = esp_lib:AddObjectListener(game:GetService("Workspace").Ingredients, {
@@ -34823,7 +34854,8 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     --setthreadidentity(8);
 
     local function onCharacterAdded(character)
-        local inputClient = game.Players.LocalPlayer.Character:FindFirstChild('CharacterHandler'):WaitForChild('InputClient', math.huge);
+        --repeat task.wait() until game.Players.LocalPlayer.Character
+        --inputClient = game.Players.LocalPlayer.Character:FindFirstChild('CharacterHandler'):WaitForChild('InputClient', math.huge);
         if (not getKey) then
             repeat
                 print('Waiting for get getkey func');
@@ -34874,7 +34906,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
 
     game.Players.LocalPlayer.CharacterAdded:Connect(onCharacterAdded);
 
-
+    setthreadcaps(7)
     deepwokensettings.functions.autoloot = function(v)
         --[[
             Mythic = {Color3.fromRGB(),deepwokensettings.lootmythic}
@@ -34886,38 +34918,46 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
             };
             ["Common"] = {
                 col = Color3.fromRGB(64, 80, 76); -- could make it a table and keep the color and the variable inside
-                val = deepwokensettings.lootmythic;
+                val = deepwokensettings.lootcommon;
             };
             ["Rare"] = {
-                col = CColor3.fromRGB(136, 83, 83); -- could make it a table and keep the color and the variable inside
-                val = deepwokensettings.lootmythic;
+                col = Color3.fromRGB(136, 83, 83); -- could make it a table and keep the color and the variable inside
+                val = deepwokensettings.lootrare;
             };
             ["Uncommon"] = {
                 col = Color3.fromRGB(163, 142, 101); -- could make it a table and keep the color and the variable inside
-                val = deepwokensettings.lootmythic;
+                val = deepwokensettings.lootunc;
             };
             ["Enchant"] = {
                 col = Color3.fromRGB(226, 255, 231); -- could make it a table and keep the color and the variable inside
-                val = deepwokensettings.lootmythic;
+                val = deepwokensettings.lootenchant;
             };
         };
-        warn(`[autoloot] [func] [BG Color: {v.BackgroundColor3}] [IMG Color: {v.ImageColor3}]`)
+        warn(`[autoloot] [func] [BG Color: {v.BackgroundColor3}] `) -- [IMG Color: {v.ImageColor3}]
         if v.Name:find('Medallion') and deepwokensettings.lootmedallion then 
             warn(`[autoloot] ->? picking up medallion`)
             return;
         end;
         for color, value in next, LootColors do 
-            if value['col'] == v.BackgroundColor3 and value['val'] == true then 
+            if v:IsA('TextButton') and value['col'] == v.BackgroundColor3 and (deepwokensettings.autolootfilter and value['val'] == true or deepwokensettings.autolootfilter == false and true) then 
                 warn(`[autoloot] ->? picking up {color} [reason : {value['val']}]`)
+                firesignal(v.MouseButton1Click)
             end
         end
     end
     game.Players.LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
-        if child.Name == 'ChoicePrompt' then 
+        if child.Name == 'ChoicePrompt' and deepwokensettings.autoloot == true then 
             local UiLocation = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('ChoicePrompt').ChoiceFrame.Options;
-            for i,v in next, UiLocation:GetChildren() do 
-                deepwokensettings.functions.autoloot(v);
-            end;
+            task.spawn(function()
+                repeat 
+                    task.wait()
+                    for i,v in next, UiLocation:GetChildren() do 
+                        if v:IsA('TextButton') then 
+                            deepwokensettings.functions.autoloot(v);
+                        end
+                    end;
+                until UiLocation == nil
+            end)
         end;
     end);
 
@@ -34931,20 +34971,23 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     if game.CoreGui:FindFirstChild('AzfakeProximity') then 
         game.CoreGui:FindFirstChild('AzfakeProximity'):Destroy()
     end
-    local ProximityGUI = Instance.new('ScreenGui');
+    local ProximityGUI = Instance.new('ScreenGui'); -- BILLBOARD GUI
     ProximityGUI.Name = 'AzfakeProximity'
     local ProximityFrame = Instance.new('Frame');
+    ProximityFrame.BackgroundTransparency = 1
     ProximityFrame.Name = '_azfakeproximity';
     ProximityFrame.Parent = ProximityGUI;
-    ProximityFrame.Position = UDim2.new(0.25,0,0.25,0)
+    ProximityFrame.Position = UDim2.new(0.38,0,0.1,0)
     ProximityFrame.Size = UDim2.new(0.25,0,0.25,0)
     local ProximityLabel = Instance.new('TextLabel');
+    ProximityLabel.BackgroundTransparency = 1
     ProximityLabel.Size = UDim2.new(1,0,1,0);
     ProximityLabel.Name = 'proximitylabel';
     ProximityLabel.RichText = true;
     ProximityLabel.TextSize = 20;
     ProximityLabel.Text = ''
     ProximityLabel.Parent = ProximityFrame;
+    ProximityGUI.Parent = game.CoreGui
 
 
     local function roll()
@@ -34963,7 +35006,6 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end;   
     end;
 
-    setthreadcaps(7)
 
 
     local moderatorIds = {}
@@ -35065,8 +35107,8 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
                 then
                     if v.HumanoidRootPart.ReceiveAge == 0 then
                         local cf = v.PrimaryPart.CFrame
-                        --v.PrimaryPart.Velocity = Vector3.new(14.465, 14.465, 14.465)
-                        --v.HumanoidRootPart.CFrame = CFrame.new(cf.X, -4980, cf.Z)
+                        v.PrimaryPart.Velocity = Vector3.new(14.465, 14.465, 14.465)
+                        v.HumanoidRootPart.CFrame = CFrame.new(cf.X, -4980, cf.Z)
                         v.Humanoid.Health = 0
                         if sethiddenproperty then
                             sethiddenproperty(v.HumanoidRootPart, "NetworkIsSleeping", false)
@@ -35078,6 +35120,30 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     end);
     local autoparrytoggle = sector:AddToggle("Auto Parry", false, function(e)
         deepwokensettings['autoparry'] = e;
+        if e == false then 
+            return
+        end;
+        maid.autoParryOrb = RunService.RenderStepped:Connect(function(dt)
+            if (not myRootPart) then return end;
+            local myPosition = myRootPart.Position;
+
+            for _, v in next, workspace.Thrown:GetChildren() do
+                if (not spawnedAt) then
+                    spawnedAt = tick();
+                end;
+
+                if (v.Name == 'ArdourBall2' and tick() - spawnedAt >= 3) then
+                    local distance = (myPosition - v.Position).Magnitude;
+
+                    if (distance <= 15 and tick() - lastParryAt >= 0.1) then
+                        lastParryAt = tick();
+                        blockAttack(true);
+                        unblockAttack();
+                        break;
+                    end;
+                end;
+            end;
+        end);
     end)
     sector:AddSlider("Auto Parry Distance", 0, 0, 250, 1, function(State)
         deepwokensettings['autoparrydistance'] = State
@@ -35119,7 +35185,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     end)
     local PlayersInProximity = {}
     local HasBeenAround = false;
-    moresect:AddSlider("Proximity Range", 0, 200, 1000, 1, function(State)
+    moresect:AddSlider("Proximity Range", 0, 200, 5000, 1, function(State)
         deepwokensettings['proximityrange'] = State
     end)
     moresect:AddToggle("Player Proximity Label", false, function(e)
@@ -35141,6 +35207,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     end)
     moresect:AddToggle("Player Proximity", false, function(e)
         deepwokensettings['playerproximity'] = e;
+        ProximityGUI.Enabled = e;
         if (e == false) then 
             maid.playerproximitycon = nil;
             return; 
@@ -35148,9 +35215,13 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         maid.playerproximitycon = game.RunService.Heartbeat:Connect(LPH_NO_VIRTUALIZE(function()
             local HumanoidRootPart = azfake:returndata().humanoidrootpart
             if not HumanoidRootPart then return end;
+            -- print(#PlayersInProximity)
+            -- for i,v in next, PlayersInProximity do 
+            --     print(i,v)
+            -- end
             if #PlayersInProximity > 0 then 
-                local PluralText = 'PLAYER'
-                ProximityLabel.Text = `{#PlayersInProximity} {#PlayersInProximity==1 and 'PLAYER' or 'PLAYERS'} ARE IN PROXIMITY` -- `PLAYERS {#PlayersInProximity} ARE IN PROXIMITY`
+                local PluralText = 'PLAYER' -- add dist
+                ProximityLabel.Text = `{#PlayersInProximity} {#PlayersInProximity==1 and 'PLAYER' or 'PLAYERS'} {#PlayersInProximity==1 and 'IS' or 'ARE'} IN PROXIMITY` -- `PLAYERS {#PlayersInProximity} ARE IN PROXIMITY`
                 if deepwokensettings.disableautoparryinproximity then 
                     deepwokensettings.autoparry = false -- and autoparry == true()
                 end
@@ -35188,22 +35259,33 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
                 end
             end;
             cleanPlayersInProximity()
-            for i, opp_player in next, game.Players:GetPlayers() do 
-                if opp_player ~= game.Players.LocalPlayer and PlayersInProximity[opp_player] == nil and opp_player.Character ~= nil and opp_player.Character:FindFirstChild('HumanoidRootPart') then 
+            --[[
+            x = {'x'}
+            table.foreach(x, function(xr)
+                warn(xr) -- index
+                warn(x[xr]) -- value
+            end)
+            ]]
+            for i, opp_player in next, game.Players:GetPlayers() do  -- PlayersInProximity[opp_player.Name] == nil
+                if opp_player ~= game.Players.LocalPlayer and opp_player.Character ~= nil and opp_player.Character:FindFirstChild('HumanoidRootPart') then 
                     local OppHumanoidRootPart = opp_player.Character:FindFirstChild('HumanoidRootPart');
                     if (OppHumanoidRootPart.Position - HumanoidRootPart.Position).Magnitude <= deepwokensettings.proximityrange then 
-                        PlayersInProximity[opp_player] = true;
-                        azfakenotify(`{opp_player.Name} is in proximity`,'untilClick') -- could destroy after
+                        --PlayersInProximity[opp_player.Name] = {};
+                        if not table.find(PlayersInProximity,opp_player.Name) then 
+                            table.insert(PlayersInProximity,opp_player.Name)
+                            azfakenotify(`{opp_player.Name} is in proximity`,'untilClick') -- could destroy after
+                        end
                     else
-                        if PlayersInProximity[opp_player] ~= nil then 
+                        if table.find(PlayersInProximity,opp_player.Name) then --~= nil then         PlayersInProximity[opp_player] == true
                             azfakenotify(`{opp_player.Name} left the proximity`,'untilClick')
                             for index, oldplayer in next, PlayersInProximity do 
-                                if oldplayer == nil then -- cleanup
+                                if not game.Players:FindFirstChild(oldplayer) then -- cleanup   oldplayer == nil
                                     table.remove(PlayersInProximity,index) 
                                     print(`[azfake] -> removed nil in player proximity , probably left`)
                                 end
-                                if oldplayer == opp_player then 
-                                    table.remove(PlayersInProximity,i)
+                                if oldplayer == opp_player.Name then 
+                                    print(`[azfake] -> removed {opp_player.Name} in player proximity , probably left`)
+                                    table.remove(PlayersInProximity,index)
                                 end
                             end
                         end
@@ -35262,33 +35344,94 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         esp_lib.mobesp = xstate;
         updateESP('mobesp', 'Visible', xstate)
     end)
+    -- have 20 ingredients display at a time
+    -- one gets picked up another 1 gets added
+    esp_lib:CreateOnPath(game:GetService("Workspace").Ingredients, {
+        max = 20;
+        SelfName = true;
+        distance = function()
+            return deepwokensettings.ingredientespdistance;
+        end;
+        TableReceiveColor = deepwokensettings;
+        Color = function()
+            return deepwokensettings.ingredientespcolor;
+        end;
+        IsEnabled = 'IngredientEsp';
+        flag = 'ingredient';
+    })
+    esp_lib:CreateOnPath(game:GetService("Workspace").Chests,{
+        max = 20;
+        SelfName = true;
+        distance = function()
+            return deepwokensettings.chestespdistance;
+        end;
+        Color = function()
+            return deepwokensettings.chestespcolor; --Color3.fromRGB(255,255,255); --Color3.fromRGB(0,70,70);
+        end;
+        IsEnabled = 'chestesp';
+        --PrimaryPart = 'HumanoidRootPart';
+        flag = 'chestesp';
+    })
     espsector:AddToggle('Ingredient Esp', false, function(xstate)
         deepwokensettings.ingredientesp = xstate;
         esp_lib.IngredientEsp = xstate
         if xstate == true then 
-            local ingredientesp = esp_lib:AddObjectListener(game:GetService("Workspace").Ingredients, {
-                SelfName = true;
-                TableReceiveColor = deepwokensettings;
-                Color = function()
-                    return deepwokensettings.ingredientespcolor; --Color3.fromRGB(255,255,255); --Color3.fromRGB(0,70,70);
-                end;
-                IsEnabled = 'IngredientEsp';
-                --PrimaryPart = 'HumanoidRootPart';
-                flag = 'ingredient';
-            }) 
+            -- local ingredientesp = esp_lib:AddObjectListener(game:GetService("Workspace").Ingredients, {
+            --     SelfName = true;
+            --     distance = function()
+            --         return deepwokensettings.ingredientespdistance;
+            --     end;
+            --     TableReceiveColor = deepwokensettings;
+            --     Color = function()
+            --         return deepwokensettings.ingredientespcolor; --Color3.fromRGB(255,255,255); --Color3.fromRGB(0,70,70);
+            --     end;
+            --     IsEnabled = 'IngredientEsp';
+            --     --PrimaryPart = 'HumanoidRootPart';
+            --     flag = 'ingredient';
+            -- }) 
         else
-            updateEsp('ingredient','destroy')
+            updateEsp('ingredient','Visible',false) --updateEsp('ingredient','destroy')
         end
     end)
     espsector:AddColorpicker('Ingredient Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
         deepwokensettings['ingredientespcolor'] = ztx
         updateESP('ingredient', 'Color', ztx)
     end)
-
+    espsector:AddSlider("Ingredient Esp Range", 0, 200, 5000, 1, function(State)
+        deepwokensettings['ingredientespdistance'] = State
+    end)
     espsector:AddToggle('Artifact Esp', false, function(xstate)
         deepwokensettings.artifactesp = xstate;
         esp_lib.artifactesp = xstate
     end)
+    espsector:AddToggle('Chest Esp', false, function(xstate)
+        deepwokensettings.chestesp = xstate;
+        esp_lib.chestesp = xstate
+        if xstate == true then 
+            -- local chestesp = esp_lib:AddObjectListener(game:GetService("Workspace").Chests, {
+            --     SelfName = true;
+            --     distance = function()
+            --         return deepwokensettings.chestespdistance;
+            --     end;
+            --     Color = function()
+            --         return deepwokensettings.chestespcolor; --Color3.fromRGB(255,255,255); --Color3.fromRGB(0,70,70);
+            --     end;
+            --     IsEnabled = 'chestesp';
+            --     --PrimaryPart = 'HumanoidRootPart';
+            --     flag = 'chestesp';
+            -- }) 
+        else
+            updateEsp('chestesp','destroy')
+        end
+    end)
+    espsector:AddColorpicker('Chest Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        deepwokensettings['chestespcolor'] = ztx
+        updateESP('chestesp', 'Color', ztx)
+    end)
+    espsector:AddSlider("Chest Esp Range", 0, 200, 5000, 1, function(State)
+        deepwokensettings['chestespdistance'] = State
+    end)
+    
     --AddListen
     --["Gathered Wheat"]
 
@@ -35368,7 +35511,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
 
         _G.canAttack = true;
     end
-    local function dodgeAttack(cancel) 
+    local function roll(cancel) 
 
     end
     local function detect(v,dect)
@@ -35896,7 +36039,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end;
     
         local function f(animTrack, mob)
-            if not checkRange(14,mob) then return end
+            if not checkRange(14,mob.PrimaryPart) then return end
             local swingSpeed = calculateSwing(mob) or 1;
     
             --parryAttack({getSpeed(swingSpeed)},mob.PrimaryPart,animTrack,15);
@@ -35928,11 +36071,11 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
             parryfunc()
         end;
     
-        parryAnimTables['7626771915'] = 0.4; -- One Hand Slash 3
-        parryAnimTables['7627049402'] = 0.4; -- One Hand Slash 4
+        parryAnimTables['7626771915'] = 0.35; -- One Hand Slash 3
+        parryAnimTables['7627049402'] = 0.35; -- One Hand Slash 4
     
-        parryAnimTables['7627558238'] = 0.4; -- Two Hand Slash 2
-        parryAnimTables['7627372304'] = 0.4; -- Two Hand Slash 3
+        parryAnimTables['7627558238'] = 0.35; -- Two Hand Slash 2
+        parryAnimTables['7627372304'] = 0.35; -- Two Hand Slash 3
     end
     parryAnimTables['5827250000'] = 0.35; -- Running Attack One Handed
     parryAnimTables['5827423063'] = 0.35; -- Slash1
@@ -35945,7 +36088,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end;
 
         local function f(animTrack, mob)
-            if not checkRange(14,mob) then return end
+            if not checkRange(14,mob.PrimaryPart) then return end
 
             local ignoreHeavyHand = false;
             for i,v in next, mob.Humanoid:GetPlayingAnimationTracks() do
@@ -36002,10 +36145,11 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end;
 
         local function f(animTrack, mob)
+            if not checkRange(14,mob.PrimaryPart) then return end
             local swingSpeed = calculateSwing(mob) or 1;
     
             --parryAttack({getSpeed(swingSpeed)},mob.PrimaryPart,animTrack,15);
-            task.wait(swingSpeed)
+            task.wait(swingSpeed - 0.4)
             parryfunc()
         end;
 
@@ -36053,7 +36197,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
         end;
 
         local function f(animTrack, mob)
-            if not checkRange(14,mob) then return end
+            if not checkRange(14,mob.PrimaryPart) then return end
             local swingSpeed = calculateSwing(mob) or 1;
     
             --parryAttack({getSpeed(swingSpeed)},mob.PrimaryPart,animTrack,15);
@@ -36226,7 +36370,835 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
     parryAnimTables['11508725111'] = function(_, mob)
         parryAttack({1.5}, mob.PrimaryPart, _, 400, true);
     end;
+    -- crabbo
+    parryAnimTables['8176091986'] = makeDelayBlockWithRange(50, 1); --Double slam
+    parryAnimTables['7942002115'] = makeDelayBlockWithRange(50, 0.4); --Probably double swipe
+
+    parryAnimTables['7938093143'] = function(_, mob) -- grab
+        if (not checkRange(50, mob.PrimaryPart)) then return end;
+
+        _taskwait(0.5);
+        roll();
+    end;
+
+    parryAnimTables['7961600084'] = function(_,mob) --Jump attack
+        if not checkRange(150,mob.PrimaryPart) then return; end
+        repeat
+            task.wait();
+        until not _.IsPlaying or checkRange(15,mob.PrimaryPart)
+        if not _.IsPlaying then return; end
+        roll();
+    end;
+    --Guns
+    do
+        local function getSpeed(x)
+            return -0.5*x + 1.275; --Should be -0.5*x + 1.05
+        end;
+
+        local function f(animTrack, mob)
+            if not checkRange(14,mob.PrimaryPart) then return end
+            local swingSpeed = calculateSwing(mob) or 1;
+    
+            --parryAttack({getSpeed(swingSpeed)},mob.PrimaryPart,animTrack,15);
+            task.wait(swingSpeed-0.5)
+            parryfunc()
+        end;
+
+        parryAnimTables['6437665734'] = f; -- Primary Shot
+        parryAnimTables['6432920452'] = f; -- Offhand shot
+        parryAnimTables['7565307809'] = f; -- Aerial Shot
+        parryAnimTables['8172871094'] = makeDelayBlockWithRange(20, 0.3); -- Rifle Spear Crit
+    end;
+
+
+    parryAnimTables['9928429385'] = 0.3; -- Rifle
+    parryAnimTables['9928485641'] = 0.3; -- Rifle
+    parryAnimTables['9930447958'] = 0.3; -- Rifle
+    parryAnimTables['9928485641'] = 0.3; -- Rifle
+    parryAnimTables['9930618934'] = 0.3; -- Rifle
+
+    parryAnimTables['11468287607'] = 0.4; -- Shadow Hero Blade Critical
+    parryAnimTables['11312302005'] = 0.4; -- Wind Hero Blade Critical
+    parryAnimTables['11308969885'] = 0.4; --Flame Hero Blade Critical
+    parryAnimTables['10904625331'] = 0.4; --Thunder Hero Blade Critical
+    parryAnimTables['11183196198'] = makeDelayBlockWithRange(28,0.4); --Frost Hero Blade Critical
+
+    parryAnimTables['12108376249'] = 0.3; -- Eclipse kick
+    parryAnimTables['9212883524'] = 0.6; -- Halberd Critical
+
+    parryAnimTables['6415074870'] = function(_, mob) -- Shadow Gun
+        if (not checkRange(60, mob.PrimaryPart)) then return end;
+
+        _taskwait(0.5);
+        blockAttack();
+        task.wait(0.3);
+        unblockAttack();
+    end;
+
+    -- Golem
+    parryAnimTables['6500704554'] = function(_, mob) -- Upsmash (Dodge)
+        if (not checkRange(50, mob.PrimaryPart)) then return end;
+
+        _taskwait(0.4);
+        roll();
+    end;
+
+    parryAnimTables['6501497627'] = function(animationTrack, mob) -- Cyclone
+        if (not mob.PrimaryPart) then return end;
+        _taskwait(3.3);
+
+        repeat
+            task.wait(0.1);
+
+            if (not checkRange(50, mob.PrimaryPart)) then
+                print('mob too far away :(');
+                _G.canAttack = true;
+                continue;
+            end;
+
+            _G.canAttack = false;
+            print(animationTrack.IsPlaying, animationTrack.Parent);
+            blockAttack();
+            unblockAttack();
+        until not animationTrack.IsPlaying or not mob.Parent;
+        _G.canAttack = true;
+    end;
+
+    parryAnimTables['6499077558'] = makeDelayBlockWithRange(50, 0.4); -- Double Smash
+    parryAnimTables['6501044846'] = makeDelayBlockWithRange(50, 0.5); -- Stomp
+
+    -- Ice Mantra
+    parryAnimTables['5808939025'] = function(_, mob) -- Ice Eruption
+        if (not checkRange(40, mob.PrimaryPart)) then return end;
+
+        _taskwait(0.35);
+        roll();
+    end;
+
+    parryAnimTables['5865907089'] = function(_, mob) -- Glacial Arc
+        if (not checkRange(40, mob.PrimaryPart)) then return end;
+
+        _taskwait(0.6);
+        blockAttack();
+        unblockAttack();
+    end;
+
+    parryAnimTables['7612017515'] = makeDelayBlockWithRange(50, 0.3); -- Ice Blade
+    parryAnimTables['7543723607'] = 0.7; -- Ice Spike
+    parryAnimTables['7599113567'] = 0.6; -- Ice Dagger
+    parryAnimTables['6054920207'] = 0.3; -- Crystal Impale
+
+    -- Shadow
+    parryAnimTables['9470857690'] = makeDelayBlockWithRange(40, 0.2); -- Shade Bringer
+    parryAnimTables['9359697890'] = 0.3; -- Shadow Devour
+    parryAnimTables['11959603858'] = 0.9; -- Shadow Stomp
+    parryAnimTables['11468287607'] = 0.4; -- Shadow Sword
+
+    parryAnimTables['9149348937'] = function(_, mob) -- Rising Shadow
+        local distance = (mob.HumanoidRootPart.Position - myRootPart.Position).Magnitude;
+        if (distance > 200) then return end;
+
+        _taskwait(0.4);
+        local ranAt = tick();
+
+        print(distance);
+        if (distance > 8) then
+            repeat
+                for _, v in next, workspace.Thrown:GetChildren() do
+                    if (v.Name == 'TRACKER' and IsA(v, 'BasePart')) then
+                        if(not checkRangeFromPing(v, 5, 10)) then continue end;
+
+                        print('block');
+                        blockAttack();
+                        unblockAttack();
+                        break;
+                    end;
+                end;
+
+                task.wait();
+            until tick() - ranAt > 3.5;
+        else
+            blockAttack();
+            unblockAttack();
+        end;
+    end;
+
+    parryAnimTables['6318273143'] = function(_, mob) -- Shadow Assault
+        if (not checkRange(80, mob.PrimaryPart) or not myRootPart) then return end;
+
+        local mobRoot = mob:FindFirstChild('HumanoidRootPart');
+        if (not mobRoot) then return end;
+
+        local distance = (mobRoot.Position - myRootPart.Position).Magnitude;
+        _taskwait(0.3);
+        _taskwait(distance/60);
+        blockAttack();
+        unblockAttack();
+    end;
+
+    parryAnimTables['8018881257'] = function(_, mob) -- Shadow eruption
+        for i = 1, 2 do
+            task.spawn(function()
+                _taskwait(i*0.33);
+                if (not checkRange(30, mob.PrimaryPart)) then return end;
+                blockAttack();
+                unblockAttack();
+            end);
+        end;
+    end;
+
+    parryAnimTables['7620630583'] = function(_, mob) -- Shadow Roar
+        repeat
+            _taskwait(0.2);
+            if (not checkRange(40, mob.PrimaryPart)) then continue end;
+            task.spawn(function()
+                blockAttack();
+                unblockAttack();
+            end);
+        until not _.IsPlaying;
+    end;
+
+    parryAnimTables['6038858570'] = function(animationTrack,mob) -- Darkblade
+        if (not checkRange(80, mob.PrimaryPart)) then return end
+        local distance = (myRootPart.Position - mob.PrimaryPart.Position).Magnitude;
+        if distance < 5 then
+            _taskwait(0.37);
+            blockAttack();
+            unblockAttack();
+            return;
+        end
+        repeat
+            task.wait();
+        until not animationTrack.IsPlaying or checkRange(15,mob.PrimaryPart);
+        if not animationTrack.IsPlaying then return; end
+        blockAttack();
+        unblockAttack();
+    end
+
+    -- snow golem
+    parryAnimTables['8131612979'] = function(_, mob) -- groundPunch
+        if (not checkRange(60, mob.PrimaryPart)) then return end
+
+        _taskwait(0.7);
+        roll();
+    end;
+
+    parryAnimTables['8131156119'] = function(_, mob) -- Punt
+        if (not checkRange(60, mob.PrimaryPart)) then return end
+
+        _taskwait(0.2)
+        roll();
+    end;
+
+    parryAnimTables['8130745441'] = makeDelayBlockWithRange(40, 0.3); -- Swing1
+    parryAnimTables['8130778356'] = makeDelayBlockWithRange(40, 0.3); -- Swing2
+
+    parryAnimTables['8131374542'] = makeDelayBlockWithRange(100, 0.7); -- Air cutter
+
+    -- squiddo (we use db)
+    parryAnimTables['6916513795'] = 0.225;
+    parryAnimTables['6916546485'] = 0.225;
+    parryAnimTables['6916545890'] = 0.225;
+
+    -- enforcer (we use db)
+    parryAnimTables['7018046790'] = makeDelayBlockWithRange(50, 0.45); -- slash 1
+    parryAnimTables['7018083796'] = makeDelayBlockWithRange(50, 0.45); -- slash 2
+    parryAnimTables['7019686291'] = makeDelayBlockWithRange(50, 0.45); -- kick
+
+    parryAnimTables['7019018522'] = function(animationTrack, mob) -- spin
+        print('got spin to win');
+
+        repeat
+            _taskwait(0.1);
+
+            if (not checkRange(30, mob.PrimaryPart)) then
+                print('mob too far away :(');
+                continue;
+            end;
+
+            blockAttack();
+            unblockAttack();
+        until not animationTrack.IsPlaying;
+    end;
+
+    -- Hive Mech
+    parryAnimTables['11834551880'] = function(_,mob)  --Roguemech upsmash
+        if not checkRange(40,mob.PrimaryPart) then return; end
+        _taskwait(0.8);
+        roll();
+    end;
+
+    parryAnimTables['11834549387'] = 0.5; --Roguemech Stomp
+    parryAnimTables['11834545925'] = 0.3; --Roguemech  Baragge Stomp
+    parryAnimTables['11867360757'] = makeDelayBlockWithRange(40,0.7); --Roguemech GroundPound
+
+    -- crocco (we use db)
+    parryAnimTables['8226933122'] = function(_, mob) -- Triple bite
+        parryAttack({0.44, 0.44, 0.44}, mob.PrimaryPart, _,  30);
+    end;
+
+    parryAnimTables['10976633163'] = function(_, mob) -- Crocco Dig Move
+        _taskwait(0.7);
+
+        local ranAt = tick();
+
+        repeat
+            task.wait();
+            print(mob.HumanoidRootPart.Transparency);
+        until checkRange(10, mob.HumanoidRootPart) or mob.HumanoidRootPart.Transparency == 0;
+        if (tick() - ranAt > 8) then return print('not playing') end;
+
+        print('parry!');
+
+        blockAttack();
+        unblockAttack();
+    end;
+
+    parryAnimTables['8227583745'] = function(_, mob) --Double shlash Crocco
+        parryAttack({0.3, 0.8}, mob.PrimaryPart, _, 30);
+    end;
+
+    parryAnimTables['8228293862'] = function(_, mob) -- Breath
+        if (not checkRange(75, mob.PrimaryPart)) then return end;
+
+        _taskwait(0.35);
+        roll();
+    end;
+
+    parryAnimTables['8229868275'] = function(_, mob) -- Dig
+        if (not checkRange(30, mob.PrimaryPart)) then return end;
+
+        _taskwait(2);
+        roll();
+    end;
+
+    parryAnimTables['8227878518'] = function(_, mob) -- Tail
+        parryAttack({0.65}, mob.PrimaryPart, _, 30);
+    end;
+
+    -- Black Tresher
+    parryAnimTables['11095471496'] = 0.4; -- Crocco Flip
+    parryAnimTables['9474995715'] = function(_,mob)-- CRocco Breath
+        if not checkRange(20,mob.PrimaryPart) then return; end
+        task.wait(0.2);
+        roll();
+    end;
+
+    -- sharko (we use db)
+    parryAnimTables['5117879514'] = function(animTrack, mob) -- Swipe
+        parryAttack({0.37}, mob.PrimaryPart, animTrack, 40);
+    end;
+
+    parryAnimTables['11710417615'] = function(animationTrack, mob) --Coral Attack
+        -- sharko could do aoe attack if lots of player check that
+
+        local target = mob:FindFirstChild('Target');
+        target = target and target.Value;
+        if (target ~= LocalPlayer.Character) then return end;
+
+        _taskwait(0.4);
+        blockAttack();
+
+        repeat
+            task.wait();
+        until not animationTrack.IsPlaying;
+
+        unblockAttack();
+    end;
+
+    parryAnimTables['10739102450'] = function(_, mob) -- Cortal Attack But for Player
+        parryAttack({0.4}, mob.PrimaryPart, _, 35);
+    end;
+
+    parryAnimTables['5121733951'] = function(_, mob) -- sharko double swipe
+        parryAttack({0.43,0.58},mob.PrimaryPart,_,40);
+    end;
+
+    parryAnimTables['11710290503'] = function(_, mob) -- sharko punt
+        if (not checkRange(40, mob.PrimaryPart)) then return end;
+
+        _taskwait(0.35)
+        roll();
+    end;
+
+    parryAnimTables['9357410713'] = function(_,mob) -- Mechalodant Beam
+        _taskwait(1.6);
+        if not checkRange(80,mob.PrimaryPart) then return; end
+        blockAttack();
+        unblockAttack();
+    end
+
+    parryAnimTables['9356892933'] = function(animationTrack, mob) -- Mechalodant GunFire
+        local target = mob:FindFirstChild('Target');
+        target = target and target.Value;
+        if (target ~= LocalPlayer.Character) then return end;
+
+        _taskwait(0.4);
+        blockAttack();
+
+        repeat
+            task.wait();
+        until not animationTrack.IsPlaying;
+
+        unblockAttack();
+    end;
+
+    parryAnimTables['11710316011'] = function(_,mob) -- Sharko Water bite
+        _taskwait(0.5);
+        if not checkRange(50,mob.PrimaryPart) then return; end
+        roll();
+    end;
+
+    parryAnimTables['9903304018'] = function(_, mob) --Teleport Move
+        _taskwait(0.5);
+        if (not checkRange(20, mob.PrimaryPart)) then return print('too far away') end;
+        warn('block');
+        roll();
+    end;
+
+    --Ferryman
+    local teleportedAt = tick();
+    local firstAnim = tick();
+    parryAnimTables['5968288116'] = function(_, mob) -- Ferryman Teleport Attack (Doesn't work in second phase...)
+        local target = mob:FindFirstChild('Target');
+        if (not target or target.Value ~= LocalPlayer.Character) then return  warn('Ferryman Dash: Target is not LocalPlaye') end;
+
+        if (mob.Humanoid.Health/mob.Humanoid.MaxHealth)*100 >= 50 then
+            if tick()-teleportedAt > 2 then
+                if tick() - firstAnim > 3 then
+                    firstAnim = tick();
+                    return;
+                end
+                teleportedAt = tick();
+                parryAttack({0.8},mob.PrimaryPart,_,1000,true)
+            else
+                teleportedAt = tick();
+                parryAttack({0.2},mob.PrimaryPart,_,1000,true)
+            end
+        else
+            if tick()-teleportedAt > 2 then
+                if tick() - firstAnim > 3 then
+                    firstAnim = tick();
+                    return;
+                end
+                teleportedAt = tick();
+                parryAttack({0.8},mob.PrimaryPart,_,1000,true)
+            else
+                teleportedAt = tick();
+                parryAttack({0.1},mob.PrimaryPart,_,1000,true)
+            end
+        end
+    end;
+
+
+    -- Owl
+    parryAnimTables['7639648215'] = makeDelayBlockWithRange(40, 0.3); -- Swipe (Idk)
+    parryAnimTables['7639988883'] = makeDelayBlockWithRange(40, 0.6); -- Slow Swipe (Ok)
+    parryAnimTables['7675544287'] = function(_, mob) -- Grab
+        local target = mob:FindFirstChild('Target');
+        target = target and target.Value;
+
+        if (target ~= LocalPlayer.Character) then return warn('owl grab: target is not localplayer') end;
+
+        _taskwait(0.35);
+        roll();
+    end;
+
+    parryAnimTables['7673097597'] = function(_, mob) -- Owl rush (spinning attack)
+        local target = mob:FindFirstChild('Target');
+        target = target and target.Value;
+
+        if (target ~= LocalPlayer.Character) then return print('owl spin target is not localplayer') end;
+
+        _taskwait(0.37);
+        roll();
+    end;
+
+    -- Mud Skipper
+    parryAnimTables['11573034823'] = 0.22;
+    parryAnimTables['11572468462'] = 0.22;
+
+    -- Lion Fish
+
+    parryAnimTables['5680585677'] = function(_, mob)
+        if (not checkRange(70, mob.PrimaryPart)) then return print('lion fish beam triple bite too far away') end;
+
+        task.spawn(function()
+            _taskwait(0.4);
+            blockAttack();
+            unblockAttack();
+        end);
+
+        task.spawn(function()
+            _taskwait(1.1);
+            blockAttack();
+            unblockAttack();
+        end);
+
+        task.spawn(function()
+            _taskwait(1.8);
+            blockAttack();
+            unblockAttack();
+        end);
+    end;
+
+    parryAnimTables['6372560712'] = function(animTrack, mob) -- FishBeam
+        local target = mob:FindFirstChild('Target');
+        target = target and target.Value;
+
+        if (target ~= LocalPlayer.Character) then return print('lion fish beam target not set to player') end;
+
+        local wasUp = false;
+
+        repeat
+            local _, _, z = mob:GetPivot():ToOrientation();
+
+            if (z < -1.7 and not wasUp) then
+                wasUp = true;
+                warn('rised up');
+            elseif (z > -1.5 and wasUp) then
+                warn('rised down', animTrack.TimePosition, animTrack.Speed);
+                roll();
+                break;
+            end;
+
+            task.wait();
+        until not animTrack.IsPlaying or not mob.Parent;
+    end;
+
+    -- Duke
+    parryAnimTables['8285321158'] = function(_, mob)
+        parryAttack({0.87},mob.PrimaryPart,_,34)
+        print("---------------WIND BALL SHOT----------------")
+    end;
+
+    parryAnimTables['8285534401'] = function(_, mob) --Wind Stomp thing
+        _taskwait(0.5);
+        if (not checkRange(28, mob.PrimaryPart)) then return end;
+        roll();
+        print("---------------Wind stomp")
+    end;
+
+    parryAnimTables['8290626574'] = function(_, mob) --Wind Stomp 2
+        _taskwait(0.7);
+        if (not checkRange(118, mob.PrimaryPart)) then return end;
+        roll();
+        print("---------------Wind Stomp 2",tick());
+    end;
+
+
+    parryAnimTables['8285638571'] = function(_, mob) --Downward punch?
+        _taskwait(0.1);
+        if (not checkRange(47, mob.PrimaryPart)) then return end;
+        roll();
+        print("---------------Downward Punch")
+    end;
+
+    parryAnimTables['8286153000'] = function(_, mob) --Wind Arrow
+        parryAttack({0.4},mob.PrimaryPart,_,34)
+        print("---------------Wind Arrow")
+
+    end;
+
+    parryAnimTables['8290899374'] = function(_, mob) --Levitate
+        _taskwait(0.8);
+        if (not checkRange(28, mob.PrimaryPart)) then return end;
+        roll();
+        print("---------------Levitate")
+    end;
+
+    parryAnimTables['8294560344'] = function(_, mob) --Spirit Bomb?
+        _taskwait(2.1);
+        if (not checkRange(47, mob.PrimaryPart)) then return end;
+        roll();
+        print("---------------Spirint Bomb")
+    end;
+
+    -- Car Buncle
+    parryAnimTables['9422296675'] = 0.8; -- Leap
+    parryAnimTables['9422278968'] = function(_, mob) -- Flail
+        if (not checkRange(100, mob.PrimaryPart)) then return end;
+
+        _taskwait(0.9);
+
+        repeat
+            task.wait();
+            if (not checkRange(40, mob.PrimaryPart)) then continue end;
+
+            blockAttack();
+            unblockAttack();
+            _taskwait(0.4);
+        until not _.IsPlaying or not mob.Parent;
+    end;
+
+    -- Boneboy (Bonekeeper)
+    parryAnimTables['9681905891'] = function(_, mob) -- Charge Prep
+        print('charge anim star!t');
+        --_taskwait(0.8);
+        task.wait(0.78)
+
+        repeat task.wait(); until checkRange(30, mob.PrimaryPart) or not _.IsPlaying;
+
+        print('charge!');
+        roll();
+    end;
+
+    parryAnimTables['9681421310'] = function(_, mob)
+        print('sweep1');
+        parryAttack({0.6}, mob.PrimaryPart, _, 30);
+    end;
+
+    parryAnimTables['9710538334'] = function(_, mob)
+        print('choke start');
+        if (not checkRange(30, mob.PrimaryPart)) then return end;
+        _taskwait(0.3);
+        roll();
+        unblockAttack();
+    end;
+
+    -- Chaser
+    parryAnimTables['10099861170'] = makeDelayBlockWithRange(70, 0.8); -- The Slam (end part)
+    local effectsList = {};
 	
+    -- Silent heart uppercut
+    effectsList.Mani = function(effectData)
+        if (effectData.target ~= myRootPart.Parent) then return end;
+
+        blockAttack();
+        unblockAttack();
+    end;
+
+    effectsList.ManiWindup = function(effectData)
+        if((effectData.pos - myRootPart.Position).Magnitude >= 45) then return print('too far'); end;
+
+        _taskwait(0.3);
+        blockAttack();
+        unblockAttack();
+    end;
+
+    effectsList.EthironPointSpikes = function(effectData)
+        _taskwait(0.5);
+        for _, point in next, effectData.points do
+            if(checkRange(20, point.pos)) then
+                roll();
+                break;
+            end;
+        end;
+    end;
+
+    effectsList.EnforcerPull = function(effectData)
+        if (string.find(effectData.char.Name, '.enforcer')) then return end;
+        if (effectData.targ ~= LocalPlayer.Character) then return end;
+        blockAttack();
+        unblockAttack();
+    end;
+
+    effectsList.Perilous = function(effectData)
+        if (not string.find(effectData.char.Name, '.chaser')) then return end;
+        _taskwait(0.5);
+        roll();
+    end;
+
+    effectsList.DisplayThornsRed = function(effectData) -- Umbral Knight
+        if (effectData.Character ~= LocalPlayer.Character) then return print('Umbral Knight wasnt on me')  end;
+        blockAttack();
+        unblockAttack();
+    end;
+
+    effectsList.DisplayThorns = function(effectData) --Providence Thorns
+        if effectData.Character ~= LocalPlayer.Character then return print('Providence Hit wasnt on me') end;
+        _taskwait(effectData.Time-effectData.Window);
+        blockAttack();
+        unblockAttack();
+    end;
+
+    effectsList.FireHit2 = function(effectData)
+        if effectData.echar ~= LocalPlayer.Character then return print('Fire Hit wasnt on me'); end
+        _taskwait(1);
+        blockAttack();
+        unblockAttack();
+    end
+
+    effectsList.GolemLaserFire = function(effectData)
+        if (not checkRange(15, effectData.aimPos)) then return print('Golem laser: Too far away') end;
+        print('DA DODGIES');
+        roll();
+    end;
+
+    effectsList.WindCarve = function(effectData)
+        if (effectData.char == LocalPlayer.Character) then return; end
+        if (effectData.command ~= 'startAttack' or not checkRange(17, effectData.char.PrimaryPart)) then return end;
+        local startedAt = tick();
+
+        repeat
+            task.spawn(function()
+                blockAttack();
+                unblockAttack();
+            end);
+            task.wait(0.2);
+        until tick() - startedAt > effectData.dur+0.5;
+        table.foreach(effectData, warn);
+    end;
+
+    -- Fire SongSeeker
+
+    effectsList.FireSword = function(effectData)
+        if (not checkRange(25, effectData.Character.PrimaryPart)) then return print('Fire Sword: Too far away') end;
+        if (effectData.Character == LocalPlayer.Character) then return end;
+        if (effectData.BlueFlame) then return; end
+        _taskwait(0.55);
+        print('we parry it!');
+        blockAttack();
+        unblockAttack();
+    end;
+
+    effectsList.FireSwordBlue = function(effectData)
+        if (not checkRange(25, effectData.Character.PrimaryPart)) then return print('Fire Sword: Too far away') end;
+        if (effectData.Character == LocalPlayer.Character) then return end;
+
+        _taskwait(0.6);
+        print('we parry it!');
+        blockAttack();
+        unblockAttack();
+    end;
+
+    effectsList.FireDash = function(effectData)
+        if (not checkRange(50, effectData.Character.PrimaryPart)) then return print('Fire Dash: Too far away') end;
+        if (effectData.Character == LocalPlayer.Character) then return end;
+
+        table.foreach(effectData, warn);
+        print('OOOOMG EPICO');
+        blockAttack();
+        unblockAttack();
+    end;
+
+    effectsList.fireRepulseWindup = function(effectData)
+        if (not checkRange(50, effectData.char.PrimaryPart)) then return print('Fire Repulse Wind Up: Too far away') end;
+        if (effectData.char == LocalPlayer.Character) then return end;
+
+        _taskwait(0.8);
+        blockAttack();
+        _taskwait(1);
+        unblockAttack();
+    end;
+
+    effectsList.FireSlashSpin = function(effectData)
+        -- RisingFlame
+        if (not checkRange(20, effectData.Character.PrimaryPart)) then return print('Fire Slash Spin: Too far away') end;
+        if not (effectData.pos) then return print("Ignoring Fire Spin"); end
+        if (effectData.Character == LocalPlayer.Character) then return end;
+
+        blockAttack();
+        unblockAttack();
+    end;
+
+    -- Wind Song Seeker
+
+    effectsList.WindSword = function(effectData)
+        if (not checkRange(25, effectData.Character.PrimaryPart)) then return print('Wind Sword: Too far away') end;
+        if (effectData.Character == LocalPlayer.Character) then return end;
+        if (effectData.Time == 1.1) then return end; -- Gale Lunge wind sword (hopefully dont break anything)
+
+        _taskwait(0.4);
+        blockAttack();
+        unblockAttack();
+    end;
+
+    effectsList.OwlDisperse = function(effectData)
+        local target = effectData.Character and effectData.Character:FindFirstChild('Target');
+        if (not target or target.Value ~= LocalPlayer.Character) then return end;
+
+        print('owl disperse!');
+
+        local startedAt = tick();
+        local duration = effectData.Duration;
+
+        task.wait(duration/3);
+
+        while (tick() - startedAt <= duration+0.3) do
+            task.spawn(function()
+                blockAttack();
+                unblockAttack();
+            end);
+            task.wait(0.2);
+        end;
+        print('owl disperse finished');
+    end;
+
+    effectsList.ThrowWeaponLocal = function(data) --Stormbreaker Recall
+        local obj = data.Primary;
+        if (not obj) then return end;
+
+        repeat task.wait() until obj.Anchored;
+
+        repeat
+            task.wait();
+        until not obj.Parent or checkRange(20, obj);
+        if not obj.Parent then return; end
+
+        blockAttack();
+        unblockAttack();
+    end;
+
+    -- Vent
+    effectsList.BlueStun = function(effectData)
+        if (effectData.CH == LocalPlayer.Character) then return; end
+        if (not checkRange(20,effectData.CH.PrimaryPart)) then return; end
+        if (not library.flags.parryVent) then return end;
+
+        blockAttack();
+        unblockAttack();
+    end;
+
+    local function getCaster(data)
+        if not data then return; end
+        local caster;
+        for _,obj in next, data do
+            if typeof(obj) ~= "Instance" or obj.Parent ~= workspace.Live or obj == LocalPlayer.Character then continue; end
+
+            return obj;
+        end
+        return caster;
+    end
+
+    game.ReplicatedStorage.Requests.ClientEffect.OnClientEvent:Connect(function(effectName, effectData)
+        if (not library.flags.autoParry or table.find(_G.blacklistedNames, effectName)) then return end;
+
+        local caster = getCaster(effectData);
+
+        if (caster) then
+            local autoParryMode = library.flags.autoParryMode;
+            local isPlayer = Players:FindFirstChild(caster.Name)
+
+            if (not autoParryMode.All) then
+                --If not Parry Guild and its a player and hes in your guild do nothing
+                if (not autoParryMode.Guild and isPlayer and Utility:isTeamMate(isPlayer)) then
+                    return;
+                end
+                --If Parry Mobs and its a player and they dont parry players then do nothing
+                if (autoParryMode.Mobs and isPlayer and not autoParryMode.Players) then
+                    return
+                end;
+                --If Parry Player and its not a player and don't parry mobs then do nothing
+                if (autoParryMode.Players and not isPlayer and not autoParryMode.Mobs) then
+                    return;
+                end;
+                --If Parry Guild And Its a Player and its not guild member then do nothing
+                if (autoParryMode.Guild and isPlayer and not Utility:isTeamMate(isPlayer)) then
+                    return;
+                end
+            end;
+        end;
+
+        local f = effectsList[effectName];
+
+        if (f) then
+            warn('Using custom effectFunc for', effectName);
+            f(effectData, effectName);
+        elseif (getgenv().UNKNOWN_EFFECT_LOG) then
+            print('Unknown effect', effectName);
+        end;
+    end);
     local function parry(oppcharacter, animationid, supposedfunc, animation)
         if deepwokensettings.whitelistmode ~= 'All' and deepwokensettings.whitelistmode ~= 'Mobs' and oppcharacter.Name ~= deepwokensettings.whitelistmode then 
             print('parry not whitelsited')
@@ -36236,7 +37208,7 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
             return print('parry not a mob')
         end
         print('parry called')
-        if type(parryAnimTables[animationid]) ~= 'function' then 
+        if type(parryAnimTables[animationid]) ~= 'function' and type(parryAnimTables[animationid]) ~= 'table' then 
             print('parry number timing')
             task.wait(parryAnimTables[animationid])
             parryfunc()
@@ -36416,8 +37388,13 @@ elseif table.find({'4111023553','5735553160','6032399813'},tostring(game.PlaceId
                     if not game.Players:FindFirstChild(v.Name) and v.PrimaryPart then
                         if isnetworkowner(v.PrimaryPart) then -- or isnetworkowner(v.HumanoidRootPart)
                             print('isNetworkowner, '..v:GetFullName())
-                            if v.Parent:FindFirstChildWhichIsA('Humanoid') then 
-                                v.Parent:FindFirstChildWhichIsA('Humanoid').Health = 0
+                            if v.Parent:FindFirstChildWhichIsA('Humanoid') and v.Parent:FindFirstChild('Head') then 
+                                --v.Parent:FindFirstChildWhichIsA('Humanoid').Health = 0
+                                --v.Parent.Head:Destroy()
+                                --v.Parent:SetPrimaryPartCFrame(CFrame.new(0,-10000,0))
+                                local cf = v.PrimaryPart.CFrame
+                                v.PrimaryPart.Velocity = Vector3.new(14.465, 14.465, 14.465)
+                                v.HumanoidRootPart.CFrame = CFrame.new(cf.X, -4980, cf.Z)
                             end
                         end
                     end;
