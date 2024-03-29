@@ -665,9 +665,9 @@ function Notify(titletxt, text, time)
     end
 end
 
-if not game.Players.LocalPlayer.Character or game.Players.LocalPlayer.Character and not game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+if not game:IsLoaded() then-- not game.Players.LocalPlayer.Character or game.Players.LocalPlayer.Character and not game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
     azfakenotify('Waiting for game to load','untilClick')
-    repeat task.wait() until game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
+    repeat task.wait() until game:IsLoaded() --game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart')
 else
     -- Loaded
 end
@@ -34051,7 +34051,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 --PrimaryPart = type(options.PrimaryPart) == "string" and c:WaitForChild(options.PrimaryPart) or type(options.PrimaryPart) == "function" and options.PrimaryPart(c),
                 --Name = plrshift.Name,
                 --Player = plrshift,
-                PrimaryPart = v.Character.Head;
+                PrimaryPart = HeadPart;-- v.Character.Head;
                 Name = `{v.Character:FindFirstChild('ShifterHolder').Value} Titan`;
                 CustomName = 'Shifter';
                 Player = plrshift;
