@@ -33523,80 +33523,80 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end
         -- chatlogger could return table so chatlogger:disable()
     end)
-    -- local voidfor = ''
-    -- local specificvoid = weirdsector:AddDropdown("Specific Void", {'none'}, "", false, function(dropdownv)
-    --     voidfor = dropdownv;
-    -- end)
-    -- weirdsector:AddButton('Void Person',function()
-    --     if game.Players:FindFirstChild(voidfor) then 
-    --         aotfreedomwar.functions.instakillplayer(game.Players:FindFirstChild(voidfor))
-    --     end
-    -- end)
-    -- weirdsector:AddToggle('Void CFrame',false,function(x)
-    --     aotfreedomwar.voidcframe = x
-    --     -- chatlogger could return table so chatlogger:disable()
-    -- end)
-    -- weirdsector:AddToggle('Die with Them',false,function(x)
-    --     aotfreedomwar.diewithem = x
-    --     -- chatlogger could return table so chatlogger:disable()
-    -- end)
-    -- weirdsector:AddSlider('Drag Death CFrame',0,15,50,10,function(xstate) -- min def max dec
-    --     getgenv().aotfreedomwar['incrementdeath'] = xstate
-    -- end)
-    -- weirdsector:AddButton('Just Grab',function()
-    --     if game.Players:FindFirstChild(voidfor) then 
-    --         aotfreedomwar.functions.instakillplayer(game.Players:FindFirstChild(voidfor),'grab')
-    --     end
-    -- end)
-    -- weirdsector:AddToggle('TP Original Pos',false,function(x)
-    --     aotfreedomwar.tptooriginalpos = x
-    --     -- chatlogger could return table so chatlogger:disable()
-    -- end)
-    -- weirdsector:AddToggle('Void Instead',false,function(x)
-    --     aotfreedomwar.voidplayer = x
-    --     -- chatlogger could return table so chatlogger:disable()
-    -- end)
-    -- weirdsector:AddButton('Kill Nearest Player', function()
-    --     local xtable = {}
-    --     local closestplayer = nil;
-    --     local closestdist = nil;
-    --     for i,v in next, game.Players:GetPlayers() do 
-    --         if v ~= game.Players.LocalPlayer and v.Character and aotfreedomwar.functions.checkiftitan(v.Character) == false then 
-    --             local dist = (v.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
-    --             if dist <= 25 then 
-    --                 if closestplayer == nil then 
-    --                     closestplayer = v;
-    --                     closestdist = dist;
-    --                 else
-    --                     if closestdist > dist then 
-    --                         closestplayer = v;
-    --                         closestdist = dist;
-    --                     end
-    --                 end
-    --             end
-    --             table.insert(xtable,v.Name) -- check ifnottitan
-    --         end
-    --     end
-    --     if not closestplayer then return end
-    --     xtable = closestplayer -- game.Players:FindFirstChild(xtable[math.random(1,#xtable)])
-    --     aotfreedomwar.functions.instakillplayer(xtable)
-    -- end)
-    -- weirdsector:AddButton('Kill Anyone', function()
-    --     local xtable = {}
-    --     for i,v in next, game.Players:GetPlayers() do 
-    --         if v ~= game.Players.LocalPlayer and v.Character and aotfreedomwar.functions.checkiftitan(v.Character) == false then 
-    --             table.insert(xtable,v.Name) -- check ifnottitan
-    --         end
-    --     end
-    --     xtable = game.Players:FindFirstChild(xtable[math.random(1,#xtable)])
-    --     aotfreedomwar.functions.instakillplayer(xtable)
-    -- end)
-    -- weirdsector:AddButton('Fix Insta Kill', function()
-    --   --  game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = true; -- could check if true;
-    --     game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = true;
-    --     task.wait(1)
-    --     game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = false;
-    -- end)
+    local voidfor = ''
+    local specificvoid = weirdsector:AddDropdown("Specific Void", {'none'}, "", false, function(dropdownv)
+        voidfor = dropdownv;
+    end)
+    weirdsector:AddButton('Void Person',function()
+        if game.Players:FindFirstChild(voidfor) then 
+            aotfreedomwar.functions.instakillplayer(game.Players:FindFirstChild(voidfor))
+        end
+    end)
+    weirdsector:AddToggle('Void CFrame',false,function(x)
+        aotfreedomwar.voidcframe = x
+        -- chatlogger could return table so chatlogger:disable()
+    end)
+    weirdsector:AddToggle('Die with Them',false,function(x)
+        aotfreedomwar.diewithem = x
+        -- chatlogger could return table so chatlogger:disable()
+    end)
+    weirdsector:AddSlider('Drag Death CFrame',0,15,50,10,function(xstate) -- min def max dec
+        getgenv().aotfreedomwar['incrementdeath'] = xstate
+    end)
+    weirdsector:AddButton('Just Grab',function()
+        if game.Players:FindFirstChild(voidfor) then 
+            aotfreedomwar.functions.instakillplayer(game.Players:FindFirstChild(voidfor),'grab')
+        end
+    end)
+    weirdsector:AddToggle('TP Original Pos',false,function(x)
+        aotfreedomwar.tptooriginalpos = x
+        -- chatlogger could return table so chatlogger:disable()
+    end)
+    weirdsector:AddToggle('Void Instead',false,function(x)
+        aotfreedomwar.voidplayer = x
+        -- chatlogger could return table so chatlogger:disable()
+    end)
+    weirdsector:AddButton('Kill Nearest Player', function()
+        local xtable = {}
+        local closestplayer = nil;
+        local closestdist = nil;
+        for i,v in next, game.Players:GetPlayers() do 
+            if v ~= game.Players.LocalPlayer and v.Character and aotfreedomwar.functions.checkiftitan(v.Character) == false then 
+                local dist = (v.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                if dist <= 25 then 
+                    if closestplayer == nil then 
+                        closestplayer = v;
+                        closestdist = dist;
+                    else
+                        if closestdist > dist then 
+                            closestplayer = v;
+                            closestdist = dist;
+                        end
+                    end
+                end
+                table.insert(xtable,v.Name) -- check ifnottitan
+            end
+        end
+        if not closestplayer then return end
+        xtable = closestplayer -- game.Players:FindFirstChild(xtable[math.random(1,#xtable)])
+        aotfreedomwar.functions.instakillplayer(xtable)
+    end)
+    weirdsector:AddButton('Kill Anyone', function()
+        local xtable = {}
+        for i,v in next, game.Players:GetPlayers() do 
+            if v ~= game.Players.LocalPlayer and v.Character and aotfreedomwar.functions.checkiftitan(v.Character) == false then 
+                table.insert(xtable,v.Name) -- check ifnottitan
+            end
+        end
+        xtable = game.Players:FindFirstChild(xtable[math.random(1,#xtable)])
+        aotfreedomwar.functions.instakillplayer(xtable)
+    end)
+    weirdsector:AddButton('Fix Insta Kill', function()
+      --  game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = true; -- could check if true;
+        game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = true;
+        task.wait(1)
+        game.Players.LocalPlayer.Character.Humanoid.Grabbing.Value = false;
+    end)
     local playerlooking = ''
     local hookingpvp = ''
     local Servers = sector:AddDropdown("Look At", {'none'}, "", false, function(dropdownv)
@@ -33627,18 +33627,21 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     for i,v in next, game.Players:GetPlayers() do 
         if v ~= game.Players.LocalPlayer then 
             Servers:Add(v.Name) 
-       --     specificvoid:Add(v.Name)
+       
+            specificvoid:Add(v.Name)
             hookdrop:Add(v.Name)
         end 
     end
     game.Players.PlayerAdded:Connect(function(v)
         Servers:Add(v.Name)
-     --   specificvoid:Add(v.Name)
+     
+        specificvoid:Add(v.Name)
         hookdrop:Add(v.Name)
     end)
     game.Players.PlayerRemoving:Connect(function(v)
         Servers:Remove(v.Name)
-      --  specificvoid:Remove(v.Name)
+      
+        specificvoid:Remove(v.Name)
         hookdrop:Add(v.Name)
     end)
     
@@ -33706,6 +33709,19 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     sector:AddToggle('Infinite Blades',false,function(xstate)
         getgenv().aotfreedomwar['infiniteblades'] = xstate
     end)
+    sector:AddToggle('Get All Skills',false,function(xstate)
+        getgenv().aotfreedomwar['getallskills'] = xstate
+    end)
+    sector:AddToggle('No Titan Attack',false,function(xstate)
+        getgenv().aotfreedomwar['notitanattack'] = xstate
+        if getgenv().aotfreedomwar['notitanattack'] == false then 
+            if game.Players.LocalPlayer.Character ~= nil then 
+                if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
+                    game.Players.LocalPlayer.Character.Humanoid.Invinsible.Value = false;
+                end
+            end
+        end
+    end)
     sector:AddToggle('Super Jump Midair',false,function(xstate)
         getgenv().aotfreedomwar['superjumpmidair'] = xstate
     end)
@@ -33730,7 +33746,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     while task.wait() do 
                         if aotfreedomwar.infhealth == false or getgenv().loopsUnload == true then break end
                         --game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0);
-                        if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada') then 
+                        if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada') and game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada'):FindFirstChild('Eat') then 
                             game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada').Eat:FireServer();
                         else
                             game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0)
@@ -33807,19 +33823,6 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     sector:AddButton('Fix Spike Nets',function()
         for i,v in next, game.Players.LocalPlayer.Backpack:GetChildren() do 
             if v.Name == 'SpikeNet' then v:Destroy() end
-        end
-    end)
-    sector:AddToggle('Get All Skills',false,function(xstate)
-        getgenv().aotfreedomwar['getallskills'] = xstate
-    end)
-    sector:AddToggle('No Titan Attack',false,function(xstate)
-        getgenv().aotfreedomwar['notitanattack'] = xstate
-        if getgenv().aotfreedomwar['notitanattack'] == false then 
-            if game.Players.LocalPlayer.Character ~= nil then 
-                if game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') then 
-                    game.Players.LocalPlayer.Character.Humanoid.Invinsible.Value = false;
-                end
-            end
         end
     end)
     sector:AddToggle('Titan Nape Hitbox',false,function(xstate)
@@ -34742,6 +34745,8 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
         whirlpoolesp = false;
         whirlpoolespdistance = 2000;
         whirlpoolespcolor = Color3.fromRGB(255,255,255);
+        mobespcolor = Color3.fromRGB(255,255,255);
+        mobespdistance = 200;
     }
     
     -- local ingredientesp = esp_lib:AddObjectListener(game:GetService("Workspace").Ingredients, {
@@ -35854,13 +35859,22 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
     end)
     espsector:AddToggle('Mob Esp', false, function(xstate)
         deepwokensettings.mobesp = xstate;
-        esp_lib.mobesp = xstate;
-        updateESP('mobesp', 'Visible', xstate)
+        --esp_lib.mobesp = xstate;
+        --updateESP('mobesp', 'Visible', xstate)
     end)
+    espsector:AddColorpicker('Mob Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)--ChIslandest
+        deepwokensettings['mobespcolor'] = ztx
+        --updateESP('island', 'Color', ztx)
+    end)
+    espsector:AddSlider("Mob Esp Range", 0, 200, 5000, 1, function(State)
+        deepwokensettings['mobespdistance'] = State
+    end)
+
     -- have 20 ingredients display at a time
     -- one gets picked up another 1 gets added
 
     local function rayEsp(t)
+        -- could set the global esp[flag] = {}
         local child = t.child
         local flag = t.flag
         local distcap = t.maxdist
@@ -35868,6 +35882,8 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
         local nobox = t.nobox or false;
         local notracer = t.notracer or false; -- notraceror notraror notraacer
         local givenaname = t.name -- supposed to be given name
+        local activet = t.active
+        local disableremove = t.removeondisable
         local b = esp_lib:Add(child, {
             SelfName = true;
             IsEnabled = flag;
@@ -35878,39 +35894,44 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
             NoTracer = notracer;
             NoBox = nobox;
             Name = givenaname;
+            active = activet;
+            removeondisable = disableremove;
         });
         return b
     end
 
-
-    esp_lib:CreateOnPath(game:GetService("Workspace").Ingredients, {
-        max = 20;
-        renderclosest = true;
-        SelfName = true;
-        distance = function()
-            return deepwokensettings.ingredientespdistance;
-        end;
-        TableReceiveColor = deepwokensettings;
-        Color = function()
-            return deepwokensettings.ingredientespcolor;
-        end;
-        IsEnabled = 'IngredientEsp';
-        flag = 'ingredient';
-    })
-    esp_lib:CreateOnPath(game:GetService("Workspace").Chests,{
-        max = 20;
-        renderclosest = true;
-        SelfName = true;
-        distance = function()
-            return deepwokensettings.chestespdistance;
-        end;
-        Color = function()
-            return deepwokensettings.chestespcolor; --Color3.fromRGB(255,255,255); --Color3.fromRGB(0,70,70);
-        end;
-        IsEnabled = 'chestesp';
-        --PrimaryPart = 'HumanoidRootPart';
-        flag = 'chestesp';
-    })
+    if game:GetService("Workspace"):FindFirstChild('Ingredients') then 
+        esp_lib:CreateOnPath(game:GetService("Workspace").Ingredients, {
+            max = 20;
+            renderclosest = true;
+            SelfName = true;
+            distance = function()
+                return deepwokensettings.ingredientespdistance;
+            end;
+            TableReceiveColor = deepwokensettings;
+            Color = function()
+                return deepwokensettings.ingredientespcolor;
+            end;
+            IsEnabled = 'IngredientEsp';
+            flag = 'ingredient';
+        })
+    end
+    if game:GetService("Workspace"):FindFirstChild('Chests') then 
+        esp_lib:CreateOnPath(game:GetService("Workspace").Chests,{
+            max = 20;
+            renderclosest = true;
+            SelfName = true;
+            distance = function()
+                return deepwokensettings.chestespdistance;
+            end;
+            Color = function()
+                return deepwokensettings.chestespcolor; --Color3.fromRGB(255,255,255); --Color3.fromRGB(0,70,70);
+            end;
+            IsEnabled = 'chestesp';
+            --PrimaryPart = 'HumanoidRootPart';
+            flag = 'chestesp';
+        })
+    end
     espsector:AddToggle('Ingredient Esp', false, function(xstate)
         deepwokensettings.ingredientesp = xstate;
         esp_lib.IngredientEsp = xstate
@@ -35939,9 +35960,83 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
     espsector:AddSlider("Ingredient Esp Range", 0, 200, 5000, 1, function(State)
         deepwokensettings['ingredientespdistance'] = State
     end)
+
+
+
+
+
+
+    local function onObjectAdded(child)  -- ESP.Objects[workspace.Part]:Remove() would work btw
+        if child.Name == 'PieceofForge' and deepwokensettings.artifactesp then
+            esp_lib:Add(child, {   -- SelfName = true;
+                Name = function()
+                    return 'Artifact' -- Artific
+                end;
+                IsEnabled = 'artifactesp';
+                flag = 'artifact';
+                tag = 'artifact';
+                active = function()
+                    return deepwokensettings.artifactesp
+                end;
+                removeondisable = true; -- removenoactive
+            });
+        elseif child:FindFirstChild('Lid') and deepwokensettings.chestesp then 
+            rayEsp{
+                Name = function()
+                    return 'Chest'
+                end;    
+                child = child;
+                flag = 'chestesp';
+                maxdist = function()
+                    return deepwokensettings.chestespdistance
+                end,
+                color = function()
+                    return deepwokensettings.chestespcolor
+                end,
+                active = function()
+                    return deepwokensettings.chestesp
+                end;
+                nobox = true;
+                notracer = true;
+                removeondisable = true;
+            }
+        end;
+    end
+    local function onObjectRemoval(child) 
+        if ESP.Objects[child] then 
+            ESP.Objects[child]:Remove()
+            print('removed esp[]')
+        end
+    end
+    local function flagremove(flag) -- flagrm
+        for i,v in next, ESP.Objects do 
+            if v.flag == flag then 
+                v:Remove()
+            end
+        end
+    end;
+
+    -- newgen fucnts
+
+    local function loopdirectory(popdir)
+        local dirs = popdir
+        -- for _, Directory in next, dirs do 
+        --     for i, child in next, Directory:GetChildren() do 
+        --         onObjectAdded(child)
+        --     end
+        -- end
+        for _, Directory in next, dirs do 
+            for i, child in next, Directory:GetChildren() do 
+                onObjectAdded(child)
+            end
+        end
+    end
+
+
+
     espsector:AddToggle('Artifact Esp', false, function(xstate)
         deepwokensettings.artifactesp = xstate;
-        esp_lib.artifactesp = xstate
+        loopdirectory({workspace.Thrown,workspace})
     end)
     -- espsector:AddToggle('Chest Esp', false, function(xstate)
     --     deepwokensettings.chestesp = xstate;
@@ -35992,7 +36087,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
     end)
     espsector:AddColorpicker('Chest Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
         deepwokensettings['chestespcolor'] = ztx
-        updateESP('chestesp', 'Color', ztx)
+        --updateESP('chestesp', 'Color', ztx)
     end)
     espsector:AddSlider("Chest Esp Range", 0, 200, 5000, 1, function(State)
         deepwokensettings['chestespdistance'] = State
@@ -36004,7 +36099,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
         if xstate == false then 
             maid.locationcheck = nil;
             esp_lib.island = xstate;
-            updateESP('island', 'remove')
+            --updateESP('island', 'remove')
             return;
         end;
         if xstate == true then 
@@ -36033,6 +36128,9 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
                             IsEnabled = 'island';
                             maxdistance = function()
                                 return deepwokensettings.islandespdistance
+                            end;
+                            active = function()
+                                return deepwokensettings.islandesp
                             end;
                         })
 
@@ -36065,67 +36163,33 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
     end)
     espsector:AddColorpicker('Island Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)--ChIslandest
         deepwokensettings['islandespcolor'] = ztx
-        updateESP('island', 'Color', ztx)
+        --updateESP('island', 'Color', ztx)
     end)
     espsector:AddSlider("Island Esp Range", 0, 2000, 5000, 1, function(State)
         deepwokensettings['islandespdistance'] = State
     end)
-    local function onObjectAdded(child)  -- ESP.Objects[workspace.Part]:Remove() would work btw
-        if child.Name == 'PieceofForge' then
-            esp_lib:Add(child, {
-                SelfName = true;
-                IsEnabled = 'artifactesp';
-                flag = 'artifact';
-                tag = 'artifact';
-            });
-        elseif child:FindFirstChild('Lid') then 
-            rayEsp{
-                child = child;
-                flag = 'chestesp';
-                maxdist = function()
-                    return deepwokensettings.chestespdistance
-                end,
-                color = function()
-                    return deepwokensettings.chestespcolor
-                end,
-            }
-        end;
-    end
-    local function onObjectRemoval(child) 
-        if ESP.Objects[child] then 
-            ESP.Objects[child]:Remove()
-            print('removed esp[]')
-        end
-    end
-    local function flagremove(flag) -- flagrm
-        for i,v in next, ESP.Objects do 
-            if v.flag == flag then 
-                v:Remove()
-            end
-        end
-    end;
-
-    -- newgen fucnts
     espsector:AddToggle('Whirlpool Esp', false, function(xstate)
         deepwokensettings.whirlpoolesp = xstate;
         esp_lib.whirlpoolesp = xstate;
-        if xstate == false then 
-            -- could loop in workspace see if object is in esp.objects for i,v in next, 
-            for i,v in next, ESP.Objects do 
-                if v.flag == 'whirlpoolesp' then 
-                    v:Remove()
-                end
-            end
-            return;
-        end;    
+        -- if xstate == false then 
+        --     -- could loop in workspace see if object is in esp.objects for i,v in next, 
+        --     for i,v in next, ESP.Objects do 
+        --         if v.flag == 'whirlpoolesp' then 
+        --             v:Remove()
+        --         end
+        --     end
+        --     return;
+        -- end;    
         for i,v in next, workspace:GetChildren() do 
             if v.Name == 'DepthsWhirlpool' then --namee
-                if v:FindFirstChild('Center') then 
+                if v:FindFirstChild('Center') then                        --IsEnabled = 'whirlpoolesp'; -- depthsesp
                     esp_lib:Add(v, {
                         SelfName = true;
-                        IsEnabled = 'whirlpoolesp'; -- depthsesp
                         flag = 'whirlpoolesp';
                         tag = 'whirlpoolesp';
+                        active = function()
+                            return deepwokensettings.whirlpoolesp;
+                        end;
                         Color = function()
                             return deepwokensettings.whirlpoolespcolor;
                         end;
@@ -36150,6 +36214,9 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
                                 maxdistance = function()
                                     return deepwokensettings.whirlpoolespdistance;
                                 end;
+                                active = function()
+                                    return deepwokensettings.whirlpoolesp;
+                                end;
                             });
                         end
                     end)
@@ -36159,7 +36226,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
     end)
     espsector:AddColorpicker('Whirlpool Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)--ChIslandest
         deepwokensettings.whirlpoolespcolor = ztx
-        updateESP('whirlpoolesp', 'Color', ztx)
+        --updateESP('whirlpoolesp', 'Color', ztx)
     end)
     espsector:AddSlider("Whirlpool Esp Range", 0, 2000, 5000, 1, function(State)
         deepwokensettings.whirlpoolespdistance = State
@@ -37878,6 +37945,12 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
                     tag = 'mobesp';
                     IsEnabled = 'mobesp';
                     entity = true;
+                    maxdistance = function()
+                        return deepwokensettings.mobespdistance
+                    end;
+                    active = function()
+                        return deepwokensettings.mobesp
+                    end;
                 });
             end)
         end;
