@@ -33750,13 +33750,13 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             maid.infhealth2 = nil;
             return
         end;
+        game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100)
         maid.infhealth = game.RunService.RenderStepped:Connect(function()
             -- task.delay(0.1,function()
             --     if game.Players.LocalPlayer.Backpack:FindFirstChild('Granada') then 
             --         game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame.DestroyTool:FireServer(game.Players.LocalPlayer.Backpack.Granada)
             --     end
             -- end)
-            game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100)
             for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame:GetChildren() do 
                 if tonumber(v.Name) and tonumber(v.Name) > 3 then 
                     v:Destroy()
@@ -33780,13 +33780,13 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             end
         end)
         if aotfreedomwar.twothreads then 
+            game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100)
             maid.infhealth2 = game.RunService.RenderStepped:Connect(function()
                 -- task.delay(0.1,function()
                 --     if game.Players.LocalPlayer.Backpack:FindFirstChild('Granada') then 
                 --         game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame.DestroyTool:FireServer(game.Players.LocalPlayer.Backpack.Granada)
                 --     end
                 -- end)
-                game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100)
                 for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame:GetChildren() do 
                     if tonumber(v.Name) and tonumber(v.Name) > 3 then 
                         v:Destroy()
