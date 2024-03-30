@@ -7083,7 +7083,7 @@ function AddConfigurations()
     task.spawn(function()
         while task.wait(10) do 
             pcall(function()
-                system.Save()
+                system.savefunc() --Save()
             end)
         end
     end)
@@ -34046,6 +34046,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         getgenv().aotfreedomwar['attackspeed'] = xstate
     end)
     local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
+    esp_lib.Settings.usecustomespcolor = true;
     esp_lib.Players = false;
     esp_lib.Boxes = false;
     esp_lib.Names = true;
