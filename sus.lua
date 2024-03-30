@@ -7082,7 +7082,9 @@ function AddConfigurations()
 
     task.spawn(function()
         while task.wait(10) do 
-            system.Save()
+            pcall(function()
+                system.Save()
+            end)
         end
     end)
 end
@@ -7124,7 +7126,7 @@ sharedRequires['CreateFlySystem'] = function(sector, gnvtable)
             -- getgenv().flying = true
             task.spawn(function()
                 repeat wait()
-                until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game.Players.LocalPlayer.Character:findFirstChild("Torso") and game.Players.LocalPlayer.Character:findFirstChild("Humanoid")
+                until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game.Players.LocalPlayer.Character:FindFirstChild("Torso") and game.Players.LocalPlayer.Character:findFirstChild("Humanoid")
                 local mouse = game.Players.LocalPlayer:GetMouse()
                 repeat wait() until mouse
                 local plr = game.Players.LocalPlayer
@@ -7132,7 +7134,7 @@ sharedRequires['CreateFlySystem'] = function(sector, gnvtable)
                 local deb = true
                 local ctrl = {f = 0, b = 0, l = 0, r = 0}
                 local lastctrl = {f = 0, b = 0, l = 0, r = 0}
-                local maxspeed = gnvtable['flyspeed']
+                local maxspeed = gnvtable['flyspeed'] /2
                 local speed = maxspeed  
                 function Fly()
                     local bv = Instance.new("BodyVelocity", game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart"));bv.Name ='exploitation'
@@ -33259,6 +33261,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         spacetoimpulse = false;
         gtoimpulse = false;
         autokick = false;
+        twothreads = false;
     } -- add m1 when next to enemy shifter
 
     aotfreedomwar.functions.pretendimpulse = function() -- force impulse
@@ -33734,26 +33737,78 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     sector:AddToggle('Auto Kill Insub',false,function(xstate)
         getgenv().aotfreedomwar['autoattackwhennearenemy'] = xstate
     end)
+    sector:AddToggle('Two Threads Inf Heal',false,function(xstate)
+        getgenv().aotfreedomwar['twothreads'] = xstate
+    end)
     local ifn = sector:AddToggle('Start Inf Healing',false,function(x)
         -- for i=1, 3 do 
         --     game:GetService("Players").LocalPlayer.Backpack:WaitForChild('Granada').Eat:FireServer();
         -- end;
         aotfreedomwar.infhealth = x;
-        if x == true then 
-            LPH_NO_VIRTUALIZE(function()
-                task.spawn(function()
-                    game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100);
-                    while task.wait() do 
-                        if aotfreedomwar.infhealth == false or getgenv().loopsUnload == true then break end
-                        --game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0);
-                        if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada') and game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada'):FindFirstChild('Eat') then 
+        if x == false then 
+            maid.infhealth = nil;
+            maid.infhealth2 = nil;
+            return
+        end;
+        maid.infhealth = game.RunService.RenderStepped:Connect(function()
+            -- task.delay(0.1,function()
+            --     if game.Players.LocalPlayer.Backpack:FindFirstChild('Granada') then 
+            --         game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame.DestroyTool:FireServer(game.Players.LocalPlayer.Backpack.Granada)
+            --     end
+            -- end)
+            game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100)
+            for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame:GetChildren() do 
+                if tonumber(v.Name) and tonumber(v.Name) > 3 then 
+                    v:Destroy()
+                end
+            end
+            if aotfreedomwar.infhealth == false or getgenv().loopsUnload == true then maid.infhealth = nil end
+            --game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0); --  and game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada'):FindFirstChild('Eat')
+            if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada') then 
+                pcall(function()
+                    for i=1, 3 do 
+                        game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada').Eat:FireServer();
+                        task.wait()
+                    end
+                end)
+                task.wait(0.001)
+                if game.Players.LocalPlayer.Backpack:FindFirstChild('Granada') then 
+                    game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame.DestroyTool:FireServer(game.Players.LocalPlayer.Backpack.Granada)
+                end
+            else
+                game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0)
+            end
+        end)
+        if aotfreedomwar.twothreads then 
+            maid.infhealth2 = game.RunService.RenderStepped:Connect(function()
+                -- task.delay(0.1,function()
+                --     if game.Players.LocalPlayer.Backpack:FindFirstChild('Granada') then 
+                --         game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame.DestroyTool:FireServer(game.Players.LocalPlayer.Backpack.Granada)
+                --     end
+                -- end)
+                game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100)
+                for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame:GetChildren() do 
+                    if tonumber(v.Name) and tonumber(v.Name) > 3 then 
+                        v:Destroy()
+                    end
+                end
+                if aotfreedomwar.infhealth == false or getgenv().loopsUnload == true then maid.infhealth2 = nil end
+                --game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0); --  and game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada'):FindFirstChild('Eat')
+                if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada') then 
+                    pcall(function()
+                        for i=1, 3 do 
                             game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada').Eat:FireServer();
-                        else
-                            game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0)
+                            task.wait()
                         end
-                    end;
-                end);
-            end)()
+                    end)
+                    task.wait(0.001)
+                    if game.Players.LocalPlayer.Backpack:FindFirstChild('Granada') then 
+                        game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame.DestroyTool:FireServer(game.Players.LocalPlayer.Backpack.Granada)
+                    end
+                else
+                    game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0)
+                end
+            end)
         end
     end,{
         ask = 'Stops when you die, click button twice until granada disappears on equip'; -- granola
@@ -34198,7 +34253,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             aotfreedomwar.functions.pretendimpulse()
         end
     end)
-
+    --expand legs toggle
     local aimbotctn; aimbotctn = game.RunService.RenderStepped:Connect(function() -- couldve done ainmbot or mouthaimbot then distinguish it in the fucntion
         if aimbot then 
             pcall(function()
@@ -34651,6 +34706,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
     local rightsect = tab:CreateSector('Cheats', 'right')
     local moreright = tab:CreateSector('Cheats', 'right')
     local espsector = esptab:CreateSector('Cheats','left')
+    local moreesp = esptab:CreateSector('Cheats','left') -- moresp
     local Stats = game:GetService("Stats")
 
     local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
@@ -34667,6 +34723,8 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
         usecustomwaitdelay = false;
         customwaitdelay = 0;
         playeresp = false;
+        playerespdistance = 2000;
+        playerespcolor = Color3.fromRGB(255,255,255);
         boxesp = false;
         tracers = false;
         espnames = false;
@@ -34747,6 +34805,11 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
         whirlpoolespcolor = Color3.fromRGB(255,255,255);
         mobespcolor = Color3.fromRGB(255,255,255);
         mobespdistance = 200;
+        npcesp = false;
+        npcespdistance = 2000;
+        npcespcolor = Color3.fromRGB(255,255,255);
+        tptojars = false;
+        lookatjars = false;
     }
     
     -- local ingredientesp = esp_lib:AddObjectListener(game:GetService("Workspace").Ingredients, {
@@ -34781,6 +34844,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
     local fastSwingEffects = {'OffhandAttack', 'HeavyAttack', 'MediumAttack', 'LightAttack', 'UsingSpell'};
 
     local oldClearEffect = effectReplicatorEnv.clearEffects;
+    local isLayer2 = game.ReplicatedStorage:FindFirstChild('LAYER2_DUNGEON');
 
     local function setupNoStun()
         effectReplicator.EffectAdded:connect(function(effect)
@@ -35049,7 +35113,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
     -- game.Players.LocalPlayer.CharacterAdded:Connect(function(x)
     --     onCharacterAdded(x)
     -- end)
-
+    _G.canAttack = true;
 
     if (game.Players.LocalPlayer.Character) then
         task.spawn(onCharacterAdded, game.Players.LocalPlayer.Character);
@@ -35111,13 +35175,89 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
             end)
         end;
     end);
-
+    local ChaserTween = nil
+    local BloodJar = nil
+    
     deepwokensettings.functions.getactivebloodjar = function()
         local chaser = workspace.Live:FindFirstChild(".chaser")
         if not chaser then
             return nil
         end
         return chaser.HumanoidRootPart:FindFirstChild("BloodJar")
+    end
+
+	deepwokensettings.functions.resetchasertween = function() -- resetchartween
+		if not ChaserTween then
+			return
+		end
+
+		ChaserTween:Pause()
+		ChaserTween:Cancel()
+		ChaserTween = nil
+	end
+
+    deepwokensettings.functions.TPToClosestJar = function()
+        if not deepwokensettings.tptojars then 
+            deepwokensettings.functions.resetchasertween()
+            return;
+        end;
+        deepwokensettings.functions.resetchasertween()
+        -- local bloodjar deepwokensettings.functions.getactivebloodjar() = -- jarz
+        -- if not bloodjar then 
+        --     return;
+        -- end;
+        -- "better function"
+        local jar = nil;
+        local jardist = 0;
+        local jarholderobj = nil;
+        for i, jarholder in next, chaser.HumanoidRootPart:GetChildren() do 
+            if jarholder.Name == 'BloodJar' and jarholder.Value ~= nil then 
+                if jarholder.Value:FindFirstChildOfClass('Part') then 
+                    local obj = jarholder.Value:FindFirstChildOfClass('Part')
+                    local dist = (obj.Position - azfake:returndata().humanoidrootpart.Position).Magnitude
+                    if dist < 50 then 
+                        if jar == nil then 
+                            jar = jarholder.Value;
+                            jardist = dist;
+                            jarholderobj = jarholder;
+                        else
+                            if jardist > dist then 
+                                jar = jarholder.Value;
+                                jardist = dist;
+                                jarholderobj = jarholder;
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        -- local obj = bloodjar.Value.Parent:FindFirstChildOfClass("Part");
+        -- if not obj then 
+        --     return print('bloodjar no part');
+        -- end;
+        if not jar then return end;
+        if ChaserTween then return end; -- already tweening
+
+        BloodJar = jarholderobj;
+        local tweenCompleted = false;
+        ChaserTween = game.TweenService:Create(azfake:returndata().humanoidrootpart,TweenInfo.new(jardist/10,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {CFrame = jar:FindFirstChildOfClass('Part').CFrame})
+        ChaserTween:Play()
+        ChaserTween.Completed:Connect(function()
+            tweenCompleted = true;
+        end)
+
+        task.spawn(function()
+            repeat
+                task.wait() 
+                if deepwokensettings.lookatjars == true then 
+                    workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p,jar:FindFirstChildOfClass('Part').Position)    
+                end
+            until tweenCompleted == true and not jarholderobj or deepwokensettings.tptojars == false
+            ChaserTween = nil;
+            BloodJar = nil;
+        end)
+
+
     end
 
 
@@ -35395,10 +35535,6 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
                 if
                     v.PrimaryPart
                     and v ~= LocalPlayer.Character
-                    and v:FindFirstChild("HumanoidRootPart")
-                    and not v.Name:find(".megalodaunt")
-                    and not v.Name:find(".chaser")
-                    and not v.Name:find("lionfish")
                 then
                     if v.HumanoidRootPart.ReceiveAge == 0 then
                         local cf = v.PrimaryPart.CFrame
@@ -35411,6 +35547,13 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
                     end
                 end
             end
+            --[[
+
+                                and v:FindFirstChild("HumanoidRootPart")
+                    and not v.Name:find(".megalodaunt")
+                    and not v.Name:find(".chaser")
+                    and not v.Name:find("lionfish")
+            ]]
         end)
     end);
 
@@ -35421,33 +35564,82 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
             maid.autoParryOnEffectAddd = nil;
             maid.autoParrySlotBall = nil;
             maid.autoParryOrb = nil;
+            maid.autoParryLayer2DescAdded = nil;
             return
         end;
         if (game.PlaceId == 8668476218) then -- trial of 1
-            maid.autoParryOrb = RunService.RenderStepped:Connect(function(dt)
-                local myRootPart = azfake:returndata().humanoidrootpart
-                if (not myRootPart) then return end;
-                local myPosition = myRootPart.Position;
-    
-                for _, v in next, workspace.Thrown:GetChildren() do
-                    if (not spawnedAt) then
-                        spawnedAt = tick();
-                    end;
-    
-                    if (v.Name == 'ArdourBall2' and tick() - spawnedAt >= 3) then
-                        local distance = (myPosition - v.Position).Magnitude;
-    
-                        if (distance <= 15 and tick() - lastParryAt >= 0.1) then
-                            lastParryAt = tick();
-                            --blockAttack(true);
-                            --unblockAttack();
+            if (isLayer2) then
+                local chaserBeamDebounce = true;
+
+                maid.autoParryLayer2DescAdded = workspace.DescendantAdded:Connect(function(obj)
+                    if (obj.Name == 'BloodTendrilBeam') then -- Chaser Beam
+                        if (not chaserBeamDebounce) then return end;
+                        chaserBeamDebounce = false;
+                        _G.canAttack = false;
+
+                        task.delay(0.1, function() chaserBeamDebounce = true; end);
+                        _taskwait(0.55);
+                        blockAttack();
+                        unblockAttack();
+                        _G.canAttack = true;
+                    elseif (obj.Name == 'SpikeStabEff') then -- Chaser Explosion
+                        _G.canAttack = false;
+                        _taskwait(0.6);
+                        if (not checkRange(20, obj)) then _G.canAttack = true; return end;
+                        print(obj, 'got added', obj:GetFullName());
+                        blockAttack();
+                        unblockAttack();
+                        _G.canAttack = true;
+                    elseif (obj.Name == 'ParticleEmitter3' and string.find(obj:GetFullName(), 'avatar')) then -- Avatar Beam
+                        _taskwait(0.75);
+
+                        local avatar = obj.Parent.Parent.Parent;
+                        local target = avatar and avatar:FindFirstChild('Target');
+
+                        if (target and target.Value ~= LocalPlayer.Character) then return end;
+
+                        _G.canAttack = false;
+                        warn('AVATAR BEAM: now we parry');
+                        repeat
                             blockAttack();
                             unblockAttack();
-                            break;
+                            task.wait(0.1);
+                        until not obj.Parent or not obj.Enabled;
+                        _G.canAttack = true;
+                    elseif (obj.Name == 'GrabPart') then -- Avatar Blind Ball
+                        repeat
+                            task.wait();
+                        until not obj.Parent or checkRange(20, obj);
+                        if (not obj.Parent) then return end;
+                        roll();
+                    end
+                end);
+            else
+                maid.autoParryOrb = RunService.RenderStepped:Connect(function(dt)
+                    local myRootPart = azfake:returndata().humanoidrootpart
+                    if (not myRootPart) then return end;
+                    local myPosition = myRootPart.Position;
+        
+                    for _, v in next, workspace.Thrown:GetChildren() do
+                        if (not spawnedAt) then
+                            spawnedAt = tick();
+                        end;
+        
+                        if (v.Name == 'ArdourBall2' and tick() - spawnedAt >= 3) then
+                            local distance = (myPosition - v.Position).Magnitude;
+        
+                            if (distance <= 15 and tick() - lastParryAt >= 0.1) then
+                                lastParryAt = tick();
+                                --blockAttack(true);
+                                --unblockAttack();
+                                blockAttack();
+                                unblockAttack();
+                                break;
+                            end;
                         end;
                     end;
-                end;
-            end);
+                end);
+            end
         end
         maid.autoParrySlotBall = workspace.Thrown.ChildAdded:Connect(function(obj)
             task.wait();
@@ -35836,8 +36028,51 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
             end
         end))
     end)
-    
+    moreright:AddToggle('No Fog', false, function(e)
+        deepwokensettings.noog = e;
+        if e == false then 
+            maid.checkfog = nil;
+            return;
+        end;
+        maid.checkfog = game.RunService.Heartbeat:Connect(LPH_NO_VIRTUALIZE(function()
+            game.Lighting.FogStart = 10000000000
+            game.Lighting.FogEnd = 10000000000
+            if game.Lighting:FindFirstChildOfClass("Atmosphere") then
+                game.Lighting:FindFirstChildOfClass("Atmosphere").Density = 0
+            end
+        end))
+    end)
+    moreright:AddToggle('No Wind', false, function(e)
+        deepwokensettings.nowind = e;
+        if e == false then 
+            maid.checkwind = nil;
+            return;
+        end;
+        maid.checkwind = game.RunService.Heartbeat:Connect(LPH_NO_VIRTUALIZE(function()
+            local rootPart = azfake:returndata().humanoidrootpart;
+            if (not rootPart) then return end;
 
+            local windPusher = rootPart:FindFirstChild('WindPusher');
+            if (windPusher) then
+                windPusher.Parent = game.Lighting;
+            end;
+        end))
+    end)
+    local jartoggle = moreright:AddToggle('TP To Jars', false, function(e) -- jars:IsPressed()
+        deepwokensettings.tptojars = e;
+        task.spawn(function()
+            repeat 
+                task.wait()
+                if ChaserTween ~= nil then 
+                    deepwokensettings.functions.TPToClosestJar() -- tptTPtoojars
+                end
+            until getgenv().loopsUnload == true or deepwokensettings.tptojars == false
+        end)
+    end)
+    moreright:AddToggle('Look At Jar', false, function(e) -- jars:IsPressed()
+        deepwokensettings.lookatjars = e;
+    end)
+    jartoggle:AddKeybind()
     -- local selectionspoof = moresect:AddDropdown('Loot', deepwokensettings.lootablevariety, "" , false, function(e)
     --     selectedTalent = e;
     -- end); 
@@ -35857,6 +36092,16 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
         deepwokensettings.playeresp = xstate;
         esp_lib.Players = xstate
     end)
+    espsector:AddColorpicker('Player Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        deepwokensettings['playerespcolor'] = ztx
+        esp_lib.Settings.playerespcolor = deepwokensettings.playerespcolor
+    end)
+    espsector:AddSlider("Player Esp Range", 0, 200, 5000, 1, function(State)
+        deepwokensettings['playerespdistance'] = State
+        esp_lib.Settings.playerespdistance = deepwokensettings.playerespdistance
+    end)
+
+
     espsector:AddToggle('Mob Esp', false, function(xstate)
         deepwokensettings.mobesp = xstate;
         --esp_lib.mobesp = xstate;
@@ -35884,8 +36129,10 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
         local givenaname = t.name -- supposed to be given name
         local activet = t.active
         local disableremove = t.removeondisable
+        local pivoting = t.usepivot
+        local selfname = t.selfname
         local b = esp_lib:Add(child, {
-            SelfName = true;
+            SelfName = selfname;
             IsEnabled = flag;
             flag = flag;
             tag = flag;
@@ -35896,6 +36143,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
             Name = givenaname;
             active = activet;
             removeondisable = disableremove;
+            usepivot = pivoting;
         });
         return b
     end
@@ -35962,13 +36210,22 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
     end)
 
 
-
+    local function addVoidedEsp(model,options)
+        if not model:FindFirstChildOfClass('BasePart') then 
+            -- esp:add(vector3position, {})
+            options.child = model.WorldPivot
+            rayEsp(options)
+        end
+    end
 
 
 
     local function onObjectAdded(child)  -- ESP.Objects[workspace.Part]:Remove() would work btw
         if child.Name == 'PieceofForge' and deepwokensettings.artifactesp then
-            esp_lib:Add(child, {   -- SelfName = true;
+            --local function addFo
+            if not child:FindFirstChildOfClass('BasePart') then 
+            end
+            addVoidedEsp(child, {   -- SelfName = true;
                 Name = function()
                     return 'Artifact' -- Artific
                 end;
@@ -35979,7 +36236,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
                     return deepwokensettings.artifactesp
                 end;
                 removeondisable = true; -- removenoactive
-            });
+            })
         elseif child:FindFirstChild('Lid') and deepwokensettings.chestesp then 
             rayEsp{
                 Name = function()
@@ -36066,7 +36323,9 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
                 if v:FindFirstChild('Lid') then 
                     rayEsp{
                         child = v;
-                        Name = 'Chest';
+                        Name = function()
+                            return 'Chest' 
+                        end;
                         flag = 'chestesp';
                         maxdist = function()
                             return deepwokensettings.chestespdistance
@@ -36074,8 +36333,12 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
                         color = function()
                             return deepwokensettings.chestespcolor
                         end,
+                        active = function()
+                            return deepwokensettings.chestesp
+                        end;
                         nobox = true;
                         notracer = true;
+                        removeondisable = true;
                     }
                     --NoTracer = true;
                     --NoBox = true;
@@ -36094,7 +36357,79 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
     end)
 
 
-    espsector:AddToggle('Island Esp', false, function(xstate)
+
+    moreesp:AddToggle('NPC Esp', false, function(xstate)
+        deepwokensettings.npcesp = xstate;
+        esp_lib.npcesp = xstate;
+        if xstate == false then 
+            return;
+        end
+        local function espIt(v)
+            rayEsp{
+                child = v;
+                Name = function()
+                    return v.Name;
+                end;
+                flag = 'npcesp';
+                maxdist = function()
+                    return deepwokensettings.npcespdistance
+                end,
+                color = function()
+                    return deepwokensettings.npcespcolor
+                end,
+                active = function()
+                    return deepwokensettings.npcesp
+                end;
+                nobox = true;
+                notracer = true;
+                removeondisable = true;
+                RenderInNil = true;
+                usepivot = true;
+            }
+        end
+        esp_lib:CreateOnPath(game:GetService("Workspace").NPCs, {
+            max = 30;
+            renderclosest = true;
+            --SelfName = true;
+            SelfHumanoidName = true;
+            flag = 'npcesp';
+            distance = function()
+                return deepwokensettings.npcespdistance;
+            end;
+            Color = function()
+                return deepwokensettings.npcespcolor
+            end,
+            active = function()
+                return deepwokensettings.npcesp
+            end;
+            nobox = true;
+            notracer = true;
+            removeondisable = true;
+            RenderInNil = true;
+            usepivot = true;
+        })
+        --for i,v in next, workspace.NPCs:GetChildren() do --workspaace
+           -- espIt(v)
+            -- if v.PrimaryPart ~= nil then 
+            --     espIt(v)
+            -- else
+            --     local ctn; ctn = v.ChildAdded:Connect(function(c)
+            --         task.wait(2)
+            --         if v.PrimaryPart then 
+            --             espIt(v)
+            --         end
+            --     end)
+            -- end
+        --end
+    end)
+    moreesp:AddColorpicker('NPC Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        deepwokensettings['npcespcolor'] = ztx
+    end)
+    moreesp:AddSlider("NPC Esp Range", 0, 200, 5000, 1, function(State)
+        deepwokensettings['npcespdistance'] = State
+    end)
+
+    moreesp:AddToggle('Island Esp', false, function(xstate)
         deepwokensettings.islandesp = xstate;
         if xstate == false then 
             maid.locationcheck = nil;
@@ -36161,14 +36496,14 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
         end ;
         esp_lib.island = xstate;
     end)
-    espsector:AddColorpicker('Island Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)--ChIslandest
+    moreesp:AddColorpicker('Island Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)--ChIslandest
         deepwokensettings['islandespcolor'] = ztx
         --updateESP('island', 'Color', ztx)
     end)
-    espsector:AddSlider("Island Esp Range", 0, 2000, 5000, 1, function(State)
+    moreesp:AddSlider("Island Esp Range", 0, 2000, 5000, 1, function(State)
         deepwokensettings['islandespdistance'] = State
     end)
-    espsector:AddToggle('Whirlpool Esp', false, function(xstate)
+    moreesp:AddToggle('Whirlpool Esp', false, function(xstate)
         deepwokensettings.whirlpoolesp = xstate;
         esp_lib.whirlpoolesp = xstate;
         -- if xstate == false then 
@@ -36224,11 +36559,11 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
             end
         end
     end)
-    espsector:AddColorpicker('Whirlpool Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)--ChIslandest
+    moreesp:AddColorpicker('Whirlpool Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)--ChIslandest
         deepwokensettings.whirlpoolespcolor = ztx
         --updateESP('whirlpoolesp', 'Color', ztx)
     end)
-    espsector:AddSlider("Whirlpool Esp Range", 0, 2000, 5000, 1, function(State)
+    moreesp:AddSlider("Whirlpool Esp Range", 0, 2000, 5000, 1, function(State)
         deepwokensettings.whirlpoolespdistance = State
     end)
     
@@ -36239,6 +36574,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
         onObjectAdded(v)
     end;
     workspace.ChildAdded:Connect(function(child)
+        task.wait(.1)
         onObjectAdded(child)
         -- if child.Name == 'PieceofForge' then -- or :find('forge')
         --     esp_lib:Add(child, {
@@ -36249,6 +36585,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
         -- end;
     end);
     workspace.Thrown.ChildAdded:Connect(function(child)
+        task.wait(.1)
         onObjectAdded(child)
     end);
     workspace.Thrown.ChildRemoved:Connect(function(child)
@@ -37921,13 +38258,14 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
             -- parryAnimTables[anim.Animation.AnimationId]:split('')[2]
             local AnimationMainID = string.split(anim.Animation.AnimationId,'//')[2]
             if parryAnimTables[AnimationMainID] and deepwokensettings['autoparry'] == true then 
-                print('parry found anim')
+                --print('parry found anim')
                 if char:FindFirstChild('HumanoidRootPart') then 
                     if type(parryAnimTables[AnimationMainID]) ~= 'table' and type(parryAnimTables[AnimationMainID]) ~= 'function' then
                         if (char:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > deepwokensettings.autoparrydistance then 
                             return
                         end
                     end
+                    print('parrying, '..AnimationMainID)
                     parry(char,AnimationMainID, parryAnimTables[AnimationMainID], anim)
                 end
             end
@@ -37950,6 +38288,9 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
                     end;
                     active = function()
                         return deepwokensettings.mobesp
+                    end;
+                    Color = function()
+                        return deepwokensettings.mobespcolor
                     end;
                 });
             end)
