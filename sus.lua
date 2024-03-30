@@ -33655,7 +33655,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
 
     local autom1tgl = sector:AddToggle('Auto M1',false,function(xstate)
         getgenv().aotfreedomwar['autom1'] = xstate -- autom12
-    end)
+    end):AddKeybind()
     local autom1tgl = sector:AddToggle('Auto Kick',false,function(xstate)
         getgenv().aotfreedomwar['autokick'] = xstate -- autom12
     end)
@@ -34113,8 +34113,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 Name = `{v.Character:FindFirstChild('ShifterHolder').Value} Titan`;
                 CustomName = 'Shifter';
                 Player = plrshift;
-                Color = Color3.fromRGB(75,0,130), --(255,50,50),
-                offset = Vector2.new(0,30)
+                Color = Color3.fromRGB(255,0,0); --Color3.fromRGB(75,0,130), --(255,50,50),
+                offset = Vector2.new(0,30);
+                usecustomespcolor = true;
                 -- ColorDynamic = false;,
                 --Name = 'Shifter',
                 --IsEnabled = 'Shifter'..i,
