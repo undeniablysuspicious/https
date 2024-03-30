@@ -7080,13 +7080,13 @@ function AddConfigurations()
     local Configiuration= window:CreateTab('Configiuration')
     local system = Configiuration:CreateConfigSystem()
 
-    task.spawn(function()
-        while task.wait(10) do 
-            pcall(function()
-                system.savefunc() --Save()
-            end)
-        end
-    end)
+    -- task.spawn(function()
+    --     while task.wait(10) do 
+    --         pcall(function()
+    --             system.savefunc() --Save()
+    --         end)
+    --     end
+    -- end)
 end
 -- snap spell create value , chime in air .
 -- person to snap uses that chime. to snap u have to create a chime then use a snappable spell
