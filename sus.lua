@@ -444,6 +444,51 @@ function azfake:returndata()
     }
 end 
 
+local signals = {
+	gamestepped = {};
+	heartbeat = {};
+}
+
+function signals.gamestepped:connect(desc,func)
+	print('@connecting '..desc);
+	local connection = game.RunService.RenderStepped:Connect(function()
+		func()
+	end)
+	return connection
+end
+function signals.heartbeat:connect(desc,func)
+	print('@connecting '..desc);
+	local connection = game.RunService.Heartbeat:Connect(function()
+		func()
+	end)
+	return connection
+end
+
+function signals.compile(raw)
+	local modules = {}
+	if raw:find('httpservice') then 
+		modules['http'] = game:GetService('HttpService');
+	end
+	if raw:find('replicatedstorage') then 
+		modules['rep'] = game:GetService('ReplicatedStorage');
+	end
+	if raw:find('exec') then 
+		modules['exec'] = identifyexecutor();
+	end
+	if raw:find('char') then 
+		modules['char'] = game.Players.LocalPlayer.Character;
+	end
+    local stored = {} --0
+    for i,v in next, modules do 
+        table.insert(stored,i) --+= 1
+    end
+	if #stored == 1 then modules = modules[stored[1]] end;
+	return modules
+end
+
+-- print bad if no good
+
+
 
 
 -- azfake.repstring = {}
@@ -833,6 +878,7 @@ local brokenfeaturewhitelist = {
     'ExtinctPurchase'
 }
 local vs = 'NonPremium'
+local isV4 = false;
 
 if getgenv().adminCheck and getgenv().adminCheck == true then table.insert(admins,game.Players.LocalPlayer.Name) end
 if table.find(buasx,game.Players.LocalPlayer.Name) then vs = 'Premium-Developer'; getgenv().premiumWhitelist = true; end  
@@ -1069,6 +1115,7 @@ print('ld')
 
 if vs == 'debug' then 
     typeofazfake = 'DEBUG'
+    isV4 = true;
     
     print('\ndebug\n')
     print(' ---------- Welcome, '..game.Players.LocalPlayer.Name..' ----------\n') 
@@ -1098,6 +1145,20 @@ if vs == 'debug' then
     -- end)
 end
 
+if isV4 then 
+    local quickcmds = {
+        ['rejoin'] = function()
+            game:GetService('TeleportService'):teleport(game.PlaceId)
+        end;    
+    }
+    task.spawn(function()
+        rconsoleprint('rconsole quick commands')
+        while task.wait(1) do 
+            local input = rconsoleinput('> ')
+            if quickcmds[input] then quickcmds[input]() end
+        end
+    end)
+end
 
 
 --[[
@@ -7075,6 +7136,17 @@ end
 
 local Maid = loadstring(game:HttpGet('https://raw.githubusercontent.com/Quenty/NevermoreEngine/version2/Modules/Shared/Events/Maid.lua'))();
 local maid = Maid.new()
+task.spawn(function()
+    print('@v;;;')
+    repeat task.wait(.1) until getgenv().loopsUnload == true
+    print('@ended')
+    for i,v in next, maid do 
+        pcall(function()
+            maid[i] = nil;
+        end)
+    end
+    print('offloaded @maid')
+end)
 
 function AddConfigurations()
     local Configiuration= window:CreateTab('Configiuration')
@@ -7107,6 +7179,8 @@ game:GetService('UserInputService').InputEnded:Connect(function(key,istyping) --
     if istyping then getgenv().istyping = true  return end 
     getgenv().istyping = false --//could make it so it sets a global variable for holding a key to true instead of getstat
 end)
+local Mouse = game.Players.LocalPlayer:GetMouse()
+
 local sharedRequires = {};
 
 sharedRequires['CreateFlySystem'] = function(sector, gnvtable)
@@ -7125,10 +7199,7 @@ sharedRequires['CreateFlySystem'] = function(sector, gnvtable)
             Players = game.Players
             -- getgenv().flying = true
             task.spawn(function()
-                repeat wait()
-                until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and game.Players.LocalPlayer.Character:FindFirstChild("Torso") and game.Players.LocalPlayer.Character:findFirstChild("Humanoid")
-                local mouse = game.Players.LocalPlayer:GetMouse()
-                repeat wait() until mouse
+                repeat task.wait() until azfake:returndata().humanoidrootpart and azfake:returndata().humanoid
                 local plr = game.Players.LocalPlayer
                 local torso = plr.Character:WaitForChild('HumanoidRootPart')
                 local deb = true
@@ -7146,7 +7217,7 @@ sharedRequires['CreateFlySystem'] = function(sector, gnvtable)
                             bv.velocity = Vector3.new(0,0,0)
                             bv.maxForce = Vector3.new(9e9, 9e9, 9e9) -- 9e9
                         end
-                        if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+                        if game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and bv ~= nil then 
                             local prevRotation = game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation
                             speed = gnvtable['flyspeed'] --Options.FlySpeedSlide.Value
                             maxspeed = gnvtable['flyspeed']
@@ -7195,7 +7266,7 @@ sharedRequires['CreateFlySystem'] = function(sector, gnvtable)
                     plr.Character:WaitForChild('Humanoid').PlatformStand = false
                     print('stop flying')
                 end
-                mouse.KeyDown:connect(function(key)
+                Mouse.KeyDown:connect(function(key)
                     if key:lower() == "w" then
                         ctrl.f = 1
                     elseif key:lower() == "s" then
@@ -7206,7 +7277,7 @@ sharedRequires['CreateFlySystem'] = function(sector, gnvtable)
                         ctrl.r = 1
                     end
                 end)
-                mouse.KeyUp:connect(function(key)
+                Mouse.KeyUp:connect(function(key)
                     if key:lower() == "w" then
                         ctrl.f = 0
                         speed = 0
@@ -7235,12 +7306,31 @@ sharedRequires['CreateWalkSpeedSystem'] = function(sector, gnvtable)
     local ctn = nil;
     local ToggleWalkSpeed = sector:AddToggle("WalkSpeed", false, function(e)
         gnvtable['walkspeed'] = e
+        if e == false then 
+            maid.walkspeedcon = nil;
+            return ;
+        end;   
+        maid.walkspeedcon = game.RunService.RenderStepped:Connect(function() 
+            local RootPart = azfake:returndata().humanoidrootpart
+            local Humanoid = azfake:returndata().humanoid
+            if not RootPart then return end;
+            if not Humanoid then return end;
+    
+            if gnvtable['flying'] then return end;
+    
+            
+            RootPart.Velocity = RootPart.Velocity * Vector3.new(0, 1, 0)
+            if Humanoid.MoveDirection.Magnitude > 0 then
+                RootPart.Velocity = RootPart.Velocity + Humanoid.MoveDirection.Unit * gnvtable['walkspeedspeed']
+            end
+        end)
+
         if e == true and ctn  == nil then 
-            ctn = game.Players.LocalPlayer.Character.Humanoid:GetPropertyChangedSignal('WalkSpeed'):Connect(function()
-                if gnvtable['walkspeed'] == true then 
-                    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = gnvtable['walkspeedspeed']
-                end
-            end)
+            -- ctn = game.Players.LocalPlayer.Character.Humanoid:GetPropertyChangedSignal('WalkSpeed'):Connect(function()
+            --     if gnvtable['walkspeed'] == true then 
+            --         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = gnvtable['walkspeedspeed']
+            --     end
+            -- end)
         end;
     end)
     sector:AddSlider("WalkSpeed Speed", 0, 0, 250, 1, function(State)
@@ -7249,11 +7339,11 @@ sharedRequires['CreateWalkSpeedSystem'] = function(sector, gnvtable)
     pcall(function()
 
     end)
-    ctn = game.Players.LocalPlayer.Character.Humanoid:GetPropertyChangedSignal('WalkSpeed'):Connect(function()
-        if gnvtable['walkspeed'] == true then 
-            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = gnvtable['walkspeedspeed']
-        end
-    end)
+    -- ctn = game.Players.LocalPlayer.Character.Humanoid:GetPropertyChangedSignal('WalkSpeed'):Connect(function()
+    --     if gnvtable['walkspeed'] == true then 
+    --         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = gnvtable['walkspeedspeed']
+    --     end
+    -- end)
     ToggleWalkSpeed:AddKeybind()
 end
 sharedRequires['CreateNoclip'] = function(sector, gnvtable)
@@ -33731,6 +33821,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     sector:AddToggle('No Cooldown',false,function(xstate)
         getgenv().aotfreedomwar['nocooldown'] = xstate
     end)
+    sector:AddToggle('No Stun',false,function(xstate)
+        getgenv().aotfreedomwar['nostun'] = xstate
+    end)
     sector:AddToggle('Auto Reload',false,function(xstate)
         getgenv().aotfreedomwar['autoreload'] = xstate
     end)
@@ -34550,7 +34643,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                         v.Enabled = true;
                     end
                 end
-                if gearfolder and gearfolder.Skills.Dodge.Value == false and getgenv().aotfreedomwar['getallskills'] and Character and Humanoid and gearfolder and gearscript  then 
+                if gearfolder and gearfolder:FindFirstChild('Skills') and gearfolder.Skills.Dodge.Value == false and getgenv().aotfreedomwar['getallskills'] and Character and Humanoid and gearfolder and gearscript  then 
                     for i,v in next, gearfolder.Skills:GetChildren() do 
                         v.Value = true;
                         warn(`set {v.Name}`)
@@ -38437,6 +38530,10 @@ else
     
     AddConfigurations()
     getgenv().AddPlayerList(weirdsector)
+    sharedRequires['CreateFlySystem'](weirdsector, nogamesettings)
+    sharedRequires['CreateWalkSpeedSystem'](weirdsector, nogamesettings)
+    sharedRequires['CreateNoclip'](weirdsector, nogamesettings)
+    sharedRequires['SetupChatlogger'](weirdsector, nogamesettings)
 
     weirdsector:AddButton('Rejoin',function()
         game:GetService('TeleportService'):teleport(game.PlaceId)
