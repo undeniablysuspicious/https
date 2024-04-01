@@ -444,49 +444,7 @@ function azfake:returndata()
     }
 end 
 
-local signals = {
-	gamestepped = {};
-	heartbeat = {};
-}
-
-function signals.gamestepped:connect(desc,func)
-	print('@connecting '..desc);
-	local connection = game.RunService.RenderStepped:Connect(function()
-		func()
-	end)
-	return connection
-end
-function signals.heartbeat:connect(desc,func)
-	print('@connecting '..desc);
-	local connection = game.RunService.Heartbeat:Connect(function()
-		func()
-	end)
-	return connection
-end
-
-function signals.compile(raw)
-	local modules = {}
-	if raw:find('httpservice') then 
-		modules['http'] = game:GetService('HttpService');
-	end
-	if raw:find('replicatedstorage') then 
-		modules['rep'] = game:GetService('ReplicatedStorage');
-	end
-	if raw:find('exec') then 
-		modules['exec'] = identifyexecutor();
-	end
-	if raw:find('char') then 
-		modules['char'] = game.Players.LocalPlayer.Character;
-	end
-    local stored = {} --0
-    for i,v in next, modules do 
-        table.insert(stored,i) --+= 1
-    end
-	if #stored == 1 then modules = modules[stored[1]] end;
-	return modules
-end
-
--- print bad if no good
+--
 
 
 
@@ -7179,6 +7137,56 @@ game:GetService('UserInputService').InputEnded:Connect(function(key,istyping) --
     if istyping then getgenv().istyping = true  return end 
     getgenv().istyping = false --//could make it so it sets a global variable for holding a key to true instead of getstat
 end)
+
+local signals = {
+	gamestepped = {};
+	heartbeat = {};
+}
+
+function signals.gamestepped:connect(desc,func)
+	print('@connecting '..desc);
+	local connection = game.RunService.RenderStepped:Connect(function()
+		func()
+	end)
+	return connection
+end
+function signals.heartbeat:connect(desc,func)
+	print('@connecting '..desc);
+	local connection = game.RunService.Heartbeat:Connect(function()
+		func()
+	end)
+	return connection
+end
+
+function signals.compile(raw)
+	local modules = {}
+	if raw:find('httpservice') then 
+		modules['http'] = game:GetService('HttpService');
+	end
+	if raw:find('replicatedstorage') then 
+		modules['rep'] = game:GetService('ReplicatedStorage');
+	end
+	if raw:find('exec') then 
+		modules['exec'] = identifyexecutor();
+	end
+	if raw:find('char') then 
+		modules['char'] = game.Players.LocalPlayer.Character;
+	end
+    local stored = {} --0
+    for i,v in next, modules do 
+        table.insert(stored,i) --+= 1
+    end
+	if #stored == 1 then modules = modules[stored[1]] end;
+	return modules
+end
+function signals.conceal(f)
+    task.spawn(function()
+        f()
+    end)
+end
+
+-- print bad if no good
+
 local Mouse = game.Players.LocalPlayer:GetMouse()
 
 local sharedRequires = {};
@@ -7661,6 +7669,9 @@ function BlockUtils:BlockRandomUser()
         end;
     end;
 end;
+
+local universeid = signals.compile('httpservice'):JSONDecode(game:HttpGet(`https://apis.roblox.com/universes/v1/places/{game.PlaceId}/universe`))['universeId']
+-- setclipboard(game.HttpService:JSONDecode(game:HttpGet(`https://apis.roblox.com/universes/v1/places/{game.PlaceId}/universe`))['universeId'])
 
 
 if game.PlaceId == 0 then 
@@ -38515,6 +38526,406 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
     end)
 
     AddConfigurations()
+elseif universeid == 4871329703 then -- type soul
+    local tab = window:CreateTab(gameName)
+    local esptab = window:CreateTab('ESP')
+    local sector = tab:CreateSector('Cheats','left')
+    local espsector = esptab:CreateSector('Cheats','left')
+
+    local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
+    esp_lib.Players = false;
+    esp_lib.Boxes = false;
+    esp_lib.Names = false;
+    esp_lib.AutoRemove = true;
+    esp_lib.Settings.usecustomespcolor = true;
+    esp_lib:Toggle(true)
+
+
+    getgenv().typesoulsettings = {
+        functions = {};
+        connections = {};
+        autoparry = false;
+        autoparrydistance = 0;
+        autoflashstep = false;
+        missionboardesp = false;
+        missionboardespcolor = Color3.fromRGB(255,255,255);
+        missionboardespdistance = 1000; -- 10009
+        playeresp = false;
+        playerespdistance = 2000;
+        playerespcolor = Color3.fromRGB(255,255,255);
+
+    }
+    typesoulsettings.functions.teleport = function(pos)
+        if pos:IsA('BasePart') then
+            pos = pos.CFrame;
+        end;   
+        if typeof(pos) == 'Vector3' then 
+            pos = CFrame.new(pos);
+        end;
+        -- @init
+        if azfake:returndata().humanoidrootpart then 
+            local rootPart = azfake:returndata().humanoidrootpart;
+            local dist = (pos.Position - azfake:returndata().humanoidrootpart.Positon).Magnitude
+
+            repeat 
+                task.wait(.5)
+                dist = (pos.Position - azfake:returndata().humanoidrootpart.Positon).Magnitude
+                local _time = dist / 650;
+                _time += 0.2
+                game.TweenService:Create(rootPart,TweenInfo.new(_time,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = pos}):Play()
+            until dist <= 40
+            game.TweenService:Create(rootPart,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = pos}):Play()
+
+            -- when close just teleport
+            --rootPart.Parent = nil;
+            --rootPart.CFrame = pos;
+            --rootPart.Parent = azfake:returndata().character
+        end;
+        --workspace.NPCs.MissionNPC:GetChildren()[4].Board.Union.CFrame
+        -- @ successfully tp
+    end
+
+    local function checkdist(range, pos)
+        if pos:IsA('BasePart') then pos = pos.Position end;
+        local b = false;
+        if azfake:returndata().humanoidrootpart then 
+            local rootPart = azfake:returndata().humanoidrootpart
+            local dist = (pos - rootPart.Position).Magnitude;
+            if dist <= range then 
+                b = true;
+            end
+        end
+        return b
+    end;
+
+    local function conceal(f)
+        task.spawn(function()
+            f()
+        end )
+    end
+
+    --[[
+    local xb = {'rbxassetid://14069236613','rbxassetid://14079307927','rbxassetid://14069005805'}
+    game.Players.LocalPlayer.Character.Humanoid.AnimationPlayed:Connect(function(x)
+        if table.find(xb,tostring(x.Animation.AnimationId)) then return end
+        if x.Priority == Enum.AnimationPriority.Idle then return end;
+        if x.Priority == Enum.AnimationPriority.Movement then return end;
+        if x.Priority == Enum.AnimationPriority.Core then return end;
+        setclipboard(x.Animation.AnimationId)
+    end)
+    ]]
+
+    typesoulsettings.functions.getentityfolder = function(x)
+        if not x then x = game.Players.LocalPlayer.Name end;
+        return workspace.Entities:FindFirstChild(x)
+    end;    
+
+    typesoulsettings.functions.parry = function(hold)
+        if not typesoulsettings.functions.getentityfolder() then return print('no entity folder') end;
+        typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Pressed")
+        if hold then 
+            task.wait(hold) -- @shouldve concealed
+        end
+        typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Released")
+    end;
+    typesoulsettings.functions.parrylist = function(tbl,  mob, dist ,anim)
+        if not typesoulsettings.functions.getentityfolder() then return print('no entity folder') end;
+        for i,v in next, tbl do 
+            task.wait(v)
+            if checkdist(dist, mob.PrimaryPart) and anim.IsPlaying then 
+                typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Pressed")
+                typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Released")
+            end
+        end
+    end;
+
+    typesoulsettings.functions.flashstep = function()
+        if workspace.Entities:FindFirstChild(game.Players.LocalPlayer.Name) then 
+            local folder = workspace.Entities:FindFirstChild(game.Players.LocalPlayer.Name);
+            folder.CharacterHandler.Remotes.Flashstep:FireServer('Pressed');
+        end;
+    end;    -- could make a check to get folder
+
+    local parryAnims = {};
+
+
+    sector:AddToggle('Auto Parry', false, function(e)
+        typesoulsettings.autoparry = e;
+        if not e then 
+            maid.autoparrycheck = nil;
+            return;
+        end;
+
+        local function onAdded(obj)
+            local hardNames = {
+                'SchwertCritical' --,'Tenran','Byakurai'
+            }
+            if obj.Name:find('hitbox') or obj.Name:find('Hitbox') then 
+                signals.conceal(function()
+                    local hurtPart = obj;
+                    if obj:IsA('Model') then
+                        hurtPart = obj.PrimaryPart
+                    end
+                    repeat task.wait() until not hurtPart or checkdist(6,hurtPart)
+                    if hurtPart and checkdist(6, hurtPart) then 
+                        print('@parrying hurtpart '..obj.Name)
+                        typesoulsettings.functions.parry()
+                    end
+                end)
+            elseif table.find(hardNames,obj.Name) then --obj.Name == 'SchwertCritical'  then 
+                local hurtPart = obj;
+                if obj:IsA('Model') then hurtPart = obj.PrimaryPart end;
+                signals.conceal(function()
+                    repeat task.wait() until not hurtPart or checkdist(14,hurtPart)
+                    if hurtPart and checkdist(13,hurtPart) then 
+                        print(':parrying hardname '..obj.Name)
+                        typesoulsettings.functions.parry()
+                    end
+                end)
+            -- elseif obj:IsA('BasePart') then 
+            --     signals.conceal(function()
+            --         repeat task.wait() until not obj or checkdist(10,obj)
+            --         if obj and checkdist(6,obj) then 
+            --             print(':parrying random part '..obj.Name)
+            --             typesoulsettings.functions.parry()
+            --         end
+            --     end)
+            end
+        end
+
+        maid.autoparrycheck = workspace.Effects.ChildAdded:Connect(function(child)
+            local ctn; ctn = child.ChildAdded:Connect(function(obj)
+                onAdded(obj)
+            end)
+            table.insert(typesoulsettings.connections,ctn)
+        end)
+        for i,v in next, workspace.Effects:GetChildren() do 
+            local ctn; ctn = v.ChildAdded:Connect(function(obj)
+                onAdded(obj)
+            end)
+            table.insert(typesoulsettings.connections,ctn)
+        end
+    end)
+    sector:AddSlider("Auto Parry Distance", 0, 0, 100, 1, function(State)
+        typesoulsettings.autoparrydistance = State -- deepwtykensettings  typesoulsettings
+    end)
+
+    sector:AddToggle('Auto Flashstep', false, function(e)
+        typesoulsettings.autoflashstep = e;
+        if not e then 
+            maid.autoflashstep = nil;
+            return;
+        end;
+        maid.autoflashstep = signals.heartbeat:connect("omega flashy", function()
+            typesoulsettings.functions.flashstep()
+        end)
+    end)
+    sharedRequires['CreateFlySystem'](sector, typesoulsettings)
+    sharedRequires['CreateWalkSpeedSystem'](sector, typesoulsettings)
+    sharedRequires['CreateNoclip'](sector, typesoulsettings)
+    sharedRequires['SetupChatlogger'](sector, typesoulsettings)
+    local function rayEsp(t)
+        -- could set the global esp[flag] = {}
+        local child = t.child
+        local flag = t.flag
+        local distcap = t.maxdist
+        local color = t.color
+        local nobox = t.nobox or false;
+        local notracer = t.notracer or false; -- notraceror notraror notraacer
+        local givenaname = t.name -- supposed to be given name
+        local activet = t.active
+        local disableremove = t.removeondisable
+        local pivoting = t.usepivot
+        local selfname = t.selfname
+        local b = esp_lib:Add(child, {
+            SelfName = selfname;
+            IsEnabled = flag;
+            flag = flag;
+            tag = flag;
+            maxdistance = distcap;
+            Color = t.color;
+            NoTracer = notracer;
+            NoBox = nobox;
+            Name = givenaname;
+            active = activet;
+            removeondisable = disableremove;
+            usepivot = pivoting;
+        });
+        return b
+    end
+
+    espsector:AddToggle('Use Names', false, function(xstate)
+        typesoulsettings.espnames = xstate;
+        esp_lib.Names = xstate
+    end)
+    espsector:AddToggle('Use Boxes', false, function(xstate)
+        typesoulsettings.boxesp = xstate;
+        esp_lib.Boxes = xstate
+    end)
+    espsector:AddToggle('Use Tracers', false, function(xstate)
+        typesoulsettings.tracers = xstate;
+        esp_lib.Tracers = xstate
+    end)
+    espsector:AddToggle('Player Esp', false, function(xstate)
+        typesoulsettings.playeresp = xstate;
+        esp_lib.Players = xstate
+    end)
+    espsector:AddColorpicker('Player Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        typesoulsettings['playerespcolor'] = ztx
+        esp_lib.Settings.playerespcolor = typesoulsettings.playerespcolor
+    end)
+    espsector:AddSlider("Player Esp Range", 0, 200, 5000, 1, function(State)
+        typesoulsettings['playerespdistance'] = State
+        esp_lib.Settings.playerespdistance = typesoulsettings.playerespdistance
+    end)
+
+    espsector:AddToggle('Mission Board Esp',false,function(e)
+        typesoulsettings.missionboardesp = e;
+        if not e then return end;
+        for i,v in next, workspace.NPCs.MissionNPC:GetChildren() do -- workspace.MissionBoards:GetChildren()  
+            rayEsp{
+                child = v;
+                Name = function()
+                    return 'Mission Board' 
+                end;
+                flag = 'board';
+                maxdist = function()
+                    return typesoulsettings.missionboardespdistance
+                end,
+                color = function()
+                    return typesoulsettings.missionboardespcolor
+                end,
+                active = function()
+                    return typesoulsettings.missionboardesp
+                end;
+                nobox = true;
+                notracer = true;
+                removeondisable = true;
+            }
+        end
+    end)
+    espsector:AddColorpicker('Board Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        typesoulsettings['missionboardespcolor'] = ztx
+        --updateESP('chestesp', 'Color', ztx)
+    end)
+    espsector:AddSlider("Board Esp Range", 0, 200, 5000, 1, function(State)
+        typesoulsettings['missionboardespdistance'] = State
+    end)
+
+    do
+        parryAnims['14070372787'] = 0.36
+        parryAnims['14070373836'] = 0.33
+        parryAnims['14070374931'] = 0.3 -- 0.33 matches eprfectly
+        parryAnims['14069237877'] = 0.33
+        parryAnims['14069239027'] = 0.3
+        parryAnims['14069240312'] = 0.3
+        parryAnims['14663938197'] = 0.33 --0.38 -- idk
+        parryAnims['14663985722'] = 0.33
+        parryAnims['14666888203'] = 0.35
+        parryAnims['14664132464'] = 0.31
+        parryAnims['14069009404'] = 0.33
+        parryAnims['14069010389'] = 0.32
+        parryAnims['14069017740'] = 0.28
+        parryAnims['14771379522'] = 0.3
+        parryAnims['14774768876'] = 0.31
+        parryAnims['14774820991'] = 0.33
+        
+        -- gun
+        parryAnims['16749239700'] = 0.12
+        parryAnims['16749240878'] = 0.12--8
+        parryAnims['16749241651'] = 0.12--4
+        parryAnims['14070502124'] = function(mob, anim, id)
+            typesoulsettings.functions.parryList({0.1,0.1,0.1}, mob, 10, anim)
+        end;
+
+        -- reaper sword
+
+        parryAnims['14070072624'] = 0.36
+        parryAnims['14070073772'] = 0.33
+        parryAnims['14070074688'] = 0.3 -- 0.33 matches eprfectly
+
+
+
+        -- crits
+        parryAnims['14069224323'] = 0.4 -- might make funct
+
+        parryAnims['14068997392'] = function(mob, anim, id)
+            typesoulsettings.functions.parryList({0.4,0.3,0.2}, mob, 10, anim)
+        end;
+
+        parryAnims['14071690484'] = function(mob, anim, id)
+            typesoulsettings.functions.parryList({0.4,0.3}, mob, 10, anim)
+        end;
+
+        parryAnims['14070060393'] = 0.45
+
+        parryAnims['14070029680'] = 0.4
+    end
+
+
+    local function attachAnimationPlayed(child)
+        signals.conceal(function()
+            child:WaitForChild('Humanoid')
+            local ctn; ctn = child.Humanoid.AnimationPlayed:Connect(function(anim)
+                --print(tostring(anim.Animation.AnimationId))
+                local animationId = tostring(anim.Animation.AnimationId):split('/')[3]
+               -- print(animationId)
+                if parryAnims[animationId] then 
+                    print('can parry')
+                    local registry = parryAnims[animationId] -- parryregistration
+                    if type(registry) == 'function' then 
+                        registry(child, anim, animationId);
+                        return;
+                    elseif type(registry) == 'table' then 
+                        return;
+                    end
+                    local objdist = child.PrimaryPart
+                    if not objdist then objdist = child:FindFirstChildOfClass('BasePart') end
+                    if not objdist then 
+                        print(child.Name..' has no part to detect distance')
+                        return
+                    end;
+                    if checkdist(typesoulsettings.autoparrydistance,objdist) then 
+                        print('parrying ',animationId);
+                        signals.conceal(function()
+                            task.wait(registry);
+                            if anim.IsPlaying then 
+                                typesoulsettings.functions.parry()
+                            end
+                        end)
+                    end;
+                end
+            end);
+            table.insert(typesoulsettings.connections,ctn)
+        end)
+    end;    
+
+    for i,v in next, workspace.Entities:GetChildren() do 
+        if v ~= game.Players.LocalPlayer.Character then 
+            attachAnimationPlayed(v)
+        end;
+    end
+
+    workspace.Entities.ChildAdded:Connect(function(v)
+        if v ~= game.Players.LocalPlayer.Character then 
+            attachAnimationPlayed(v)
+        end;
+    end)
+
+
+    AddConfigurations()
+
+    task.spawn(function()
+        while task.wait() do 
+            if getgenv().loopsUnload == true then 
+                print('type soul break end');
+                for i,v in next, typesoulsettings.connections do 
+                    v:Disconnect(); -- print(i) cna u name connections?
+                end
+                break
+            end
+        end
+    end)
 else
 
     -- PlayerExperience
@@ -38528,7 +38939,7 @@ else
     }
     setupAimbotTab(getgenv().nogamesettings)
     
-    AddConfigurations()
+    --AddConfigurations()
     getgenv().AddPlayerList(weirdsector)
     sharedRequires['CreateFlySystem'](weirdsector, nogamesettings)
     sharedRequires['CreateWalkSpeedSystem'](weirdsector, nogamesettings)
@@ -38539,7 +38950,7 @@ else
         game:GetService('TeleportService'):teleport(game.PlaceId)
     end)
     setupEspTab(getgenv().nogamesettings)
-
+    AddConfigurations()
 end
 
 
