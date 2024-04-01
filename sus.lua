@@ -7357,9 +7357,9 @@ end
 sharedRequires['CreateNoclip'] = function(sector, gnvtable)
     local ToggleBindNoclip = sector:AddToggle("Noclip", false, function(e)
         gnvtable['noclip'] = e 
-        if gnvtable['noclip']  == false and getgenv().istyping == false then
+        if gnvtable['noclip'] == false then -- and getgenv().istyping == false 
             gnvtable['noclipfunction']:Disconnect()
-        elseif gnvtable['noclip']  == true and getgenv().istyping == false then --  
+        elseif gnvtable['noclip']  == true then --   and getgenv().istyping == false
             -- task.wait(0.1)
             -- local function NoclipLoop()
             --     if getgenv()['pilgrammedsettings']['noclip']  == true and game.Players.LocalPlayer.Character  and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >= 0 then
@@ -34155,6 +34155,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     esp_lib.Boxes = false;
     esp_lib.Names = true;
     esp_lib.AutoRemove = false;
+    esp_lib.Settings.usecustomespcolor = true;
     esp_lib:Toggle(true)
     local titanespsave = esp_lib:AddObjectListener(workspace.OnGameTitans, {
         --Name = 'Titan';
@@ -38530,6 +38531,7 @@ elseif universeid == 4871329703 then -- type soul
     local tab = window:CreateTab(gameName)
     local esptab = window:CreateTab('ESP')
     local sector = tab:CreateSector('Cheats','left')
+    local rightsect = tab:CreateSector('Cheats','right')
     local espsector = esptab:CreateSector('Cheats','left')
 
     local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
@@ -38546,6 +38548,7 @@ elseif universeid == 4871329703 then -- type soul
         connections = {};
         autoparry = false;
         autoparrydistance = 0;
+        pingadjuster = 0;
         autoflashstep = false;
         missionboardesp = false;
         missionboardespcolor = Color3.fromRGB(255,255,255);
@@ -38553,10 +38556,27 @@ elseif universeid == 4871329703 then -- type soul
         playeresp = false;
         playerespdistance = 2000;
         playerespcolor = Color3.fromRGB(255,255,255);
-
+        autofarm = false;
+        farmx = 0;
+        farmy = 0;
+        farmz = 0;
+        farmrotation = 0;
+        tweenspeed = 100;
+        autocreateparty = false;
+        selectednpc = '';
+        selectedfarm = 'Mobs';
+        autom1 = false;
+        autom2 = false;
+        lootboxesp = false;
+        lootboxespcolor = Color3.fromRGB(255,255,255);
+        lootboxespdistance = 2000;
+        autoequipweapon = false;
+        useskillselect = {};
+        autouseskills = false;
+        autogrip = false;
     }
-    typesoulsettings.functions.teleport = function(pos)
-        if pos:IsA('BasePart') then
+    typesoulsettings.functions.teleport = function(pos, speed)
+        if typeof(pos) ~= 'Vector3' and pos:IsA('BasePart') then
             pos = pos.CFrame;
         end;   
         if typeof(pos) == 'Vector3' then 
@@ -38565,16 +38585,26 @@ elseif universeid == 4871329703 then -- type soul
         -- @init
         if azfake:returndata().humanoidrootpart then 
             local rootPart = azfake:returndata().humanoidrootpart;
-            local dist = (pos.Position - azfake:returndata().humanoidrootpart.Positon).Magnitude
-
-            repeat 
-                task.wait(.5)
-                dist = (pos.Position - azfake:returndata().humanoidrootpart.Positon).Magnitude
-                local _time = dist / 650;
-                _time += 0.2
-                game.TweenService:Create(rootPart,TweenInfo.new(_time,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = pos}):Play()
-            until dist <= 40
-            game.TweenService:Create(rootPart,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = pos}):Play()
+            local dist = (pos.Position - azfake:returndata().humanoidrootpart.Position).Magnitude
+            local _time = dist / 650;
+            _time += 0.2
+            if speed then 
+                _time += (speed / 1000)
+            end
+            game.TweenService:Create(rootPart,TweenInfo.new(_time,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = pos}):Play()
+            
+            -- repeat 
+            --     task.wait(.5)
+            --     dist = (pos.Position - azfake:returndata().humanoidrootpart.Position).Magnitude
+            --     local _time = dist / 650;
+            --     _time += 0.2
+            --     if speed then 
+            --         _time += (speed / 1000)
+            --     end
+            --     game.TweenService:Create(rootPart,TweenInfo.new(_time,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = pos}):Play()
+            -- until dist <= 40
+            -- game.TweenService:Create(rootPart,TweenInfo.new(0.6,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = pos}):Play()
+            -- azfake:returndata().humanoidrootpart.CFrame = pos
 
             -- when close just teleport
             --rootPart.Parent = nil;
@@ -38583,16 +38613,23 @@ elseif universeid == 4871329703 then -- type soul
         end;
         --workspace.NPCs.MissionNPC:GetChildren()[4].Board.Union.CFrame
         -- @ successfully tp
-    end
+    end -- tp(part, 100)
 
     local function checkdist(range, pos)
-        if pos:IsA('BasePart') then pos = pos.Position end;
+        if typeof(pos) ~= 'Vector3' and pos:IsA('BasePart') then pos = pos.Position end;
+        if typeof(pos) ~= 'Vector3' and pos:IsA('Model') then 
+            if pos.PrimaryPart then 
+                pos = pos.PrimaryPart.Position
+            else
+                pos = pos:FindFirstChildOfClass('BasePart').Position
+            end
+        end;
         local b = false;
         if azfake:returndata().humanoidrootpart then 
             local rootPart = azfake:returndata().humanoidrootpart
             local dist = (pos - rootPart.Position).Magnitude;
             if dist <= range then 
-                b = true;
+                b = dist;
             end
         end
         return b
@@ -38630,8 +38667,12 @@ elseif universeid == 4871329703 then -- type soul
     end;
     typesoulsettings.functions.parrylist = function(tbl,  mob, dist ,anim)
         if not typesoulsettings.functions.getentityfolder() then return print('no entity folder') end;
-        for i,v in next, tbl do 
-            task.wait(v)
+        for i,v in next, tbl do
+            local timetowait = v
+            if typesoulsettings.pingadjuster > 0  then 
+                timetowait -= typesoulsettings.pingadjuster / 1400 -- 100 
+            end; 
+            task.wait(timetowait) -- v
             if checkdist(dist, mob.PrimaryPart) and anim.IsPlaying then 
                 typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Pressed")
                 typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Released")
@@ -38645,6 +38686,13 @@ elseif universeid == 4871329703 then -- type soul
             folder.CharacterHandler.Remotes.Flashstep:FireServer('Pressed');
         end;
     end;    -- could make a check to get folder
+
+    typesoulsettings.functions.m1 = function()
+        game:GetService("ReplicatedStorage").Remotes.ServerCombatHandler:FireServer('LightAttack')
+    end;
+    typesoulsettings.functions.m2 = function()
+        game:GetService("ReplicatedStorage").Remotes.ServerCombatHandler:FireServer('CriticalAttack')
+    end;
 
     local parryAnims = {};
 
@@ -38709,6 +38757,15 @@ elseif universeid == 4871329703 then -- type soul
     sector:AddSlider("Auto Parry Distance", 0, 0, 100, 1, function(State)
         typesoulsettings.autoparrydistance = State -- deepwtykensettings  typesoulsettings
     end)
+    sector:AddSlider("Parry Ping Adjuster", 0, 0, 100, 1, function(State)
+        typesoulsettings.pingadjuster = State -- deepwtykensettings  typesoulsettings pingadjust
+    end)
+    sector:AddButton('Kill Self', function()
+        if not azfake:returndata().character then return end;
+        if azfake:returndata().character:FindFirstChild('Head') then 
+            azfake:returndata().character:FindFirstChild('Head'):Destroy();
+        end;
+    end)
 
     sector:AddToggle('Auto Flashstep', false, function(e)
         typesoulsettings.autoflashstep = e;
@@ -38720,6 +38777,180 @@ elseif universeid == 4871329703 then -- type soul
             typesoulsettings.functions.flashstep()
         end)
     end)
+    --
+
+    local npclist = {};
+    local entitylist = {'Mobs'};
+    for i,v in next, workspace.NPCs:GetDescendants() do 
+        if v:IsA('Model') and not v.Name:find('MissionBoard') then 
+            table.insert(npclist,v.Name)
+        end;
+    end;
+    for i,v in next, workspace.Entities:GetChildren() do 
+        if v:IsA('Model') and v.Name ~= game.Players.LocalPlayer.Name then 
+            table.insert(entitylist,v.Name)
+        end;
+    end;
+    sector:AddDropdown("NPC List", npclist, "", false, function(State)
+        typesoulsettings.selectednpc = State 
+    end)
+    sector:AddButton("Teleport To NPC", function()
+        if typesoulsettings.selectednpc == '' then return end;
+        local obj = nil; --workspace.NPCs:FindFirstChild(typesoulsettings.selectednpc);
+        for i,v in next, workspace.NPCs:GetDescendants() do 
+            if v.Name == typesoulsettings.selectednpc then obj = v break end;
+        end;
+        if not obj then return azfakenotify('couldnt find npc??', 3) end;
+        azfakenotify('Teleporting to, '..obj.Name,3)
+        local tpPart = obj.PrimaryPart;
+        if not tpPart then 
+            tpPart = obj:FindFirstChildOfClass('BasePart')
+        end;
+        typesoulsettings.functions.teleport(tpPart, 100)
+    end)
+    sector:AddSeperator('-')
+    local forentity = rightsect:AddDropdown("Entity List", entitylist, "Mobs", false, function(State) -- could change to quest
+        typesoulsettings.selectedfarm = State 
+    end)
+    local entityadded; entityadded = workspace.Entities.ChildAdded:Connect(function(child)
+        task.wait(.1);
+        if child.Name ~= game.Players.LocalPlayer.Name and not table.find(entitylist, child.Name) then 
+            forentity:Add(child.Name)
+        end;
+    end); table.insert(typesoulsettings.connections, entityadded);
+    local entityremoved; entityremoved = workspace.Entities.ChildAdded:Connect(function(child)
+        task.wait(.1);
+        if child.Name ~= game.Players.LocalPlayer.Name and table.find(entitylist, child.Name) then 
+            forentity:Remove(child.Name)
+        end;
+    end); table.insert(typesoulsettings.connections, entityremoved);
+
+    rightsect:AddButton("Teleport To Board", function() -- Bounty
+        if not azfake:returndata().humanoidrootpart then return end
+        local rootPart = azfake:returndata().humanoidrootpart
+        signals.conceal(function()
+            local closestbounty = nil;
+            local closestdist = nil;
+            for i,v in next, workspace.NPCs.MissionNPC:GetChildren() do -- (v:IsA('Model') and v.PrimaryPart and v.PrimaryPart.Position or v:FindFirstChildOfClass('BasePart').Position)
+                local dist = (v.WorldPivot.Position - rootPart.Position).Magnitude
+                if closestbounty == nil then 
+                    closestbounty = v
+                    closestdist = dist
+                else
+                    if closestdist > dist then 
+                        closestbounty = v
+                        closestdist = dist
+                    end
+                end
+            end;
+            if closestbounty then 
+                typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.Part or closestbounty)
+            end
+        end);
+    end)
+    rightsect:AddButton("Teleport To Lootbox", function() -- Bounty
+        if not azfake:returndata().humanoidrootpart then return end
+        local rootPart = azfake:returndata().humanoidrootpart
+        signals.conceal(function()
+            local closestbounty = nil;
+            local closestdist = nil; -- (v:IsA('Model') and v.PrimaryPart and v.PrimaryPart.Position or v:FindFirstChildOfClass('BasePart').Position)
+            for i,v in next, workspace.Lootboxes:GetChildren() do 
+                local dist = (v.WorldPivot.Position - rootPart.Position).Magnitude
+                if closestbounty == nil then 
+                    closestbounty = v
+                    closestdist = dist
+                else
+                    if closestdist > dist then 
+                        closestbounty = v
+                        closestdist = dist
+                    end
+                end
+            end;
+            if closestbounty then 
+                local tppart = closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:IsA('Model') and closestbounty:FindFirstChildOfClass('BasePart')
+                typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'))
+            end
+        end);
+    end)
+
+    local function getclosestboard() -- fucntion
+        local closestdist = nil;
+        local closestboard = nil;
+        for i,v in next, workspace.NPCs.MissionNPC:GetChildren() do -- checkdist(10000,v.PrimaryPart) :FindFirstChildOfClass('BasePart')
+            local dist = (v.WorldPivot.Position - azfake:returndata().humanoidrootpart.Position).Magnitude;
+            if closestdist == nil then 
+                closestdist = dist;
+                closestboard = v;
+            else
+                if closestdist > dist then 
+                    closestdist = dist;
+                    closestboard = v;
+                end;
+            end;    
+        end;   
+        return {board = closestboard, dist = closestdist} 
+    end;
+    rightsect:AddToggle('Auto M1', false, function(e)
+        typesoulsettings.autom1 = e;
+    end)
+    rightsect:AddToggle('Auto M2', false, function(e)
+        typesoulsettings.autom2 = e;
+    end)
+    local forentity = rightsect:AddDropdown("Use Skills", {'One','Two','Three'}, "", true, function(State) -- could change to quest
+        typesoulsettings.useskillselect = State -- useskillselection 
+    end)
+    rightsect:AddToggle('Auto Use Skills', false, function(e)
+        typesoulsettings.autouseskills = e;
+    end)
+    local concurrentdialogueframe
+    game.Players.LocalPlayer.PlayerGui.DialogueUI.ChildAdded:Connect(function(child)
+        concurrentdialogueframe = child;
+    end)
+    local justresettofix = false;
+    rightsect:AddToggle('Auto Farm', false, function(e) -- autofarmsect
+        typesoulsettings.autofarm = e;
+        if not e then maid.autofarmtype = nil return end;
+        -- signals.conceal(function()
+        --     maid.autofarmtype = signals.heartbeat:connect("@autofarm go wild",function()
+
+        --     end);
+        -- end);
+    end)
+    rightsect:AddToggle('Auto Create Party', false, function(e)
+        typesoulsettings.autocreateparty = e;
+    end)
+    rightsect:AddToggle('Auto Get Quest', false, function(e)
+        typesoulsettings.autogetquest = e;
+    end)
+    rightsect:AddToggle('Auto Equip Weapon', false, function(e) -- srightsectector
+        typesoulsettings.autoequipweapon = e;
+    end)
+    rightsect:AddSeperator('-')
+    rightsect:AddSlider("Farm X Offset", -20, 0, 20, 1, function(State)
+        typesoulsettings.farmx = State --faermx
+    end)
+    rightsect:AddSlider("Farm Y Offset", -20, 0, 20, 1, function(State)
+        typesoulsettings.farmy = State 
+    end)
+    rightsect:AddSlider("Farm Z Offset", -20, 0, 20, 1, function(State)
+        typesoulsettings.farmz = State 
+    end)
+    rightsect:AddSlider("Farming Rotation", -360, 0, 360, 1, function(State)
+        typesoulsettings.farmrotation = State -- farmrot
+    end)
+    rightsect:AddSeperator('-')
+    -- rightsect:AddToggle('Use 1', false, function(e)
+    --     typesoulsettings.use1 = e;
+    -- end)
+    -- rightsect:AddToggle('Use 2', false, function(e)
+    --     typesoulsettings.use2 = e;
+    -- end)
+    -- rightsect:AddToggle('Use 3', false, function(e) -- srightsectector
+    --     typesoulsettings.use3 = e;
+    -- end)
+    --
+
+
     sharedRequires['CreateFlySystem'](sector, typesoulsettings)
     sharedRequires['CreateWalkSpeedSystem'](sector, typesoulsettings)
     sharedRequires['CreateNoclip'](sector, typesoulsettings)
@@ -38812,6 +39043,63 @@ elseif universeid == 4871329703 then -- type soul
         typesoulsettings['missionboardespdistance'] = State
     end)
 
+    espsector:AddToggle('Lootbox Esp',false,function(e)
+        typesoulsettings.lootboxesp = e;
+        if not e then return end;
+        for i,v in next, workspace.NPCs.MissionNPC:GetChildren() do -- workspace.MissionBoards:GetChildren()  
+            rayEsp{
+                child = v;
+                Name = function()
+                    return 'LOOTBOX' 
+                end;
+                flag = 'lootbox';
+                maxdist = function()
+                    return typesoulsettings.lootboxespdistance
+                end,
+                color = function()
+                    return typesoulsettings.lootboxespcolor
+                end,
+                active = function()
+                    return typesoulsettings.lootboxesp
+                end;
+                nobox = true;
+                notracer = true;
+                removeondisable = true;
+            }
+        end
+    end)
+    espsector:AddColorpicker('Lootbox Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        typesoulsettings.lootboxespcolor = ztx
+    end)
+    espsector:AddSlider("Lootbox Esp Range", 0, 200, 5000, 1, function(State)
+        typesoulsettings.lootboxespdistance = State -- ['lootboxespdistance']
+    end)
+
+    workspace:WaitForChild('Lootboxes').ChildAdded:Connect(function(child)
+        if typesoulsettings.lootboxesp then 
+            rayEsp{
+                child = child;
+                Name = function()
+                    return 'LOOTBOX' 
+                end;
+                flag = 'lootbox';
+                maxdist = function()
+                    return typesoulsettings.lootboxespdistance
+                end,
+                color = function()
+                    return typesoulsettings.lootboxespcolor
+                end,
+                active = function()
+                    return typesoulsettings.lootboxesp
+                end;
+                nobox = true;
+                notracer = true;
+                removeondisable = true;
+            }
+        end
+    end)
+
+
     do
         parryAnims['14070372787'] = 0.36
         parryAnims['14070373836'] = 0.33
@@ -38835,7 +39123,7 @@ elseif universeid == 4871329703 then -- type soul
         parryAnims['16749240878'] = 0.12--8
         parryAnims['16749241651'] = 0.12--4
         parryAnims['14070502124'] = function(mob, anim, id)
-            typesoulsettings.functions.parryList({0.1,0.1,0.1}, mob, 10, anim)
+            typesoulsettings.functions.parrylist({0.1,0.1,0.1}, mob, 10, anim)
         end;
 
         -- reaper sword
@@ -38850,11 +39138,11 @@ elseif universeid == 4871329703 then -- type soul
         parryAnims['14069224323'] = 0.4 -- might make funct
 
         parryAnims['14068997392'] = function(mob, anim, id)
-            typesoulsettings.functions.parryList({0.4,0.3,0.2}, mob, 10, anim)
+            typesoulsettings.functions.parrylist({0.4,0.3,0.2}, mob, 10, anim)
         end;
 
         parryAnims['14071690484'] = function(mob, anim, id)
-            typesoulsettings.functions.parryList({0.4,0.3}, mob, 10, anim)
+            typesoulsettings.functions.parrylist({0.4,0.3}, mob, 10, anim)
         end;
 
         parryAnims['14070060393'] = 0.45
@@ -38888,6 +39176,10 @@ elseif universeid == 4871329703 then -- type soul
                     if checkdist(typesoulsettings.autoparrydistance,objdist) then 
                         print('parrying ',animationId);
                         signals.conceal(function()
+                            local timetowait = registry
+                            if typesoulsettings.pingadjuster > 0  then 
+                                timetowait -= typesoulsettings.pingadjuster / 1400 -- 100 
+                            end;
                             task.wait(registry);
                             if anim.IsPlaying then 
                                 typesoulsettings.functions.parry()
@@ -38924,6 +39216,194 @@ elseif universeid == 4871329703 then -- type soul
                 end
                 break
             end
+            if typesoulsettings.autofarm == true then 
+                signals.conceal(function()
+                    local statusfu = false;
+                    if not azfake:returndata().humanoidrootpart then return end;
+                    local rootPart = azfake:returndata().humanoidrootpart 
+                    local cframecheck = CFrame.new(typesoulsettings.farmx,typesoulsettings.farmy,typesoulsettings.farmz) * CFrame.Angles(math.rad(typesoulsettings.farmrotation),math.rad(0),math.rad(0))
+                    local quested = false;
+                    if not game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI') then return end;
+    
+                    if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then
+                        quested = true;
+                    end;
+                    if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true then
+                        quested = true;
+                    end;
+                    if typesoulsettings.selectedfarm == 'Mobs' then 
+                        if typesoulsettings.autogetquest and not quested and statusfu == false then 
+                            statusfu = true;
+                            local gui = nil;
+                            local boardget = getclosestboard()['board'].Board
+                            print('[teleporting to board]')
+    
+                            typesoulsettings.functions.teleport(boardget.Union, 150)
+    
+                            -- repeat -- teleport to board
+                            --     task.wait(.5);
+                            --     if not checkdist(30, boardget.WorldPivot.Position) then 
+                            --         typesoulsettings.functions.teleport(boardget.Union, 150)
+                            --     end;
+                            --     rootPart.CFrame = boardget.Union.CFrame
+                            -- until quested == true or checkdist(10, boardget.WorldPivot.Position) or typesoulsettings.autofarm == false or justresettofix == true
+                            gui = game.Players.LocalPlayer.PlayerGui:FindFirstChild('DialogueUI')
+    
+                            if vs == 'debug' then 
+                                print('[accepting quest]')
+                                print('[also running anti quest bug]')
+                            end
+                            if justresettofix == false then 
+                                task.delay(7,function()
+                                    if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then
+                                        quested = true;
+                                    end;
+                                    if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true then
+                                        quested = true;
+                                    end;
+                                    if quested == false and azfake:returndata().character and justresettofix == false then -- justresetted
+                                        task.wait(2)
+                                        if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then
+                                            quested = true;
+                                        end;
+                                        if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true then
+                                            quested = true;
+                                        end;
+                                        if quested == false then 
+                                            print('[anti quest bug triggered, potential fix]')
+                                            justresettofix = true
+                                            game.Players.LocalPlayer.Character.Head:Destroy()
+                                        end
+                                    end
+                                end)
+                            end
+                            repeat 
+                                gui = game.Players.LocalPlayer.PlayerGui:FindFirstChild('DialogueUI')
+                                if gui and #gui:GetChildren() ~= 2 and game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
+                                    fireclickdetector(boardget.Union.ClickDetector);
+                                end
+                                if gui then 
+                                    task.wait(1)
+                                    for i,v in next, gui:GetChildren() do 
+                                        firesignal(v.Yes.MouseButton1Click);
+                                    end;
+                                end
+                                task.wait(2)
+                                if game.Players.LocalPlayer:FindFirstChild('MissionBoard') then 
+                                    --game.Players.LocalPlayer.MissionBoard:FireServer('Yes')
+                                end
+                            until quested == true or typesoulsettings.autofarm == false or justresettofix == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true  -- (gui and #gui:GetChildren() ~= 1);
+                            task.wait(2)
+                            --gui = gui:GetChildren()[2]
+                            -- repeat
+                            print('got quest')
+                            statusfu = false
+                            if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then
+                                justresettofix = false;
+                            end;
+                            if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true then
+                                justresettofix = false;
+                            end;
+                            print('[fixing]')
+                            --if then 
+                            --    justresettofix = false;
+                            --end
+                            --firesignal(gui.Yes.MouseButton1Click);
+                        end;
+                        for i,v in next, workspace.Entities:GetChildren() do -- get closestenemies in 150
+                            if v:IsA('Model') and not game.Players:FindFirstChild(v.Name) and v.PrimaryPart and checkdist(150,v.PrimaryPart) and v:FindFirstChildWhichIsA('Humanoid') and v:FindFirstChildWhichIsA('Humanoid').Health > 0 then 
+                                local dist = checkdist(30,v.PrimaryPart)
+                                local canAttack = true;
+                                if dist then 
+                                    --rootPart.CFrame = v.HumanoidRootPart.CFrame * cframecheck;
+                                    -- carry; tp to sky; grip
+                                    if v:FindFirstChildWhichIsA('Humanoid').Health == 1 and typesoulsettings.autogrip == true then 
+                                        rootPart.CFrame = v.HumanoidRootPart.CFrame 
+                                        canAttack = false;
+                                        pcall(function()
+                                            azfake:returndata().character.CharacterHandler.Remotes.Execute:FireServer()
+                                        end);
+                                        task.wait(5)
+                                    else
+                                        rootPart.CFrame = v.HumanoidRootPart.CFrame * cframecheck;
+                                    end;
+                                else
+                                    typesoulsettings.functions.teleport(v.HumanoidRootPart, 150)
+                                end
+                                if canAttack == true then 
+                                    -- m1
+                                    if typesoulsettings.autom1 then 
+                                        task.delay(0.1,function()
+                                            typesoulsettings.functions.m1() -- autom1
+                                        end)
+                                    end;  
+                                    if typesoulsettings.autom2 then 
+                                        task.delay(0.1,function()
+                                            typesoulsettings.functions.m2() -- autom1
+                                        end)
+                                    end;  
+                                    if typesoulsettings.autouseskills then 
+                                        for i,v in next, typesoulsettings.useskillselect do 
+                                            local ohString1 = "Skill"
+                                            local ohString2 = tostring(v)
+                                            local ohString3 = "Pressed"
+                                        
+                                            game:GetService("ReplicatedStorage").Remotes.ServerCombatHandler:FireServer(ohString1, ohString2, ohString3)
+                                        end;
+                                    end;
+                                end
+                            end;
+                        end;
+                    else
+                        local opp = workspace.Entities:FindFirstChild(typesoulsettings.selectedfarm);
+                        if opp then 
+                            if not checkdist(30,opp.PrimaryPart) then 
+                                repeat 
+                                    task.wait(1) 
+                                    typesoulsettings.functions.teleport(opp.PrimaryPart, 150)
+                                until not opp or checkdist(30,opp.PrimaryPart)
+                            end
+                            rootPart.CFrame = opp.HumanoidRootPart.CFrame * cframecheck;
+                            if typesoulsettings.autom1 then 
+                                typesoulsettings.functions.m1() -- autom1
+                            end;  
+                            if typesoulsettings.autom2 then 
+                                typesoulsettings.functions.m2() -- autom1
+                            end;  
+                            if typesoulsettings.autouseskills then 
+                                for i,v in next, typesoulsettings.useskillselect do 
+                                    local ohString1 = "Skill"
+                                    local ohString2 = tostring(v)
+                                    local ohString3 = "Pressed"
+                                
+                                    game:GetService("ReplicatedStorage").Remotes.ServerCombatHandler:FireServer(ohString1, ohString2, ohString3)
+                                end;
+                            end;
+                        end;
+                    end
+                end)
+            end
+            if typesoulsettings.autoequipweapon == true and azfake:returndata().character then 
+                pcall(function()
+                    if azfake:returndata().character["Right Arm"].Handle.Part1 == nil then 
+                        task.delay(0.1,function()
+                            if azfake:returndata().character["Right Arm"].Handle.Part1 == nil then 
+                                azfake:returndata().character.CharacterHandler.Remotes.Weapon:FireServer()
+                            end
+                        end)
+                    end
+                end)
+            end;
+            if typesoulsettings.autocreateparty == true and game.Players.LocalPlayer:FindFirstChild('PlayerGui') then --filldirection
+                -- check if isnt in party;
+                if game.Players.LocalPlayer:FindFirstChild('PlayerGui'):FindFirstChild('MissionsUI') and azfake:returndata().character then 
+                    if game.Players.LocalPlayer:FindFirstChild('PlayerGui'):FindFirstChild('MissionsUI').MainFrame.Visible == false then 
+                        pcall(function()
+                            azfake:returndata().character.CharacterHandler.Remotes.PartyCreate:FireServer()
+                        end)
+                    end;
+                end;  
+            end;
         end
     end)
 else
