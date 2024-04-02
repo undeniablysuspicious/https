@@ -38616,14 +38616,15 @@ elseif universeid == 4871329703 then -- type soul
     end -- tp(part, 100)
 
     local function checkdist(range, pos)
-        if typeof(pos) ~= 'Vector3' and pos:IsA('BasePart') then pos = pos.Position end;
-        if typeof(pos) ~= 'Vector3' and pos:IsA('Model') then 
+        if typeof(pos) ~= 'Vector3' and pos and pos:IsA('BasePart') then pos = pos.Position end;
+        if typeof(pos) ~= 'Vector3' and pos and pos:IsA('Model') then 
             if pos.PrimaryPart then 
                 pos = pos.PrimaryPart.Position
             else
                 pos = pos:FindFirstChildOfClass('BasePart').Position
             end
         end;
+        if not pos then print('aint no way u checking distance with no pos') end;
         local b = false;
         if azfake:returndata().humanoidrootpart then 
             local rootPart = azfake:returndata().humanoidrootpart
@@ -38707,8 +38708,11 @@ elseif universeid == 4871329703 then -- type soul
         local function onAdded(obj)
             local hardNames = {
                 'SchwertCritical' --,'Tenran','Byakurai'
+            };
+            local dontParry = {
+                'WaveshotProjectile'; -- already got parry down;
             }
-            if obj.Name:find('hitbox') or obj.Name:find('Hitbox') then 
+            if obj.Name:find('hitbox') or obj.Name:find('Hitbox') or obj.Name:find('Projectile') then 
                 signals.conceal(function()
                     local hurtPart = obj;
                     if obj:IsA('Model') then
@@ -38742,16 +38746,20 @@ elseif universeid == 4871329703 then -- type soul
         end
 
         maid.autoparrycheck = workspace.Effects.ChildAdded:Connect(function(child)
-            local ctn; ctn = child.ChildAdded:Connect(function(obj)
-                onAdded(obj)
-            end)
-            table.insert(typesoulsettings.connections,ctn)
+            if child.Name ~= game.Players.LocalPlayer.Name then 
+                local ctn; ctn = child.ChildAdded:Connect(function(obj)
+                    onAdded(obj)
+                end)
+                table.insert(typesoulsettings.connections,ctn);
+            end;
         end)
         for i,v in next, workspace.Effects:GetChildren() do 
-            local ctn; ctn = v.ChildAdded:Connect(function(obj)
-                onAdded(obj)
-            end)
-            table.insert(typesoulsettings.connections,ctn)
+            if v.Name ~= game.Players.LocalPlayer.Name then 
+                local ctn; ctn = v.ChildAdded:Connect(function(obj)
+                    onAdded(obj)
+                end)
+                table.insert(typesoulsettings.connections,ctn);
+            end
         end
     end)
     sector:AddSlider("Auto Parry Distance", 0, 0, 100, 1, function(State)
@@ -38924,6 +38932,9 @@ elseif universeid == 4871329703 then -- type soul
     end)
     rightsect:AddToggle('Auto Equip Weapon', false, function(e) -- srightsectector
         typesoulsettings.autoequipweapon = e;
+    end)
+    rightsect:AddToggle('Auto Grip', false, function(e) -- srightsectector
+        typesoulsettings.autogrip = e;
     end)
     rightsect:AddSeperator('-')
     rightsect:AddSlider("Farm X Offset", -20, 0, 20, 1, function(State)
@@ -39141,13 +39152,27 @@ elseif universeid == 4871329703 then -- type soul
             typesoulsettings.functions.parrylist({0.4,0.3,0.2}, mob, 10, anim)
         end;
 
+        -- piercing light
         parryAnims['14071690484'] = function(mob, anim, id)
-            typesoulsettings.functions.parrylist({0.4,0.3}, mob, 10, anim)
+            typesoulsettings.functions.parrylist({0.3,0.31}, mob, 10, anim) -- {0.4,0.3}
         end;
 
         parryAnims['14070060393'] = 0.45
 
         parryAnims['14070029680'] = 0.4
+
+        -- magic
+
+        -- volley
+        parryAnims['14071712668'] = function(mob, anim, id)
+            typesoulsettings.functions.parrylist({0.7, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 ,0.1, 0.1, 0.1 ,0.1, 0.1}, mob, 18, anim)
+        end;
+
+        -- brace
+        parryAnims['14071654671'] = 0.35 -- attack is at 0.4 tho
+
+        -- suikawari
+        parryAnims['14071653586'] = 0.65 -- attack taken at 0.7
     end
 
 
@@ -39207,6 +39232,15 @@ elseif universeid == 4871329703 then -- type soul
 
     AddConfigurations()
 
+    local farmstatus = 'idle'
+    local function getstatus()
+        return farmstatus
+    end
+    local function setstatus(x)
+        farmstatus = x
+        return farmstatus
+    end
+    local holdfolder = {}
     task.spawn(function()
         while task.wait() do 
             if getgenv().loopsUnload == true then 
@@ -39224,7 +39258,9 @@ elseif universeid == 4871329703 then -- type soul
                     local cframecheck = CFrame.new(typesoulsettings.farmx,typesoulsettings.farmy,typesoulsettings.farmz) * CFrame.Angles(math.rad(typesoulsettings.farmrotation),math.rad(0),math.rad(0))
                     local quested = false;
                     if not game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI') then return end;
-    
+                    if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true and not checkdist(15, getclosestboard()['board'].Board.WorldPivot.Position) then 
+                        game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible = false;
+                    end
                     if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then
                         quested = true;
                     end;
@@ -39232,11 +39268,17 @@ elseif universeid == 4871329703 then -- type soul
                         quested = true;
                     end;
                     if typesoulsettings.selectedfarm == 'Mobs' then 
-                        if typesoulsettings.autogetquest and not quested and statusfu == false then 
+                        if typesoulsettings.autogetquest and not quested and statusfu == false and getstatus() == 'idle' then 
+                            setstatus('tweening')
+                            local index = 0
+                            for i,v in next, holdfolder do 
+                                index += 1
+                                table.remove(holdfolder, index)
+                            end
                             statusfu = true;
                             local gui = nil;
                             local boardget = getclosestboard()['board'].Board
-                            print('[teleporting to board]')
+                            --print('[teleporting to board]')
     
                             typesoulsettings.functions.teleport(boardget.Union, 150)
     
@@ -39250,8 +39292,8 @@ elseif universeid == 4871329703 then -- type soul
                             gui = game.Players.LocalPlayer.PlayerGui:FindFirstChild('DialogueUI')
     
                             if vs == 'debug' then 
-                                print('[accepting quest]')
-                                print('[also running anti quest bug]')
+                                --print('[accepting quest]')
+                                --print('[also running anti quest bug]')
                             end
                             if justresettofix == false then 
                                 task.delay(7,function()
@@ -39273,30 +39315,86 @@ elseif universeid == 4871329703 then -- type soul
                                             print('[anti quest bug triggered, potential fix]')
                                             justresettofix = true
                                             game.Players.LocalPlayer.Character.Head:Destroy()
+                                            game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible = false;
                                         end
                                     end
                                 end)
                             end
+                            --task.delay(1,function()
+                                -- typesoulsettings.functions.teleport(boardget.Union, 150)
+                            --end)
+
+                            local isnearboard = false;
                             repeat 
-                                gui = game.Players.LocalPlayer.PlayerGui:FindFirstChild('DialogueUI')
-                                if gui and #gui:GetChildren() ~= 2 and game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
-                                    fireclickdetector(boardget.Union.ClickDetector);
+                                task.wait()
+                                isnearboard = checkdist(10, boardget.WorldPivot.Position)
+                            until isnearboard ~= false or typesoulsettings.autofarm == false or justresettofix == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true
+                            --print('[is near board]')
+                            gui = game.Players.LocalPlayer.PlayerGui:FindFirstChild('DialogueUI')
+                            if gui and #gui:GetChildren() ~= 2 and game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
+                                fireclickdetector(boardget.Union.ClickDetector);
+                            end
+                            if gui then 
+                                task.wait(1)
+                                for i,v in next, gui:GetChildren() do 
+                                    firesignal(v.Yes.MouseButton1Click);
+                                end;
+                                --print('[trying to accept gui quest]')
+                                if #gui:GetChildren() == 2 then 
+                                    --print('shouldve accepted')
+                                else
+                                    --print('wasnt another gui quest idk why')
                                 end
-                                if gui then 
-                                    task.wait(1)
-                                    for i,v in next, gui:GetChildren() do 
-                                        firesignal(v.Yes.MouseButton1Click);
-                                    end;
-                                end
-                                task.wait(2)
-                                if game.Players.LocalPlayer:FindFirstChild('MissionBoard') then 
-                                    --game.Players.LocalPlayer.MissionBoard:FireServer('Yes')
-                                end
-                            until quested == true or typesoulsettings.autofarm == false or justresettofix == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true  -- (gui and #gui:GetChildren() ~= 1);
+
+                                task.spawn(function()
+                                    if getstatus() == 'tweening' or getstatus() == 'idle' then 
+                                        local status = getstatus()
+                                        local haschanged = false;
+                                        local timeawaited = 0;
+                                        repeat 
+                                            task.wait(1)
+                                            haschanged = status ~= getstatus() or false
+                                            timeawaited += 1
+                                        until haschanged or timeawaited >= 7
+                                        if not haschanged and timeawaited >= 7 then 
+                                            print('[status has been tweening for time]'..status..'-'..getstatus())
+                                            if checkdist(10, boardget.WorldPivot.Position) then 
+                                                fireclickdetector(boardget.Union.ClickDetector);
+                                                task.wait(1.5)
+                                                for i,v in next, gui:GetChildren() do 
+                                                    firesignal(v.Yes.MouseButton1Click);
+                                                end;
+                                                print('[BUGFIX TRYING TO ACCEPT AGAIN]')
+                                            end
+                                        end
+                                    end
+                                end)
+                                --task.delay(8,function()
+                                    --if checkdist(10, boardget.WorldPivot.Position) and 
+                                --end)
+                            end
+                            -- repeat 
+                            --     gui = game.Players.LocalPlayer.PlayerGui:FindFirstChild('DialogueUI')
+                            --     if gui and #gui:GetChildren() ~= 2 and game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
+                            --         fireclickdetector(boardget.Union.ClickDetector);
+                            --     end
+                            --     if gui then 
+                            --         task.wait(1)
+                            --         for i,v in next, gui:GetChildren() do 
+                            --             firesignal(v.Yes.MouseButton1Click);
+                            --         end;
+                            --     end
+                            --     task.wait(2)
+                            --     if game.Players.LocalPlayer:FindFirstChild('MissionBoard') then 
+                            --         --game.Players.LocalPlayer.MissionBoard:FireServer('Yes')
+                            --     end
+                            -- until quested == true or typesoulsettings.autofarm == false or justresettofix == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true  -- (gui and #gui:GetChildren() ~= 1);
+                            
+                            
                             task.wait(2)
                             --gui = gui:GetChildren()[2]
                             -- repeat
-                            print('got quest')
+                            --print('got quest')
                             statusfu = false
                             if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then
                                 justresettofix = false;
@@ -39304,59 +39402,102 @@ elseif universeid == 4871329703 then -- type soul
                             if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true then
                                 justresettofix = false;
                             end;
-                            print('[fixing]')
+                            --print('[fixing]')
                             --if then 
                             --    justresettofix = false;
                             --end
                             --firesignal(gui.Yes.MouseButton1Click);
                         end;
-                        for i,v in next, workspace.Entities:GetChildren() do -- get closestenemies in 150
-                            if v:IsA('Model') and not game.Players:FindFirstChild(v.Name) and v.PrimaryPart and checkdist(150,v.PrimaryPart) and v:FindFirstChildWhichIsA('Humanoid') and v:FindFirstChildWhichIsA('Humanoid').Health > 0 then 
-                                local dist = checkdist(30,v.PrimaryPart)
-                                local canAttack = true;
-                                if dist then 
-                                    --rootPart.CFrame = v.HumanoidRootPart.CFrame * cframecheck;
-                                    -- carry; tp to sky; grip
-                                    if v:FindFirstChildWhichIsA('Humanoid').Health == 1 and typesoulsettings.autogrip == true then 
-                                        rootPart.CFrame = v.HumanoidRootPart.CFrame 
-                                        canAttack = false;
-                                        pcall(function()
-                                            azfake:returndata().character.CharacterHandler.Remotes.Execute:FireServer()
-                                        end);
-                                        task.wait(5)
-                                    else
-                                        rootPart.CFrame = v.HumanoidRootPart.CFrame * cframecheck;
+                        if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == false and game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
+                            quested = false;
+                            setstatus('idle')
+                        end;    
+                        -- or just queueui enabled
+                        if typesoulsettings.autofarm ~= false and getgenv().loopsUnload ~= true and quested == true then 
+                            setstatus('attacking') -- farmimg
+                            local bothdead = false
+                            for i,v in next, workspace.Entities:GetChildren() do -- get closestenemies in 150
+                                if v:IsA('Model') and not game.Players:FindFirstChild(v.Name) and v.PrimaryPart and checkdist(300,v.PrimaryPart) and v:FindFirstChildWhichIsA('Highlight') and v:FindFirstChildWhichIsA('Humanoid') and v:FindFirstChildWhichIsA('Humanoid').Health > 0 then 
+                                    -- check if highlight maybe
+                                    -- make function a repeat
+                                    if not holdfolder[v.Name] then 
+                                        holdfolder[v.Name] = false;
                                     end;
-                                else
-                                    typesoulsettings.functions.teleport(v.HumanoidRootPart, 150)
-                                end
-                                if canAttack == true then 
-                                    -- m1
-                                    if typesoulsettings.autom1 then 
-                                        task.delay(0.1,function()
-                                            typesoulsettings.functions.m1() -- autom1
-                                        end)
-                                    end;  
-                                    if typesoulsettings.autom2 then 
-                                        task.delay(0.1,function()
-                                            typesoulsettings.functions.m2() -- autom1
-                                        end)
-                                    end;  
-                                    if typesoulsettings.autouseskills then 
-                                        for i,v in next, typesoulsettings.useskillselect do 
-                                            local ohString1 = "Skill"
-                                            local ohString2 = tostring(v)
-                                            local ohString3 = "Pressed"
-                                        
-                                            game:GetService("ReplicatedStorage").Remotes.ServerCombatHandler:FireServer(ohString1, ohString2, ohString3)
+                                    local amount = 0
+                                    for i,v in next, holdfolder do 
+                                        if v == true then 
+                                            amount += 1
+                                        end
+                                    end
+                                    if amount == #holdfolder then bothdead = true end;
+                                    local dist = checkdist(45,v.PrimaryPart) -- 30
+                                    local canAttack = true;
+                                    if dist then 
+                                        --rootPart.CFrame = v.HumanoidRootPart.CFrame * cframecheck;
+                                        -- carry; tp to sky; grip
+                                        if v:FindFirstChildWhichIsA('Humanoid').Health == 1  then  -- and not getstatus('gripping')
+                                            -- setstatus('gripping')
+                                            holdfolder[v.Name] = true;
+                                            if typesoulsettings.autogrip == true and bothdead == true then 
+                                                setstatus('gripping')
+                                                rootPart.CFrame = v.HumanoidRootPart.CFrame 
+                                                canAttack = false;
+                                                azfake:returndata().character.CharacterHandler.Remotes.Execute:FireServer()
+                                                task.delay(4,function()
+                                                    print('gripping shouldve stopped')
+                                                    setstatus('attacking')
+                                                end)
+                                            end
+                                            -- pcall(function()
+                                            --     if getstatus() ~= 'gripping' then 
+                                            --         setstatus('gripping')
+                                            --         task.delay(0.1,function()
+                                            --             azfake:returndata().character.CharacterHandler.Remotes.Execute:FireServer()
+                                            --         end)
+                                            --     end
+                                            --     --task.delay(0.5,function()
+                                            --        -- game.TweenService:Create(azfake:returndata().character.PrimaryPart,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {CFrame = azfake:returndata().character.PrimaryPart.CFrame * CFrame.new(0,40,0)}):Play()
+                                            --     --end)
+                                            -- end);
+                                            -- task.delay(4,function()
+                                            --     setstatus('attacking')
+                                            -- end)
+                                            --task.wait(5)
+                                        else
+                                            rootPart.CFrame = v.HumanoidRootPart.CFrame * cframecheck;
                                         end;
-                                    end;
-                                end
+                                    else
+                                        typesoulsettings.functions.teleport(v.HumanoidRootPart, 150)
+                                    end
+                                    if getstatus() == 'gripping' then canAttack = false end;
+                                    if canAttack == true then 
+                                        -- m1
+                                        if typesoulsettings.autom1 then 
+                                            task.delay(0.1,function()
+                                                typesoulsettings.functions.m1() -- autom1
+                                            end)
+                                        end;  
+                                        if typesoulsettings.autom2 then 
+                                            task.delay(0.1,function()
+                                                typesoulsettings.functions.m2() -- autom1
+                                            end)
+                                        end;  
+                                        if typesoulsettings.autouseskills then 
+                                            for i,v in next, typesoulsettings.useskillselect do 
+                                                local ohString1 = "Skill"
+                                                local ohString2 = tostring(v)
+                                                local ohString3 = "Pressed"
+                                            
+                                                game:GetService("ReplicatedStorage").Remotes.ServerCombatHandler:FireServer(ohString1, ohString2, ohString3)
+                                            end;
+                                        end;
+                                    end
+                                end;
                             end;
-                        end;
+                        end
                     else
                         local opp = workspace.Entities:FindFirstChild(typesoulsettings.selectedfarm);
-                        if opp then 
+                        if opp and opp.PrimaryPart then 
                             if not checkdist(30,opp.PrimaryPart) then 
                                 repeat 
                                     task.wait(1) 
