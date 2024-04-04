@@ -39059,7 +39059,29 @@ elseif universeid == 4871329703 then -- type soul
     end)
     rightsect:AddSeperator('-')
 
-
+    local bkeytroll = lefttab:AddButton('Use Key Troll', function()
+        if not azfake:returndata().character then return end;
+        signals.conceal(function()
+            local rootPart = azfake:returndata().character.PrimaryPart
+            rootPart.Anchored = true;
+            rootPart.CFrame *= CFrame.new(0,-15,0)
+            local t1 = 0
+            repeat 
+                task.wait(0.1)
+                t1 += 0.5
+                local ohString1 = "Skill"
+                local ohString2 = 'One'
+                local ohString3 = "Pressed"
+            
+                game:GetService("ReplicatedStorage").Remotes.ServerCombatHandler:FireServer(ohString1, ohString2, ohString3)
+            until t1 > 2
+            task.wait(2)
+            rootPart.CFrame *= CFrame.new(0,16,35)
+            rootPart.Anchored = false;
+        end)
+    end)
+    bkeytroll:ActivateKnowledge()
+    bkeytroll:AddKnowledge('Put Key On 1')
     lefttab:AddButton('Kill Self', function()
         if not azfake:returndata().character then return end;
         if azfake:returndata().character:FindFirstChild('Head') then 
@@ -39202,12 +39224,14 @@ elseif universeid == 4871329703 then -- type soul
                     end
                 end;
                 if closestbounty then 
+                    closestbounty:WaitForChild('Items')
+                    print('waiting for items')
                     local function claimLootbox(item, lootbox)
                         local id = lootbox:GetAttribute('ID')
                         game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(id, item)
                     end;
                     task.spawn(function()
-                        print(closestbounty.PrimaryPart)
+                        --print(closestbounty.PrimaryPart)
                         for i,v in next, closestbounty:GetDescendants() do 
                             print(v:GetFullName())
                         end;
@@ -39230,7 +39254,7 @@ elseif universeid == 4871329703 then -- type soul
                         end)
                         repeat 
                             task.wait()
-                            if closestbounty then 
+                            if closestbounty and closestbounty:FindFirstChild('Items') then 
                                 for i,v in next, closestbounty.Items:GetChildren() do -- .Model.Items
                                     claimLootbox(v.Name, closestbounty)
                                 end
@@ -39246,7 +39270,7 @@ elseif universeid == 4871329703 then -- type soul
                                     ID = closestbounty:GetAttribute('ID')
                                 end
                             end
-                        until not closestbounty
+                        until not closestbounty or not closestbounty and closestbounty:FindFirstChild('Items') 
                     end)
                     if typesoulsettings.lootnonblatant == false then 
                         --local tppart = closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:IsA('Model') and closestbounty:FindFirstChildOfClass('BasePart')
@@ -39257,7 +39281,7 @@ elseif universeid == 4871329703 then -- type soul
                                 if closestbounty then 
                                     typesoulsettings.functions.teleport(closestbounty,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
                                 end
-                            until not closestbounty.PrimaryPart
+                            until not closestbounty
                         end)
                     end
                 end
