@@ -38689,6 +38689,9 @@ elseif universeid == 4871329703 then -- type soul
         childgamermode = false;
         randomtext = false;
         rainbowcloak = false;
+        npcesp = false;
+        npcespcolor = Color3.fromRGB(255,255,255);
+        npcespdistance = 2000;
     }
     typesoulsettings.functions.teleport = function(pos, speed)
         if typeof(pos) ~= 'Vector3' and pos:IsA('BasePart') then
@@ -39489,6 +39492,41 @@ elseif universeid == 4871329703 then -- type soul
         typesoulsettings['playerespdistance'] = State
         esp_lib.Settings.playerespdistance = typesoulsettings.playerespdistance
     end)
+
+    espsector:AddToggle('NPC Esp',false,function(e)
+        typesoulsettings.npcesp = e;
+        if not e then return end;
+        for i,v in next, workspace.NPCs:GetDescendants() do -- workspace.MissionBoards:GetChildren()  
+            if v.Parent:FindFirstChild('Humanoid') then 
+                rayEsp{
+                    child = v.Parent;
+                    Name = function()
+                        return v.Parent.Name
+                    end;
+                    flag = 'npc';
+                    maxdist = function()
+                        return typesoulsettings.npcespdistance
+                    end,
+                    color = function()
+                        return typesoulsettings.npcespcolor
+                    end,
+                    active = function()
+                        return typesoulsettings.npcesp
+                    end;
+                    nobox = true;
+                    notracer = true;
+                    removeondisable = true;
+                }
+            end
+        end
+    end)
+    espsector:AddColorpicker('NPC Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        typesoulsettings['npcespcolor'] = ztx
+    end)
+    espsector:AddSlider("NPC Esp Range", 0, 200, 5000, 1, function(State)
+        typesoulsettings['npcespdistance'] = State
+    end)
+
 
     espsector:AddToggle('Mission Board Esp',false,function(e)
         typesoulsettings.missionboardesp = e;
