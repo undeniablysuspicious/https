@@ -39604,7 +39604,7 @@ elseif universeid == 4871329703 then -- type soul
                                     task.wait(1)
                                     repeat 
                                         task.wait(2)
-                                        if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
+                                        if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false and game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == false  then 
                                             typesoulsettings.functions.teleport(boardget.Union, typesoulsettings.tweenspeed)
                                             task.wait(0.5)
                                             fireclickdetector(boardget.Union.ClickDetector);
@@ -39613,7 +39613,7 @@ elseif universeid == 4871329703 then -- type soul
                                                 firesignal(v.Yes.MouseButton1Click);
                                             end;
                                         end
-                                    until game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true
+                                    until game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true
                                 end);
     
                                 task.spawn(function()
@@ -39661,7 +39661,7 @@ elseif universeid == 4871329703 then -- type soul
                             -- until quested == true or typesoulsettings.autofarm == false or justresettofix == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true  -- (gui and #gui:GetChildren() ~= 1);
                             
                             
-                            task.wait(2)
+                            task.wait(0.1)--(2)
                             --gui = gui:GetChildren()[2]
                             -- repeat
                             --print('got quest')
