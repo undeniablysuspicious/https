@@ -39140,7 +39140,7 @@ elseif universeid == 4871329703 then -- type soul
             maid.autolootbox = nil;
             return
         end;
-        maid.autolootbox = workspace.Lootbox.ChildAdded:Connect(function(child)
+        maid.autolootbox = workspace.Lootboxes.ChildAdded:Connect(function(child)
             local rootPart = azfake:returndata().humanoidrootpart
             signals.conceal(function()
                 local closestbounty = nil;
@@ -39594,6 +39594,41 @@ elseif universeid == 4871329703 then -- type soul
     workspace.Entities.ChildAdded:Connect(function(v)
         if v ~= game.Players.LocalPlayer.Character then 
             attachAnimationPlayed(v)
+        end;
+    end)
+
+
+    -- game.Players.PlayerAdded:Connect(function(opp)
+    --     if opp ~= game.Players.LocalPlayer then 
+
+    --     end
+    -- end)
+    local function connectTouched(child)
+        child.PlayerName.MouseButton1Down:Connect(function()
+            if workspace.Camera.CameraSubject == workspace.Entities:FindFirstChild(child.Name) then
+                if game.Players.LocalPlayer.Character then 
+                    workspace.Camera.CameraSubject = game.Players.LocalPlayer.Character
+                end
+                maid.oldcameracon = nil;
+                return
+            end
+            maid.oldcameracon = nil;
+            maid.oldcameracon = workspace.CurrentCamera:GetPropertyChangedSignal('CameraSubject'):Connect(function()
+                if workspace.Entities:FindFirstChild(child.Name) then 
+                    workspace.Camera.CameraSubject = workspace.Entities:FindFirstChild(child.Name)
+                end
+            end)
+            if workspace.Entities:FindFirstChild(child.Name) then 
+                workspace.Camera.CameraSubject = workspace.Entities:FindFirstChild(child.Name)
+            end
+        end)
+    end
+    for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui.Leaderboard.PlayerList.PlayerListFrame:GetChildren() do 
+        if v:FindFirstChild('PlayerName') then connectTouched(v) end;
+    end
+    game:GetService("Players").LocalPlayer.PlayerGui.Leaderboard.PlayerList.PlayerListFrame.ChildAdded:Connect(function(child)
+        if child ~= game.Players.LocalPlayer.Name then 
+            connectTouched(child)
         end;
     end)
 
