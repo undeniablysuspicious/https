@@ -39308,6 +39308,9 @@ elseif universeid == 4871329703 then -- type soul
         maid.autolootbox = workspace.Lootboxes.ChildAdded:Connect(function(child)
             takeLootbox(child)
         end);
+        for i,v in next, workspace.Lootboxes:GetChildren() do 
+            takeLootbox(v)
+        end
     end)
     lefttab:AddSeperator('-')
     lefttab:AddToggle('Auto Flashstep', false, function(e)
