@@ -34605,7 +34605,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 maid.shifterautom1 = nil; maid.walkspeedcon = nil; maid.shifterautom2 = nil;
                 MouseCon:Disconnect(); break 
             end
-            --pcall(function()
+            pcall(function()
                 Character = Player.Character
                 Humanoid = Character and Character:FindFirstChild('Humanoid') or nil
                 gearfolder = Humanoid and Humanoid:FindFirstChild('Gear') or nil
@@ -34795,7 +34795,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 end
                 --workspace.PlayersDataFolder:FindFirstChild(Player.Name).Rank.Value = 5
                 --workspace.PlayersDataFolder:FindFirstChild(Player.Name).GamePoints.Value = 50000
-            --end)
+            end)
         end
     end)
     AddConfigurations()
@@ -40486,7 +40486,7 @@ elseif universeid == 3734304510 then  -- south bronx
                 if southbroxsettings.safefarm then 
                     DealerCFrame *= CFrame.new(0,-5,0)
                     bankNPCcFRAME *= CFrame.new(0,-5,0)
-                    bankNPCcFRAME *= CFrame.new(0,-5,0)
+                    checkCardCFrame *= CFrame.new(0,-5,0)
                 end
                 if not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
                     repeat 
