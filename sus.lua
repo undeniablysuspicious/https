@@ -72,8 +72,8 @@ setthreadidentity(7)
 -- could make getgenv return a different getgenv() or getgenv().azfake
 
 
-getgenv().versioncode = '#5c'
-getgenv().azfake_version = 'v3 '..getgenv().versioncode
+-- getgenv().versioncode = '#5c'
+-- getgenv().azfake_version = 'v3 '..getgenv().versioncode
 -- print(('V4 %s'):format('4a prolly when syn v3 comes out'))
 -- 1234
 
@@ -7739,7 +7739,12 @@ end;
 
 local universeid = signals.compile('httpservice'):JSONDecode(game:HttpGet(`https://apis.roblox.com/universes/v1/places/{game.PlaceId}/universe`))['universeId']
 -- setclipboard(game.HttpService:JSONDecode(game:HttpGet(`https://apis.roblox.com/universes/v1/places/{game.PlaceId}/universe`))['universeId'])
-
+local azfakebuild = {
+    build = 'v3';
+    vs = 'a';
+    code = '1'
+}
+local compiledVersion = azfakebuild['build']..'.'..azfakebuild.vs..azfakebuild.code
 
 if game.PlaceId == 0 then 
 
@@ -40487,7 +40492,8 @@ elseif universeid == 3734304510 then  -- south bronx
                     repeat 
                         task.wait(1)
                         tweento(DealerCFrame, 4)
-                    until checkdist(DealerCFrame)
+                        fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
+                    until checkdist(DealerCFrame) and game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID')
 
                     fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
                     game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Fake ID'))
@@ -40503,8 +40509,12 @@ elseif universeid == 3734304510 then  -- south bronx
                 if game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
                     game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Fake ID'))
                 end
-                tweento(bankNPCcFRAME) --DealerbankNPCcFRAMEFram)
-                fireproximityprompt(workspace.NPCs["Bank Teller"].UpperTorso.Attachment.ProximityPrompt)
+                repeat 
+                    task.wait()
+                    tweento(bankNPCcFRAME)
+                    fireproximityprompt(workspace.NPCs["Bank Teller"].UpperTorso.Attachment.ProximityPrompt)
+                until not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID')
+                --tweento(bankNPCcFRAME) --DealerbankNPCcFRAMEFram)
                 repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextTransparency < 0.4
                 task.wait(0.5)
                 local checkingText = game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning --Frame
@@ -40532,18 +40542,20 @@ elseif universeid == 3734304510 then  -- south bronx
                     game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Card'))
                     if atm == nil then return print('[THERE WERE NO ATMS]') end;
                     local inputManager = game.VirtualInputManager
-                    tweento(atm.CFrame, 2)
-                    inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
-                    task.wait(.03)
-                    inputManager:SendKeyEvent(false,Enum.KeyCode.W,false,game)
-                    task.wait(0.3)
-                    fireproximityprompt(atm.Attachment.ProximityPrompt)
-                    task.wait(1)
-                    local inputManager = game:GetService('VirtualInputManager')
-                    local m = game.Players.LocalPlayer:GetMouse()
-                    inputManager:SendMouseButtonEvent(m.X,m.Y,0,true,game,0) -- 1319,574
-                    task.wait(0.1)
-                    inputManager:SendMouseButtonEvent(m.X,m.Y,0,false,game,0)
+                    repeat 
+                        tweento(atm.CFrame, 2)
+                        inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
+                        task.wait(.03)
+                        inputManager:SendKeyEvent(false,Enum.KeyCode.W,false,game)
+                        task.wait(0.3)
+                        fireproximityprompt(atm.Attachment.ProximityPrompt)
+                        task.wait(1)
+                        local inputManager = game:GetService('VirtualInputManager')
+                        local m = game.Players.LocalPlayer:GetMouse()
+                        inputManager:SendMouseButtonEvent(m.X,m.Y,0,true,game,0) -- 1319,574
+                        task.wait(0.1)
+                        inputManager:SendMouseButtonEvent(m.X,m.Y,0,false,game,0)
+                    until not game.Players.LocalPlayer.Character:FindFirstChild('Card')
                     task.wait(2)
                 else
                     print('[application not successful]')
@@ -40839,7 +40851,11 @@ desktop by buying them with robux or just being able to do it by default it it i
 
 ]]
 
-Notify('','Running | Version | '..getgenv().azfake_version,'untilClick')
+getgenv().versioncode = '#5c'
+getgenv().azfake_version = 'v3, 4a'--'v3 '..getgenv().versioncode
+
+
+Notify('','Running | Version | '..compiledVersion,'untilClick')
 if vs == 'debug' then 
     azfakenotify('A real scripter has the power for code to come to life;','untilClick') -- 'AZFAKE',
 end
