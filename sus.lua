@@ -39089,7 +39089,7 @@ elseif universeid == 4871329703 then -- type soul
             local GameName = ''
             for i,v in next, gameIDS do 
                 if i == game.PlaceId then 
-                    print('found game id')
+                    --print('found game id')
                     GameName = v
                 end;
             end;
@@ -39149,8 +39149,8 @@ elseif universeid == 4871329703 then -- type soul
             maid.autolootbox = nil;
             return
         end;
-        maid.autolootbox = workspace.Lootboxes.ChildAdded:Connect(function(child)
-            local rootPart = azfake:returndata().humanoidrootpart
+        local function takeLootbox(child)
+                        local rootPart = azfake:returndata().humanoidrootpart
             signals.conceal(function()
                 local closestbounty = nil;
                 local closestdist = nil; -- (v:IsA('Model') and v.PrimaryPart and v.PrimaryPart.Position or v:FindFirstChildOfClass('BasePart').Position)
@@ -39188,21 +39188,21 @@ elseif universeid == 4871329703 then -- type soul
                     end)
                     if typesoulsettings.lootnonblatant == false then 
                         local tppart = closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:IsA('Model') and closestbounty:FindFirstChildOfClass('BasePart')
-                        typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'))
+                        typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
                         task.spawn(function()
                             repeat 
                                 task.wait()
                                 if closestbounty then 
-                                    typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'))
+                                    typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
                                 end
                             until not closestbounty
                         end)
                     end
-
-
-
                 end
             end);
+        end
+        maid.autolootbox = workspace.Lootboxes.ChildAdded:Connect(function(child)
+            takeLootbox(child)
         end);
     end)
     lefttab:AddSeperator('-')
