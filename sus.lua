@@ -7626,7 +7626,7 @@ sharedRequires['smartlog'] = function(...)
     return print(...)
 end
 
-function signals.new(f)
+function signals.new(f,uu)
     local random = Random.new()
     local letters = {'1','2','3','4','5','6','7','8','9','0','a','b','c','d','e','f','g','h','i','j','k4','l','m','n','o','p4','q','r','s','t','u','v4','w','x','y','z','gej0h','hrhw1','ewh2','gew3','ffs4','gh5','w6','f7r','ff8','e9r','h','br'}
     function getRandomLetter()
@@ -7651,6 +7651,7 @@ function signals.new(f)
     DATA.TIMETAKEN = os.time()
     DATA.func = f;
     DATA.hash = RANDOMSTRING
+    if uu then RANDOMSTRING = uu end;
     sharedRequires[RANDOMSTRING] = DATA;
     if vs then print('setup table, '..RANDOMSTRING) end;
     return DATA
@@ -39065,11 +39066,45 @@ elseif universeid == 4871329703 then -- type soul
             azfake:returndata().character:FindFirstChild('Head'):Destroy();
         end;
     end)
+    lefttab:AddButton('Serverhop', function()
+        local gameIDS = {}
+        gameIDS[14069122388] = "Hueco Mundo"
+        gameIDS[14069678431] = "Karakura Town"
+        gameIDS[14069956183] = "Rukon District"
+        gameIDS[14070029709] = "Soul Society"
+        gameIDS[14069866342] = "Las Noches"
+        gameIDS[14071822972] = "Wandenreich City"
+        local GameName = ''
+        for i,v in next, gameIDS do 
+            if i == game.PlaceId then 
+                --print('found game id')
+                GameName = v
+            end;
+        end;
+        local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer(GameName)
+        if not GetTable then 
+            repeat 
+                if GetTable == nil then 
+                    GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer(GameName)
+                end
+                task.wait()
+            until GetTable
+            print('waited get cooldown')
+        end
+        local foundTP = nil;
+        for i,jobIdTable in next, GetTable do 
+            local shouldbreak = false
+            if jobIdTable['JobID'] ~= game.JobId then 
+                game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(GameName,jobIdTable['JobID'])
+                break
+            end
+        end
+    end)
     lefttab:AddButton('Join Raid Server', function()
         if not azfake:returndata().character then return end;
         print('raid func hash '..RaidJoin.hash)
         local raidresult = RaidJoin.func()
-        azfakenotify(statusafter,3)
+        azfakenotify(tostring(statusafter),3)
     end)
     lefttab:AddToggle('Auto Join Raid', false, function(e)
         typesoulsettings.autojoinraid = e;
@@ -39150,7 +39185,7 @@ elseif universeid == 4871329703 then -- type soul
             return
         end;
         local function takeLootbox(child)
-                        local rootPart = azfake:returndata().humanoidrootpart
+            local rootPart = azfake:returndata().humanoidrootpart
             signals.conceal(function()
                 local closestbounty = nil;
                 local closestdist = nil; -- (v:IsA('Model') and v.PrimaryPart and v.PrimaryPart.Position or v:FindFirstChildOfClass('BasePart').Position)
@@ -39172,30 +39207,57 @@ elseif universeid == 4871329703 then -- type soul
                         game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(id, item)
                     end;
                     task.spawn(function()
+                        print(closestbounty.PrimaryPart)
+                        for i,v in next, closestbounty:GetDescendants() do 
+                            print(v:GetFullName())
+                        end;
+                        local itemsTho = {}
+                        local ID = nil
+                        for i,v in next, closestbounty.Items:GetChildren() do -- .Model.Items
+                            claimLootbox(v.Name, closestbounty)
+                            table.insert(itemsTho,v.Name)
+                            ID = closestbounty:GetAttribute('ID')
+                        end
+                        local ticky = 0
+                        task.spawn(function()
+                            repeat 
+                                task.wait()
+                                ticky += 0.1
+                                for i,v in next, itemsTho do 
+                                    game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(ID, v)
+                                end
+                            until ticky > 5
+                        end)
                         repeat 
                             task.wait()
                             if closestbounty then 
+                                for i,v in next, closestbounty.Items:GetChildren() do -- .Model.Items
+                                    claimLootbox(v.Name, closestbounty)
+                                end
                                 for i,v in next, closestbounty:GetDescendants() do 
+                                    --print(v:GetFullName())
                                     if v:IsA('ClickDetector') then 
                                         fireclickdetector(v)
                                     end;
                                 end;
-                                for i,v in next, closestbounty.Model.Items:GetChildren() do 
+                                for i,v in next, closestbounty.Items:GetChildren() do -- .Model.Items
                                     claimLootbox(v.Name, closestbounty)
+                                    table.insert(itemsTho,v.Name)
+                                    ID = closestbounty:GetAttribute('ID')
                                 end
                             end
                         until not closestbounty
                     end)
                     if typesoulsettings.lootnonblatant == false then 
-                        local tppart = closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:IsA('Model') and closestbounty:FindFirstChildOfClass('BasePart')
-                        typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
+                        --local tppart = closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:IsA('Model') and closestbounty:FindFirstChildOfClass('BasePart')
+                        typesoulsettings.functions.teleport(closestbounty,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
                         task.spawn(function()
                             repeat 
                                 task.wait()
                                 if closestbounty then 
-                                    typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
+                                    typesoulsettings.functions.teleport(closestbounty,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
                                 end
-                            until not closestbounty
+                            until not closestbounty.PrimaryPart
                         end)
                     end
                 end
@@ -39430,7 +39492,7 @@ elseif universeid == 4871329703 then -- type soul
     espsector:AddToggle('Lootbox Esp',false,function(e)
         typesoulsettings.lootboxesp = e;
         if not e then return end;
-        for i,v in next, workspace.NPCs.MissionNPC:GetChildren() do -- workspace.MissionBoards:GetChildren()  
+        for i,v in next, workspace.Lootboxes:GetChildren() do -- workspace.MissionBoards:GetChildren()  
             rayEsp{
                 child = v;
                 Name = function()
@@ -39556,7 +39618,7 @@ elseif universeid == 4871329703 then -- type soul
                 --print(tostring(anim.Animation.AnimationId))
                 local animationId = tostring(anim.Animation.AnimationId):split('/')[3]
                -- print(animationId)
-                if parryAnims[animationId] then 
+                if parryAnims[animationId] and typesoulsettings.autoparry == true then 
                     --print('can parry')
                     local registry = parryAnims[animationId] -- parryregistration
                     if type(registry) == 'function' then 
