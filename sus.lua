@@ -39274,12 +39274,12 @@ elseif universeid == 4871329703 then -- type soul
                     end)
                     if typesoulsettings.lootnonblatant == false then 
                         --local tppart = closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:IsA('Model') and closestbounty:FindFirstChildOfClass('BasePart')
-                        typesoulsettings.functions.teleport(closestbounty,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
+                        typesoulsettings.functions.teleport(closestbounty:FindFirstChildOfClass('BasePart'),150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
                         task.spawn(function()
                             repeat 
                                 task.wait()
                                 if closestbounty then 
-                                    typesoulsettings.functions.teleport(closestbounty,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
+                                    typesoulsettings.functions.teleport(closestbounty:FindFirstChildOfClass('BasePart'),150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
                                 end
                             until not closestbounty
                         end)
