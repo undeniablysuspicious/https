@@ -39096,21 +39096,36 @@ elseif universeid == 4871329703 then -- type soul
             local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer(GameName)
             local foundTP = nil;
             local statusafter = 'No Servers Avaiable'
-            for i,jobIdTable in next, GetTable do 
-                local shouldbreak = false
-                if foundTP then break end;
-                for ind,val in next, jobIdTable do
-                    --print(ind,val)
+
+            local function checkifourserverisntaraid()
+                local b = false;
+                for i,jobIdTable in next, GetTable do 
+                    local shouldbreak = false
+                    if jobIdTable['JobID'] == game.JobId and jobIdTable['Raid'] == true then 
+                        b = true
+                        break
+                    end
+                end
+                return b
+            end
+
+            if checkifourserverisntaraid() == false then 
+                for i,jobIdTable in next, GetTable do 
+                    local shouldbreak = false
                     --if foundTP then break end;
-                    if ind == 'Raid' and val == true and jobIdTable['ServerPlayers'] <= 29 then 
-                        print(jobIdTable['ServerPlayers'])
-                        statusafter = 'Joining Server With '..tostring(jobIdTable['ServerPlayers'])
-                        foundTP = jobIdTable['JobID']
-                        shouldbreak = true
-                        pcall(function()
-                            game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(GameName,foundTP)
-                        end)
-                        task.wait(3)
+                    for ind,val in next, jobIdTable do
+                        --print(ind,val)
+                        --if foundTP then break end;
+                        if ind == 'Raid' and val == true and jobIdTable['ServerPlayers'] <= 29 then 
+                            print(jobIdTable['ServerPlayers'])
+                            statusafter = 'Joining Server With '..tostring(jobIdTable['ServerPlayers'])
+                            foundTP = jobIdTable['JobID']
+                            shouldbreak = true
+                            pcall(function()
+                                game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(GameName,foundTP)
+                            end)
+                            task.wait(3)
+                        end
                     end
                 end
             end
