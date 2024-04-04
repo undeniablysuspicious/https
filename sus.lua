@@ -39623,15 +39623,22 @@ elseif universeid == 4871329703 then -- type soul
             end
         end)
     end
-    for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui.Leaderboard.PlayerList.PlayerListFrame:GetChildren() do 
-        if v:FindFirstChild('PlayerName') then connectTouched(v) end;
+    local function setupLeaderboardAdded()
+        for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui.Leaderboard.PlayerList.PlayerListFrame:GetChildren() do 
+            if v:FindFirstChild('PlayerName') then connectTouched(v) end;
+        end
+        game:GetService("Players").LocalPlayer.PlayerGui.Leaderboard.PlayerList.PlayerListFrame.ChildAdded:Connect(function(child)
+            if child ~= game.Players.LocalPlayer.Name then 
+                connectTouched(child)
+            end;
+        end)
     end
-    game:GetService("Players").LocalPlayer.PlayerGui.Leaderboard.PlayerList.PlayerListFrame.ChildAdded:Connect(function(child)
-        if child ~= game.Players.LocalPlayer.Name then 
-            connectTouched(child)
-        end;
+    game:GetService("Players").LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
+        if child.Name == 'Leaderboard' then task.wait(2) setupLeaderboardAdded() end;
     end)
-
+    if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerGui') and game:GetService("Players").LocalPlayer:FindFirstChild('PlayerGui'):FindFirstChild('Leaderboard') then 
+        setupLeaderboardAdded()
+    end
 
     AddConfigurations()
 
