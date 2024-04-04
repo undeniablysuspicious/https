@@ -38688,6 +38688,7 @@ elseif universeid == 4871329703 then -- type soul
         autolootlootbox = false;
         childgamermode = false;
         randomtext = false;
+        rainbowcloak = false;
     }
     typesoulsettings.functions.teleport = function(pos, speed)
         if typeof(pos) ~= 'Vector3' and pos:IsA('BasePart') then
@@ -39122,6 +39123,9 @@ elseif universeid == 4871329703 then -- type soul
             end
         end
     end)
+    lefttab:AddToggle('Rainbow Cloak', false, function(e)
+        typesoulsettings.rainbowcloak = e;
+    end)
     lefttab:AddButton('Join Raid Server', function()
         if not azfake:returndata().character then return end;
         print('raid func hash '..RaidJoin.hash)
@@ -39230,6 +39234,10 @@ elseif universeid == 4871329703 then -- type soul
                         local id = lootbox:GetAttribute('ID')
                         game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(id, item)
                     end;
+                    local tpPart = nil;
+                    for i,v in next, closestbounty:GetDescendants() do 
+                        if v:IsA('BasePart') then tpPart = v end;
+                    end;
                     task.spawn(function()
                         --print(closestbounty.PrimaryPart)
                         for i,v in next, closestbounty:GetDescendants() do 
@@ -39274,12 +39282,12 @@ elseif universeid == 4871329703 then -- type soul
                     end)
                     if typesoulsettings.lootnonblatant == false then 
                         --local tppart = closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:IsA('Model') and closestbounty:FindFirstChildOfClass('BasePart')
-                        typesoulsettings.functions.teleport(closestbounty:FindFirstChildOfClass('BasePart'),150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
+                        typesoulsettings.functions.teleport(tpPart,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
                         task.spawn(function()
                             repeat 
                                 task.wait()
                                 if closestbounty then 
-                                    typesoulsettings.functions.teleport(closestbounty:FindFirstChildOfClass('BasePart'),150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
+                                    typesoulsettings.functions.teleport(tpPart,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
                                 end
                             until not closestbounty
                         end)
@@ -39757,6 +39765,22 @@ elseif universeid == 4871329703 then -- type soul
                     v:Disconnect(); -- print(i) cna u name connections?
                 end
                 break
+            end
+            if typesoulsettings.rainbowcloak == true and azfake:returndata().character then 
+                pcall(function()
+                    local colors = {
+                        'White';
+                        'Black';
+                        'Red';
+                        'Blue';
+                    }
+                    for i,v in next, colors do 
+                        local ohString1 = "Equip"
+                        local ohString2 = v..' '.."Puffer"
+                        azfake:returndata().character.CharacterHandler.Remotes.EquipAccessory:FireServer(ohString1, ohString2)
+                        task.wait(.25)
+                    end
+                end)
             end
             if typesoulsettings.autofarm == true then 
                 signals.conceal(function()
