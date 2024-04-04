@@ -39094,6 +39094,15 @@ elseif universeid == 4871329703 then -- type soul
                 end;
             end;
             local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer(GameName)
+            if not GetTable then 
+                repeat 
+                    if GetTable == nil then 
+                        GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer(GameName)
+                    end
+                    task.wait()
+                until GetTable
+                print('waited get cooldown')
+            end
             local foundTP = nil;
             local statusafter = 'No Servers Avaiable'
 
