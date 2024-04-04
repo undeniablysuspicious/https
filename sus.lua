@@ -58,11 +58,12 @@ end))
 -- setthreadidentity(9)
 setthreadidentity(7)
 
-local old_gc = getgc();
-local oldgc;
-oldgc = hookfunction(getgc, function(...)
-    return old_gc
-end)
+-- local old_gc = getgc();
+-- local oldgc;
+-- oldgc = hookfunction(getgc, function(...)
+--     return old_gc
+-- end)
+
 -- New example script written by wally
 -- You can suggest changes with a pull request or something
 
@@ -1110,7 +1111,7 @@ if isV4 then
         end;    
     }
     task.spawn(function()
-        rconsoleprint('rconsole quick commands')
+        rconsoleprint('\nrconsole quick commands')
         while task.wait(1) do 
             local input = rconsoleinput('> ')
             if quickcmds[input] then quickcmds[input]() end
@@ -6542,6 +6543,13 @@ azfake.traceresp = function(opposing,info)
     end)
     return prep
 end
+local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
+esp_lib.Players = false;
+esp_lib.Boxes = false;
+esp_lib.Names = false;
+--esp_lib.AutoRemove = true;
+esp_lib.Settings.usecustomespcolor = true;
+esp_lib:Toggle(true)
 
 local function setupEspTab(globaltable) -- Espwindow
     local EspTab = window:CreateTab('ESP')
@@ -6555,125 +6563,149 @@ local function setupEspTab(globaltable) -- Espwindow
         savedfunction = nil;
         savedcirc = nil;
         espcolor = Color3.fromRGB(255, 255,255);
+        usenames = false;
+        usetracers = false;
+        useboxes = false;
     }
+    -- playerespsector:AddToggle("Player ESP", false, function(xstate)
+    --     globaltable['setupespsettings']['playeresp'] = xstate
+    --     if globaltable['setupespsettings']['playeresp'] == true then 
+    --         for _,loop_player in next, game.Players:GetChildren() do 
+    --             --if not table.find(game.Players:GetPlayers())
+    --             if loop_player ~= game.Players.LocalPlayer then 
+    --                 local v = loop_player.Character
+    --                 local loop_character = loop_player.Character
+    --                 task.spawn(function()
+    --                     local __assigned = azfake.__esp__call(loop_player,{
+    --                         esptext = '..';
+    --                         ['removedcallback'] = function()
+    --                             --__assigned.object:Remove()
+    --                         end; -- ojbecy
+    --                         ['inloopfunction'] = function()
+    --                             --
+    --                         end;
+    --                         playersettings = true;
+    --                         yoffset = 5;
+    --                         maxdistance = globaltable['setupespsettings']['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+    --                     })
+    --                     __assigned.inloopfunction = function()-- whati f no max health
+    --                         local dist = nil
+    --                         if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
+    --                             dist = math.floor((loop_player.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude)
+    --                         end
+    --                         if loop_player and loop_player.Character and loop_player.Character:FindFirstChildWhichIsA('Humanoid') then 
+    --                             __assigned.object.Text = loop_player.Name..' - '..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'\n'..tostring(math.floor(dist))..' studs away'--(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+    --                         else
+    --                             __assigned.object:Remove()
+    --                         end
+    --                         __assigned.maxdistance = globaltable['setupespsettings']['maxviewplayerdistance']
+    --                         __assigned.checkingvalue = globaltable['setupespsettings']['playeresp']
+    --                         __assigned.object.Color = globaltable['setupespsettings']['espcolor']
+    --                     end
+    --                     __assigned.removedcallback = function()
+    --                         pcall(function()
+    --                             __assigned.object:Remove()
+    --                         end)
+    --                     end
+    --                     __assigned.waitingvalue = false;
+    --                     __assigned.playersettings = false;
+    --                 end)
+    --             end
+    --         end
+    --         local DirectoryAdded = game.Players.ChildAdded:Connect(function(loop_player)
+
+    --             local v = loop_player.Character
+    --             local loop_character = loop_player.Character
+    --             task.spawn(function()
+    --                 local __assigned = azfake.__esp__call(loop_player,{
+    --                     esptext = '..';
+    --                     ['removedcallback'] = function()
+    --                         --__assigned.object:Remove()
+    --                     end; -- ojbecy
+    --                     ['inloopfunction'] = function()
+    --                         --
+    --                     end;
+    --                     playersettings = true;
+    --                     maxdistance = globaltable['setupespsettings']['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+    --                 })
+    --                 __assigned.inloopfunction = function()-- whati f no max health
+    --                     local dist = nil
+    --                     if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
+    --                         dist = math.floor((loop_player.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude)
+    --                     end
+    --                     if loop_player and loop_player.Character and loop_player.Character:FindFirstChildWhichIsA('Humanoid') then 
+    --                         __assigned.object.Text = loop_player.Name..' - '..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'\n'..tostring(math.floor(dist))..' studs away'--(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+    --                     else
+    --                         __assigned.object:Remove()
+    --                     end
+    --                     __assigned.maxdistance = globaltable['setupespsettings']['maxviewplayerdistance']
+    --                     __assigned.checkingvalue = globaltable['setupespsettings']['playeresp']
+    --                     __assigned.object.Color = globaltable['setupespsettings']['espcolor']
+    --                 end
+    --                 __assigned.removedcallback = function()
+    --                     pcall(function()
+    --                         __assigned.object:Remove()
+    --                     end)
+    --                 end
+    --                 __assigned.playersettings = false;
+    --             end)
+    --             -- if not game.Players:FindFirstChild(v.Name) then 
+    --             --     task.spawn(function()
+    --             --         local __assigned = azfake.__esp__call(v,{
+    --             --             esptext = '..';
+    --             --             ['removedcallback'] = function()
+    --             --                 __assigned.object:Remove()
+    --             --             end; -- ojbecy
+    --             --             ['inloopfunction'] = function()
+    --             --                 --
+    --             --             end;
+    --             --             charactersettings = true;
+    --             --             maxdistance = getgenv().fightlocalgame['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
+    --             --         })
+    --             --         __assigned.inloopfunction = function()-- whati f no max health
+    --             --             __assigned.object.Text = v.Name..' - '..math.floor(v:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(v:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(v:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(v:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
+    --             --             __assigned.maxdistance = getgenv().fightlocalgame['maxviewplayerdistance']
+    --             --         end
+    --             --         __assigned.removedcallback = function()
+    --             --             pcall(function()
+    --             --                 __assigned.object:Remove()
+    --             --             end)
+    --             --         end
+    --             --         __assigned.checkingvalue = getgenv().fightlocalgame['playeresp']
+    --             --         __assigned.waitingvalue = false;
+    --             --     end)
+    --             -- end
+    --         end)
+    --         task.spawn(function()
+    --             repeat task.wait(.3) until getgenv().loopsUnload == true ;
+    --             DirectoryAdded:Disconnect()
+    --         end)
+    --     end
+    -- end)
+    -- playerespsector:AddColorpicker('Player Display Colour',Color3.fromRGB(255, 255,255), function(ztx)
+    --     globaltable['setupespsettings']['espcolor'] = ztx
+    -- end)
+    playerespsector:AddToggle("Use Names", false, function(xstate)
+        globaltable['setupespsettings']['usenames'] = xstate
+        esp_lib.Names = xstate;
+    end)
+    playerespsector:AddToggle("Use Tracers", false, function(xstate)
+        globaltable['setupespsettings']['usetracers'] = xstate
+        esp_lib.Tracers = xstate;
+    end)
+    playerespsector:AddToggle("Use Boxes", false, function(xstate)
+        globaltable['setupespsettings']['useboxes'] = xstate
+        esp_lib.Boxes = xstate;
+    end)
     playerespsector:AddToggle("Player ESP", false, function(xstate)
         globaltable['setupespsettings']['playeresp'] = xstate
-        if globaltable['setupespsettings']['playeresp'] == true then 
-            for _,loop_player in next, game.Players:GetChildren() do 
-                --if not table.find(game.Players:GetPlayers())
-                if loop_player ~= game.Players.LocalPlayer then 
-                    local v = loop_player.Character
-                    local loop_character = loop_player.Character
-                    task.spawn(function()
-                        local __assigned = azfake.__esp__call(loop_player,{
-                            esptext = '..';
-                            ['removedcallback'] = function()
-                                --__assigned.object:Remove()
-                            end; -- ojbecy
-                            ['inloopfunction'] = function()
-                                --
-                            end;
-                            playersettings = true;
-                            yoffset = 5;
-                            maxdistance = globaltable['setupespsettings']['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
-                        })
-                        __assigned.inloopfunction = function()-- whati f no max health
-                            local dist = nil
-                            if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
-                                dist = math.floor((loop_player.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude)
-                            end
-                            if loop_player and loop_player.Character and loop_player.Character:FindFirstChildWhichIsA('Humanoid') then 
-                                __assigned.object.Text = loop_player.Name..' - '..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'\n'..tostring(math.floor(dist))..' studs away'--(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
-                            else
-                                __assigned.object:Remove()
-                            end
-                            __assigned.maxdistance = globaltable['setupespsettings']['maxviewplayerdistance']
-                            __assigned.checkingvalue = globaltable['setupespsettings']['playeresp']
-                            __assigned.object.Color = globaltable['setupespsettings']['espcolor']
-                        end
-                        __assigned.removedcallback = function()
-                            pcall(function()
-                                __assigned.object:Remove()
-                            end)
-                        end
-                        __assigned.waitingvalue = false;
-                        __assigned.playersettings = false;
-                    end)
-                end
-            end
-            local DirectoryAdded = game.Players.ChildAdded:Connect(function(loop_player)
-
-                local v = loop_player.Character
-                local loop_character = loop_player.Character
-                task.spawn(function()
-                    local __assigned = azfake.__esp__call(loop_player,{
-                        esptext = '..';
-                        ['removedcallback'] = function()
-                            --__assigned.object:Remove()
-                        end; -- ojbecy
-                        ['inloopfunction'] = function()
-                            --
-                        end;
-                        playersettings = true;
-                        maxdistance = globaltable['setupespsettings']['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
-                    })
-                    __assigned.inloopfunction = function()-- whati f no max health
-                        local dist = nil
-                        if loop_player.Character:FindFirstChild('HumanoidRootPart') and loop_player.Character:FindFirstChild('Humanoid') then 
-                            dist = math.floor((loop_player.Character:FindFirstChild('HumanoidRootPart').Position - game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position).Magnitude)
-                        end
-                        if loop_player and loop_player.Character and loop_player.Character:FindFirstChildWhichIsA('Humanoid') then 
-                            __assigned.object.Text = loop_player.Name..' - '..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(loop_player.Character:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'\n'..tostring(math.floor(dist))..' studs away'--(math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(loop_character:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
-                        else
-                            __assigned.object:Remove()
-                        end
-                        __assigned.maxdistance = globaltable['setupespsettings']['maxviewplayerdistance']
-                        __assigned.checkingvalue = globaltable['setupespsettings']['playeresp']
-                        __assigned.object.Color = globaltable['setupespsettings']['espcolor']
-                    end
-                    __assigned.removedcallback = function()
-                        pcall(function()
-                            __assigned.object:Remove()
-                        end)
-                    end
-                    __assigned.playersettings = false;
-                end)
-                -- if not game.Players:FindFirstChild(v.Name) then 
-                --     task.spawn(function()
-                --         local __assigned = azfake.__esp__call(v,{
-                --             esptext = '..';
-                --             ['removedcallback'] = function()
-                --                 __assigned.object:Remove()
-                --             end; -- ojbecy
-                --             ['inloopfunction'] = function()
-                --                 --
-                --             end;
-                --             charactersettings = true;
-                --             maxdistance = getgenv().fightlocalgame['maxviewplayerdistance'] -- getgenv().fightlocalgame['maxplayermobdistance'];
-                --         })
-                --         __assigned.inloopfunction = function()-- whati f no max health
-                --             __assigned.object.Text = v.Name..' - '..math.floor(v:FindFirstChildWhichIsA('Humanoid').Health)..'/'..math.floor(v:FindFirstChildWhichIsA('Humanoid').MaxHealth)..'  '..(math.floor(v:FindFirstChildWhichIsA('Humanoid').Health)/math.floor(v:FindFirstChildWhichIsA('Humanoid').MaxHealth))*100
-                --             __assigned.maxdistance = getgenv().fightlocalgame['maxviewplayerdistance']
-                --         end
-                --         __assigned.removedcallback = function()
-                --             pcall(function()
-                --                 __assigned.object:Remove()
-                --             end)
-                --         end
-                --         __assigned.checkingvalue = getgenv().fightlocalgame['playeresp']
-                --         __assigned.waitingvalue = false;
-                --     end)
-                -- end
-            end)
-            task.spawn(function()
-                repeat task.wait(.3) until getgenv().loopsUnload == true ;
-                DirectoryAdded:Disconnect()
-            end)
-        end
+        esp_lib.Players = xstate;
     end)
     playerespsector:AddColorpicker('Player Display Colour',Color3.fromRGB(255, 255,255), function(ztx)
         globaltable['setupespsettings']['espcolor'] = ztx
+        esp_lib.Settings.playerespcolor = ztx; -- globaltable['setupespsettings']['espcolor']
     end)
+
     playerespsector:AddToggle("Tracer ESP", false, function(xstate)
         globaltable['setupespsettings']['traceraim'] = xstate
         if globaltable['setupespsettings']['traceraim'] == true then 
@@ -38531,6 +38563,7 @@ elseif universeid == 4871329703 then -- type soul
     local tab = window:CreateTab(gameName)
     local esptab = window:CreateTab('ESP')
     local sector = tab:CreateSector('Cheats','left')
+    local lefttab = tab:CreateSector('Cheats','left')
     local rightsect = tab:CreateSector('Cheats','right')
     local espsector = esptab:CreateSector('Cheats','left')
 
@@ -38574,6 +38607,11 @@ elseif universeid == 4871329703 then -- type soul
         useskillselect = {};
         autouseskills = false;
         autogrip = false;
+        tweenspeed = 100;
+        lootnonblatant = false;
+        autolootlootbox = false;
+        childgamermode = false;
+        randomtext = false;
     }
     typesoulsettings.functions.teleport = function(pos, speed)
         if typeof(pos) ~= 'Vector3' and pos:IsA('BasePart') then
@@ -38668,6 +38706,7 @@ elseif universeid == 4871329703 then -- type soul
     end;
     typesoulsettings.functions.parrylist = function(tbl,  mob, dist ,anim)
         if not typesoulsettings.functions.getentityfolder() then return print('no entity folder') end;
+        if not mob.PrimaryPart then return print('no primary part for '..mob.Name) end;
         for i,v in next, tbl do
             local timetowait = v
             if typesoulsettings.pingadjuster > 0  then 
@@ -38751,6 +38790,9 @@ elseif universeid == 4871329703 then -- type soul
                     onAdded(obj)
                 end)
                 table.insert(typesoulsettings.connections,ctn);
+                child.Destroying:Connect(function()
+                    ctn:Disconnect()
+                end)
             end;
         end)
         for i,v in next, workspace.Effects:GetChildren() do 
@@ -38759,6 +38801,9 @@ elseif universeid == 4871329703 then -- type soul
                     onAdded(obj)
                 end)
                 table.insert(typesoulsettings.connections,ctn);
+                v.Destroying:Connect(function()
+                    ctn:Disconnect()
+                end)
             end
         end
     end)
@@ -38768,23 +38813,7 @@ elseif universeid == 4871329703 then -- type soul
     sector:AddSlider("Parry Ping Adjuster", 0, 0, 100, 1, function(State)
         typesoulsettings.pingadjuster = State -- deepwtykensettings  typesoulsettings pingadjust
     end)
-    sector:AddButton('Kill Self', function()
-        if not azfake:returndata().character then return end;
-        if azfake:returndata().character:FindFirstChild('Head') then 
-            azfake:returndata().character:FindFirstChild('Head'):Destroy();
-        end;
-    end)
-
-    sector:AddToggle('Auto Flashstep', false, function(e)
-        typesoulsettings.autoflashstep = e;
-        if not e then 
-            maid.autoflashstep = nil;
-            return;
-        end;
-        maid.autoflashstep = signals.heartbeat:connect("omega flashy", function()
-            typesoulsettings.functions.flashstep()
-        end)
-    end)
+    --
     --
 
     local npclist = {};
@@ -38799,7 +38828,7 @@ elseif universeid == 4871329703 then -- type soul
             table.insert(entitylist,v.Name)
         end;
     end;
-    sector:AddDropdown("NPC List", npclist, "", false, function(State)
+    sector:AddDropdown("NPC Teleport List", npclist, "", false, function(State)
         typesoulsettings.selectednpc = State 
     end)
     sector:AddButton("Teleport To NPC", function()
@@ -38937,6 +38966,9 @@ elseif universeid == 4871329703 then -- type soul
         typesoulsettings.autogrip = e;
     end)
     rightsect:AddSeperator('-')
+    rightsect:AddSlider("Tween Speed", 0, 100, 250, 1, function(State)
+        typesoulsettings.tweenspeed = State --faermx
+    end)
     rightsect:AddSlider("Farm X Offset", -20, 0, 20, 1, function(State)
         typesoulsettings.farmx = State --faermx
     end)
@@ -38950,6 +38982,196 @@ elseif universeid == 4871329703 then -- type soul
         typesoulsettings.farmrotation = State -- farmrot
     end)
     rightsect:AddSeperator('-')
+
+
+    lefttab:AddButton('Kill Self', function()
+        if not azfake:returndata().character then return end;
+        if azfake:returndata().character:FindFirstChild('Head') then 
+            azfake:returndata().character:FindFirstChild('Head'):Destroy();
+        end;
+    end)
+
+    lefttab:AddToggle('Auto Flashstep', false, function(e)
+        typesoulsettings.autoflashstep = e;
+        if not e then 
+            maid.autoflashstep = nil;
+            return;
+        end;
+        maid.autoflashstep = signals.heartbeat:connect("omega flashy", function()
+            typesoulsettings.functions.flashstep()
+        end)
+    end)
+    lefttab:AddToggle('Lootbox Non-Blatant', false, function(e)
+        typesoulsettings.lootnonblatant = e;
+    end)
+    lefttab:AddToggle('Auto Lootbox', false, function(e)
+        typesoulsettings.autolootlootbox = e;
+        if not e then 
+            maid.autolootbox = nil;
+            return
+        end;
+        maid.autolootbox = workspace.Lootbox.ChildAdded:Connect(function(child)
+            local rootPart = azfake:returndata().humanoidrootpart
+            signals.conceal(function()
+                local closestbounty = nil;
+                local closestdist = nil; -- (v:IsA('Model') and v.PrimaryPart and v.PrimaryPart.Position or v:FindFirstChildOfClass('BasePart').Position)
+                for i,v in next, workspace.Lootboxes:GetChildren() do 
+                    local dist = (v.WorldPivot.Position - rootPart.Position).Magnitude
+                    if closestbounty == nil then 
+                        closestbounty = v
+                        closestdist = dist
+                    else
+                        if closestdist > dist then 
+                            closestbounty = v
+                            closestdist = dist
+                        end
+                    end
+                end;
+                if closestbounty then 
+                    local function claimLootbox(item, lootbox)
+                        local id = lootbox:GetAttribute('ID')
+                        game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(id, item)
+                    end;
+                    task.spawn(function()
+                        repeat 
+                            task.wait()
+                            if closestbounty then 
+                                for i,v in next, closestbounty:GetDescendants() do 
+                                    if v:IsA('ClickDetector') then 
+                                        fireclickdetector(v)
+                                    end;
+                                end;
+                                for i,v in next, closestbounty.Model.Items:GetChildren() do 
+                                    claimLootbox(v.Name, closestbounty)
+                                end
+                            end
+                        until not closestbounty
+                    end)
+                    if typesoulsettings.lootnonblatant == false then 
+                        local tppart = closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:IsA('Model') and closestbounty:FindFirstChildOfClass('BasePart')
+                        typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'))
+                        task.spawn(function()
+                            repeat 
+                                task.wait()
+                                if closestbounty then 
+                                    typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'))
+                                end
+                            until not closestbounty
+                        end)
+                    end
+
+
+
+                end
+            end);
+        end);
+    end)
+    lefttab:AddToggle('Child Gamer Mode', false, function(e)
+        typesoulsettings.childgamermode = e;
+    end)
+    lefttab:AddToggle('Random Text', false, function(e)
+        typesoulsettings.randomtext = e;
+    end)
+    local holdUsernames = {}
+    lefttab:AddToggle('Streamer Mode', false, function(e)
+        typesoulsettings.streamermode = e;
+        if not e then 
+            maid.streamermode = nil
+            for i,v in next, holdUsernames do 
+                for _, child in next, game:GetService("Players").LocalPlayer.PlayerGui.Leaderboard.PlayerList.PlayerListFrame:GetChildren() do 
+                    -- for index, child in next, v:GetChildren() do 
+                    --     if child.Name == i then 
+                    --         print('renaming ',i)
+                    --         child.PlayerName.Text = v:split('-')[1]
+                    --         child.PlayerTitle.Text = v:split('-')[2]
+                    --     end
+                    -- end;
+                    if child.Name == i then 
+                        print('renaming ',i)
+                        child.PlayerName.Text = v:split('-')[1]
+                        child.PlayerTitle.Text = v:split('-')[2]
+                    end
+                end; 
+            end;
+            holdUsernames = {}
+            return
+        end; 
+        local random = Random.new()
+        local letters = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
+        function getRandomLetter()
+            return letters[random:NextInteger(1,#letters)]
+        end
+        function getRandomString(length, includeCapitals)
+            local length = length or 10
+            local str = ''
+            for i=1,length do
+                local randomLetter = getRandomLetter()
+                if includeCapitals and random:NextNumber() > .5 then
+                    randomLetter = string.upper(randomLetter)
+                end
+                str = str .. randomLetter
+            end
+            return str
+        end
+        maid.streamermode = signals.heartbeat:connect("black", function()
+            pcall(function()
+                local path = game:GetService("Players").LocalPlayer.PlayerGui.Settings.Frame
+                -- getRandomString(math.random(1,10,true))
+                path.PlayerName.Text = typesoulsettings.randomtext == true and getRandomString(math.random(1,10),true) or 'POWERED BY AZFAKE'
+                --path.PlayerName.Text = 'PROTECTED BY AZFAKE'
+                local defaultRegion = 'OHIO, NIGGERLAND' -- defaultregion:split(' ',2)
+                if typesoulsettings.childgamermode then defaultRegion = 'OHIO, WONDERLAND' end;
+                path.Region.Text = typesoulsettings.randomtext == true and getRandomString(math.random(1,10),true) or defaultRegion --'OHIO, NIGGERLAND'
+                path.CurrentServer.Text = typesoulsettings.randomtext == true and getRandomString(math.random(1,10),true) or 'AZFAKES SERVER'
+                path.CharacterName.Text = typesoulsettings.randomtext == true and getRandomString(math.random(1,10),true) or 'PROTECTED BY AZFAKE'
+                path.ServerTime.Text = typesoulsettings.randomtext == true and getRandomString(math.random(1,10),true) or 'TIME TO SHINE'
+                path.Version.Text = typesoulsettings.randomtext == true and getRandomString(math.random(1,10),true) or 'V3'
+
+                for i, child in next, game:GetService("Players").LocalPlayer.PlayerGui.Leaderboard.PlayerList.PlayerListFrame:GetChildren() do 
+                    -- for index, child in next, v:GetChildren() do 
+                    --     if child:FindFirstChild('PlayerName') then 
+                    --         if not holdUsernames[child.Name] then 
+                    --             holdUsernames[child.Name] = child:FindFirstChild('PlayerName').Text..'-'..child:FindFirstChild('PlayerTitle').Text 
+                    --         end;
+                    --         -- AZFAKE NIGGER #1
+                    --         local function getsummary(vv)
+                    --             local text = 'AZFAKE NIGGER #'..tostring(i)
+                    --             if typesoulsettings.randomtext == true then 
+                    --                 text = getRandomString(math.random(1,10),true);
+                    --             end;
+                    --             if typesoulsettings.childgamermode then 
+                    --                 text = 'AZFAKE CHILD #'..tostring(i)
+                    --             end
+                    --             if vv == 'title' then text = '' end;
+                    --             return text
+                    --         end;    
+                    --         child:FindFirstChild('PlayerName').Text = getsummary()
+                    --         child:FindFirstChild('PlayerTitle').Text = ''
+                    --     end;
+                    if child:FindFirstChild('PlayerName') then 
+                        if not holdUsernames[child.Name] then 
+                            holdUsernames[child.Name] = child:FindFirstChild('PlayerName').Text..'-'..child:FindFirstChild('PlayerTitle').Text 
+                            print('hold')
+                        end;
+                        -- AZFAKE NIGGER #1
+                        local function getsummary(vv)
+                            local text = 'AZFAKE NIGGER #'..tostring(i)
+                            if typesoulsettings.randomtext == true then 
+                                text = getRandomString(math.random(1,10),true);
+                            end;
+                            if typesoulsettings.childgamermode then 
+                                text = 'AZFAKE CHILD #'..tostring(i)
+                            end
+                            if vv == 'title' then text = '' end;
+                            return text
+                        end;    
+                        child:FindFirstChild('PlayerName').Text = getsummary()
+                        child:FindFirstChild('PlayerTitle').Text = ''
+                    end;
+                end;
+            end)
+        end);
+    end)
     -- rightsect:AddToggle('Use 1', false, function(e)
     --     typesoulsettings.use1 = e;
     -- end)
@@ -39184,9 +39406,10 @@ elseif universeid == 4871329703 then -- type soul
                 local animationId = tostring(anim.Animation.AnimationId):split('/')[3]
                -- print(animationId)
                 if parryAnims[animationId] then 
-                    print('can parry')
+                    --print('can parry')
                     local registry = parryAnims[animationId] -- parryregistration
                     if type(registry) == 'function' then 
+                        print('parrying '..animationId)
                         registry(child, anim, animationId);
                         return;
                     elseif type(registry) == 'table' then 
@@ -39195,7 +39418,7 @@ elseif universeid == 4871329703 then -- type soul
                     local objdist = child.PrimaryPart
                     if not objdist then objdist = child:FindFirstChildOfClass('BasePart') end
                     if not objdist then 
-                        print(child.Name..' has no part to detect distance')
+                        --print(child.Name..' has no part to detect distance')
                         return
                     end;
                     if checkdist(typesoulsettings.autoparrydistance,objdist) then 
@@ -39214,6 +39437,9 @@ elseif universeid == 4871329703 then -- type soul
                 end
             end);
             table.insert(typesoulsettings.connections,ctn)
+            child.Humanoid.Died:Connect(function()
+                ctn:Disconnect();
+            end)
         end)
     end;    
 
@@ -39232,7 +39458,11 @@ elseif universeid == 4871329703 then -- type soul
 
     AddConfigurations()
 
+    local grip2 = 0
+    local isfarming = false;
     local farmstatus = 'idle'
+    local made1godead = false;
+    local gripped = false;
     local function getstatus()
         return farmstatus
     end
@@ -39240,7 +39470,6 @@ elseif universeid == 4871329703 then -- type soul
         farmstatus = x
         return farmstatus
     end
-    local holdfolder = {}
     task.spawn(function()
         while task.wait() do 
             if getgenv().loopsUnload == true then 
@@ -39268,20 +39497,43 @@ elseif universeid == 4871329703 then -- type soul
                         quested = true;
                     end;
                     if typesoulsettings.selectedfarm == 'Mobs' then 
-                        if typesoulsettings.autogetquest and not quested and statusfu == false and getstatus() == 'idle' then 
+                        if typesoulsettings.autogetquest and not quested and statusfu == false and getstatus() == 'idle' then -- and getstatus() == 'idle'
                             setstatus('tweening')
-                            local index = 0
-                            for i,v in next, holdfolder do 
-                                index += 1
-                                table.remove(holdfolder, index)
-                            end
+                            -- local index = 0
+                            -- for i,v in next, holdfolder do 
+                            --     index += 1
+                            --     print('removing '..i)
+                            --     holdfolder[i] = nil
+                            --     -- pcall(function()
+                            --     --     table.remove(holdfolder, i) -- dict takes string not number wont remove   index
+                            --     -- end)
+                            --     -- pcall(function()
+                            --     --     table.remove(holdfolder, index) -- dict takes string not number wont remove   index
+                            --     -- end)    
+                            -- end
                             statusfu = true;
                             local gui = nil;
                             local boardget = getclosestboard()['board'].Board
                             --print('[teleporting to board]')
+                            -- if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then
+                            --     quested = true;
+                            -- end;
+                            -- if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true then
+                            --     quested = true;
+                            -- end;
+                            local hasqueue = false;
+                            repeat 
+                                task.wait(1)
+                                typesoulsettings.functions.teleport(boardget.Union, typesoulsettings.tweenspeed) --150)
+                                if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then 
+                                    hasqueue = true;
+                                end
+                                if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true then 
+                                    hasqueue = true;
+                                end
+                            until typesoulsettings.autofarm == false or hasqueue == true or checkdist(10, boardget.WorldPivot.Position)
     
-                            typesoulsettings.functions.teleport(boardget.Union, 150)
-    
+                            task.wait(.5)
                             -- repeat -- teleport to board
                             --     task.wait(.5);
                             --     if not checkdist(30, boardget.WorldPivot.Position) then 
@@ -39297,6 +39549,7 @@ elseif universeid == 4871329703 then -- type soul
                             end
                             if justresettofix == false then 
                                 task.delay(7,function()
+                                    if justresettofix then return print('[no run fix]') end
                                     if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then
                                         quested = true;
                                     end;
@@ -39312,6 +39565,7 @@ elseif universeid == 4871329703 then -- type soul
                                             quested = true;
                                         end;
                                         if quested == false then 
+                                            setstatus('idle')
                                             print('[anti quest bug triggered, potential fix]')
                                             justresettofix = true
                                             game.Players.LocalPlayer.Character.Head:Destroy()
@@ -39323,12 +39577,12 @@ elseif universeid == 4871329703 then -- type soul
                             --task.delay(1,function()
                                 -- typesoulsettings.functions.teleport(boardget.Union, 150)
                             --end)
-
+    
                             local isnearboard = false;
                             repeat 
                                 task.wait()
                                 isnearboard = checkdist(10, boardget.WorldPivot.Position)
-                            until isnearboard ~= false or typesoulsettings.autofarm == false or justresettofix == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true
+                            until typesoulsettings.autofarm == false or isnearboard ~= false or typesoulsettings.autofarm == false or justresettofix == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true
                             --print('[is near board]')
                             gui = game.Players.LocalPlayer.PlayerGui:FindFirstChild('DialogueUI')
                             if gui and #gui:GetChildren() ~= 2 and game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
@@ -39339,13 +39593,29 @@ elseif universeid == 4871329703 then -- type soul
                                 for i,v in next, gui:GetChildren() do 
                                     firesignal(v.Yes.MouseButton1Click);
                                 end;
-                                --print('[trying to accept gui quest]')
+                                -- print('[trying to accept gui quest]')
                                 if #gui:GetChildren() == 2 then 
-                                    --print('shouldve accepted')
+                                    -- print('shouldve accepted')
                                 else
-                                    --print('wasnt another gui quest idk why')
+                                    -- print('wasnt another gui quest idk why')
                                 end
 
+                                task.spawn(function()
+                                    task.wait(1)
+                                    repeat 
+                                        task.wait(2)
+                                        if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
+                                            typesoulsettings.functions.teleport(boardget.Union, typesoulsettings.tweenspeed)
+                                            task.wait(0.5)
+                                            fireclickdetector(boardget.Union.ClickDetector);
+                                            task.wait(1)
+                                            for i,v in next, gui:GetChildren() do 
+                                                firesignal(v.Yes.MouseButton1Click);
+                                            end;
+                                        end
+                                    until game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true
+                                end);
+    
                                 task.spawn(function()
                                     if getstatus() == 'tweening' or getstatus() == 'idle' then 
                                         local status = getstatus()
@@ -39356,9 +39626,9 @@ elseif universeid == 4871329703 then -- type soul
                                             haschanged = status ~= getstatus() or false
                                             timeawaited += 1
                                         until haschanged or timeawaited >= 7
-                                        if not haschanged and timeawaited >= 7 then 
+                                        if not haschanged and timeawaited >= 7 and game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
                                             print('[status has been tweening for time]'..status..'-'..getstatus())
-                                            if checkdist(10, boardget.WorldPivot.Position) then 
+                                            if checkdist(10, boardget.WorldPivot.Position)  then 
                                                 fireclickdetector(boardget.Union.ClickDetector);
                                                 task.wait(1.5)
                                                 for i,v in next, gui:GetChildren() do 
@@ -39410,98 +39680,182 @@ elseif universeid == 4871329703 then -- type soul
                         end;
                         if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == false and game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
                             quested = false;
-                            setstatus('idle')
+                            if getstatus() ~= 'tweening' then 
+                                setstatus('idle')
+                            end
                         end;    
                         -- or just queueui enabled
-                        if typesoulsettings.autofarm ~= false and getgenv().loopsUnload ~= true and quested == true then 
-                            setstatus('attacking') -- farmimg
+                        if isfarming == false and typesoulsettings.autofarm ~= false and getgenv().loopsUnload ~= true and quested == true and getstatus() ~= 'attacking' and getstatus() ~= 'gripping' then 
+                            --setstatus('attacking') -- farmimg
+                            local holdfolder = {}
                             local bothdead = false
                             for i,v in next, workspace.Entities:GetChildren() do -- get closestenemies in 150
                                 if v:IsA('Model') and not game.Players:FindFirstChild(v.Name) and v.PrimaryPart and checkdist(300,v.PrimaryPart) and v:FindFirstChildWhichIsA('Highlight') and v:FindFirstChildWhichIsA('Humanoid') and v:FindFirstChildWhichIsA('Humanoid').Health > 0 then 
                                     -- check if highlight maybe
                                     -- make function a repeat
+                                    -- print(holdfolder)
                                     if not holdfolder[v.Name] then 
                                         holdfolder[v.Name] = false;
                                     end;
+                                    isfarming = true;
+                                    --holdfolder[v.Name] = false;
                                     local amount = 0
-                                    for i,v in next, holdfolder do 
-                                        if v == true then 
-                                            amount += 1
-                                        end
-                                    end
-                                    if amount == #holdfolder then bothdead = true end;
+                                    -- for i,v in next, holdfolder do 
+                                    --     if v == true then 
+                                    --         amount += 1
+                                    --     end
+                                    -- end
+                                    -- if amount == #holdfolder then bothdead = true print('both dead') end;
                                     local dist = checkdist(45,v.PrimaryPart) -- 30
                                     local canAttack = true;
-                                    if dist then 
-                                        --rootPart.CFrame = v.HumanoidRootPart.CFrame * cframecheck;
-                                        -- carry; tp to sky; grip
-                                        if v:FindFirstChildWhichIsA('Humanoid').Health == 1  then  -- and not getstatus('gripping')
-                                            -- setstatus('gripping')
+                                    if not dist then 
+                                        repeat 
+                                            task.wait(1)
+                                            typesoulsettings.functions.teleport(v.HumanoidRootPart, typesoulsettings.tweenspeed) --150)
+                                        until not v or checkdist(45,v.PrimaryPart)
+                                    end;
+                                    print('enter re')
+                                    setstatus('attacking') -- farmimg
+                                    repeat 
+                                        task.wait()
+                                        cframecheck = CFrame.new(typesoulsettings.farmx,typesoulsettings.farmy,typesoulsettings.farmz) * CFrame.Angles(math.rad(typesoulsettings.farmrotation),math.rad(0),math.rad(0))
+                                        if v:FindFirstChildWhichIsA('Humanoid').Health == 1 then 
                                             holdfolder[v.Name] = true;
-                                            if typesoulsettings.autogrip == true and bothdead == true then 
-                                                setstatus('gripping')
-                                                rootPart.CFrame = v.HumanoidRootPart.CFrame 
-                                                canAttack = false;
-                                                azfake:returndata().character.CharacterHandler.Remotes.Execute:FireServer()
-                                                task.delay(4,function()
-                                                    print('gripping shouldve stopped')
-                                                    setstatus('attacking')
-                                                end)
+                                            if made1godead == false then 
+                                                made1godead = nil
+                                            elseif made1godead == nil then 
+                                                made1godead = true;
+                                            end;
+                                            for i,v in next, holdfolder do 
+                                                if v == true then 
+                                                    amount += 1
+                                                end
                                             end
-                                            -- pcall(function()
-                                            --     if getstatus() ~= 'gripping' then 
-                                            --         setstatus('gripping')
-                                            --         task.delay(0.1,function()
-                                            --             azfake:returndata().character.CharacterHandler.Remotes.Execute:FireServer()
-                                            --         end)
-                                            --     end
-                                            --     --task.delay(0.5,function()
-                                            --        -- game.TweenService:Create(azfake:returndata().character.PrimaryPart,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {CFrame = azfake:returndata().character.PrimaryPart.CFrame * CFrame.new(0,40,0)}):Play()
-                                            --     --end)
-                                            -- end);
-                                            -- task.delay(4,function()
-                                            --     setstatus('attacking')
-                                            -- end)
-                                            --task.wait(5)
+                                            local amountinfolder = 0
+                                            for __, vv in next, holdfolder do 
+                                                amountinfolder += 1
+                                            end;
+                                            if amount == amountinfolder then bothdead = true print('both dead') else print(amount,amountinfolder) end;
+                                        end;
+                                        rootPart.CFrame = v.HumanoidRootPart.CFrame * cframecheck;
+                                        -- if dist then 
+                                        --     --rootPart.CFrame = v.HumanoidRootPart.CFrame * cframecheck;
+                                        --     -- carry; tp to sky; grip
+                                        --     rootPart.CFrame = v.HumanoidRootPart.CFrame * cframecheck;
+                                        -- else
+                                        --     typesoulsettings.functions.teleport(v.HumanoidRootPart, typesoulsettings.tweenspeed) --150)
+                                        --     dist = checkdist(45,v.PrimaryPart)
+                                        -- end
+                                        if getstatus() == 'gripping' then canAttack = false end;
+                                        if canAttack == true then 
+                                            -- m1
+                                            if typesoulsettings.autom1 then 
+                                                task.delay(0.1,function()
+                                                    typesoulsettings.functions.m1() -- autom1
+                                                end)
+                                            end;  
+                                            if typesoulsettings.autom2 then 
+                                                task.delay(0.1,function()
+                                                    typesoulsettings.functions.m2() -- autom1
+                                                end)
+                                            end;  
+                                            if typesoulsettings.autouseskills and type(typesoulsettings.useskillselect) == 'table' then 
+                                                for i,v in next, typesoulsettings.useskillselect do 
+                                                    local ohString1 = "Skill"
+                                                    local ohString2 = tostring(v)
+                                                    local ohString3 = "Pressed"
+                                                
+                                                    game:GetService("ReplicatedStorage").Remotes.ServerCombatHandler:FireServer(ohString1, ohString2, ohString3)
+                                                end;
+                                            end;
+                                        end
+                                    until typesoulsettings.autofarm == false or holdfolder[v.Name] == true or not v or v == nil or getstatus() == 'idle' or getstatus() == 'gripping' or v.Parent == nil or v:FindFirstChildWhichIsA('Humanoid').Health <= 0 or bothdead == true
+                                    print('shouldve broken')
+                                    
+                                    if v:FindFirstChildWhichIsA('Humanoid').Health == 1 and made1godead == true then -- typesoulsettings.autogrip only players
+                                        if gripped == false then 
+                                            gripped = nil;
+                                        elseif gripped == nil then 
+                                            gripped = true;
+                                        end;
+                                        rootPart.CFrame = v.HumanoidRootPart.CFrame 
+                                        repeat 
+                                            task.wait(1) 
+                                            if azfake:returndata().character.Humanoid.WalkSpeed ~= 0 then 
+                                                azfake:returndata().character.CharacterHandler.Remotes.Execute:FireServer()
+                                            end
+                                            task.wait(2)
+                                        until azfake:returndata().character.Humanoid.WalkSpeed == 0
+                                        print('MID GRIP')
+                                        repeat 
+                                            task.wait(1) 
+                                        until azfake:returndata().character.Humanoid.WalkSpeed ~= 0
+                                        print('FINISHED GRIP')
+                                        if gripped == true then 
+                                            setstatus('idle')
+                                            isfarming = false;
+                                            made1godead = false;
+                                            gripped = false;
                                         else
-                                            rootPart.CFrame = v.HumanoidRootPart.CFrame * cframecheck;
+                                            isfarming = false;
+                                            setstatus('idle')
                                         end;
                                     else
-                                        typesoulsettings.functions.teleport(v.HumanoidRootPart, 150)
+                                        setstatus('idle')
+                                        isfarming = false;
+                                        print('WASNT A HUMANOID MOB')
+                                        if made1godead ~= nil then 
+                                            made1godead = false;
+                                            gripped = false;
+                                        end
                                     end
-                                    if getstatus() == 'gripping' then canAttack = false end;
-                                    if canAttack == true then 
-                                        -- m1
-                                        if typesoulsettings.autom1 then 
-                                            task.delay(0.1,function()
-                                                typesoulsettings.functions.m1() -- autom1
-                                            end)
-                                        end;  
-                                        if typesoulsettings.autom2 then 
-                                            task.delay(0.1,function()
-                                                typesoulsettings.functions.m2() -- autom1
-                                            end)
-                                        end;  
-                                        if typesoulsettings.autouseskills then 
-                                            for i,v in next, typesoulsettings.useskillselect do 
-                                                local ohString1 = "Skill"
-                                                local ohString2 = tostring(v)
-                                                local ohString3 = "Pressed"
-                                            
-                                                game:GetService("ReplicatedStorage").Remotes.ServerCombatHandler:FireServer(ohString1, ohString2, ohString3)
-                                            end;
-                                        end;
-                                    end
+                                    
+                                    
+                                    -- if typesoulsettings.autogrip and bothdead and v then  -- and not getstatus('gripping')        v:FindFirstChildWhichIsA('Humanoid').Health == 1 and 
+                                    --     if getstatus() ~= 'gripping' then 
+                                    --         setstatus('gripping')
+                                    --         rootPart.CFrame = v.HumanoidRootPart.CFrame 
+                                    --         canAttack = false;
+                                    --         task.spawn(function()
+                                    --             repeat 
+                                    --                 task.wait(0.5)
+                                    --             until not v
+                                    --             if grip2 < 3 then grip2 += 1 end;
+                                    --         end)
+                                    --         repeat 
+                                    --             task.wait(1) 
+                                    --             if azfake:returndata().character.Humanoid.WalkSpeed ~= 0 then 
+                                    --                 azfake:returndata().character.CharacterHandler.Remotes.Execute:FireServer()
+                                    --             end
+                                    --             task.wait(2)
+                                    --         until azfake:returndata().character.Humanoid.WalkSpeed == 0
+                                    --         repeat 
+                                    --             task.wait(1) 
+                                    --         until azfake:returndata().character.Humanoid.WalkSpeed > 0
+                                    --         --task.wait(4)
+                                    --         print('gripping shouldve stopped')
+                                    --         setstatus('idle')
+                                    --     end
+                                    -- else
+                                    --     setstatus('idle')
+                                    --     isfarming = false;
+                                    -- end;
+                                    -- if grip2 >= 2 then 
+                                    --     print('reset with my ball sacks man')
+                                    --     isfarming = false;
+                                    --     setstatus('idle')
+                                    -- end;
                                 end;
                             end;
                         end
+                        --end)
                     else
                         local opp = workspace.Entities:FindFirstChild(typesoulsettings.selectedfarm);
                         if opp and opp.PrimaryPart then 
                             if not checkdist(30,opp.PrimaryPart) then 
                                 repeat 
                                     task.wait(1) 
-                                    typesoulsettings.functions.teleport(opp.PrimaryPart, 150)
+                                    typesoulsettings.functions.teleport(opp.PrimaryPart, typesoulsettings.tweenspeed) --150)
                                 until not opp or checkdist(30,opp.PrimaryPart)
                             end
                             rootPart.CFrame = opp.HumanoidRootPart.CFrame * cframecheck;
@@ -39526,9 +39880,9 @@ elseif universeid == 4871329703 then -- type soul
             end
             if typesoulsettings.autoequipweapon == true and azfake:returndata().character then 
                 pcall(function()
-                    if azfake:returndata().character["Right Arm"].Handle.Part1 == nil then 
+                    if azfake:returndata().character["Right Arm"].Handle.Part1 == nil and azfake:returndata().character:FindFirstChild('Right Arm') then 
                         task.delay(0.1,function()
-                            if azfake:returndata().character["Right Arm"].Handle.Part1 == nil then 
+                            if azfake:returndata().character:FindFirstChild('Right Arm') and azfake:returndata().character["Right Arm"].Handle.Part1 == nil then 
                                 azfake:returndata().character.CharacterHandler.Remotes.Weapon:FireServer()
                             end
                         end)
@@ -39547,6 +39901,506 @@ elseif universeid == 4871329703 then -- type soul
             end;
         end
     end)
+elseif universeid == 3734304510 then  -- south bronx
+    local tab = window:CreateTab(gameName)
+    local esptab = window:CreateTab('ESP')
+    local sector = tab:CreateSector('Cheats','left')
+    local leftsect = tab:CreateSector('Cheats','left')
+    local rightsector = tab:CreateSector('Cheats','right')
+    local espsector = esptab:CreateSector('Cheats','left')
+
+    getgenv().southbroxsettings = {
+        boxfarm = false;
+        oneshotkill = false;
+        headhitbox = false;
+        hitx = 0;
+        hity = 0;
+        hitz = 0;
+        playerespcolor = Color3.fromRGB(255,255,255);
+        playeresp = false;
+        playerespdistance = 2000;
+        npcespcolor = Color3.fromRGB(255,255,255);
+        npcesp = false;
+        npcespdistance = 2000;
+        atmesp = false;
+        atmespcolor = Color3.fromRGB(255,255,255);
+        atmespdistance = 2000;
+        atmespdisablecolor = Color3.fromRGB(255,255,255);
+        silentaim = false;
+        cardfarm = false;
+        safefarm = false;
+    }
+    setupAimbotTab(getgenv().southbroxsettings)
+    
+    --AddConfigurations()
+    sharedRequires['CreateFlySystem'](rightsector, southbroxsettings)
+    sharedRequires['CreateWalkSpeedSystem'](rightsector, southbroxsettings)
+    sharedRequires['CreateNoclip'](rightsector, southbroxsettings)
+
+    local function sethitbox() -- upd
+        for i,v in next, game.Players:GetPlayers() do 
+            if v ~= game.Players.LocalPlayer and v.Character then 
+                if southbroxsettings.headhitbox then -- oneshotkill
+                    --v.Character.Head.Size = Vector3.new(southbroxsettings.hitx,southbroxsettings.hity,southbroxsettings.hitz)
+                else
+                    --v.Character.Head.Size = Vector3.new(1.1542654037475586, 1.1710413694381714, 1.1542654037475586)
+                end;
+            end;
+        end;
+    end
+
+    sector:AddButton('Rejoin',function()
+        game:GetService('TeleportService'):teleport(game.PlaceId)
+    end)
+
+    --sector:AddButton('Anti Cheat Bypass',function()
+    
+    --end);
+    sector:AddToggle('One Shot Gun', false, function(e)
+        southbroxsettings.oneshotkill = e;
+    end);
+    sector:AddSeperator('-')
+    sector:AddToggle('Custom Head Hitbox', false, function(e)
+        southbroxsettings.headhitbox = e;
+        sethitbox()
+    end);
+    sector:AddSlider("Hitbox X", 0, 0, 40, 1, function(State)
+        southbroxsettings.hitx = State -- deepwtykensettings  typesoulsettings
+        sethitbox()
+    end)
+    sector:AddSlider("Hitbox Y", 0, 0, 40, 1, function(State)
+        southbroxsettings.hity = State -- deepwtykensettings  typesoulsettings
+        sethitbox()
+    end)
+    sector:AddSlider("Hitbox Z", 0, 0, 40, 1, function(State)
+        southbroxsettings.hitz = State -- deepwtykensettings  typesoulsettings
+        sethitbox()
+    end)
+
+    sector:AddSeperator('-')
+    sector:AddLabel('Goto Boxes before Use')
+    sector:AddToggle('Box Farm', false, function(e)
+        southbroxsettings.boxfarm = e;
+        if not e then return end;
+        local function jobfunct()
+            game:GetService("ReplicatedStorage").RemoteEvents.FetchGUI:FireServer('Box Job')
+        end;  
+        signals.conceal(function()
+            while task.wait() do 
+                local root = azfake:returndata().humanoidrootpart
+                if getgenv().loopsUnload == true or southbroxsettings.boxfarm == false then print('south bronx farm break end') break end;
+                print('starting')
+                task.wait(.3)
+                jobfunct()                 
+                local newargs = {
+                    CFrame.new(-551.3541870117188,3.5371456146240234,-83.16889953613281);
+                    CFrame.new(-546.5244140625,3.5371460914611816,-83.23412322998047);
+                    CFrame.new(-538.115234375,3.72835111618042,-83.00000762939453);
+                    CFrame.new(-531.1220703125,3.4735217094421387,-82.80518341064453);
+                    CFrame.new(-522.7515869140625,3.4121322631835938,-82.6013412475586);
+                    CFrame.new(-516.1234130859375,3.4121322631835938,-82.47898864746094);
+                    CFrame.new(-508.5804748535156,3.4121322631835938,-82.33951568603516);
+                    CFrame.new(-500.9989929199219,3.4121322631835938,-82.19927215576172);
+                    CFrame.new(-492.8343200683594,3.4121322631835938,-82.0482406616211);
+                    CFrame.new(-486.2525939941406,3.4121322631835938,-81.9264907836914);
+                    CFrame.new(-480.1707458496094,3.4121322631835938,-81.8139877319336);
+                    CFrame.new(-473.3390808105469,3.4121322631835938,-81.68761444091797);
+                    CFrame.new(-467.1322937011719,3.4121322631835938,-81.57279968261719);
+                    CFrame.new(-459.9673767089844,3.4121322631835938,-81.44026184082031);
+                    CFrame.new(-453.3022766113281,3.7371323108673096,-81.32750701904297);
+                    CFrame.new(-446.3456726074219,3.5898265838623047,-81.22049713134766);
+                    CFrame.new(-439.3890380859375,3.4121932983398438,-81.11347198486328);
+                    CFrame.new(-432.2657775878906,3.4121932983398438,-81.0038833618164);
+                    CFrame.new(-425.55908203125,3.4121932983398438,-80.90070343017578);
+                    CFrame.new(-418.4358215332031,3.4121932983398438,-80.7911148071289);
+                    CFrame.new(-411.5208435058594,3.4121932983398438,-80.68473052978516);
+                    CFrame.new(-406.4444580078125,3.411583423614502,-80.25312805175781);
+                    CFrame.new(-401.73095703125,3.4121766090393066,-76.04637908935547);
+                    CFrame.new(-401.2643127441406,3.4121928215026855,-73.4693603515625);
+                    CFrame.new(-401.2643127441406,3.4121928215026855,-73.4693603515625);
+                }
+                local inputManager = game:GetService('VirtualInputManager')  
+                local changed = false
+                for i,v in next, newargs do 
+                    if getgenv().loopsUnload == true or southbroxsettings.boxfarm == false then print('south bronx farm break end') break end;
+                    changed = false;
+                    root.CFrame = v
+                    if i > 3 then 
+                        task.spawn(function()
+                            repeat task.wait()
+                                workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p, workspace.cratetruck2.Model.ClickBox.Position)
+                            until changed == true
+                        end)
+                    else
+                        workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p, workspace.PlaceHere.Position)
+                    end
+                    --
+                    task.wait(.275)
+                    if i == 1 then 
+                        task.wait(.1)
+                        fireproximityprompt(workspace.PlaceHere.Attachment.ProximityPrompt)
+                    end
+                    pcall(function()
+                        game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:FindFirstChild('Crate'))
+                    end)
+                    if i == #newargs then 
+                        print('ended')
+                        inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
+                        task.wait(.03)
+                        inputManager:SendKeyEvent(false,Enum.KeyCode.W,false,game)
+                        task.wait(0.3)
+                        fireproximityprompt(workspace.cratetruck2.Model.ClickBox.ProximityPrompt)
+                    end
+                    changed = true
+                end;
+                task.wait(.3)
+                jobfunct()
+                print('tping back to')
+                for i,v in next, newargs do 
+                    if getgenv().loopsUnload == true or southbroxsettings.boxfarm == false then print('south bronx farm break end') break end;
+                    pcall(function()
+                        local num = #newargs;
+                        num = num - i
+                        root.CFrame = newargs[num]
+                        task.wait(.275)
+                    end)
+                end;
+                print('claiming')
+                task.wait(0.15)
+            end
+        end);
+    end);
+    sector:AddToggle('Safe Card Farm', false, function(e)
+        southbroxsettings.safefarm = e;
+    end)
+    sector:AddToggle('Card Farm', false, function(e)
+        southbroxsettings.cardfarm = e;
+        --game.Players.LocalPlayer.Character.PrimaryPart.Anchored = e;
+        if not e then return end;
+        game.Players.LocalPlayer.Character.PrimaryPart.CFrame *= CFrame.new(0,-12,0)
+        task.spawn(function()
+            local function tweento(b,g)
+                local root = game.Players.LocalPlayer.Character.PrimaryPart
+                local timing = (b.Position - root.Position).Magnitude / 37
+                timing += 1
+                if g then timing += g end
+                local t = game.TweenService:Create(root,TweenInfo.new(timing,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = b}); t:Play()
+                task.wait(timing+0.01)
+                --repeat task.wait() until t.Completed
+                print('done tween')
+            end;
+            local function createPlatform()
+                local part = Instance.new('Part'); part.Size = Vector3.new(5,1,5);part.Transparency = 0.5
+                part.Parent = workspace; part.Name = 'myplatform';part.Anchored = true
+            end
+            
+            local function setPlatform(cfr)
+                if workspace:FindFirstChild('myplatform') then 
+                    workspace:FindFirstChild('myplatform').CFrame = cfr.CFrame * CFrame.new(0,-3.9,0)
+                else
+                    createPlatform()
+                    workspace:WaitForChild('myplatform').CFrame = cfr.CFrame * CFrame.new(0,-3.9,0)
+                end
+            end
+            game.Players.LocalPlayer.PlayerGui.ChildAdded:Connect(function(x)
+                if x.Name == 'ATM' then 
+                    x:FindFirstChildOfClass('Frame').Size = UDim2.new(1,0,1,0)
+                    x:FindFirstChildOfClass('Frame').Swipe.Size = UDim2.new(1,0,1,0)
+                    x:FindFirstChildOfClass('Frame').Swipe.Position = UDim2.new(0,0,0,0)
+                    x:FindFirstChildOfClass('Frame').Swipe.ZIndex = 5
+                    x:FindFirstChildOfClass('Frame').Position = UDim2.new(0,0,0,0)
+                end
+            end)
+            signals.conceal(function()
+                while task.wait(0) do 
+                    if getgenv().loopsUnload == true or southbroxsettings.cardfarm == false then  break end;
+                    setPlatform(azfake:returndata().humanoidrootpart)
+                    if game.Players.LocalPlayer.Character.Humanoid.Sit == true then 
+                        game.Players.LocalPlayer.Character.Humanoid.Sit = false
+                    end
+                end;
+            end)
+            local function checkdist(cf)
+                return (cf.Position - azfake:returndata().humanoidrootpart.Position).Magnitude < 8
+            end
+            while task.wait() do 
+                if getgenv().loopsUnload == true or southbroxsettings.cardfarm == false then  break end;
+                --Daler
+                --if azfake:returndata().character.Humanoid.FloorMaterial == Enum.Material.Air then 
+                    --setPlatform(root)
+                --end
+                local DealerCFrame = CFrame.new(217.7833709716797,3.7371320724487305,-334.5723876953125);
+                local bankNPCcFRAME = CFrame.new(-49.11941146850586,3.7371387481689453,-322.2247619628906);
+                local checkCardCFrame = CFrame.new(-42.873199462890625,3.7371387481689453,-331.6510925292969);
+                if southbroxsettings.safefarm then 
+                    DealerCFrame *= CFrame.new(0,-5,0)
+                    bankNPCcFRAME *= CFrame.new(0,-5,0)
+                    bankNPCcFRAME *= CFrame.new(0,-5,0)
+                end
+                if not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
+                    repeat 
+                        task.wait(1)
+                        tweento(DealerCFrame, 4)
+                    until checkdist(DealerCFrame)
+
+                    fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
+                    game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Fake ID'))
+                end
+
+                if southbroxsettings.safefarm then 
+                   -- tweento(DealerCFrame, -1)
+                   -- fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
+                   -- task.wait(0.1)
+                   -- tweento(DealerCFrame, -1)
+                end;
+
+                if game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
+                    game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Fake ID'))
+                end
+                tweento(bankNPCcFRAME) --DealerbankNPCcFRAMEFram)
+                fireproximityprompt(workspace.NPCs["Bank Teller"].UpperTorso.Attachment.ProximityPrompt)
+                repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextTransparency < 0.4
+                task.wait(0.5)
+                local checkingText = game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning --Frame
+                local CompletedMessage = 'Your application was successful. Please allow 30 seconds for the bank to prepare your card.'
+                if checkingText.Text:find('was successful.') then 
+                    print('[card application was a success]')
+                    print('[tweening to nearest atm]')
+                    tweento(checkCardCFrame)
+                    task.wait(30.5)
+                    fireproximityprompt(workspace.Blank.Attachment.ProximityPrompt)
+                    local atm = nil;
+                    local atmdsist = nil;
+                    for i,v in next, workspace.ATMS:GetChildren() do 
+                        if v.ATMScreen.Transparency == 0 then 
+                            local dist = (v.Position - game.Players.LocalPlayer.Character.PrimaryPart.Position).Magnitude;
+                            if atm == nil then 
+                                atm = v;
+                                atmdsist = dist--(atm.Position - game.Players.LocalPlayer.Character.PrimaryPart.Position).Magnitude;
+                            elseif atmdsist > dist then 
+                                atm = v;
+                                atmdsist = dist
+                            end;
+                        end;
+                    end;
+                    game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Card'))
+                    if atm == nil then return print('[THERE WERE NO ATMS]') end;
+                    local inputManager = game.VirtualInputManager
+                    tweento(atm.CFrame, 2)
+                    inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
+                    task.wait(.03)
+                    inputManager:SendKeyEvent(false,Enum.KeyCode.W,false,game)
+                    task.wait(0.3)
+                    fireproximityprompt(atm.Attachment.ProximityPrompt)
+                    task.wait(1)
+                    local inputManager = game:GetService('VirtualInputManager')
+                    local m = game.Players.LocalPlayer:GetMouse()
+                    inputManager:SendMouseButtonEvent(m.X,m.Y,0,true,game,0) -- 1319,574
+                    task.wait(0.1)
+                    inputManager:SendMouseButtonEvent(m.X,m.Y,0,false,game,0)
+                    task.wait(2)
+                else
+                    print('[application not successful]')
+                end;
+            end;
+        end);
+    end)
+
+    leftsect:AddButton('Infinite Ammo', function()
+        local getunf = nil;
+        for index,funct in next, getgc() do 
+            if type(funct) == 'function' and getinfo(funct).source:find('Gun')  then
+                warn(getinfo(funct).name)
+                if getinfo(funct).name == 'Reload' then 
+                    print('got reload funct')
+                    getunf = funct
+                end;
+                for i,v in next, debug.getupvalues(funct) do 
+                    print(i,v)
+                end
+            end
+        end
+        
+        debug.setupvalue(getunf,3,math.huge)
+        debug.setupvalue(getunf,5,math.huge)
+        debug.setupvalue(getunf,6,math.huge)
+        azfakenotify('Reload Gun.',3)
+    end);
+    leftsect:AddButton('Silent Aim', false, function(e)
+        southbroxsettings.silentaim = e;
+    end);
+
+    local function rayEsp(t)
+        -- could set the global esp[flag] = {}
+        local child = t.child
+        local flag = t.flag
+        local distcap = t.maxdist
+        local color = t.color
+        local nobox = t.nobox or false;
+        local notracer = t.notracer or false; -- notraceror notraror notraacer
+        local givenaname = t.name -- supposed to be given name
+        local activet = t.active
+        local disableremove = t.removeondisable
+        local pivoting = t.usepivot
+        local selfname = t.selfname
+        local b = esp_lib:Add(child, {
+            SelfName = selfname;
+            IsEnabled = flag;
+            flag = flag;
+            tag = flag;
+            maxdistance = distcap;
+            Color = t.color;
+            NoTracer = notracer;
+            NoBox = nobox;
+            Name = givenaname;
+            active = activet;
+            removeondisable = disableremove;
+            usepivot = pivoting;
+        });
+        return b
+    end
+
+    espsector:AddToggle('Use Names', false, function(xstate)
+        southbroxsettings.espnames = xstate;
+        esp_lib.Names = xstate
+    end)
+    espsector:AddToggle('Use Boxes', false, function(xstate)
+        southbroxsettings.boxesp = xstate;
+        esp_lib.Boxes = xstate
+    end)
+    espsector:AddToggle('Use Tracers', false, function(xstate)
+        southbroxsettings.tracers = xstate;
+        esp_lib.Tracers = xstate
+    end)
+    espsector:AddToggle('Player Esp', false, function(xstate)
+        southbroxsettings.playeresp = xstate;
+        esp_lib.Players = xstate
+    end)
+    espsector:AddColorpicker('Player Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        southbroxsettings['playerespcolor'] = ztx
+        esp_lib.Settings.playerespcolor = southbroxsettings.playerespcolor
+    end)
+    espsector:AddSlider("Player Esp Range", 0, 200, 5000, 1, function(State)
+        southbroxsettings['playerespdistance'] = State
+        esp_lib.Settings.playerespdistance = southbroxsettings.playerespdistance
+    end)
+
+    espsector:AddToggle('NPC Esp',false,function(e)
+        southbroxsettings.npcesp = e;
+        if not e then return end;
+        for i,v in next, workspace.NPCs:GetChildren() do -- workspace.MissionBoards:GetChildren()  
+            rayEsp{
+                child = v;
+                Name = function()
+                    return v.Name 
+                end;
+                flag = 'npc'; -- npctag npcflag
+                maxdist = function()
+                    return southbroxsettings.npcespdistance
+                end,
+                color = function()
+                    return southbroxsettings.npcespcolor
+                end,
+                active = function()
+                    return southbroxsettings.npcesp
+                end;
+                nobox = true;
+                notracer = true;
+                removeondisable = true;
+            }
+        end
+    end)
+    espsector:AddColorpicker('NPC Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        southbroxsettings['npcespcolor'] = ztx
+    end)
+    espsector:AddSlider("NPC Esp Range", 0, 200, 5000, 1, function(State)
+        southbroxsettings['npcespdistance'] = State
+    end)
+    espsector:AddToggle('ATM Esp',false,function(e)
+        southbroxsettings.atmesp = e;
+        if not e then return end;
+        for i,v in next, workspace.ATMS:GetChildren() do -- workspace.MissionBoards:GetChildren()  
+            rayEsp{
+                child = v; -- Color == Color3.fromRGB(248, 248, 248) 
+                Name = function()
+                    return v.ATMScreen.Transparency == 0 and 'AVAILABLE ATM' or 'NOT AVAILABLE ATM'
+                end;
+                flag = 'atm'; -- npctag npcflag
+                maxdist = function()
+                    return southbroxsettings.atmespdistance
+                end,
+                color = function()
+                    return v.ATMScreen.Transparency == 0 and southbroxsettings.atmespcolor or southbroxsettings.atmespdisablecolor --southbroxsettings.npcespcolor
+                end,
+                active = function()
+                    return southbroxsettings.atmesp
+                end;
+                nobox = true;
+                notracer = true;
+                removeondisable = true;
+            }
+        end
+    end)
+    espsector:AddColorpicker('ATM Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        southbroxsettings['atmespcolor'] = ztx
+    end)
+    espsector:AddColorpicker('ATM Disabled Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        southbroxsettings['atmespdisablecolor'] = ztx
+    end)
+    espsector:AddSlider("ATM Esp Range", 0, 200, 5000, 1, function(State)
+        southbroxsettings['atmespdistance'] = State
+    end)
+
+    local function getclosetomouse(originalargs)
+        local wasclose = nil;
+        local closedist = nil;
+        for i,v in next, game.Players:GetPlayers() do 
+            if v ~= game.Players.LocalPlayer and v.Character then 
+                local mouseget = game.Players.LocalPlayer:GetMouse().hit.p 
+                local dist = (mouseget - v.Character.PrimaryPart.Position)
+                if dist.Magnitude < 15 then 
+                    if wasclose == nil then 
+                        wasclose = v;
+                        closedist = dist;
+                    else
+                        if closedist > dist then 
+                            wasclose = v;
+                            closedist = dist;
+                        end
+                    end
+                end
+            end
+        end;    
+        return {closest = wasclose}
+    end;
+
+    --setupEspTab(getgenv().southbroxsettings)
+    AddConfigurations()
+
+    local metahook;
+    metahook = hookmetamethod(game,'__namecall',function(self,...)
+        local args = {...}
+        local call_type = getnamecallmethod();
+    
+        if call_type == 'Kick' then 
+            warn('Attempted to kick')
+            return task.wait(math.huge)
+        elseif call_type == 'FireServer' and tostring(self) == 'InflictTarget' and southbroxsettings.oneshotkill  then 
+            args[5] = 100
+            return metahook(self,unpack(args))
+        elseif call_type == 'FireServer' and tostring(self) == 'VisualiseBullet' and southbroxsettings.silentaim  then 
+            args[9][11] = Vector3.new(5,5,5)
+        else
+            return metahook(self,...)
+        end
+        return metahook(self,...)
+    end)
+
+    task.spawn(function()
+    
+    end)
+
+
 else
 
     -- PlayerExperience
