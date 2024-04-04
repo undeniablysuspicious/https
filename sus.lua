@@ -7217,6 +7217,7 @@ function signals.conceal(f)
     end)
 end
 
+-- signals.new()
 -- print bad if no good
 
 local Mouse = game.Players.LocalPlayer:GetMouse()
@@ -7624,6 +7625,39 @@ sharedRequires['smartlog'] = function(...)
     end)
     return print(...)
 end
+
+function signals.new(f)
+    local random = Random.new()
+    local letters = {'1','2','3','4','5','6','7','8','9','0','a','b','c','d','e','f','g','h','i','j','k4','l','m','n','o','p4','q','r','s','t','u','v4','w','x','y','z','gej0h','hrhw1','ewh2','gew3','ffs4','gh5','w6','f7r','ff8','e9r','h','br'}
+    function getRandomLetter()
+        return letters[random:NextInteger(1,#letters)]
+    end
+    function getRandomString(length, includeCapitals)
+        local length = length or 10
+        local str = ''
+        for i=1,length do
+            local randomLetter = getRandomLetter()
+            if includeCapitals and random:NextNumber() > .5 then
+                pcall(function()
+                    randomLetter = string.upper(randomLetter)
+                end)
+            end
+            str = str .. randomLetter
+        end
+        return str
+    end
+    local RANDOMSTRING = getRandomString(20,true)
+    local DATA = {}
+    DATA.TIMETAKEN = os.time()
+    DATA.func = f;
+    DATA.hash = RANDOMSTRING
+    sharedRequires[RANDOMSTRING] = DATA;
+    if vs then print('setup table, '..RANDOMSTRING) end;
+    return DATA
+end;
+-- local storefunction = signals.new(os.time()); storefunction.funct()
+
+getgenv().__shared = sharedRequires
 
 local IsFriendWith = LocalPlayer.IsFriendsWith;
 	
@@ -38575,6 +38609,47 @@ elseif universeid == 4871329703 then -- type soul
     esp_lib.Settings.usecustomespcolor = true;
     esp_lib:Toggle(true)
 
+    local RaidJoin = signals.new(function()
+        local gameIDS = {}
+        gameIDS[14069122388] = "Hueco Mundo"
+        gameIDS[14069678431] = "Karakura Town"
+        gameIDS[14069956183] = "Rukon District"
+        gameIDS[14070029709] = "Soul Society"
+        gameIDS[14069866342] = "Las Noches"
+        gameIDS[14071822972] = "Wandenreich City"
+        local GameName = ''
+        for i,v in next, gameIDS do 
+            if i == game.PlaceId then 
+                print('found game id')
+                GameName = v
+            end;
+        end;
+        print(GameName)
+        local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer(GameName)
+        local foundTP = nil;
+        local statusafter = 'No Servers Avaiable'
+        for i,jobIdTable in next, GetTable do 
+            local shouldbreak = false
+            if foundTP then break end;
+            for ind,val in next, jobIdTable do
+                --print(ind,val)
+                --if foundTP then break end;
+                if ind == 'Raid' and val == true and jobIdTable['ServerPlayers'] <= 29 then 
+                    print(jobIdTable['ServerPlayers'])
+                    statusafter = 'Joining Server With '..tostring(jobIdTable['ServerPlayers'])
+                    foundTP = jobIdTable['JobID']
+                    shouldbreak = true
+                    pcall(function()
+                        game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(GameName,foundTP)
+                    end)
+                    task.wait(3)
+                end
+            end
+        end
+        return statusafter
+    end)
+    local RAIDFUNCTIONHASH = RaidJoin.hash
+
 
     getgenv().typesoulsettings = {
         functions = {};
@@ -38990,15 +39065,55 @@ elseif universeid == 4871329703 then -- type soul
             azfake:returndata().character:FindFirstChild('Head'):Destroy();
         end;
     end)
-
-    lefttab:AddToggle('Auto Flashstep', false, function(e)
-        typesoulsettings.autoflashstep = e;
+    lefttab:AddButton('Join Raid Server', function()
+        if not azfake:returndata().character then return end;
+        print('raid func hash '..RaidJoin.hash)
+        local raidresult = RaidJoin.func()
+        azfakenotify(statusafter,3)
+    end)
+    lefttab:AddToggle('Auto Join Raid', false, function(e)
+        typesoulsettings.autojoinraid = e;
         if not e then 
-            maid.autoflashstep = nil;
+            maid.autojoinraid = nil;
             return;
         end;
-        maid.autoflashstep = signals.heartbeat:connect("omega flashy", function()
-            typesoulsettings.functions.flashstep()
+        maid.autojoinraid = signals.heartbeat:connect("auto join raids", function()
+            task.wait()
+            local gameIDS = {}
+            gameIDS[14069122388] = "Hueco Mundo"
+            gameIDS[14069678431] = "Karakura Town"
+            gameIDS[14069956183] = "Rukon District"
+            gameIDS[14070029709] = "Soul Society"
+            gameIDS[14069866342] = "Las Noches"
+            gameIDS[14071822972] = "Wandenreich City"
+            local GameName = ''
+            for i,v in next, gameIDS do 
+                if i == game.PlaceId then 
+                    print('found game id')
+                    GameName = v
+                end;
+            end;
+            local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer(GameName)
+            local foundTP = nil;
+            local statusafter = 'No Servers Avaiable'
+            for i,jobIdTable in next, GetTable do 
+                local shouldbreak = false
+                if foundTP then break end;
+                for ind,val in next, jobIdTable do
+                    --print(ind,val)
+                    --if foundTP then break end;
+                    if ind == 'Raid' and val == true and jobIdTable['ServerPlayers'] <= 29 then 
+                        print(jobIdTable['ServerPlayers'])
+                        statusafter = 'Joining Server With '..tostring(jobIdTable['ServerPlayers'])
+                        foundTP = jobIdTable['JobID']
+                        shouldbreak = true
+                        pcall(function()
+                            game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(GameName,foundTP)
+                        end)
+                        task.wait(3)
+                    end
+                end
+            end
         end)
     end)
     lefttab:AddToggle('Lootbox Non-Blatant', false, function(e)
@@ -39066,6 +39181,18 @@ elseif universeid == 4871329703 then -- type soul
             end);
         end);
     end)
+    lefttab:AddSeperator('-')
+    lefttab:AddToggle('Auto Flashstep', false, function(e)
+        typesoulsettings.autoflashstep = e;
+        if not e then 
+            maid.autoflashstep = nil;
+            return;
+        end;
+        maid.autoflashstep = signals.heartbeat:connect("omega flashy", function()
+            typesoulsettings.functions.flashstep()
+        end)
+    end)
+    lefttab:AddSeperator('Streamer Mode Settings')
     lefttab:AddToggle('Child Gamer Mode', false, function(e)
         typesoulsettings.childgamermode = e;
     end)
