@@ -40251,14 +40251,15 @@ elseif universeid == 3734304510 then  -- south bronx
     local leftsect = tab:CreateSector('Cheats','left')
     local rightsector = tab:CreateSector('Cheats','right')
     local espsector = esptab:CreateSector('Cheats','left')
+    esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
 
     getgenv().southbroxsettings = {
         boxfarm = false;
         oneshotkill = false;
         headhitbox = false;
-        hitx = 0;
-        hity = 0;
-        hitz = 0;
+        hitx = 2;
+        hity = 2;
+        hitz = 2;
         playerespcolor = Color3.fromRGB(255,255,255);
         playeresp = false;
         playerespdistance = 2000;
@@ -40284,9 +40285,11 @@ elseif universeid == 3734304510 then  -- south bronx
         for i,v in next, game.Players:GetPlayers() do 
             if v ~= game.Players.LocalPlayer and v.Character then 
                 if southbroxsettings.headhitbox then -- oneshotkill
-                    --v.Character.Head.Size = Vector3.new(southbroxsettings.hitx,southbroxsettings.hity,southbroxsettings.hitz)
+                    v.Character.Head.Size = Vector3.new(southbroxsettings.hitx,southbroxsettings.hity,southbroxsettings.hitz)
+                    v.Character.Head.OriginalSize.Value = Vector3.new(southbroxsettings.hitx,southbroxsettings.hity,southbroxsettings.hitz)
                 else
-                    --v.Character.Head.Size = Vector3.new(1.1542654037475586, 1.1710413694381714, 1.1542654037475586)
+                    v.Character.Head.Size = Vector3.new(1.1542654037475586, 1.1710413694381714, 1.1542654037475586)
+                    v.Head.OriginalSize.Value = Vector3.new(1.1542654037475586, 1.1710413694381714, 1.1542654037475586)
                 end;
             end;
         end;
@@ -40307,18 +40310,18 @@ elseif universeid == 3734304510 then  -- south bronx
         southbroxsettings.headhitbox = e;
         sethitbox()
     end);
-    sector:AddSlider("Hitbox X", 0, 0, 40, 1, function(State)
-        southbroxsettings.hitx = State -- deepwtykensettings  typesoulsettings
-        sethitbox()
-    end)
-    sector:AddSlider("Hitbox Y", 0, 0, 40, 1, function(State)
-        southbroxsettings.hity = State -- deepwtykensettings  typesoulsettings
-        sethitbox()
-    end)
-    sector:AddSlider("Hitbox Z", 0, 0, 40, 1, function(State)
-        southbroxsettings.hitz = State -- deepwtykensettings  typesoulsettings
-        sethitbox()
-    end)
+    -- sector:AddSlider("Hitbox X", 0, 0, 40, 1, function(State)
+    --     southbroxsettings.hitx = State -- deepwtykensettings  typesoulsettings
+    --     sethitbox()
+    -- end)
+    -- sector:AddSlider("Hitbox Y", 0, 0, 40, 1, function(State)
+    --     southbroxsettings.hity = State -- deepwtykensettings  typesoulsettings
+    --     sethitbox()
+    -- end)
+    -- sector:AddSlider("Hitbox Z", 0, 0, 40, 1, function(State)
+    --     southbroxsettings.hitz = State -- deepwtykensettings  typesoulsettings
+    --     sethitbox()
+    -- end)
 
     sector:AddSeperator('-')
     sector:AddLabel('Goto Boxes before Use')
@@ -40433,7 +40436,7 @@ elseif universeid == 3734304510 then  -- south bronx
                 print('done tween')
             end;
             local function createPlatform()
-                local part = Instance.new('Part'); part.Size = Vector3.new(5,1,5);part.Transparency = 0.5
+                local part = Instance.new('Part'); part.Size = Vector3.new(15,1,15);part.Transparency = 0.5
                 part.Parent = workspace; part.Name = 'myplatform';part.Anchored = true
             end
             
@@ -40569,7 +40572,7 @@ elseif universeid == 3734304510 then  -- south bronx
         debug.setupvalue(getunf,6,math.huge)
         azfakenotify('Reload Gun.',3)
     end);
-    leftsect:AddButton('Silent Aim', false, function(e)
+    leftsect:AddToggle('Silent Aim', false, function(e)
         southbroxsettings.silentaim = e;
     end);
 
@@ -40602,7 +40605,9 @@ elseif universeid == 3734304510 then  -- south bronx
         });
         return b
     end
-
+    espsector:AddToggle('Enable ESP', false, function(e)
+        esp_lib.Enabled = e;
+    end)
     espsector:AddToggle('Use Names', false, function(xstate)
         southbroxsettings.espnames = xstate;
         esp_lib.Names = xstate
@@ -40631,6 +40636,7 @@ elseif universeid == 3734304510 then  -- south bronx
     espsector:AddToggle('NPC Esp',false,function(e)
         southbroxsettings.npcesp = e;
         if not e then return end;
+        print('loading esp')
         for i,v in next, workspace.NPCs:GetChildren() do -- workspace.MissionBoards:GetChildren()  
             rayEsp{
                 child = v;
@@ -40662,6 +40668,7 @@ elseif universeid == 3734304510 then  -- south bronx
     espsector:AddToggle('ATM Esp',false,function(e)
         southbroxsettings.atmesp = e;
         if not e then return end;
+        print('loading esp')
         for i,v in next, workspace.ATMS:GetChildren() do -- workspace.MissionBoards:GetChildren()  
             rayEsp{
                 child = v; -- Color == Color3.fromRGB(248, 248, 248) 
@@ -40718,7 +40725,7 @@ elseif universeid == 3734304510 then  -- south bronx
     end;
 
     --setupEspTab(getgenv().southbroxsettings)
-    AddConfigurations()
+    
 
     local metahook;
     metahook = hookmetamethod(game,'__namecall',function(self,...)
@@ -40728,8 +40735,14 @@ elseif universeid == 3734304510 then  -- south bronx
         if call_type == 'Kick' then 
             warn('Attempted to kick')
             return task.wait(math.huge)
-        elseif call_type == 'FireServer' and tostring(self) == 'InflictTarget' and southbroxsettings.oneshotkill  then 
+        elseif call_type == 'FireServer' and tostring(self) == 'InflictTarget' and southbroxsettings.oneshotkill and not checkcaller()  then 
             args[5] = 100
+            args[4] = args[4].Parent.Head
+            args[8] = args[4]
+            print('spoofed and firing multiple times')
+            metahook(self,unpack(args))
+            metahook(self,unpack(args))
+            metahook(self,unpack(args))
             return metahook(self,unpack(args))
         elseif call_type == 'FireServer' and tostring(self) == 'VisualiseBullet' and southbroxsettings.silentaim  then 
             args[9][11] = Vector3.new(5,5,5)
@@ -40743,7 +40756,7 @@ elseif universeid == 3734304510 then  -- south bronx
     
     end)
 
-
+    AddConfigurations()
 else
 
     -- PlayerExperience
