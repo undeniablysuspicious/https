@@ -40487,15 +40487,17 @@ elseif universeid == 3734304510 then  -- south bronx
                 local bankNPCcFRAME = CFrame.new(-49.11941146850586,3.7371387481689453,-322.2247619628906);
                 local checkCardCFrame = CFrame.new(-42.873199462890625,3.7371387481689453,-331.6510925292969);
                 if southbroxsettings.safefarm then 
-                    DealerCFrame *= CFrame.new(0,-5,0)
-                    bankNPCcFRAME *= CFrame.new(0,-5,0)
-                    checkCardCFrame *= CFrame.new(0,-5,0)
+                    DealerCFrame *= CFrame.new(0,-6,0)
+                    bankNPCcFRAME *= CFrame.new(0,-6,0)
+                    --checkCardCFrame *= CFrame.new(0,-5,0)
                 end
                 if not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
                     repeat 
                         task.wait(1)
-                        tweento(DealerCFrame, 4)
-                        fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
+                        if not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
+                            tweento(DealerCFrame, 4)
+                            fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
+                        end
                     until checkdist(DealerCFrame) and game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID')
 
                     fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
@@ -40514,12 +40516,15 @@ elseif universeid == 3734304510 then  -- south bronx
                 end
                 repeat 
                     task.wait()
-                    tweento(bankNPCcFRAME)
-                    fireproximityprompt(workspace.NPCs["Bank Teller"].UpperTorso.Attachment.ProximityPrompt)
+                    tweento(bankNPCcFRAME, 2)
+                    if game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') then 
+                        fireproximityprompt(workspace.NPCs["Bank Teller"].UpperTorso.Attachment.ProximityPrompt)
+                    end
                 until not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID')
                 --tweento(bankNPCcFRAME) --DealerbankNPCcFRAMEFram)
-                repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextTransparency < 0.4
+                repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextTransparency == 0 --and game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextColor3 ~= Color3.fromRGB(255,0,0)
                 task.wait(0.5)
+               -- task.wait(5)
                 local checkingText = game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning --Frame
                 local CompletedMessage = 'Your application was successful. Please allow 30 seconds for the bank to prepare your card.'
                 if checkingText.Text:find('was successful.') then 
