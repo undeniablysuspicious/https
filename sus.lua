@@ -40265,9 +40265,10 @@ elseif universeid == 3734304510 then  -- south bronx
         boxfarm = false;
         oneshotkill = false;
         headhitbox = false;
-        hitx = 2;
-        hity = 2;
-        hitz = 2;
+        hitx = 3;
+        hity = 3;
+        hitz = 3;
+        transparencyhitbox = 0;
         playerespcolor = Color3.fromRGB(255,255,255);
         playeresp = false;
         playerespdistance = 2000;
@@ -40281,6 +40282,17 @@ elseif universeid == 3734304510 then  -- south bronx
         silentaim = false;
         cardfarm = false;
         safefarm = false;
+        usevehicleteleport = false;
+        antijam = false; --autoslide = false;
+        nocooldownshoot = false;
+        bringall = false;
+        alwayshitheadshots = false;
+        autoloot = false;
+        autoloottp = false;
+        autobankloot = false;
+        usehighlight = false;
+        hitboxcolor = Color3.fromRGB(255,255,255);
+        outlinecolor = Color3.fromRGB(255,255,255);
     }
     setupAimbotTab(getgenv().southbroxsettings)
     
@@ -40293,11 +40305,39 @@ elseif universeid == 3734304510 then  -- south bronx
         for i,v in next, game.Players:GetPlayers() do 
             if v ~= game.Players.LocalPlayer and v.Character then 
                 if southbroxsettings.headhitbox then -- oneshotkill
-                    v.Character.Head.Size = Vector3.new(southbroxsettings.hitx,southbroxsettings.hity,southbroxsettings.hitz)
-                    v.Character.Head.OriginalSize.Value = Vector3.new(southbroxsettings.hitx,southbroxsettings.hity,southbroxsettings.hitz)
+                    if not v.Character:FindFirstChild('CustomHead') then 
+                        local headclone = v.Character.Head:Clone()
+                        headclone.Name = 'CustomHead';
+                        headclone.Parent = v.Character;
+                        for i,vr in next, headclone:GetChildren() do 
+                            if typeof(vr) ~= 'Weld' and typeof(vr) ~= 'Motor6D' then 
+                                vr:Destroy()
+                                print(vr.Name)
+                            end
+                        end
+                        local newweld = Instance.new('Motor6D',v.Character);
+                        newweld.Name = 'azfake' -- random guid
+                        newweld.Part0 = v.Character.Head;
+                        newweld.Part1 = headclone --;v.CustomHead
+                    end
+                    if southbroxsettings.usehighlight == true and not v.Character.CustomHead:FindFirstChild('Highlight') then 
+                        Instance.new('Highlight',v.Character.CustomHead)
+                    end
+                    if v.Character.CustomHead:FindFirstChild('Highlight') then 
+                        v.Character.CustomHead.Highlight.FillColor = southbroxsettings.highlightcolor
+                        v.Character.CustomHead.Highlight.OutlineColor = southbroxsettings.outlinecolor
+                        v.Character.CustomHead.Highlight.FillTransparency = southbroxsettings.transparencyhitbox 
+                    end
+                    v.Character.azfake.C0 = CFrame.new(0,southbroxsettings.hitboxoffset,0) --  v.Character.Head.CFrame *
+                    v.Character.CustomHead.Color = southbroxsettings.hitboxcolor
+                    v.Character.CustomHead.Size = Vector3.new(southbroxsettings.hitx,southbroxsettings.hity,southbroxsettings.hitz)
+                    v.Character.CustomHead.Transparency = southbroxsettings.transparencyhitbox 
+                    --v.Character.Head.OriginalSize.Value = Vector3.new(southbroxsettings.hitx,southbroxsettings.hity,southbroxsettings.hitz)
                 else
-                    v.Character.Head.Size = Vector3.new(1.1542654037475586, 1.1710413694381714, 1.1542654037475586)
-                    v.Head.OriginalSize.Value = Vector3.new(1.1542654037475586, 1.1710413694381714, 1.1542654037475586)
+                    if v.Character:FindFirstChild('CustomHead') then 
+                        v.Character.CustomHead.Size = Vector3.new(1.1542654037475586, 1.1710413694381714, 1.1542654037475586)
+                    end
+                   -- v.Head.OriginalSize.Value = Vector3.new(1.1542654037475586, 1.1710413694381714, 1.1542654037475586)
                 end;
             end;
         end;
@@ -40310,27 +40350,232 @@ elseif universeid == 3734304510 then  -- south bronx
     --sector:AddButton('Anti Cheat Bypass',function()
     
     --end);
+    local dumpfunctions = {
+        slide = nil;
+        reload = nil;
+        tactreload = nil;
+    }
+    local function dumpgunmodules()
+        for index,funct in next, getgc() do 
+            if type(funct) == 'function' and getinfo(funct).source:find('Gun') then
+                if tostring(getinfo(funct).name) == 'SlideHandler' then 
+                    dumpfunctions.slide = funct;
+                elseif tostring(getinfo(funct).name) == 'Reload' then 
+                    dumpfunctions.reload = funct
+                elseif tostring(getinfo(funct).name) == 'TacticalReload' then 
+                    dumpfunctions.tactreload = funct
+                end;
+            end
+        end
+        print('[successfully compiled]')
+    end
+    dumpgunmodules()
+
     sector:AddToggle('One Shot Gun', false, function(e)
         southbroxsettings.oneshotkill = e;
     end);
-    sector:AddSeperator('-')
+    sector:AddToggle('Anti Jam Gun', false, function(e)
+        southbroxsettings.antijam = e;
+        if not e then return end;
+        dumpgunmodules()
+        task.spawn(function()
+            repeat 
+                task.wait()
+                if dumpfunctions.slide then 
+                    debug.setupvalue(dumpfunctions.slide, 3, false)
+                    debug.setupvalue(dumpfunctions.slide, 1, false)
+                    --debug.setupvalue(dumpfunctions.slide, 4, true)
+                end
+            until 1 == 2 or not game.Players.LocalPlayer.Character
+        end)
+    end) -- ani
+    sector:AddToggle('No Cooldown Shoot',false, function(e)
+        southbroxsettings.nocooldownshoot = e;
+        if not e then return end;
+        dumpgunmodules()
+        task.spawn(function()
+            repeat 
+                task.wait()
+                if dumpfunctions.slide then 
+                    debug.setupvalue(dumpfunctions.slide, 3, true)
+                end
+                if dumpfunctions.reload then 
+                    debug.setupvalue(dumpfunctions.reload, 1, true)
+                end
+                if dumpfunctions.tactreload then 
+                    debug.setupvalue(dumpfunctions.tactreload, 1, true)
+                end
+            until 1 == 2 or not game.Players.LocalPlayer.Character
+        end)
+
+    end)
+    sector:AddToggle('Always Hit Headshot',false, function(e)
+        southbroxsettings.alwayshitheadshots = e;
+        if not e then return end;
+    end)
+    sector:AddToggle('Bring All',false, function(e)
+        southbroxsettings.bringall = e;
+        if not e then 
+            maid.ringbring = nil;
+            return
+        end;
+        maid.ringbring = signals.heartbeat:connect('bring all func',function()
+            if not azfake:returndata().humanoidrootpart then return end;
+            local rootPart = azfake:returndata().humanoidrootpart
+            for i,v in next, game.Players:GetPlayers() do 
+                if v ~= game.Players.LocalPlayer and v.Character and v.Character.PrimaryPart then 
+                    v.Character.PrimaryPart.CFrame = rootPart.CFrame * CFrame.new(0,0,-25)
+                    -- could put them in that frame that can view any 3d model
+                    -- aimbot could do that too
+                end
+            end;
+        end);
+    end)
     sector:AddToggle('Custom Head Hitbox', false, function(e)
         southbroxsettings.headhitbox = e;
         sethitbox()
     end);
-    -- sector:AddSlider("Hitbox X", 0, 0, 40, 1, function(State)
-    --     southbroxsettings.hitx = State -- deepwtykensettings  typesoulsettings
+    sector:AddSlider("Hitbox X", 0, 3, 40, 1, function(State)
+        southbroxsettings.hitx = State -- deepwtykensettings  typesoulsettings
+        sethitbox()
+    end)
+    sector:AddSlider("Hitbox Y", 0, 3, 40, 1, function(State)
+        southbroxsettings.hity = State -- deepwtykensettings  typesoulsettings
+        sethitbox()
+    end)
+    sector:AddSlider("Hitbox Z", 0, 3, 40, 1, function(State)
+        southbroxsettings.hitz = State -- deepwtykensettings  typesoulsettings
+        sethitbox()
+    end)
+    sector:AddSlider("Hitbox Transparency", 0, 0, 1, 10, function(State)
+        southbroxsettings.transparencyhitbox = State -- deepwtykensettings  typesoulsettings
+        sethitbox()
+    end)
+    sector:AddSlider("Hitbox Offset", 0, 0, 10, 1, function(State)
+        southbroxsettings.hitboxoffset = State -- deepwtykensettings  typesoulsettings
+        sethitbox()
+    end)
+    -- sector:AddToggle('Custom Hitbox Color', false, function(e)
+    --     southbroxsettings.headhitbox = e;
     --     sethitbox()
-    -- end)
-    -- sector:AddSlider("Hitbox Y", 0, 0, 40, 1, function(State)
-    --     southbroxsettings.hity = State -- deepwtykensettings  typesoulsettings
-    --     sethitbox()
-    -- end)
-    -- sector:AddSlider("Hitbox Z", 0, 0, 40, 1, function(State)
-    --     southbroxsettings.hitz = State -- deepwtykensettings  typesoulsettings
-    --     sethitbox()
-    -- end)
+    -- end);
+    sector:AddToggle('Use Highlight', false, function(e)
+        southbroxsettings.usehighlight = e;
+        sethitbox()
+    end);
+    sector:AddColorpicker('Highlight Outline Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        southbroxsettings['outlinecolor'] = ztx
+        sethitbox()
+    end)
+    sector:AddColorpicker('Highlight Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        southbroxsettings['highlightcolor'] = ztx
+        sethitbox()
+    end)
+    sector:AddColorpicker('Custom Hitbox Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        southbroxsettings['hitboxcolor'] = ztx
+        sethitbox()
+    end)
+    game.Players.PlayerAdded:Connect(function(child)
+        sethitbox()
+    end)
+    game.Players.PlayerRemoving:Connect(function(child)
+        sethitbox()
+    end)
+    sector:AddSeperator('-')
 
+    local available = {}
+    local selection = ''
+    for i,v in next, workspace:GetChildren() do 
+        if v.Name:find("'s Car") then 
+            table.insert(available,v.Name)
+        end
+    end
+    local carlist = sector:AddDropdown('Steal Available Cars', available, '', false, function(e)
+        selection = e;
+    end)
+    workspace.ChildAdded:Connect(function(child)
+        task.wait(0.5)
+        if child.Name:find("'s Car") then 
+            table.insert(available,child.Name)
+            carlist:Add(child.Name)
+        end
+    end)
+    workspace.ChildRemoved:Connect(function(child) -- child removing
+        if child.Name:find("'s Car") then 
+            carlist:Remove(child.Name)
+            for i,v in next, available do 
+                if v == child.Name then 
+                    table.remove(available,i)
+                end
+            end
+        end
+    end)
+    sector:AddButton('Steal The Car',function()
+        if selection ~= '' and workspace:FindFirstChild(selection) then 
+            azfakenotify('Teleporting to Car',3)
+            workspace:FindFirstChild(selection).DriveSeat:Sit(azfake:returndata().character.Humanoid)
+        end
+    end)
+    local teleports = {
+        'Gun Store 1';
+        'Gun Store 2';
+        'Boxes';
+        'Dealership';
+        'Apartments 1';
+        'Apartments 2';
+    }
+    local tpselection = ''
+    sector:AddDropdown('Teleports', teleports, '', false, function(e)
+        tpselection = e;
+    end)
+    local tpbutton = sector:AddButton('Teleport', function()
+        if not azfake:returndata().humanoidrootpart then return end
+        local rootPart = azfake:returndata().humanoidrootpart
+        local tpconvert = {
+            ['Gun Store 1'] = CFrame.new(239.5153045654297,1.41786527633667,-165.37364196777344);
+            ['Gun Store 2'] = CFrame.new(-468.4276123046875,3.8621323108673096,351.5307312011719);
+            ['Boxes'] = CFrame.new(-551.2281494140625,3.5371456146240234,-79.05714416503906);
+            ['Dealership'] = CFrame.new(727.8724365234375,3.709824562072754,440.3905944824219);
+            ['Apartments 1'] = CFrame.new(-519.360107421875,3.7872262001037598,174.12612915039062);
+            ['Apartments 2'] = CFrame.new(284.4169616699219,5.23713493347168,38.47633743286133);
+        }
+        local tpPart = nil;
+        for i,v in next, workspace:GetChildren() do 
+            if v.Name:find("'s Car") then 
+                if v.DriveSeat.Occupant == azfake:returndata().humanoid then
+                    tpPart = v.DriveSeat
+                end
+            end
+        end
+        if tpPart then 
+            for i,v in next, tpconvert do 
+                if tostring(tpselection) == tostring(i) then 
+                    tpPart.CFrame = v
+                end
+            end
+        else
+            azfakenotify('No Part to TP',3)
+        end
+    end)
+    tpbutton:ActivateKnowledge();
+    tpbutton:AddKnowledge('Go on a bike') -- Be in a Vehicle
+
+    rightsector:AddToggle('Auto Loot', false, function(e)
+        southbroxsettings.autoloot = e;
+        if not e then return end;
+    end);
+    rightsector:AddToggle('Auto Loot Teleport', false, function(e) -- could add a safe mode
+        southbroxsettings.autoloottp= e;
+        if not e then return end;
+    end);
+    -- sector:AddToggle('Auto Bank Loot', false, function(e)
+    --     southbroxsettings.autobankloot = e;
+    --     if not e then return end;
+    -- end);
+    
+
+    --sector:AddSeperator('-')
+    --
     sector:AddSeperator('-')
     sector:AddLabel('Goto Boxes before Use')
     sector:AddToggle('Box Farm', false, function(e)
@@ -40427,6 +40672,18 @@ elseif universeid == 3734304510 then  -- south bronx
     sector:AddToggle('Safe Card Farm', false, function(e)
         southbroxsettings.safefarm = e;
     end)
+    sector:AddToggle('Use Vehicle Teleport', false, function(e)
+        southbroxsettings.usevehicleteleport = e;
+    end)
+    local function teleportVehicle(cf)
+        local getstring = "{pname}'s Car"
+        getstring = string.gsub(getstring,'{pname}',game.Players.LocalPlayer.Name)
+        if workspace:FindFirstChild(getstring) then 
+            workspace[getstring].DriveSeat.CFrame = cf
+        else
+            print('[no car]')
+        end
+    end
     sector:AddToggle('Card Farm', false, function(e)
         southbroxsettings.cardfarm = e;
         --game.Players.LocalPlayer.Character.PrimaryPart.Anchored = e;
@@ -40438,10 +40695,22 @@ elseif universeid == 3734304510 then  -- south bronx
                 local timing = (b.Position - root.Position).Magnitude / 37
                 timing += 1
                 if g then timing += g end
-                local t = game.TweenService:Create(root,TweenInfo.new(timing,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = b}); t:Play()
-                task.wait(timing+0.01)
-                --repeat task.wait() until t.Completed
-                print('done tween')
+                if southbroxsettings.usevehicleteleport then 
+                    local tt1 = 0
+                    repeat 
+                        task.wait()
+                        if game.Players.LocalPlayer.Character.Humanoid.Sit == true then 
+                            teleportVehicle(b)
+                            tt1 += 0.1
+                        end
+                    until tt1 > 1
+                    task.wait(0.05)
+                else
+                    local t = game.TweenService:Create(root,TweenInfo.new(timing,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = b}); t:Play()
+                    task.wait(timing+0.01)
+                    --repeat task.wait() until t.Completed
+                    print('done tween')
+                end
             end;
             local function createPlatform()
                 local part = Instance.new('Part'); part.Size = Vector3.new(15,1,15);part.Transparency = 0.5
@@ -40468,9 +40737,11 @@ elseif universeid == 3734304510 then  -- south bronx
             signals.conceal(function()
                 while task.wait(0) do 
                     if getgenv().loopsUnload == true or southbroxsettings.cardfarm == false then  break end;
-                    setPlatform(azfake:returndata().humanoidrootpart)
-                    if game.Players.LocalPlayer.Character.Humanoid.Sit == true then 
-                        game.Players.LocalPlayer.Character.Humanoid.Sit = false
+                    if azfake:returndata().humanoidrootpart then 
+                        setPlatform(azfake:returndata().humanoidrootpart)
+                        if game.Players.LocalPlayer.Character.Humanoid.Sit == true and southbroxsettings.usevehicleteleport == false then 
+                            game.Players.LocalPlayer.Character.Humanoid.Sit = false
+                        end
                     end
                 end;
             end)
@@ -40494,13 +40765,14 @@ elseif universeid == 3734304510 then  -- south bronx
                 if not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
                     repeat 
                         task.wait(1)
-                        if not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
+                        if not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') then 
                             tweento(DealerCFrame, 4)
                             fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
                         end
-                    until checkdist(DealerCFrame) and game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID')
+                    until checkdist(DealerCFrame) and (game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') or game.Players.LocalPlayer.Character:FindFirstChild('Fake ID')) or getgenv().loopsUnload == true or southbroxsettings.cardfarm == false
 
-                    fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
+                    --fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
+                    print('[got fake id]')
                     game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Fake ID'))
                 end
 
@@ -40514,20 +40786,24 @@ elseif universeid == 3734304510 then  -- south bronx
                 if game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
                     game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Fake ID'))
                 end
+                print('[teleporting to banekr]')
                 repeat 
                     task.wait()
                     tweento(bankNPCcFRAME, 2)
                     if game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') then 
                         fireproximityprompt(workspace.NPCs["Bank Teller"].UpperTorso.Attachment.ProximityPrompt)
                     end
-                until not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID')
+                until not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Character:FindFirstChild('Backpack') or getgenv().loopsUnload == true or southbroxsettings.cardfarm == false
+                print('[banker took card]')
                 --tweento(bankNPCcFRAME) --DealerbankNPCcFRAMEFram)
-                repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextTransparency == 0 --and game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextColor3 ~= Color3.fromRGB(255,0,0)
+                -- check for 'application' cuz this function woul;d run if check for id saying (you already have an id)
+                repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextTransparency == 0 and game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.Text:find('application')  --and game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextColor3 ~= Color3.fromRGB(255,0,0)
                 task.wait(0.5)
+                print('[banker gave us result]')
                -- task.wait(5)
                 local checkingText = game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning --Frame
                 local CompletedMessage = 'Your application was successful. Please allow 30 seconds for the bank to prepare your card.'
-                if checkingText.Text:find('was successful.') then 
+                if checkingText.Text:find('was successful.') and getgenv().loopsUnload == false and southbroxsettings.cardfarm == true then 
                     print('[card application was a success]')
                     print('[tweening to nearest atm]')
                     tweento(checkCardCFrame)
@@ -40751,6 +41027,11 @@ elseif universeid == 3734304510 then  -- south bronx
     metahook = hookmetamethod(game,'__namecall',function(self,...)
         local args = {...}
         local call_type = getnamecallmethod();
+
+        if southbroxsettings.alwayshitheadshots and call_type == 'FireServer' and tostring(self) == 'InflictTarget' then 
+            args[4] = args[4].Parent.Head
+            args[8] = args[4]
+        end
     
         if call_type == 'Kick' then 
             warn('Attempted to kick')
@@ -40759,7 +41040,7 @@ elseif universeid == 3734304510 then  -- south bronx
             args[5] = 100
             args[4] = args[4].Parent.Head
             args[8] = args[4]
-            print('spoofed and firing multiple times')
+            --print('spoofed and firing multiple times')
             metahook(self,unpack(args))
             metahook(self,unpack(args))
             metahook(self,unpack(args))
@@ -40773,7 +41054,21 @@ elseif universeid == 3734304510 then  -- south bronx
     end)
 
     task.spawn(function()
-    
+        while task.wait() do 
+            if getgenv().loopsUnload == true then print('south bronx break end') break end;
+            if southbroxsettings.autoloot then 
+                for i,v in next, game.Players:GetPlayers() do 
+                    if v ~= game.Players.LocalPlayer and v.Character then 
+                        if v.Character.Humanoid.Health <= 0 then 
+                            if southbroxsettings.autoloottp and azfake:returndata().humanoidrootpart then 
+                                azfake:returndata().humanoidrootpart.CFrame = v.Character.UpperTorso.CFrame
+                            end
+                            fireproximityprompt(v.Character.UpperTorso.ProximityPrompt)
+                        end
+                    end
+                end
+            end
+        end
     end)
 
     AddConfigurations()
@@ -40868,8 +41163,9 @@ if vs == 'debug' then
     azfakenotify('A real scripter has the power for code to come to life;','untilClick') -- 'AZFAKE',
 end
 -- print(typeofazfake)
+-- pee es fiye
 
-window.NameLabel.Text = 'Azfake V3 - '..typeofazfake
+window.NameLabel.Text = 'Mixous Hub V3 - '..typeofazfake -- Project V3 
 --[[
     local BillboardGui = Instance.new('BillboardGui')
 BillboardGui.LightInfluence = 1
