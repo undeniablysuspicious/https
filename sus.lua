@@ -7173,6 +7173,7 @@ end)
 local signals = {
 	gamestepped = {};
 	heartbeat = {};
+    connections = {};
 }
 
 function signals.gamestepped:connect(desc,func)
@@ -7656,6 +7657,22 @@ function signals.new(f,uu)
     if vs then print('setup table, '..RANDOMSTRING) end;
     return DATA
 end;
+
+function signals.connections.new()
+    local ctn = {
+        funct = f
+    }
+    local connectionFunction = 'notASSIGN';
+    task.spawn(function()
+        repeat task.wait() until connectionFunction ~= 'notASSIGN'
+
+        --for i,v in next, 
+    end)
+
+    return connectionFunction
+end
+-- signals.connections.new() = function()
+-- check if function is set to nil
 -- local storefunction = signals.new(os.time()); storefunction.funct()
 
 getgenv().__shared = sharedRequires
@@ -39145,7 +39162,7 @@ elseif universeid == 4871329703 then -- type soul
         if not e then 
             maid.autojoinraid = nil;
             return;
-        end;
+        end; -- signals.connection.new()
         maid.autojoinraid = signals.heartbeat:connect("auto join raids", function()
             task.wait()
             local gameIDS = {}
@@ -39187,7 +39204,7 @@ elseif universeid == 4871329703 then -- type soul
                 return b
             end
 
-            if checkifourserverisntaraid() == false then 
+            if checkifourserverisntaraid() == false and typesoulsettings.autojoinraid == true then 
                 for i,jobIdTable in next, GetTable do 
                     local shouldbreak = false
                     --if foundTP then break end;
@@ -39263,8 +39280,12 @@ elseif universeid == 4871329703 then -- type soul
                             repeat 
                                 task.wait()
                                 ticky += 0.1
-                                for i,v in next, itemsTho do 
-                                    game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(ID, v)
+                                if ID then 
+                                    for i,v in next, itemsTho do 
+                                        game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(ID, v)
+                                    end
+                                else
+                                    ID = closestbounty:GetAttribute('ID')
                                 end
                             until ticky > 5
                         end)
@@ -39848,7 +39869,7 @@ elseif universeid == 4871329703 then -- type soul
                         quested = true;
                     end;
                     if typesoulsettings.selectedfarm == 'Mobs' then 
-                        if typesoulsettings.autogetquest and not quested and statusfu == false and getstatus() == 'idle' then -- and getstatus() == 'idle'
+                        if typesoulsettings.autogetquest and not quested and statusfu == false and getstatus() == 'idle' and justresettofix == false then -- and getstatus() == 'idle'
                             setstatus('tweening')
                             -- local index = 0
                             -- for i,v in next, holdfolder do 
@@ -39875,7 +39896,7 @@ elseif universeid == 4871329703 then -- type soul
                             local hasqueue = false;
                             repeat 
                                 task.wait(1)
-                                typesoulsettings.functions.teleport(boardget.Union, typesoulsettings.tweenspeed) --150)
+                                typesoulsettings.functions.teleport(boardget.WorldPivot.Position, typesoulsettings.tweenspeed) --150)
                                 if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then 
                                     hasqueue = true;
                                 end
@@ -39921,6 +39942,10 @@ elseif universeid == 4871329703 then -- type soul
                                             justresettofix = true
                                             game.Players.LocalPlayer.Character.Head:Destroy()
                                             game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible = false;
+                                            task.delay(5,function()
+                                                setstatus('idle')
+                                                justresettofix = false
+                                            end)
                                         end
                                     end
                                 end)
@@ -40023,6 +40048,7 @@ elseif universeid == 4871329703 then -- type soul
                             if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true then
                                 justresettofix = false;
                             end;
+                            setstatus('idle')
                             --print('[fixing]')
                             --if then 
                             --    justresettofix = false;
@@ -40293,6 +40319,7 @@ elseif universeid == 3734304510 then  -- south bronx
         usehighlight = false;
         hitboxcolor = Color3.fromRGB(255,255,255);
         outlinecolor = Color3.fromRGB(255,255,255);
+        seethroughwalls = false;
     }
     setupAimbotTab(getgenv().southbroxsettings)
     
@@ -40309,6 +40336,7 @@ elseif universeid == 3734304510 then  -- south bronx
                         local headclone = v.Character.Head:Clone()
                         headclone.Name = 'CustomHead';
                         headclone.Parent = v.Character;
+                        headclone.CanCollide = false;
                         for i,vr in next, headclone:GetChildren() do 
                             if typeof(vr) ~= 'Weld' and typeof(vr) ~= 'Motor6D' then 
                                 vr:Destroy()
@@ -40327,6 +40355,14 @@ elseif universeid == 3734304510 then  -- south bronx
                         v.Character.CustomHead.Highlight.FillColor = southbroxsettings.highlightcolor
                         v.Character.CustomHead.Highlight.OutlineColor = southbroxsettings.outlinecolor
                         v.Character.CustomHead.Highlight.FillTransparency = southbroxsettings.transparencyhitbox 
+                        if southbroxsettings.seethroughwalls then 
+                            v.Character.CustomHead.Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        else
+                            v.Character.CustomHead.Highlight.DepthMode = Enum.HighlightDepthMode.Occluded
+                        end
+                    end
+                    if southbroxsettings.usehighlight == false and v.Character.CustomHead:FindFirstChild('Highlight') then 
+                        v.Character.CustomHead:FindFirstChild('Highlight'):Destroy()
                     end
                     v.Character.azfake.C0 = CFrame.new(0,southbroxsettings.hitboxoffset,0) --  v.Character.Head.CFrame *
                     v.Character.CustomHead.Color = southbroxsettings.hitboxcolor
@@ -40382,9 +40418,9 @@ elseif universeid == 3734304510 then  -- south bronx
             repeat 
                 task.wait()
                 if dumpfunctions.slide then 
-                    debug.setupvalue(dumpfunctions.slide, 3, false)
+                    debug.setupvalue(dumpfunctions.slide, 3, true)
                     debug.setupvalue(dumpfunctions.slide, 1, false)
-                    --debug.setupvalue(dumpfunctions.slide, 4, true)
+                    debug.setupvalue(dumpfunctions.slide, 4, false)
                 end
             until 1 == 2 or not game.Players.LocalPlayer.Character
         end)
@@ -40463,6 +40499,10 @@ elseif universeid == 3734304510 then  -- south bronx
         southbroxsettings.usehighlight = e;
         sethitbox()
     end);
+    sector:AddToggle('See through walls', false, function(e)
+        southbroxsettings.seethroughwalls = e;
+        sethitbox()
+    end)
     sector:AddColorpicker('Highlight Outline Colour',Color3.fromRGB(255, 255,255), function(ztx)
         southbroxsettings['outlinecolor'] = ztx
         sethitbox()
@@ -40848,7 +40888,7 @@ elseif universeid == 3734304510 then  -- south bronx
         end);
     end)
 
-    leftsect:AddButton('Infinite Ammo', function()
+    rightsector:AddButton('Infinite Ammo', function()
         local getunf = nil;
         for index,funct in next, getgc() do 
             if type(funct) == 'function' and getinfo(funct).source:find('Gun')  then
