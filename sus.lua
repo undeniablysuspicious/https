@@ -38629,13 +38629,15 @@ elseif universeid == 4871329703 then -- type soul
     local farmrightsect = tab:CreateSector('Cheats','right')
     local espsector = esptab:CreateSector('Cheats','left')
 
-    local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
-    esp_lib.Players = false;
-    esp_lib.Boxes = false;
-    esp_lib.Names = false;
-    esp_lib.AutoRemove = true;
-    esp_lib.Settings.usecustomespcolor = true;
-    esp_lib:Toggle(true)
+    -- local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
+    -- esp_lib.Players = false;
+    -- esp_lib.Boxes = false;
+    -- esp_lib.Names = false;
+    -- esp_lib.AutoRemove = true;
+    -- esp_lib.Settings.usecustomespcolor = true;
+    -- esp_lib:Toggle(true)
+
+    local esp_lib = {}
 
     local RaidJoin = signals.new(function()
         local gameIDS = {}
@@ -39868,7 +39870,7 @@ elseif universeid == 4871329703 then -- type soul
 
 
 
-
+    -- do parry when windup finishes
     do
         parryAnims['14070372787'] = 0.36
         parryAnims['14070373836'] = 0.33
@@ -39880,7 +39882,7 @@ elseif universeid == 4871329703 then -- type soul
         parryAnims['14663985722'] = 0.27 --0.33
         parryAnims['14666888203'] = 0.31 --0.35
         parryAnims['14664132464'] = 0.28 --0.31
-        parryAnims['14069009404'] = 0.33
+        parryAnims['14069009404'] = 0.27 --0.33
         parryAnims['14069010389'] = 0.28 --0.32
         parryAnims['14069017740'] = 0.28 -- might do 275
         parryAnims['14771379522'] = 0.24 --0.26 --0.3
@@ -39888,7 +39890,8 @@ elseif universeid == 4871329703 then -- type soul
         parryAnims['14069023072'] = 0.22
         parryAnims['14774768876'] = 0.24 --0.31
         parryAnims['14774820991'] = 0.24 --0.33
-        parryAnims['14776252587'] = 0.22
+        parryAnims['14776252587'] = 0.22;
+        parryAnims['14776880646'] = 0.22
         
         -- gun
         parryAnims['16749239700'] = 0.12
@@ -40415,6 +40418,7 @@ elseif universeid == 4871329703 then -- type soul
                                         repeat 
                                             task.wait(1) 
                                             if azfake:returndata().character.Humanoid.WalkSpeed ~= 0 then 
+                                                rootPart.CFrame = v.HumanoidRootPart.CFrame
                                                 azfake:returndata().character.CharacterHandler.Remotes.Execute:FireServer()
                                             end
                                             task.wait(2)
@@ -40540,6 +40544,7 @@ elseif universeid == 3734304510 then  -- south bronx
     local sector = tab:CreateSector('Cheats','left')
     local leftsect = tab:CreateSector('Cheats','left')
     local rightsector = tab:CreateSector('Cheats','right')
+    local modsector = tab:CreateSector('Cheats','right')
     local espsector = esptab:CreateSector('Cheats','left')
     esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
 
@@ -40576,6 +40581,12 @@ elseif universeid == 3734304510 then  -- south bronx
         hitboxcolor = Color3.fromRGB(255,255,255);
         outlinecolor = Color3.fromRGB(255,255,255);
         seethroughwalls = false;
+        noblur = false; -- disableblur
+        norecoil = false; -- disablerecoil
+        maxbulletspeed = false;
+        maxbulletrange = false;
+        holdtoshoot = false;
+        fullbright = false;
     }
     setupAimbotTab(getgenv().southbroxsettings)
     
@@ -41082,127 +41093,127 @@ elseif universeid == 3734304510 then  -- south bronx
             while task.wait() do 
                 if getgenv().loopsUnload == true or southbroxsettings.cardfarm == false then  break end;
                 if game.Players.LocalPlayer.Character then 
-                --Daler
-                --if azfake:returndata().character.Humanoid.FloorMaterial == Enum.Material.Air then 
-                    --setPlatform(root)
-                --end
-                local DealerCFrame = CFrame.new(217.7833709716797,3.7371320724487305,-334.5723876953125);
-                local bankNPCcFRAME = CFrame.new(-49.11941146850586,3.7371387481689453,-322.2247619628906);
-                local checkCardCFrame = CFrame.new(-42.873199462890625,3.7371387481689453,-331.6510925292969);
-                if southbroxsettings.safefarm then 
-                    DealerCFrame *= CFrame.new(0,-6,0)
-                    bankNPCcFRAME *= CFrame.new(0,-6,0)
-                    --checkCardCFrame *= CFrame.new(0,-5,0)
-                end
-                if not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
-                    repeat 
-                        task.wait(1)
-                        if not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') then 
-                            tweento(DealerCFrame, 4)
-                            fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
-                        end
-                    until checkdist(DealerCFrame) and (game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') or game.Players.LocalPlayer.Character:FindFirstChild('Fake ID')) or getgenv().loopsUnload == true or southbroxsettings.cardfarm == false
-
-                    --fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
-                    print('[got fake id]')
-                    if game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
-                        game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID'))
+                    --Daler
+                    --if azfake:returndata().character.Humanoid.FloorMaterial == Enum.Material.Air then 
+                        --setPlatform(root)
+                    --end
+                    local DealerCFrame = CFrame.new(217.7833709716797,3.7371320724487305,-334.5723876953125);
+                    local bankNPCcFRAME = CFrame.new(-49.11941146850586,3.7371387481689453,-322.2247619628906);
+                    local checkCardCFrame = CFrame.new(-42.873199462890625,3.7371387481689453,-331.6510925292969);
+                    if southbroxsettings.safefarm then 
+                        DealerCFrame *= CFrame.new(0,-6,0)
+                        bankNPCcFRAME *= CFrame.new(0,-6,0)
+                        --checkCardCFrame *= CFrame.new(0,-5,0)
                     end
-                end
-
-                if southbroxsettings.safefarm then 
-                   -- tweento(DealerCFrame, -1)
-                   -- fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
-                   -- task.wait(0.1)
-                   -- tweento(DealerCFrame, -1)
-                end;
-
-                if game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
-                    game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Fake ID'))
-                end
-                print('[teleporting to banekr]') -- Character:FindFirstChild('Backpack')
-                repeat 
-                    task.wait()
-                    tweento(bankNPCcFRAME, 2)
-                    if game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') then 
-                        fireproximityprompt(workspace.NPCs["Bank Teller"].UpperTorso.Attachment.ProximityPrompt)
-                    end
-                until not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') or getgenv().loopsUnload == true or southbroxsettings.cardfarm == false
-                print('[banker took card]')
-                --tweento(bankNPCcFRAME) --DealerbankNPCcFRAMEFram)
-                -- check for 'application' cuz this function woul;d run if check for id saying (you already have an id)
-                repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextTransparency == 0 and game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.Text:find('application')  --and game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextColor3 ~= Color3.fromRGB(255,0,0)
-                task.wait(0.5)
-                print('[banker gave us result]')
-                -- task.wait(5)
-                local checkingText = game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning --Frame
-                local CompletedMessage = 'Your application was successful. Please allow 30 seconds for the bank to prepare your card.'
-                if checkingText.Text:find('was successful.') and getgenv().loopsUnload == false and southbroxsettings.cardfarm == true then 
-                    print('[card application was a success]')
-                    print('[tweening to nearest atm]')
-                    tweento(checkCardCFrame)
-                    task.wait(30.5)
-                    if not checkdist(checkCardCFrame) then 
-                        tweento(checkCardCFrame)
-                    end
-                    fireproximityprompt(workspace.Blank.Attachment.ProximityPrompt)
-                    local atm = nil;
-                    local atmdsist = nil;
-                    for i,v in next, workspace.ATMS:GetChildren() do 
-                        if v.ATMScreen.Transparency == 0 then 
-                            local dist = (v.Position - game.Players.LocalPlayer.Character.PrimaryPart.Position).Magnitude;
-                            if atm == nil then 
-                                atm = v;
-                                atmdsist = dist--(atm.Position - game.Players.LocalPlayer.Character.PrimaryPart.Position).Magnitude;
-                            elseif atmdsist > dist then 
-                                atm = v;
-                                atmdsist = dist
-                            end;
-                        end;
-                    end;
-                    game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Card'))
-                    if atm == nil then print('[THERE WERE NO ATMS]') 
+                    if not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
                         repeat 
                             task.wait(1)
-                            for i,v in next, workspace.ATMS:GetChildren() do 
-                                if v.ATMScreen.Transparency == 0 then 
-                                    local dist = (v.Position - game.Players.LocalPlayer.Character.PrimaryPart.Position).Magnitude;
-                                    if atm == nil then 
-                                        atm = v;
-                                        atmdsist = dist--(atm.Position - game.Players.LocalPlayer.Character.PrimaryPart.Position).Magnitude;
-                                    elseif atmdsist > dist then 
-                                        atm = v;
-                                        atmdsist = dist
-                                    end;
+                            if not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') then 
+                                tweento(DealerCFrame, 4)
+                                fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
+                            end
+                        until checkdist(DealerCFrame) and (game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') or game.Players.LocalPlayer.Character:FindFirstChild('Fake ID')) or getgenv().loopsUnload == true or southbroxsettings.cardfarm == false
+
+                        --fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
+                        print('[got fake id]')
+                        if game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
+                            game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID'))
+                        end
+                    end
+
+                    if southbroxsettings.safefarm then 
+                    -- tweento(DealerCFrame, -1)
+                    -- fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
+                    -- task.wait(0.1)
+                    -- tweento(DealerCFrame, -1)
+                    end;
+
+                    if game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
+                        game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Fake ID'))
+                    end
+                    print('[teleporting to banekr]') -- Character:FindFirstChild('Backpack')
+                    repeat 
+                        task.wait()
+                        tweento(bankNPCcFRAME, 2)
+                        if game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') then 
+                            fireproximityprompt(workspace.NPCs["Bank Teller"].UpperTorso.Attachment.ProximityPrompt)
+                        end
+                    until not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') or getgenv().loopsUnload == true or southbroxsettings.cardfarm == false
+                    print('[banker took card]')
+                    --tweento(bankNPCcFRAME) --DealerbankNPCcFRAMEFram)
+                    -- check for 'application' cuz this function woul;d run if check for id saying (you already have an id)
+                    repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextTransparency == 0 and game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.Text:find('application')  --and game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextColor3 ~= Color3.fromRGB(255,0,0)
+                    task.wait(0.5)
+                    print('[banker gave us result]')
+                    -- task.wait(5)
+                    local checkingText = game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning --Frame
+                    local CompletedMessage = 'Your application was successful. Please allow 30 seconds for the bank to prepare your card.'
+                    if checkingText.Text:find('was successful.') and getgenv().loopsUnload == false and southbroxsettings.cardfarm == true then 
+                        print('[card application was a success]')
+                        print('[tweening to nearest atm]')
+                        tweento(checkCardCFrame)
+                        task.wait(30.5)
+                        if not checkdist(checkCardCFrame) then 
+                            tweento(checkCardCFrame)
+                        end
+                        fireproximityprompt(workspace.Blank.Attachment.ProximityPrompt)
+                        local atm = nil;
+                        local atmdsist = nil;
+                        for i,v in next, workspace.ATMS:GetChildren() do 
+                            if v.ATMScreen.Transparency == 0 then 
+                                local dist = (v.Position - game.Players.LocalPlayer.Character.PrimaryPart.Position).Magnitude;
+                                if atm == nil then 
+                                    atm = v;
+                                    atmdsist = dist--(atm.Position - game.Players.LocalPlayer.Character.PrimaryPart.Position).Magnitude;
+                                elseif atmdsist > dist then 
+                                    atm = v;
+                                    atmdsist = dist
                                 end;
                             end;
-                        until atm ~= nil
+                        end;
+                        game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Card'))
+                        if atm == nil then print('[THERE WERE NO ATMS]') 
+                            repeat 
+                                task.wait(1)
+                                for i,v in next, workspace.ATMS:GetChildren() do 
+                                    if v.ATMScreen.Transparency == 0 then 
+                                        local dist = (v.Position - game.Players.LocalPlayer.Character.PrimaryPart.Position).Magnitude;
+                                        if atm == nil then 
+                                            atm = v;
+                                            atmdsist = dist--(atm.Position - game.Players.LocalPlayer.Character.PrimaryPart.Position).Magnitude;
+                                        elseif atmdsist > dist then 
+                                            atm = v;
+                                            atmdsist = dist
+                                        end;
+                                    end;
+                                end;
+                            until atm ~= nil
+                        end;
+                        local inputManager = game.VirtualInputManager
+                        repeat 
+                            tweento(atm.CFrame, 2)
+                            inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
+                            task.wait(.03)
+                            inputManager:SendKeyEvent(false,Enum.KeyCode.W,false,game)
+                            task.wait(0.3)
+                            fireproximityprompt(atm.Attachment.ProximityPrompt)
+                            task.wait(1)
+                            local inputManager = game:GetService('VirtualInputManager')
+                            local m = game.Players.LocalPlayer:GetMouse()
+                            inputManager:SendMouseButtonEvent(m.X,m.Y,0,true,game,0) -- 1319,574
+                            task.wait(0.1)
+                            inputManager:SendMouseButtonEvent(m.X,m.Y,0,false,game,0)
+                        until not game.Players.LocalPlayer.Character:FindFirstChild('Card')
+                        task.wait(2)
+                    else
+                        print('[application not successful]')
                     end;
-                    local inputManager = game.VirtualInputManager
-                    repeat 
-                        tweento(atm.CFrame, 2)
-                        inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
-                        task.wait(.03)
-                        inputManager:SendKeyEvent(false,Enum.KeyCode.W,false,game)
-                        task.wait(0.3)
-                        fireproximityprompt(atm.Attachment.ProximityPrompt)
-                        task.wait(1)
-                        local inputManager = game:GetService('VirtualInputManager')
-                        local m = game.Players.LocalPlayer:GetMouse()
-                        inputManager:SendMouseButtonEvent(m.X,m.Y,0,true,game,0) -- 1319,574
-                        task.wait(0.1)
-                        inputManager:SendMouseButtonEvent(m.X,m.Y,0,false,game,0)
-                    until not game.Players.LocalPlayer.Character:FindFirstChild('Card')
-                    task.wait(2)
-                else
-                    print('[application not successful]')
-                end;
                 end
             end;
         end);
     end)
 
-    rightsector:AddButton('Infinite Ammo', function()
+    modsector:AddButton('Infinite Ammo', function()
         local getunf = nil;
         for index,funct in next, getgc() do 
             if type(funct) == 'function' and getinfo(funct).source:find('Gun')  then
@@ -41242,9 +41253,9 @@ elseif universeid == 3734304510 then  -- south bronx
         end)
     end; -- applyRestraint{slide = fuunct}
 
-    rightsector:AddButton('Anti Jam Gun',function(e)
-        southbroxsettings.antijam = e;
-        if not e then return end;
+    modsector:AddButton('Anti Jam Gun',function(e)
+        --southbroxsettings.antijam = e;
+        --if not e then return end;
         dumpgunmodules()
         task.spawn(function()
             for index,funct in next, getgc() do 
@@ -41257,9 +41268,9 @@ elseif universeid == 3734304510 then  -- south bronx
             end
         end)
     end) -- ani
-    rightsector:AddButton('No Cooldown Shoot', function(e)
-        southbroxsettings.nocooldownshoot = e;
-        if not e then return end;
+    modsector:AddButton('No Cooldown Shoot', function(e)
+        --southbroxsettings.nocooldownshoot = e;
+        --if not e then return end;
         task.spawn(function()
             for index,funct in next, getgc() do 
                 if type(funct) == 'function' and getinfo(funct).source:find('Gun') then
@@ -41278,6 +41289,76 @@ elseif universeid == 3734304510 then  -- south bronx
         end)
 
     end)
+    modsector:AddToggle('Full Bright', false, function(e)
+        southbroxsettings.fullbright = e;
+    end)
+    modsector:AddToggle('No Blur', false, function(e)
+        southbroxsettings.noblur = e;
+    end)
+    modsector:AddButton('Max Bullet Range',  function(e)
+        southbroxsettings.maxbulletrange = e;
+    end)
+    modsector:AddToggle('Hold Gun To Shoot', false, function(e)
+        southbroxsettings.holdtoshoot = e;
+    end)
+    modsector:AddButton('Max Bullet Speed', function(e)
+        southbroxsettings.maxbulletspeed = e;
+    end)
+    modsector:AddButton('No Recoil', function(e)
+       -- southbroxsettings.norecoil = e;
+       task.spawn(function()
+            for index,funct in next, getgc() do 
+                if type(funct) == 'function' and getinfo(funct).source:find('Gun') then
+                    -- if tostring(getinfo(funct).name) == 'SlideHandler' then 
+                    --     --dumpfunctions.slide = funct;
+                    --     applyRestraint{slide = funct}
+                    if tostring(getinfo(funct).name) == 'RecoilCamera' then 
+                        hookfunction(funct, function()
+                            return nil
+                        end)
+                    end;
+                end
+            end
+        end)
+    end)
+    -- modsector:AddTextbox('S', nil, function(e)
+    --     -- southbroxsettings.norecoil = e;
+    --     task.spawn(function()
+    --          for index,funct in next, getgc() do 
+    --              if type(funct) == 'function' and getinfo(funct).source:find('Gun') then
+    --                  -- if tostring(getinfo(funct).name) == 'SlideHandler' then 
+    --                  --     --dumpfunctions.slide = funct;
+    --                  --     applyRestraint{slide = funct}
+    --                  if tostring(getinfo(funct).name) == 'RecoilCamera' then 
+    --                      hookfunction(funct, function()
+    --                          return nil
+    --                      end)
+    --                  end;
+    --              end
+    --          end
+    --      end)
+    --  end)
+    local inputManager = game:GetService('VirtualInputManager')
+    local m = game.Players.LocalPlayer:GetMouse()
+    local released = false
+    game.Players.LocalPlayer:GetMouse().Button1Down:Connect(function()
+        released = false;
+        if southbroxsettings.holdtoshoot then 
+            task.spawn(function()
+                repeat 
+                    task.wait()
+                    inputManager:SendMouseButtonEvent(m.X,m.Y,0,true,game,0) -- 1319,574
+                    --task.wait(0.05)
+                    inputManager:SendMouseButtonEvent(m.X,m.Y,0,false,game,0)
+                until released
+            end)
+        end
+    end)-- mouse 1 down
+    game.Players.LocalPlayer:GetMouse().Button1Up:Connect(function()
+        for i=1, 10 do 
+            released = true;
+        end
+    end)-- mouse 1 down
     leftsect:AddToggle('Silent Aim', false, function(e)
         southbroxsettings.silentaim = e;
     end);
@@ -41312,7 +41393,7 @@ elseif universeid == 3734304510 then  -- south bronx
         return b
     end
     espsector:AddToggle('Enable ESP', false, function(e)
-        esp_lib.Enabled = e;
+        esp_lib:Toggle(e) --.Enabled = e;
     end)
     espsector:AddToggle('Use Names', false, function(xstate)
         southbroxsettings.espnames = xstate;
@@ -41432,6 +41513,28 @@ elseif universeid == 3734304510 then  -- south bronx
 
     --setupEspTab(getgenv().southbroxsettings)
     
+    -- local metaindex;
+    -- metaindex = hookmetamethod(game,'__index',function(self,reading)
+    --     if tostring(self) == 'Lighting' and southbroxsettings['fullbright'] == true  then -- full bring
+    --         if tostring(reading) == 'ClockTime' then -- TimeOfDay 
+    --             return 12
+    --         elseif tostring(reading) == 'FogEnd' then 
+    --             return game.Lighting.FogStart
+    --         elseif tostring(reading) == 'Ambient' then 
+    --             return Color3.fromRGB(255, 255, 255)
+    --         elseif tostring(reading) == 'Brightness' then 
+    --             return 2
+    --         elseif tostring(reading) == 'GlobalShadows' then 
+    --             return false
+    --         else
+    --             return metaindex(self,reading)
+    --         end
+    --     else
+            
+    --         return metaindex(self,reading) --false
+    --     end
+    --     return metaindex(self,reading)
+    -- end)
 
     local metahook;
     metahook = hookmetamethod(game,'__namecall',function(self,...)
@@ -41455,8 +41558,16 @@ elseif universeid == 3734304510 then  -- south bronx
             metahook(self,unpack(args))
             metahook(self,unpack(args))
             return metahook(self,unpack(args))
-        elseif call_type == 'FireServer' and tostring(self) == 'VisualiseBullet' and southbroxsettings.silentaim  then 
-            args[9][11] = Vector3.new(5,5,5)
+        elseif call_type == 'FireServer' and tostring(self) == 'VisualiseBullet' then -- and southbroxsettings.silentaim  then 
+            if southbroxsettings.silentaim then 
+                args[9][11] = Vector3.new(5,5,5)
+            end
+            if southbroxsettings.maxbulletspeed  then 
+                args[9][8] = 2000
+            end
+            if southbroxsettings.maxbulletrange  then 
+                args[9][7] = 2000
+            end
         else
             return metahook(self,...)
         end
@@ -41474,6 +41585,7 @@ elseif universeid == 3734304510 then  -- south bronx
     task.spawn(function()
         while task.wait() do 
             if getgenv().loopsUnload == true then print('south bronx break end') break end;
+            --print('loo0p')
             if southbroxsettings.autoloot then 
                 for i,v in next, game.Players:GetPlayers() do 
                     if v ~= game.Players.LocalPlayer and v.Character then 
@@ -41494,6 +41606,21 @@ elseif universeid == 3734304510 then  -- south bronx
                         end
                     end
                 end
+            end
+            --print('loo0p2')
+            if southbroxsettings.noblur == true then 
+                pcall(function()
+                    --game:GetService("Lighting").Blur.Enabled = false;
+                    game:GetService("Lighting")['gun blur'].Enabled = false;
+                end)
+            end
+            --print('loo0pe')
+            if southbroxsettings.fullbright then 
+                game.Lighting.ClockTime = 12;
+                game.Lighting.FogEnd = 1400;
+                game.Lighting.Ambient = Color3.fromRGB(255,255,255)
+                game.Lighting.Brightness = 2;
+                game.Lighting.GlobalShadows = false;
             end
         end
     end)
