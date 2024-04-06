@@ -39333,15 +39333,15 @@ elseif universeid == 4871329703 then -- type soul
                     end)
                     closestbounty:WaitForChild('Items')
                     print('waiting for items')
+                    local tpPart = nil;
+                    for i,v in next, closestbounty:GetDescendants() do 
+                        if v:IsA('BasePart') then tpPart = v end;
+                    end;
                     local function claimLootbox(item, lootbox)
                         if checkdist(10, tpPart) then 
                             local id = lootbox:GetAttribute('ID')
                             game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(id, item)
                         end
-                    end;
-                    local tpPart = nil;
-                    for i,v in next, closestbounty:GetDescendants() do 
-                        if v:IsA('BasePart') then tpPart = v end;
                     end;
                     task.spawn(function()
                         --print(closestbounty.PrimaryPart)
