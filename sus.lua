@@ -41454,7 +41454,9 @@ else
     sharedRequires['CreateFlySystem'](weirdsector, nogamesettings)
     sharedRequires['CreateWalkSpeedSystem'](weirdsector, nogamesettings)
     sharedRequires['CreateNoclip'](weirdsector, nogamesettings)
-    sharedRequires['SetupChatlogger'](weirdsector, nogamesettings)
+    task.spawn(function()
+        sharedRequires['SetupChatlogger'](weirdsector, nogamesettings)
+    end)
 
     weirdsector:AddButton('Rejoin',function()
         game:GetService('TeleportService'):teleport(game.PlaceId)
