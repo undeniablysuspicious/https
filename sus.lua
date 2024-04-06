@@ -38623,8 +38623,10 @@ elseif universeid == 4871329703 then -- type soul
     local tab = window:CreateTab(gameName)
     local esptab = window:CreateTab('ESP')
     local sector = tab:CreateSector('Cheats','left')
+    local newother = tab:CreateSector('Cheats','left')
     local lefttab = tab:CreateSector('Cheats','left')
     local rightsect = tab:CreateSector('Cheats','right')
+    local farmrightsect = tab:CreateSector('Cheats','right')
     local espsector = esptab:CreateSector('Cheats','left')
 
     local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
@@ -38683,6 +38685,7 @@ elseif universeid == 4871329703 then -- type soul
         autoparry = false;
         autoparrydistance = 0;
         pingadjuster = 0;
+        latencyadjuster = 0;
         autoflashstep = false;
         missionboardesp = false;
         missionboardespcolor = Color3.fromRGB(255,255,255);
@@ -38924,6 +38927,9 @@ elseif universeid == 4871329703 then -- type soul
     sector:AddSlider("Parry Ping Adjuster", 0, 0, 100, 1, function(State)
         typesoulsettings.pingadjuster = State -- deepwtykensettings  typesoulsettings pingadjust
     end)
+    sector:AddSlider("Parry Latency Adjuster", 0, 0, 100, 1, function(State)
+        typesoulsettings.latencyadjuster = State -- deepwtykensettings  typesoulsettings pingadjust
+    end)
     --
     --
 
@@ -38972,54 +38978,6 @@ elseif universeid == 4871329703 then -- type soul
             forentity:Remove(child.Name)
         end;
     end); table.insert(typesoulsettings.connections, entityremoved);
-
-    rightsect:AddButton("Teleport To Board", function() -- Bounty
-        if not azfake:returndata().humanoidrootpart then return end
-        local rootPart = azfake:returndata().humanoidrootpart
-        signals.conceal(function()
-            local closestbounty = nil;
-            local closestdist = nil;
-            for i,v in next, workspace.NPCs.MissionNPC:GetChildren() do -- (v:IsA('Model') and v.PrimaryPart and v.PrimaryPart.Position or v:FindFirstChildOfClass('BasePart').Position)
-                local dist = (v.WorldPivot.Position - rootPart.Position).Magnitude
-                if closestbounty == nil then 
-                    closestbounty = v
-                    closestdist = dist
-                else
-                    if closestdist > dist then 
-                        closestbounty = v
-                        closestdist = dist
-                    end
-                end
-            end;
-            if closestbounty then 
-                typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.Part or closestbounty)
-            end
-        end);
-    end)
-    rightsect:AddButton("Teleport To Lootbox", function() -- Bounty
-        if not azfake:returndata().humanoidrootpart then return end
-        local rootPart = azfake:returndata().humanoidrootpart
-        signals.conceal(function()
-            local closestbounty = nil;
-            local closestdist = nil; -- (v:IsA('Model') and v.PrimaryPart and v.PrimaryPart.Position or v:FindFirstChildOfClass('BasePart').Position)
-            for i,v in next, workspace.Lootboxes:GetChildren() do 
-                local dist = (v.WorldPivot.Position - rootPart.Position).Magnitude
-                if closestbounty == nil then 
-                    closestbounty = v
-                    closestdist = dist
-                else
-                    if closestdist > dist then 
-                        closestbounty = v
-                        closestdist = dist
-                    end
-                end
-            end;
-            if closestbounty then 
-                local tppart = closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:IsA('Model') and closestbounty:FindFirstChildOfClass('BasePart')
-                typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'))
-            end
-        end);
-    end)
 
     local function getclosestboard() -- fucntion
         local closestdist = nil;
@@ -39075,6 +39033,29 @@ elseif universeid == 4871329703 then -- type soul
     end)
     rightsect:AddToggle('Auto Grip', false, function(e) -- srightsectector
         typesoulsettings.autogrip = e;
+    end)
+    rightsect:AddButton("Teleport To Board", function() -- Bounty
+        if not azfake:returndata().humanoidrootpart then return end
+        local rootPart = azfake:returndata().humanoidrootpart
+        signals.conceal(function()
+            local closestbounty = nil;
+            local closestdist = nil;
+            for i,v in next, workspace.NPCs.MissionNPC:GetChildren() do -- (v:IsA('Model') and v.PrimaryPart and v.PrimaryPart.Position or v:FindFirstChildOfClass('BasePart').Position)
+                local dist = (v.WorldPivot.Position - rootPart.Position).Magnitude
+                if closestbounty == nil then 
+                    closestbounty = v
+                    closestdist = dist
+                else
+                    if closestdist > dist then 
+                        closestbounty = v
+                        closestdist = dist
+                    end
+                end
+            end;
+            if closestbounty then 
+                typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.Part or closestbounty)
+            end
+        end);
     end)
     rightsect:AddSeperator('-')
     rightsect:AddSlider("Tween Speed", 0, 100, 250, 1, function(State)
@@ -39337,7 +39318,13 @@ elseif universeid == 4871329703 then -- type soul
                     print('waiting for items')
                     local tpPart = nil;
                     for i,v in next, closestbounty:GetDescendants() do 
-                        if v:IsA('BasePart') then tpPart = v end;
+                        if v:IsA('BasePart') then 
+                            tpPart = v 
+                        elseif v:IsA('MeshPart') then 
+                            tpPart = v 
+                        elseif v:IsA('Part') then 
+                            tpPart = v;
+                        end;
                     end;
                     local function claimLootbox(item, lootbox)
                         if tpPart and checkdist(10, tpPart) then 
@@ -39347,7 +39334,15 @@ elseif universeid == 4871329703 then -- type soul
                             if not tpPart then 
                                 print('gettign new tp part')
                                 for i,v in next, closestbounty:GetDescendants() do 
-                                    if v:IsA('BasePart') then tpPart = v end;
+                                    for i,v in next, closestbounty:GetDescendants() do 
+                                        if v:IsA('BasePart') then 
+                                            tpPart = v 
+                                        elseif v:IsA('MeshPart') then 
+                                            tpPart = v 
+                                        elseif v:IsA('Part') then 
+                                            tpPart = v;
+                                        end;
+                                    end;
                                 end;
                             end
                         end
@@ -39430,6 +39425,31 @@ elseif universeid == 4871329703 then -- type soul
             takeLootbox(v)
         end
     end)
+    lefttab:AddButton("Teleport To Lootbox", function() -- Bounty
+        if not azfake:returndata().humanoidrootpart then return end
+        local rootPart = azfake:returndata().humanoidrootpart
+        signals.conceal(function()
+            local closestbounty = nil;
+            local closestdist = nil; -- (v:IsA('Model') and v.PrimaryPart and v.PrimaryPart.Position or v:FindFirstChildOfClass('BasePart').Position)
+            for i,v in next, workspace.Lootboxes:GetChildren() do 
+                local dist = (v.WorldPivot.Position - rootPart.Position).Magnitude
+                if closestbounty == nil then 
+                    closestbounty = v
+                    closestdist = dist
+                else
+                    if closestdist > dist then 
+                        closestbounty = v
+                        closestdist = dist
+                    end
+                end
+            end;
+            if closestbounty then 
+                local tppart = closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:IsA('Model') and closestbounty:FindFirstChildOfClass('BasePart')
+                typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'))
+            end
+        end);
+    end)
+
     lefttab:AddSeperator('-')
     lefttab:AddToggle('Auto Flashstep', false, function(e)
         typesoulsettings.autoflashstep = e;
@@ -39558,6 +39578,40 @@ elseif universeid == 4871329703 then -- type soul
     --     typesoulsettings.use3 = e;
     -- end)
     --
+    newother:AddToggle('Auto Sprint',false,function(e)
+        typesoulsettings.autosprint = e;
+        if e == false then 
+            maid.autosprint = nil;
+            maid.autosprint2 = nil;
+            return
+        end;
+        local sprintkeys = {'w','a','s','d'}
+        local holdingkeys = {};
+        maid.autosprint = game.Players.LocalPlayer:GetMouse().KeyDown:Connect(function(k)
+            if table.find(sprintkeys,k:lower()) and azfake:returndata().character then 
+                -- table.insert(holdingkeys, true)
+                pcall(function()
+                    if #holdingkeys == 0 then 
+                        azfake:returndata().character.CharacterHandler.Remotes.Sprint:FireServer('Pressed')
+                    end
+                end)
+                table.insert(holdingkeys, k:lower())
+            end;
+        end)
+        maid.autosprint2 = game.Players.LocalPlayer:GetMouse().KeyUp:Connect(function(k)
+            if table.find(sprintkeys,k:lower()) and azfake:returndata().character then 
+               -- print(#holdingkeys,'let go of '..k:lower())
+                if #holdingkeys > 0 then table.remove(holdingkeys,1) end;
+               -- print(#holdingkeys,'2let go of '..k:lower())
+                if #holdingkeys == 0 then 
+                    pcall(function()
+                        print('had to release')
+                        azfake:returndata().character.CharacterHandler.Remotes.Sprint:FireServer('Released')
+                    end)
+                end
+            end;
+        end)
+    end)
 
 
     sharedRequires['CreateFlySystem'](sector, typesoulsettings)
@@ -39822,16 +39876,19 @@ elseif universeid == 4871329703 then -- type soul
         parryAnims['14069237877'] = 0.33
         parryAnims['14069239027'] = 0.3
         parryAnims['14069240312'] = 0.3
-        parryAnims['14663938197'] = 0.33 --0.38 -- idk
-        parryAnims['14663985722'] = 0.33
-        parryAnims['14666888203'] = 0.35
-        parryAnims['14664132464'] = 0.31
+        parryAnims['14663938197'] = 0.3 --0.33 --0.38 -- idk
+        parryAnims['14663985722'] = 0.27 --0.33
+        parryAnims['14666888203'] = 0.31 --0.35
+        parryAnims['14664132464'] = 0.28 --0.31
         parryAnims['14069009404'] = 0.33
-        parryAnims['14069010389'] = 0.32
-        parryAnims['14069017740'] = 0.28
-        parryAnims['14771379522'] = 0.3
-        parryAnims['14774768876'] = 0.31
-        parryAnims['14774820991'] = 0.33
+        parryAnims['14069010389'] = 0.28 --0.32
+        parryAnims['14069017740'] = 0.28 -- might do 275
+        parryAnims['14771379522'] = 0.24 --0.26 --0.3
+
+        parryAnims['14069023072'] = 0.22
+        parryAnims['14774768876'] = 0.24 --0.31
+        parryAnims['14774820991'] = 0.24 --0.33
+        parryAnims['14776252587'] = 0.22
         
         -- gun
         parryAnims['16749239700'] = 0.12
@@ -39931,6 +39988,9 @@ elseif universeid == 4871329703 then -- type soul
                             if typesoulsettings.pingadjuster > 0  then 
                                 timetowait -= typesoulsettings.pingadjuster / 1400 -- 100 
                             end;
+                            if typesoulsettings.latencyadjuster > 0 then 
+                                timetowait += typesoulsettings.latencyadjuster / 1400 -- 100 
+                            end
                             task.wait(registry);
                             if anim.IsPlaying then 
                                 typesoulsettings.functions.parry()
@@ -40175,6 +40235,7 @@ elseif universeid == 4871329703 then -- type soul
                                     task.wait(1)
                                     repeat 
                                         task.wait(2)
+                                        typesoulsettings.functions.teleport(boardget.WorldPivot.Position, typesoulsettings.tweenspeed)
                                         if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false and game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == false  then 
                                             typesoulsettings.functions.teleport(boardget.Union, typesoulsettings.tweenspeed)
                                             task.wait(0.5)
@@ -41020,6 +41081,7 @@ elseif universeid == 3734304510 then  -- south bronx
             end
             while task.wait() do 
                 if getgenv().loopsUnload == true or southbroxsettings.cardfarm == false then  break end;
+                if game.Players.LocalPlayer.Character then 
                 --Daler
                 --if azfake:returndata().character.Humanoid.FloorMaterial == Enum.Material.Air then 
                     --setPlatform(root)
@@ -41072,7 +41134,7 @@ elseif universeid == 3734304510 then  -- south bronx
                 repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextTransparency == 0 and game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.Text:find('application')  --and game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning.TextColor3 ~= Color3.fromRGB(255,0,0)
                 task.wait(0.5)
                 print('[banker gave us result]')
-               -- task.wait(5)
+                -- task.wait(5)
                 local checkingText = game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning --Frame
                 local CompletedMessage = 'Your application was successful. Please allow 30 seconds for the bank to prepare your card.'
                 if checkingText.Text:find('was successful.') and getgenv().loopsUnload == false and southbroxsettings.cardfarm == true then 
@@ -41135,6 +41197,7 @@ elseif universeid == 3734304510 then  -- south bronx
                 else
                     print('[application not successful]')
                 end;
+                end
             end;
         end);
     end)
