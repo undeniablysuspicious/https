@@ -39378,7 +39378,7 @@ elseif universeid == 4871329703 then -- type soul
                                     ID = closestbounty:GetAttribute('ID')
                                 end
                             end
-                        until not closestbounty or not closestbounty and closestbounty:FindFirstChild('Items') 
+                        until not closestbounty or not closestbounty and closestbounty:FindFirstChild('Items')  or not  closestbounty:FindFirstChild('Items')
                     end)
                     if typesoulsettings.lootnonblatant == false then 
                         --rootPart.Anchored = true;
@@ -39390,7 +39390,7 @@ elseif universeid == 4871329703 then -- type soul
                                 if closestbounty then 
                                     typesoulsettings.functions.teleport(tpPart,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
                                 end
-                            until not closestbounty or not tpPart or tpPart.Transparency == 1
+                            until not closestbounty or not tpPart or tpPart.Transparency == 1 or not  closestbounty:FindFirstChild('Items')
                             --rootPart.Anchored = false;
                         end)
                     end
