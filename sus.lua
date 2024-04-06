@@ -40237,8 +40237,8 @@ elseif universeid == 4871329703 then -- type soul
                                     local canAttack = true;
                                     if not dist then 
                                         repeat 
-                                            task.wait(1)
-                                            typesoulsettings.functions.teleport(v.HumanoidRootPart, typesoulsettings.tweenspeed) --150)
+                                            task.wait(0.1)
+                                            typesoulsettings.functions.teleport(v.HumanoidRootPart.CFrame * cframecheck, typesoulsettings.tweenspeed) --150)
                                         until not v or checkdist(45,v.PrimaryPart)
                                     end;
                                     print('enter re')
