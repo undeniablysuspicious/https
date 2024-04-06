@@ -39338,9 +39338,16 @@ elseif universeid == 4871329703 then -- type soul
                         if v:IsA('BasePart') then tpPart = v end;
                     end;
                     local function claimLootbox(item, lootbox)
-                        if checkdist(10, tpPart) then 
+                        if tpPart and checkdist(10, tpPart) then 
                             local id = lootbox:GetAttribute('ID')
                             game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(id, item)
+                        else
+                            if not tpPart then 
+                                print('gettign new tp part')
+                                for i,v in next, closestbounty:GetDescendants() do 
+                                    if v:IsA('BasePart') then tpPart = v end;
+                                end;
+                            end
                         end
                     end;
                     task.spawn(function()
@@ -40749,7 +40756,11 @@ elseif universeid == 3734304510 then  -- south bronx
         if tpPart then 
             for i,v in next, tpconvert do 
                 if tostring(tpselection) == tostring(i) then 
+                    tpPart.Anchored = true
                     tpPart.CFrame = v
+                    task.delay(0.1,function()
+                        tpPart.Anchored = false
+                    end)
                 end
             end
         else
@@ -40767,6 +40778,34 @@ elseif universeid == 3734304510 then  -- south bronx
         southbroxsettings.autoloottp= e;
         if not e then return end;
     end);
+
+    rightsector:AddButton('Serverhop',function()
+        local Http = game:GetService("HttpService")
+        local Api = "https://games.roblox.com/v1/games/"
+        
+        local _servers = Api..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+        
+        
+        
+        local _servers = Api..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+        function ListServers(cursor)
+           local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
+           return Http:JSONDecode(Raw)
+        end
+        
+        local listed = 0
+        local reg = {}
+        for _,server in next, ListServers(nil).data do 
+            pcall(function()
+                if server.id ~= game.JobId then 
+                    table.insert(reg,server.id)  
+                end
+                --print(server.id)
+            end)
+        end
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId,reg[math.random(1,#reg)],game.Players.LocalPlayer)
+        
+    end)
     -- sector:AddToggle('Auto Bank Loot', false, function(e)
     --     southbroxsettings.autobankloot = e;
     --     if not e then return end;
@@ -41252,17 +41291,34 @@ elseif universeid == 3734304510 then  -- south bronx
         return metahook(self,...)
     end)
 
+    local thelooted = {}
+    local function findlooted(v)
+        local b = false
+        for i,c in next, thelooted do 
+            if c == v then b = true end; -- check if b is alr true
+        end
+        return b
+    end
     task.spawn(function()
         while task.wait() do 
             if getgenv().loopsUnload == true then print('south bronx break end') break end;
             if southbroxsettings.autoloot then 
                 for i,v in next, game.Players:GetPlayers() do 
                     if v ~= game.Players.LocalPlayer and v.Character then 
-                        if v.Character.Humanoid.Health <= 0 then 
-                            if southbroxsettings.autoloottp and azfake:returndata().humanoidrootpart then 
-                                azfake:returndata().humanoidrootpart.CFrame = v.Character.UpperTorso.CFrame
+                        if v.Character.Humanoid.Health <= 0 and v.Character:FindFirstChild('UpperTorso') then 
+                            if not findlooted(v) and v.Character.UpperTorso.ProximityPrompt.Enabled == true and (v.Character.PrimaryPart.Position - game.Players.LocalPlayer.Character.PrimaryPart.Position).Magnitude <= 5 and game.Players.LocalPlayer.Character.Humanoid.MoveDirection == Vector3.new(0,0,0) then 
+                                table.insert(thelooted, v)
+                                
+                                print('looting '..v.Character.Name)
+                                
+                                if southbroxsettings.autoloottp and azfake:returndata().humanoidrootpart then 
+                                    azfake:returndata().humanoidrootpart.CFrame = v.Character.UpperTorso.CFrame
+                                end
+                                --pcall(function()
+                                    fireproximityprompt(v.Character.UpperTorso.ProximityPrompt)
+                                --end)
+                                --task.wait(0.5)
                             end
-                            fireproximityprompt(v.Character.UpperTorso.ProximityPrompt)
                         end
                     end
                 end
