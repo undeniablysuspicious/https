@@ -38720,14 +38720,17 @@ elseif universeid == 4871329703 then -- type soul
         mobespdistance = 2000;
     }
     typesoulsettings.functions.teleport = function(pos, speed)
-        if typeof(pos) ~= 'Vector3' and typeof(pos) ~= 'CFrame' and pos:IsA('BasePart') then
+        if pos and typeof(pos) ~= 'Vector3' and typeof(pos) ~= 'CFrame' and pos:IsA('BasePart') then
             pos = pos.CFrame;
         end;   
-        if typeof(pos) == 'Vector3' then 
+        if pos and typeof(pos) == 'Vector3' then 
             pos = CFrame.new(pos);
         end;
         -- @init
-        if azfake:returndata().humanoidrootpart then 
+        if not pos then 
+            print('[tween]: no position arg #1, nil?')
+        end
+        if azfake:returndata().humanoidrootpart and pos then 
             local rootPart = azfake:returndata().humanoidrootpart;
             local dist = (pos.Position - azfake:returndata().humanoidrootpart.Position).Magnitude
             local _time = dist / 650;
