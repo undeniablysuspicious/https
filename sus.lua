@@ -40527,6 +40527,7 @@ elseif universeid == 3734304510 then  -- south bronx
         for i,v in next, game.Players:GetPlayers() do 
             if v ~= game.Players.LocalPlayer and v.Character then 
                 if southbroxsettings.headhitbox then -- oneshotkill
+                    task.wait(0.1)
                     if not v.Character:FindFirstChild('CustomHead') then 
                         local headclone = v.Character.Head:Clone()
                         headclone.Name = 'CustomHead';
@@ -40620,8 +40621,8 @@ elseif universeid == 3734304510 then  -- south bronx
             if not azfake:returndata().humanoidrootpart then return end;
             local rootPart = azfake:returndata().humanoidrootpart
             for i,v in next, game.Players:GetPlayers() do 
-                if v ~= game.Players.LocalPlayer and v.Character and v.Character.PrimaryPart then 
-                    v.Character.PrimaryPart.CFrame = rootPart.CFrame * CFrame.new(0,0,-25)
+                if v ~= game.Players.LocalPlayer and v.Character and v.Character.HumanoidRootPart then 
+                    v.Character.HumanoidRootPart.CFrame = rootPart.CFrame * CFrame.new(0,0,-25)
                     -- could put them in that frame that can view any 3d model
                     -- aimbot could do that too
                 end
@@ -40754,7 +40755,7 @@ elseif universeid == 3734304510 then  -- south bronx
                     azfakenotify('Anchoring')
                     tpPart.Anchored = true
                     tpPart.CFrame = v
-                    task.delay(4 ,function() -- for i=1,4 do print unachoring in 4-i
+                    task.delay(6 ,function() -- for i=1,4 do print unachoring in 4-i
                         azfakenotify('Unanchoring')
                         tpPart.Anchored = false
                     end)
@@ -40762,6 +40763,20 @@ elseif universeid == 3734304510 then  -- south bronx
             end
         else
             azfakenotify('No Part to TP',3)
+        end
+    end)
+    local tpbutton = sector:AddButton('Unanchor Car', function()
+        if not azfake:returndata().humanoidrootpart then return end
+        local tpPart = nil;
+        for i,v in next, workspace:GetChildren() do 
+            if v.Name:find("'s Car") then 
+                if v.DriveSeat.Occupant == azfake:returndata().humanoid and azfake:returndata().humanoid ~= nil then
+                    tpPart = v.DriveSeat
+                end
+            end
+        end
+        if tpPart then 
+            tpPart.Anchored = false
         end
     end)
     tpbutton:ActivateKnowledge();
@@ -40914,7 +40929,25 @@ elseif universeid == 3734304510 then  -- south bronx
         local getstring = "{pname}'s Car"
         getstring = string.gsub(getstring,'{pname}',game.Players.LocalPlayer.Name)
         if workspace:FindFirstChild(getstring) then 
+            --workspace[getstring].DriveSeat.Anchored = true;
+            workspace[getstring].DriveSeat:Sit(game.Players.LocalPlayer.Character.Humanoid)
+            repeat task.wait() 
+                pcall(function()
+                    workspace[getstring].DriveSeat:Sit(game.Players.LocalPlayer.Character.Humanoid)
+                end)
+            until game.Players.LocalPlayer.Character.Humanoid.Sit == true 
+            task.wait(0.001)
             workspace[getstring].DriveSeat.CFrame = cf
+        else
+            print('[no car]')
+        end
+    end
+    local function jumpVehicle(cf)
+        local getstring = "{pname}'s Car"
+        getstring = string.gsub(getstring,'{pname}',game.Players.LocalPlayer.Name)
+        if workspace:FindFirstChild(getstring) then 
+            game.Players.LocalPlayer.Character.Humanoid.Sit = false;
+            --workspace[getstring].Jump:FireServer()
         else
             print('[no car]')
         end
@@ -40934,12 +40967,14 @@ elseif universeid == 3734304510 then  -- south bronx
                     local tt1 = 0
                     repeat 
                         task.wait()
-                        if game.Players.LocalPlayer.Character.Humanoid.Sit == true then 
-                            teleportVehicle(b)
-                            tt1 += 0.1
+                        teleportVehicle(b)
+                        tt1 += 0.1
+                        if game.Players.LocalPlayer.Character.Humanoid.Sit == true then -- check if has vehicle in the first place
+                            --teleportVehicle(b)
                         end
                     until tt1 > 1
                     task.wait(0.05)
+                    jumpVehicle(); --jumpVehice()
                 else
                     local t = game.TweenService:Create(root,TweenInfo.new(timing,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = b}); t:Play()
                     task.wait(timing+0.01)
@@ -41008,7 +41043,9 @@ elseif universeid == 3734304510 then  -- south bronx
 
                     --fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
                     print('[got fake id]')
-                    game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Fake ID'))
+                    if game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
+                        game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID'))
+                    end
                 end
 
                 if southbroxsettings.safefarm then 
@@ -41021,14 +41058,14 @@ elseif universeid == 3734304510 then  -- south bronx
                 if game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
                     game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Fake ID'))
                 end
-                print('[teleporting to banekr]')
+                print('[teleporting to banekr]') -- Character:FindFirstChild('Backpack')
                 repeat 
                     task.wait()
                     tweento(bankNPCcFRAME, 2)
                     if game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') then 
                         fireproximityprompt(workspace.NPCs["Bank Teller"].UpperTorso.Attachment.ProximityPrompt)
                     end
-                until not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Character:FindFirstChild('Backpack') or getgenv().loopsUnload == true or southbroxsettings.cardfarm == false
+                until not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') or getgenv().loopsUnload == true or southbroxsettings.cardfarm == false
                 print('[banker took card]')
                 --tweento(bankNPCcFRAME) --DealerbankNPCcFRAMEFram)
                 -- check for 'application' cuz this function woul;d run if check for id saying (you already have an id)
@@ -41043,6 +41080,9 @@ elseif universeid == 3734304510 then  -- south bronx
                     print('[tweening to nearest atm]')
                     tweento(checkCardCFrame)
                     task.wait(30.5)
+                    if not checkdist(checkCardCFrame) then 
+                        tweento(checkCardCFrame)
+                    end
                     fireproximityprompt(workspace.Blank.Attachment.ProximityPrompt)
                     local atm = nil;
                     local atmdsist = nil;
@@ -41059,7 +41099,23 @@ elseif universeid == 3734304510 then  -- south bronx
                         end;
                     end;
                     game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Card'))
-                    if atm == nil then return print('[THERE WERE NO ATMS]') end;
+                    if atm == nil then print('[THERE WERE NO ATMS]') 
+                        repeat 
+                            task.wait(1)
+                            for i,v in next, workspace.ATMS:GetChildren() do 
+                                if v.ATMScreen.Transparency == 0 then 
+                                    local dist = (v.Position - game.Players.LocalPlayer.Character.PrimaryPart.Position).Magnitude;
+                                    if atm == nil then 
+                                        atm = v;
+                                        atmdsist = dist--(atm.Position - game.Players.LocalPlayer.Character.PrimaryPart.Position).Magnitude;
+                                    elseif atmdsist > dist then 
+                                        atm = v;
+                                        atmdsist = dist
+                                    end;
+                                end;
+                            end;
+                        until atm ~= nil
+                    end;
                     local inputManager = game.VirtualInputManager
                     repeat 
                         tweento(atm.CFrame, 2)
@@ -41132,7 +41188,7 @@ elseif universeid == 3734304510 then  -- south bronx
                 if type(funct) == 'function' and getinfo(funct).source:find('Gun') then
                     if tostring(getinfo(funct).name) == 'SlideHandler' then 
                         --dumpfunctions.slide = funct;
-                        applyRestraint{slide = funct}
+                        applyRestraint({slide = funct})
                     end
                 end
             end
@@ -41149,10 +41205,10 @@ elseif universeid == 3734304510 then  -- south bronx
                     --     applyRestraint{slide = funct}
                     if tostring(getinfo(funct).name) == 'Reload' then 
                         --dumpfunctions.reload = funct
-                        applyRestraint{reload = funct}
+                        applyRestraint({reload = funct})
                     elseif tostring(getinfo(funct).name) == 'TacticalReload' then 
                         --dumpfunctions.tactreload = funct
-                        applyRestraint{tactreload = funct}
+                        applyRestraint({tactreload = funct})
                     end;
                 end
             end
