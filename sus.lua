@@ -39324,7 +39324,7 @@ elseif universeid == 4871329703 then -- type soul
                                 if closestbounty then 
                                     typesoulsettings.functions.teleport(tpPart,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
                                 end
-                            until not closestbounty
+                            until not closestbounty or not tpPart or tpPart.Transparency == 1
                             --rootPart.Anchored = false;
                         end)
                     end
