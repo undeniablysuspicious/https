@@ -39164,64 +39164,130 @@ elseif universeid == 4871329703 then -- type soul
             maid.autojoinraid = nil;
             return;
         end; -- signals.connection.new()
-        maid.autojoinraid = signals.heartbeat:connect("auto join raids", function()
-            task.wait()
-            local gameIDS = {}
-            gameIDS[14069122388] = "Hueco Mundo"
-            gameIDS[14069678431] = "Karakura Town"
-            gameIDS[14069956183] = "Rukon District"
-            gameIDS[14070029709] = "Soul Society"
-            gameIDS[14069866342] = "Las Noches"
-            gameIDS[14071822972] = "Wandenreich City"
-            local GameName = ''
-            for i,v in next, gameIDS do 
-                if i == game.PlaceId then 
-                    --print('found game id')
-                    GameName = v
+        -- maid.autojoinraid = signals.heartbeat:connect("auto join raids", function()
+        --     task.wait()
+        --     local gameIDS = {}
+        --     gameIDS[14069122388] = "Hueco Mundo"
+        --     gameIDS[14069678431] = "Karakura Town"
+        --     gameIDS[14069956183] = "Rukon District"
+        --     gameIDS[14070029709] = "Soul Society"
+        --     gameIDS[14069866342] = "Las Noches"
+        --     gameIDS[14071822972] = "Wandenreich City"
+        --     local GameName = ''
+        --     for i,v in next, gameIDS do 
+        --         if i == game.PlaceId then 
+        --             --print('found game id')
+        --             GameName = v
+        --         end;
+        --     end;
+        --     local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer(GameName)
+        --     if not GetTable then 
+        --         repeat 
+        --             if GetTable == nil then 
+        --                 GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer(GameName)
+        --             end
+        --             task.wait()
+        --         until GetTable
+        --         print('waited get cooldown')
+        --     end
+        --     local foundTP = nil;
+        --     local statusafter = 'No Servers Avaiable'
+
+        --     local function checkifourserverisntaraid()
+        --         local b = false;
+        --         for i,jobIdTable in next, GetTable do 
+        --             local shouldbreak = false
+        --             if tostring(jobIdTable['JobID']) == tostring(game.JobId) and jobIdTable['Raid'] == true then 
+        --                 b = true
+        --                 WasARaidServer = true
+        --                 --break
+        --             end
+        --         end
+        --         return b
+        --     end
+
+        --     if WasARaidServer == false and checkifourserverisntaraid() == false and typesoulsettings.autojoinraid == true then 
+        --         for i,jobIdTable in next, GetTable do 
+        --             local shouldbreak = false
+        --             --if foundTP then break end;
+        --             for ind,val in next, jobIdTable do
+        --                 --print(ind,val)
+        --                 --if foundTP then break end;
+        --                 if ind == 'Raid' and val == true and jobIdTable['ServerPlayers'] <= 29 then 
+        --                     print(jobIdTable['ServerPlayers'])
+        --                     statusafter = 'Joining Server With '..tostring(jobIdTable['ServerPlayers'])
+        --                     foundTP = jobIdTable['JobID']
+        --                     shouldbreak = true
+        --                     pcall(function()
+        --                         game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(GameName,foundTP)
+        --                     end)
+        --                     task.wait(3)
+        --                 end
+        --             end
+        --         end
+        --     end
+        -- end)
+        signals.conceal(function()
+            while task.wait() do 
+                if typesoulsettings.autojoinraid == false or getgenv().loopsUnload == true then print('concealed raid join break end') break end;
+                --task.wait()
+                local gameIDS = {}
+                gameIDS[14069122388] = "Hueco Mundo"
+                gameIDS[14069678431] = "Karakura Town"
+                gameIDS[14069956183] = "Rukon District"
+                gameIDS[14070029709] = "Soul Society"
+                gameIDS[14069866342] = "Las Noches"
+                gameIDS[14071822972] = "Wandenreich City"
+                local GameName = ''
+                for i,v in next, gameIDS do 
+                    if i == game.PlaceId then 
+                        --print('found game id')
+                        GameName = v
+                    end;
                 end;
-            end;
-            local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer(GameName)
-            if not GetTable then 
-                repeat 
-                    if GetTable == nil then 
-                        GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer(GameName)
-                    end
-                    task.wait()
-                until GetTable
-                print('waited get cooldown')
-            end
-            local foundTP = nil;
-            local statusafter = 'No Servers Avaiable'
-
-            local function checkifourserverisntaraid()
-                local b = false;
-                for i,jobIdTable in next, GetTable do 
-                    local shouldbreak = false
-                    if tostring(jobIdTable['JobID']) == tostring(game.JobId) and jobIdTable['Raid'] == true then 
-                        b = true
-                        WasARaidServer = true
-                        --break
-                    end
+                local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer(GameName)
+                if not GetTable then 
+                    repeat 
+                        if GetTable == nil then 
+                            GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer(GameName)
+                        end
+                        task.wait()
+                    until GetTable or typesoulsettings.autojoinraid == false or getgenv().loopsUnload == true 
+                    print('waited get cooldown')
                 end
-                return b
-            end
-
-            if WasARaidServer == false and checkifourserverisntaraid() == false and typesoulsettings.autojoinraid == true then 
-                for i,jobIdTable in next, GetTable do 
-                    local shouldbreak = false
-                    --if foundTP then break end;
-                    for ind,val in next, jobIdTable do
-                        --print(ind,val)
+                local foundTP = nil;
+                local statusafter = 'No Servers Avaiable'
+    
+                local function checkifourserverisntaraid()
+                    local b = false;
+                    for i,jobIdTable in next, GetTable do 
+                        local shouldbreak = false
+                        if tostring(jobIdTable['JobID']) == tostring(game.JobId) and jobIdTable['Raid'] == true then 
+                            b = true
+                            WasARaidServer = true
+                            --break
+                        end
+                    end
+                    return b
+                end
+    
+                if WasARaidServer == false and checkifourserverisntaraid() == false and typesoulsettings.autojoinraid == true and GetTable then 
+                    for i,jobIdTable in next, GetTable do 
+                        local shouldbreak = false
                         --if foundTP then break end;
-                        if ind == 'Raid' and val == true and jobIdTable['ServerPlayers'] <= 29 then 
-                            print(jobIdTable['ServerPlayers'])
-                            statusafter = 'Joining Server With '..tostring(jobIdTable['ServerPlayers'])
-                            foundTP = jobIdTable['JobID']
-                            shouldbreak = true
-                            pcall(function()
-                                game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(GameName,foundTP)
-                            end)
-                            task.wait(3)
+                        for ind,val in next, jobIdTable do
+                            --print(ind,val)
+                            --if foundTP then break end;
+                            if ind == 'Raid' and val == true and jobIdTable['ServerPlayers'] <= 29 then 
+                                print(jobIdTable['ServerPlayers'])
+                                statusafter = 'Joining Server With '..tostring(jobIdTable['ServerPlayers'])
+                                foundTP = jobIdTable['JobID']
+                                shouldbreak = true
+                                pcall(function()
+                                    game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(GameName,foundTP)
+                                end)
+                                task.wait(3)
+                            end
                         end
                     end
                 end
