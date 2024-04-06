@@ -7759,8 +7759,9 @@ local universeid = signals.compile('httpservice'):JSONDecode(game:HttpGet(`https
 local azfakebuild = {
     build = 'v3';
     vs = 'a';
-    code = '1'
+    code = '1';
 }
+if vs == 'debug' then azfakebuild.build = 'v4' end;
 local compiledVersion = azfakebuild['build']..'.'..azfakebuild.vs..azfakebuild.code
 
 if game.PlaceId == 0 then 
@@ -38714,6 +38715,9 @@ elseif universeid == 4871329703 then -- type soul
         npcesp = false;
         npcespcolor = Color3.fromRGB(255,255,255);
         npcespdistance = 2000;
+        mobesp = false;
+        mobespcolor = Color3.fromRGB(255,255,255);
+        mobespdistance = 2000;
     }
     typesoulsettings.functions.teleport = function(pos, speed)
         if typeof(pos) ~= 'Vector3' and pos:IsA('BasePart') then
@@ -39388,7 +39392,11 @@ elseif universeid == 4871329703 then -- type soul
                             repeat 
                                 task.wait()
                                 if closestbounty then 
-                                    typesoulsettings.functions.teleport(tpPart,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
+                                    if checkdist(30, tpPart) then 
+                                        game.Players.LocalPlayer.Character.PrimaryPart.CFrame = tpPart.CFrame
+                                    else
+                                        typesoulsettings.functions.teleport(tpPart,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
+                                    end
                                 end
                             until not closestbounty or not tpPart or tpPart.Transparency == 1 or not  closestbounty:FindFirstChild('Items')
                             --rootPart.Anchored = false;
@@ -39551,6 +39559,7 @@ elseif universeid == 4871329703 then -- type soul
         local disableremove = t.removeondisable
         local pivoting = t.usepivot
         local selfname = t.selfname
+        local primarypart = t.primarypart -- ppart
         local b = esp_lib:Add(child, {
             SelfName = selfname;
             IsEnabled = flag;
@@ -39564,6 +39573,7 @@ elseif universeid == 4871329703 then -- type soul
             active = activet;
             removeondisable = disableremove;
             usepivot = pivoting;
+            PrimaryPart = primarypart
         });
         return b
     end
@@ -39716,6 +39726,72 @@ elseif universeid == 4871329703 then -- type soul
             }
         end
     end)
+
+
+
+
+    espsector:AddToggle('Mob Esp',false,function(e)
+        typesoulsettings.mobesp = e;
+        if not e then return end;
+        for i,v in next, workspace.Entities:GetChildren() do -- workspace.MissionBoards:GetChildren() 
+            if not game.Players:GetPlayerFromCharacter(v) then 
+                rayEsp{
+                    child = v;
+                    PrimaryPart = v.PrimaryPart;
+                    selfname = true;
+                    entity = true;
+                    flag = 'mobesp';
+                    maxdist = function()
+                        return typesoulsettings.mobespdistance
+                    end,
+                    color = function()
+                        return typesoulsettings.mobespcolor
+                    end,
+                    active = function()
+                        return typesoulsettings.mobesp
+                    end;
+                    --nobox = true;
+                    --notracer = true;
+                    removeondisable = true;
+                }   
+            end
+        end
+    end)
+    espsector:AddColorpicker('Mob Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        typesoulsettings.mobespcolor = ztx
+    end)
+    espsector:AddSlider("Mob Esp Range", 0, 200, 5000, 1, function(State)
+        typesoulsettings.mobespdistance = State -- ['lootboxespdistance']
+    end)
+
+    workspace:WaitForChild('Entities').ChildAdded:Connect(function(child)
+        if typesoulsettings.mobesp then 
+            if not game.Players:GetPlayerFromCharacter(child) then 
+                rayEsp{
+                    child = child;
+                    PrimaryPart = child.PrimaryPart;
+                    selfname = true;
+                    entity = true;
+                    flag = 'mobesp';
+                    maxdist = function()
+                        return typesoulsettings.mobespdistance
+                    end,
+                    color = function()
+                        return typesoulsettings.mobespcolor
+                    end,
+                    active = function()
+                        return typesoulsettings.mobesp
+                    end;
+                    --nobox = true;
+                    --notracer = true;
+                    removeondisable = true;
+                }   
+            end
+        end
+    end)
+
+
+
 
 
     do
@@ -41269,6 +41345,7 @@ getgenv().versioncode = '#5c'
 getgenv().azfake_version = 'v3, 4a'--'v3 '..getgenv().versioncode
 
 
+
 Notify('','Running | Version | '..compiledVersion,'untilClick')
 if vs == 'debug' then 
     azfakenotify('A real scripter has the power for code to come to life;','untilClick') -- 'AZFAKE',
@@ -41276,7 +41353,9 @@ end
 -- print(typeofazfake)
 -- pee es fiye
 
-window.NameLabel.Text = 'Mixous Hub V3 - '..typeofazfake -- Project V3 
+local getVersion = string.upper(azfakebuild.build)
+
+window.NameLabel.Text = `Mixous Hub {getVersion} - `..typeofazfake -- Project V3 
 --[[
     local BillboardGui = Instance.new('BillboardGui')
 BillboardGui.LightInfluence = 1
