@@ -40751,9 +40751,11 @@ elseif universeid == 3734304510 then  -- south bronx
         if tpPart then 
             for i,v in next, tpconvert do 
                 if tostring(tpselection) == tostring(i) then 
+                    azfakenotify('Anchoring')
                     tpPart.Anchored = true
                     tpPart.CFrame = v
-                    task.delay(0.1,function()
+                    task.delay(4 ,function() -- for i=1,4 do print unachoring in 4-i
+                        azfakenotify('Unanchoring')
                         tpPart.Anchored = false
                     end)
                 end
@@ -41121,7 +41123,7 @@ elseif universeid == 3734304510 then  -- south bronx
         end)
     end; -- applyRestraint{slide = fuunct}
 
-    rightsector:AddToggle('Anti Jam Gun', false, function(e)
+    rightsector:AddButton('Anti Jam Gun',function(e)
         southbroxsettings.antijam = e;
         if not e then return end;
         dumpgunmodules()
@@ -41136,7 +41138,7 @@ elseif universeid == 3734304510 then  -- south bronx
             end
         end)
     end) -- ani
-    rightsector:AddToggle('No Cooldown Shoot',false, function(e)
+    rightsector:AddButton('No Cooldown Shoot', function(e)
         southbroxsettings.nocooldownshoot = e;
         if not e then return end;
         task.spawn(function()
