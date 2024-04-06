@@ -6093,7 +6093,7 @@ end
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/hairlinebrockeb/-back-ups-for-libs/main/cat", true))()
 -- 492, 598 "Azfake V3{"..vs..','..game.PlaceId..'}' -- M1xup Azzfake Azfake V3 M1xact
 
-local OpenGUBUTTON = Enum.KeyCode.Insert
+local OpenGUBUTTON = Enum.KeyCode.LeftAlt --Insert
 local window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(492, 598), OpenGUBUTTON) -- 2nd argument is the size, 3rd is the show/hide ofc
 local wtm = library:CreateWatermark('Azfake HUB V3',Vector3.new(100,100,50))
 
@@ -6543,17 +6543,19 @@ azfake.traceresp = function(opposing,info)
     end)
     return prep
 end
-local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
-esp_lib.Players = false;
-esp_lib.Boxes = false;
-esp_lib.Names = false;
---esp_lib.AutoRemove = true;
-esp_lib.Settings.usecustomespcolor = true;
-esp_lib:Toggle(true)
 
 local function setupEspTab(globaltable) -- Espwindow
     local EspTab = window:CreateTab('ESP')
     local playerespsector = EspTab:CreateSector('Player Esp','left')
+    local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
+    esp_lib.Players = false;
+    esp_lib.Boxes = false;
+    esp_lib.Names = false;
+    --esp_lib.AutoRemove = true;
+    esp_lib.Settings.usecustomespcolor = true;
+    esp_lib:Toggle(true)
+
+
     globaltable['setupespsettings'] = {
         playeresp = false;
         traceraim = false;
@@ -39875,6 +39877,27 @@ elseif universeid == 4871329703 then -- type soul
 
         -- suikawari
         parryAnims['14071653586'] = 0.65 -- attack taken at 0.7
+
+        -- bisection
+        parryAnims['14071628131'] = 0.52
+
+        --senmaioroshi
+        parryAnims['14071650108'] = function(mob, anim, id)
+            typesoulsettings.functions.parrylist({0.3,0.2,0.2,0.2}, mob, 10, anim) -- {0.4,0.3}
+        end;
+
+        -- rising swallow
+        parryAnims['14071648861'] = 0.25 -- attack fully happens at 0.35 (swirl) the attack to confirm the swirl is at 0.3
+
+        -- vertical down
+        parryAnims['14071657488'] = 0.35 -- just did 0.4 on random cuz it was already there for testing a previous timing and the attack was exactly on 0.4
+
+        -- spit gate
+        parryAnims['14071652427'] = 0.45
+
+        -- overpowering slash
+        parryAnims['14071644383'] = 0.5
+
     end
 
 
@@ -39985,6 +40008,7 @@ elseif universeid == 4871329703 then -- type soul
     local farmstatus = 'idle'
     local made1godead = false;
     local gripped = false;
+    local teleportingtoboard = false;
     local function getstatus()
         return farmstatus
     end
@@ -40060,18 +40084,23 @@ elseif universeid == 4871329703 then -- type soul
                             --     quested = true;
                             -- end;
                             local hasqueue = false;
-                            repeat 
-                                task.wait(1)
-                                typesoulsettings.functions.teleport(boardget.WorldPivot.Position, typesoulsettings.tweenspeed) --150)
-                                if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then 
-                                    hasqueue = true;
-                                end
-                                if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true then 
-                                    hasqueue = true;
-                                end
-                            until typesoulsettings.autofarm == false or hasqueue == true or checkdist(10, boardget.WorldPivot.Position)
-    
-                            task.wait(.5)
+                            teleportingtoboard = true 
+                            if teleportingtoboard == false then 
+                                teleportingtoboard = true 
+                                repeat 
+                                    task.wait(1)
+                                    typesoulsettings.functions.teleport(boardget.WorldPivot.Position, typesoulsettings.tweenspeed) --150)
+                                    if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then 
+                                        hasqueue = true;
+                                    end
+                                    if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true then 
+                                        hasqueue = true;
+                                    end
+                                until typesoulsettings.autofarm == false or hasqueue == true or checkdist(10, boardget.WorldPivot.Position)
+        
+                                task.wait(.5)
+                                -- else could return
+                            end
                             -- repeat -- teleport to board
                             --     task.wait(.5);
                             --     if not checkdist(30, boardget.WorldPivot.Position) then 
@@ -40576,41 +40605,7 @@ elseif universeid == 3734304510 then  -- south bronx
     sector:AddToggle('One Shot Gun', false, function(e)
         southbroxsettings.oneshotkill = e;
     end);
-    sector:AddToggle('Anti Jam Gun', false, function(e)
-        southbroxsettings.antijam = e;
-        if not e then return end;
-        dumpgunmodules()
-        task.spawn(function()
-            repeat 
-                task.wait()
-                if dumpfunctions.slide then 
-                    debug.setupvalue(dumpfunctions.slide, 3, true)
-                    debug.setupvalue(dumpfunctions.slide, 1, false)
-                    debug.setupvalue(dumpfunctions.slide, 4, false)
-                end
-            until 1 == 2 or not game.Players.LocalPlayer.Character
-        end)
-    end) -- ani
-    sector:AddToggle('No Cooldown Shoot',false, function(e)
-        southbroxsettings.nocooldownshoot = e;
-        if not e then return end;
-        dumpgunmodules()
-        task.spawn(function()
-            repeat 
-                task.wait()
-                if dumpfunctions.slide then 
-                    debug.setupvalue(dumpfunctions.slide, 3, true)
-                end
-                if dumpfunctions.reload then 
-                    debug.setupvalue(dumpfunctions.reload, 1, true)
-                end
-                if dumpfunctions.tactreload then 
-                    debug.setupvalue(dumpfunctions.tactreload, 1, true)
-                end
-            until 1 == 2 or not game.Players.LocalPlayer.Character
-        end)
-
-    end)
+    --
     sector:AddToggle('Always Hit Headshot',false, function(e)
         southbroxsettings.alwayshitheadshots = e;
         if not e then return end;
@@ -41106,6 +41101,62 @@ elseif universeid == 3734304510 then  -- south bronx
         debug.setupvalue(getunf,6,math.huge)
         azfakenotify('Reload Gun.',3)
     end);
+    local function applyRestraint(dumpfunctions)
+        task.spawn(function()
+            repeat 
+                task.wait()
+                if dumpfunctions.slide then 
+                    debug.setupvalue(dumpfunctions.slide, 3, true)
+                   -- debug.setupvalue(dumpfunctions.slide, 3, true)
+                    debug.setupvalue(dumpfunctions.slide, 1, false)
+                    debug.setupvalue(dumpfunctions.slide, 4, false)
+                end
+                if dumpfunctions.reload then 
+                    debug.setupvalue(dumpfunctions.reload, 1, true)
+                end
+                if dumpfunctions.tactreload then 
+                    debug.setupvalue(dumpfunctions.tactreload, 1, true)
+                end
+            until 1 == 2 or not game.Players.LocalPlayer.Character
+        end)
+    end; -- applyRestraint{slide = fuunct}
+
+    rightsector:AddToggle('Anti Jam Gun', false, function(e)
+        southbroxsettings.antijam = e;
+        if not e then return end;
+        dumpgunmodules()
+        task.spawn(function()
+            for index,funct in next, getgc() do 
+                if type(funct) == 'function' and getinfo(funct).source:find('Gun') then
+                    if tostring(getinfo(funct).name) == 'SlideHandler' then 
+                        --dumpfunctions.slide = funct;
+                        applyRestraint{slide = funct}
+                    end
+                end
+            end
+        end)
+    end) -- ani
+    rightsector:AddToggle('No Cooldown Shoot',false, function(e)
+        southbroxsettings.nocooldownshoot = e;
+        if not e then return end;
+        task.spawn(function()
+            for index,funct in next, getgc() do 
+                if type(funct) == 'function' and getinfo(funct).source:find('Gun') then
+                    -- if tostring(getinfo(funct).name) == 'SlideHandler' then 
+                    --     --dumpfunctions.slide = funct;
+                    --     applyRestraint{slide = funct}
+                    if tostring(getinfo(funct).name) == 'Reload' then 
+                        --dumpfunctions.reload = funct
+                        applyRestraint{reload = funct}
+                    elseif tostring(getinfo(funct).name) == 'TacticalReload' then 
+                        --dumpfunctions.tactreload = funct
+                        applyRestraint{tactreload = funct}
+                    end;
+                end
+            end
+        end)
+
+    end)
     leftsect:AddToggle('Silent Aim', false, function(e)
         southbroxsettings.silentaim = e;
     end);
