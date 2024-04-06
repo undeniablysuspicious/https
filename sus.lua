@@ -39560,6 +39560,7 @@ elseif universeid == 4871329703 then -- type soul
         local pivoting = t.usepivot
         local selfname = t.selfname
         local primarypart = t.primarypart -- ppart
+        local entity = t.entity
         local b = esp_lib:Add(child, {
             SelfName = selfname;
             IsEnabled = flag;
@@ -39573,7 +39574,8 @@ elseif universeid == 4871329703 then -- type soul
             active = activet;
             removeondisable = disableremove;
             usepivot = pivoting;
-            PrimaryPart = primarypart
+            PrimaryPart = primarypart;
+            entity = entity;
         });
         return b
     end
@@ -39765,6 +39767,7 @@ elseif universeid == 4871329703 then -- type soul
     end)
 
     workspace:WaitForChild('Entities').ChildAdded:Connect(function(child)
+        task.wait(0.5)
         if typesoulsettings.mobesp then 
             if not game.Players:GetPlayerFromCharacter(child) then 
                 rayEsp{
