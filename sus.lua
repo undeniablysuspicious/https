@@ -39157,6 +39157,7 @@ elseif universeid == 4871329703 then -- type soul
         local raidresult = RaidJoin.func()
         azfakenotify(tostring(statusafter),3)
     end)
+    local WasARaidServer = false
     lefttab:AddToggle('Auto Join Raid', false, function(e)
         typesoulsettings.autojoinraid = e;
         if not e then 
@@ -39196,15 +39197,16 @@ elseif universeid == 4871329703 then -- type soul
                 local b = false;
                 for i,jobIdTable in next, GetTable do 
                     local shouldbreak = false
-                    if jobIdTable['JobID'] == game.JobId and jobIdTable['Raid'] == true then 
+                    if tostring(jobIdTable['JobID']) == tostring(game.JobId) and jobIdTable['Raid'] == true then 
                         b = true
-                        break
+                        WasARaidServer = true
+                        --break
                     end
                 end
                 return b
             end
 
-            if checkifourserverisntaraid() == false and typesoulsettings.autojoinraid == true then 
+            if WasARaidServer == false and checkifourserverisntaraid() == false and typesoulsettings.autojoinraid == true then 
                 for i,jobIdTable in next, GetTable do 
                     local shouldbreak = false
                     --if foundTP then break end;
@@ -39225,7 +39227,7 @@ elseif universeid == 4871329703 then -- type soul
                 end
             end
         end)
-    end)
+    end,'DONTSAVE')
     lefttab:AddToggle('Lootbox Non-Blatant', false, function(e)
         typesoulsettings.lootnonblatant = e;
     end)
@@ -39253,6 +39255,9 @@ elseif universeid == 4871329703 then -- type soul
                     end
                 end;
                 if closestbounty then 
+                    task.delay(20,function()
+                        WasARaidServer = false;
+                    end)
                     closestbounty:WaitForChild('Items')
                     print('waiting for items')
                     local function claimLootbox(item, lootbox)
@@ -39310,7 +39315,7 @@ elseif universeid == 4871329703 then -- type soul
                         until not closestbounty or not closestbounty and closestbounty:FindFirstChild('Items') 
                     end)
                     if typesoulsettings.lootnonblatant == false then 
-                        rootPart.Anchored = true;
+                        --rootPart.Anchored = true;
                         --local tppart = closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:IsA('Model') and closestbounty:FindFirstChildOfClass('BasePart')
                         typesoulsettings.functions.teleport(tpPart,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
                         task.spawn(function()
@@ -39320,7 +39325,7 @@ elseif universeid == 4871329703 then -- type soul
                                     typesoulsettings.functions.teleport(tpPart,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
                                 end
                             until not closestbounty
-                            rootPart.Anchored = false;
+                            --rootPart.Anchored = false;
                         end)
                     end
                 end
