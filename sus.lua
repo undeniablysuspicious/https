@@ -40139,7 +40139,7 @@ elseif universeid == 4871329703 then -- type soul
                                                 firesignal(v.Yes.MouseButton1Click);
                                             end;
                                         end
-                                    until game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true
+                                    until justresettofix == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true
                                 end);
     
                                 task.spawn(function()
@@ -40151,8 +40151,8 @@ elseif universeid == 4871329703 then -- type soul
                                             task.wait(1)
                                             haschanged = status ~= getstatus() or false
                                             timeawaited += 1
-                                        until haschanged or timeawaited >= 7
-                                        if not haschanged and timeawaited >= 7 and game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
+                                        until justresettofix == true or haschanged or timeawaited >= 7
+                                        if justresettofix == false and not haschanged and timeawaited >= 7 and game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
                                             print('[status has been tweening for time]'..status..'-'..getstatus())
                                             if checkdist(10, boardget.WorldPivot.Position)  then 
                                                 fireclickdetector(boardget.Union.ClickDetector);
