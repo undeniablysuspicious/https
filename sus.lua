@@ -38720,7 +38720,7 @@ elseif universeid == 4871329703 then -- type soul
         mobespdistance = 2000;
     }
     typesoulsettings.functions.teleport = function(pos, speed)
-        if typeof(pos) ~= 'Vector3' and pos:IsA('BasePart') then
+        if typeof(pos) ~= 'Vector3' and typeof(pos) ~= 'CFrame' and pos:IsA('BasePart') then
             pos = pos.CFrame;
         end;   
         if typeof(pos) == 'Vector3' then 
@@ -38961,7 +38961,7 @@ elseif universeid == 4871329703 then -- type soul
             forentity:Add(child.Name)
         end;
     end); table.insert(typesoulsettings.connections, entityadded);
-    local entityremoved; entityremoved = workspace.Entities.ChildAdded:Connect(function(child)
+    local entityremoved; entityremoved = workspace.Entities.ChildRemoved:Connect(function(child)
         task.wait(.1);
         if child.Name ~= game.Players.LocalPlayer.Name and table.find(entitylist, child.Name) then 
             forentity:Remove(child.Name)
@@ -39331,8 +39331,10 @@ elseif universeid == 4871329703 then -- type soul
                     closestbounty:WaitForChild('Items')
                     print('waiting for items')
                     local function claimLootbox(item, lootbox)
-                        local id = lootbox:GetAttribute('ID')
-                        game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(id, item)
+                        if checkdist(10, tpPart) then 
+                            local id = lootbox:GetAttribute('ID')
+                            game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(id, item)
+                        end
                     end;
                     local tpPart = nil;
                     for i,v in next, closestbounty:GetDescendants() do 
@@ -39355,8 +39357,10 @@ elseif universeid == 4871329703 then -- type soul
                             repeat 
                                 task.wait()
                                 ticky += 0.1
-                                if ID then 
+                                if ID and checkdist(10, tpPart) then 
+                                    print('grabbing with id '..ID)
                                     for i,v in next, itemsTho do 
+                                        print('getting '..v)
                                         game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(ID, v)
                                     end
                                 else
@@ -39387,20 +39391,22 @@ elseif universeid == 4871329703 then -- type soul
                     if typesoulsettings.lootnonblatant == false then 
                         --rootPart.Anchored = true;
                         --local tppart = closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:IsA('Model') and closestbounty:FindFirstChildOfClass('BasePart')
-                        typesoulsettings.functions.teleport(tpPart,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
-                        task.spawn(function()
-                            repeat 
-                                task.wait()
-                                if closestbounty then 
-                                    if checkdist(30, tpPart) then 
-                                        game.Players.LocalPlayer.Character.PrimaryPart.CFrame = tpPart.CFrame
-                                    else
-                                        typesoulsettings.functions.teleport(tpPart,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
+                        if tpPart then 
+                            typesoulsettings.functions.teleport(tpPart,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
+                            task.spawn(function()
+                                repeat 
+                                    task.wait()
+                                    if closestbounty then 
+                                        if checkdist(30, tpPart) then 
+                                            game.Players.LocalPlayer.Character.PrimaryPart.CFrame = tpPart.CFrame
+                                        else
+                                            typesoulsettings.functions.teleport(tpPart,150) --(closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart'), 150)
+                                        end
                                     end
-                                end
-                            until not closestbounty or not tpPart or tpPart.Transparency == 1 or not  closestbounty:FindFirstChild('Items')
-                            --rootPart.Anchored = false;
-                        end)
+                                until not closestbounty or not tpPart or tpPart.Transparency == 1 or not  closestbounty:FindFirstChild('Items')
+                                --rootPart.Anchored = false;
+                            end)
+                        end
                     end
                 end
             end);
