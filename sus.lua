@@ -38728,6 +38728,7 @@ elseif universeid == 4871329703 then -- type soul
         mobespdistance = 2000;
         goupafterdeath = false;
         fullbright = false;
+        m2beforeparry = false;
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -38825,6 +38826,9 @@ elseif universeid == 4871329703 then -- type soul
 
     typesoulsettings.functions.parry = function(hold)
         if not typesoulsettings.functions.getentityfolder() then return print('no entity folder') end;
+        if typesoulsettings.m2beforeparry then 
+            azfake:returndata().character.CharacterHandler.Remotes.M2:FireServer()
+        end
         typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Pressed")
         if hold then 
             task.wait(hold) -- @shouldve concealed
@@ -38934,6 +38938,12 @@ elseif universeid == 4871329703 then -- type soul
             end
         end
     end)
+    sector:AddToggle('Feint Before Parry', false, function(e)
+        typesoulsettings.m2beforeparry = e;
+    end)
+    -- sector:AddToggle('Auto Feint', false, function(e)
+    --     typesoulsettings.m2beforeparry = e;
+    -- end)
     sector:AddSlider("Auto Parry Distance", 0, 0, 100, 1, function(State)
         typesoulsettings.autoparrydistance = State -- deepwtykensettings  typesoulsettings
     end)
@@ -40150,7 +40160,7 @@ elseif universeid == 4871329703 then -- type soul
                 game.Lighting.ClockTime = 12;
                 game.Lighting.FogEnd = 1400;
                 game.Lighting.Ambient = Color3.fromRGB(255,255,255)
-                game.Lighting.Brightness = 2;
+                game.Lighting.Brightness = 0;
                 game.Lighting.GlobalShadows = false;
             end
             if typesoulsettings.rainbowcloak == true and azfake:returndata().character then 
@@ -40780,7 +40790,7 @@ elseif universeid == 3734304510 then  -- south bronx
             if not azfake:returndata().humanoidrootpart then return end;
             local rootPart = azfake:returndata().humanoidrootpart
             for i,v in next, game.Players:GetPlayers() do 
-                if v ~= game.Players.LocalPlayer and v.Character and v.Character.HumanoidRootPart then 
+                if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild('HumanoidRootPart') then 
                     v.Character.HumanoidRootPart.CFrame = rootPart.CFrame * CFrame.new(0,0,-25)
                     -- could put them in that frame that can view any 3d model
                     -- aimbot could do that too
