@@ -39339,7 +39339,7 @@ elseif universeid == 4871329703 then -- type soul
                     end)
                     closestbounty:WaitForChild('Items')
                     print('waiting for items')
-                    local tpPart = nil;
+                    local tpPart = closestbounty:IsA('Model') and closestbounty.PrimaryPart or closestbounty:FindFirstChildOfClass('BasePart') or nil;
                     for i,v in next, closestbounty:GetDescendants() do 
                         if v:IsA('BasePart') then 
                             tpPart = v 
@@ -40140,6 +40140,9 @@ elseif universeid == 4871329703 then -- type soul
     local made1godead = false;
     local gripped = false;
     local teleportingtoboard = false;
+    local AmountOfDeadEnemies = 0;
+    local AmountOfGripped = 0;
+    local AmountOfEnemies = 0; --{}
     local function getstatus()
         return farmstatus
     end
@@ -40284,6 +40287,11 @@ elseif universeid == 4871329703 then -- type soul
                                             task.delay(5,function()
                                                 setstatus('idle')
                                                 justresettofix = false
+                                                isfarming = false;
+                                                made1godead = false;
+                                                gripped = false;
+                                                AmountOfGripped = 0
+                                                AmountOfDeadEnemies = 0;
                                             end)
                                         end
                                     end
@@ -40412,6 +40420,13 @@ elseif universeid == 4871329703 then -- type soul
                             local bothdead = false
                             teleportingtoboard = false
                             --typesoulsettings.functions.removecurrenttweens()
+                            if AmountOfEnemies == 0 then 
+                                for i,v in next, workspace.Entities:GetChildren() do -- get closestenemies in 150
+                                    if v:IsA('Model') and not game.Players:FindFirstChild(v.Name) and v.PrimaryPart and (v:FindFirstChildWhichIsA('BillboardGui') and checkdist(5000,v.PrimaryPart) or checkdist(300,v.PrimaryPart)) and (v:FindFirstChildWhichIsA('Highlight') or v:FindFirstChildWhichIsA('BillboardGui')) and v:FindFirstChildWhichIsA('Humanoid') and v:FindFirstChildWhichIsA('Humanoid').Health > 0 then
+                                        AmountOfEnemies += 1
+                                    end
+                                end
+                            end
                             for i,v in next, workspace.Entities:GetChildren() do -- get closestenemies in 150
                                 if v:IsA('Model') and not game.Players:FindFirstChild(v.Name) and v.PrimaryPart and (v:FindFirstChildWhichIsA('BillboardGui') and checkdist(5000,v.PrimaryPart) or checkdist(300,v.PrimaryPart)) and (v:FindFirstChildWhichIsA('Highlight') or v:FindFirstChildWhichIsA('BillboardGui')) and v:FindFirstChildWhichIsA('Humanoid') and v:FindFirstChildWhichIsA('Humanoid').Health > 0 then 
                                     -- check if highlight maybe
@@ -40449,7 +40464,7 @@ elseif universeid == 4871329703 then -- type soul
                                                 typesoulsettings.functions.teleport(HumanoidRootPart_Enemy.CFrame * cframecheck, typesoulsettings.tweenspeed) --150)
                                             end
 
-                                        until not v or checkdist(45,v.PrimaryPart) or not HumanoidRootPart_Enemy
+                                        until not v or v.PrimaryPart and checkdist(45,v.PrimaryPart) or not HumanoidRootPart_Enemy
                                     end;
                                     print('enter re')
                                     setstatus('attacking') -- farmimg
@@ -40459,12 +40474,20 @@ elseif universeid == 4871329703 then -- type soul
                                         typesoulsettings.functions.removecurrenttweens()
                                         cframecheck = CFrame.new(typesoulsettings.farmx,typesoulsettings.farmy,typesoulsettings.farmz) * CFrame.Angles(math.rad(typesoulsettings.farmrotation),math.rad(0),math.rad(0))
                                         if v:FindFirstChildWhichIsA('Humanoid').Health == 1 then 
+                                            if holdfolder[v.Name] == false then 
+                                               -- AmountOfDeadEnemies += 1
+                                            end
+                                            -- if smaller then amountofenemies
+                                            if AmountOfDeadEnemies < AmountOfEnemies then 
+                                                AmountOfDeadEnemies += 1
+                                            end
                                             holdfolder[v.Name] = true;
-                                            if made1godead == false then 
-                                                made1godead = nil
-                                            elseif made1godead == nil then 
-                                                made1godead = true;
-                                            end;
+                                            -- if made1godead == false then 
+                                            --     made1godead = nil
+                                            -- elseif made1godead == nil then 
+                                            --     made1godead = true;
+                                            -- end;
+                                            
                                             for i,v in next, holdfolder do 
                                                 if v == true then 
                                                     amount += 1
@@ -40511,12 +40534,20 @@ elseif universeid == 4871329703 then -- type soul
                                     until typesoulsettings.autofarm == false or holdfolder[v.Name] == true or not v or v == nil or getstatus() == 'idle' or getstatus() == 'gripping' or v.Parent == nil or v:FindFirstChildWhichIsA('Humanoid').Health <= 0 or bothdead == true
                                     print('shouldve broken')
                                     
-                                    if v:FindFirstChildWhichIsA('Humanoid').Health == 1 and made1godead == true then -- typesoulsettings.autogrip only players
-                                        if gripped == false then 
-                                            gripped = nil;
-                                        elseif gripped == nil then 
-                                            gripped = true;
-                                        end;
+                                    local function revertFarmingStatus()
+                                        setstatus('idle')
+                                        isfarming = false;
+                                        made1godead = false;
+                                        gripped = false;
+                                        AmountOfGripped = 0
+                                        AmountOfDeadEnemies = 0;
+                                    end
+                                    if v:FindFirstChildWhichIsA('Humanoid').Health == 1 and AmountOfDeadEnemies >= AmountOfEnemies then -- typesoulsettings.autogrip only players
+                                        --if gripped == false then 
+                                            --gripped = nil;
+                                        --elseif gripped == nil then 
+                                            --gripped = true;
+                                        --end;
                                         rootPart.CFrame = v.HumanoidRootPart.CFrame 
                                         repeat 
                                             task.wait(1) 
@@ -40531,19 +40562,19 @@ elseif universeid == 4871329703 then -- type soul
                                             task.wait(1) 
                                         until azfake:returndata().character.Humanoid.WalkSpeed ~= 0 or not v:FindFirstChild('HumanoidRootPart')
                                         print('FINISHED GRIP')
-                                        if gripped == true then 
-                                            setstatus('idle')
-                                            isfarming = false;
-                                            made1godead = false;
-                                            gripped = false;
+                                        if AmountOfGripped >= AmountOfDeadEnemies then -- RESET  FUNCTION
+                                            revertFarmingStatus()
                                         else
                                             isfarming = false;
+                                            AmountOfGripped += 1
                                             setstatus('idle')
                                         end;
                                     else
                                         setstatus('idle')
                                         isfarming = false;
                                         print('WASNT A HUMANOID MOB')
+                                        AmountOfGripped = 0
+                                        AmountOfDeadEnemies = 0;
                                         if made1godead ~= nil then 
                                             made1godead = false;
                                             gripped = false;
