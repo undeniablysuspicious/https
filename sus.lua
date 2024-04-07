@@ -38629,15 +38629,15 @@ elseif universeid == 4871329703 then -- type soul
     local farmrightsect = tab:CreateSector('Cheats','right')
     local espsector = esptab:CreateSector('Cheats','left')
 
-    -- local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
-    -- esp_lib.Players = false;
-    -- esp_lib.Boxes = false;
-    -- esp_lib.Names = false;
-    -- esp_lib.AutoRemove = true;
-    -- esp_lib.Settings.usecustomespcolor = true;
-    -- esp_lib:Toggle(true)
+    local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
+    esp_lib.Players = false;
+    esp_lib.Boxes = false;
+    esp_lib.Names = false;
+    esp_lib.AutoRemove = true;
+    esp_lib.Settings.usecustomespcolor = true;
+    esp_lib:Toggle(true)
 
-    local esp_lib = {}
+    --local esp_lib = {}
 
     local RaidJoin = signals.new(function()
         local gameIDS = {}
