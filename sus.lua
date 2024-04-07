@@ -38684,6 +38684,7 @@ elseif universeid == 4871329703 then -- type soul
     getgenv().typesoulsettings = {
         functions = {};
         connections = {};
+        tweens = {};
         autoparry = false;
         autoparrydistance = 0;
         pingadjuster = 0;
@@ -38725,8 +38726,17 @@ elseif universeid == 4871329703 then -- type soul
         mobesp = false;
         mobespcolor = Color3.fromRGB(255,255,255);
         mobespdistance = 2000;
+        goupafterdeath = false;
+        fullbright = false;
     }
-    typesoulsettings.functions.teleport = function(pos, speed)
+    typesoulsettings.functions.removecurrenttweens = function()
+        for i,v in next, typesoulsettings.tweens do 
+            v:Pause();
+            v:Cancel();
+            table.remove(typesoulsettings.tweens, i)
+        end
+    end;
+    typesoulsettings.functions.teleport = function(pos, speed) -- another arg for should cancel any tweens in table
         if pos and typeof(pos) ~= 'Vector3' and typeof(pos) ~= 'CFrame' and pos:IsA('BasePart') then
             pos = pos.CFrame;
         end;   
@@ -38740,13 +38750,14 @@ elseif universeid == 4871329703 then -- type soul
         if azfake:returndata().humanoidrootpart and pos then 
             local rootPart = azfake:returndata().humanoidrootpart;
             local dist = (pos.Position - azfake:returndata().humanoidrootpart.Position).Magnitude
-            local _time = dist / 650;
+            local _time = dist / 300 --650;
             _time += 0.2
             if speed then 
-                _time += (speed / 1000)
+                _time -= (speed / 250) -- +=  1000
             end
-            game.TweenService:Create(rootPart,TweenInfo.new(_time,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = pos}):Play()
-            
+            local newtween = game.TweenService:Create(rootPart,TweenInfo.new(_time,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = pos})
+            newtween:Play()
+            table.insert(typesoulsettings.tweens, newtween)
             -- repeat 
             --     task.wait(.5)
             --     dist = (pos.Position - azfake:returndata().humanoidrootpart.Position).Magnitude
@@ -39055,7 +39066,7 @@ elseif universeid == 4871329703 then -- type soul
                 end
             end;
             if closestbounty then 
-                typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.Part or closestbounty)
+                typesoulsettings.functions.teleport(closestbounty:IsA('Model') and closestbounty.Part or closestbounty, typesoulsettings.tweenspeed)
             end
         end);
     end)
@@ -39614,7 +39625,16 @@ elseif universeid == 4871329703 then -- type soul
             end;
         end)
     end)
-
+    newother:AddToggle('Auto Division 12',false,function(e)
+        typesoulsettings.autodivision12 = e;
+    end)
+    newother:AddToggle('Anti Void After Quest',false,function(e)
+        typesoulsettings.goupafterdeath = e;
+    end)
+    newother:AddToggle('Full Bright',false,function(e)
+        typesoulsettings.fullbright = e;
+    end)
+    --
 
     sharedRequires['CreateFlySystem'](sector, typesoulsettings)
     sharedRequires['CreateWalkSpeedSystem'](sector, typesoulsettings)
@@ -39958,6 +39978,21 @@ elseif universeid == 4871329703 then -- type soul
         -- overpowering slash
         parryAnims['14071644383'] = 0.5
 
+        -- byakurai
+        parryAnims['14071666095'] = 0.48
+
+        -- tenran
+        parryAnims['14071705811'] = 0.5 -- whole charge finishes at 0.51
+
+        -- geki
+        parryAnims['14071676388'] = 0.9 -- havent actually tested what geki does
+
+        -- hainawa
+        parryAnims['14071708829'] = 0.8 -- attack at 0.9?? havent actually tested what hainawa does
+
+        -- zangerin
+        parryAnims['14071719657'] = 0.72
+
     end
 
 
@@ -40057,11 +40092,31 @@ elseif universeid == 4871329703 then -- type soul
             end;
         end)
     end
+    local function divison12setup(child)
+        task.spawn(function()
+            repeat 
+                if typesoulsettings.autodivision12 then 
+                    for i,v in next, child:WaitForChild('Frame'):GetChildren() do 
+                        firesignal(v.MouseButton1Click)
+                    end;
+                end
+                task.wait(0.05)
+            until not child
+        end)
+    end
     game:GetService("Players").LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
         if child.Name == 'Leaderboard' then task.wait(2) setupLeaderboardAdded() end;
+        if child.Name == 'Division11Minigame' then 
+            divison12setup(child)
+        end
     end)
-    if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerGui') and game:GetService("Players").LocalPlayer:FindFirstChild('PlayerGui'):FindFirstChild('Leaderboard') then 
-        setupLeaderboardAdded()
+    if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerGui') then 
+        if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerGui'):FindFirstChild('Leaderboard') then 
+            setupLeaderboardAdded()
+        end
+        if game:GetService("Players").LocalPlayer:FindFirstChild('PlayerGui'):FindFirstChild('Division11Minigame') then 
+            divison12setup(child)
+        end
     end
 
     AddConfigurations()
@@ -40087,6 +40142,13 @@ elseif universeid == 4871329703 then -- type soul
                     v:Disconnect(); -- print(i) cna u name connections?
                 end
                 break
+            end
+            if typesoulsettings.fullbright == true then 
+                game.Lighting.ClockTime = 12;
+                game.Lighting.FogEnd = 1400;
+                game.Lighting.Ambient = Color3.fromRGB(255,255,255)
+                game.Lighting.Brightness = 2;
+                game.Lighting.GlobalShadows = false;
             end
             if typesoulsettings.rainbowcloak == true and azfake:returndata().character then 
                 pcall(function()
@@ -40147,23 +40209,27 @@ elseif universeid == 4871329703 then -- type soul
                             --     quested = true;
                             -- end;
                             local hasqueue = false;
-                            teleportingtoboard = true 
-                            if teleportingtoboard == false then 
+                            --teleportingtoboard = true 
+                            if teleportingtoboard == false and azfake:returndata().character then 
                                 teleportingtoboard = true 
                                 repeat 
                                     task.wait(1)
-                                    typesoulsettings.functions.teleport(boardget.WorldPivot.Position, typesoulsettings.tweenspeed) --150)
-                                    if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then 
-                                        hasqueue = true;
+                                    if azfake:returndata().humanoidrootpart then 
+                                        boardget = getclosestboard()['board'].Board
+                                        typesoulsettings.functions.teleport(boardget.WorldPivot.Position, typesoulsettings.tweenspeed) --150)
+                                        if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then 
+                                            hasqueue = true;
+                                        end
+                                        if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true then 
+                                            hasqueue = true;
+                                        end
                                     end
-                                    if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true then 
-                                        hasqueue = true;
-                                    end
-                                until typesoulsettings.autofarm == false or hasqueue == true or checkdist(10, boardget.WorldPivot.Position)
+                                until typesoulsettings.autofarm == false or hasqueue == true or checkdist(10, boardget.WorldPivot.Position) or game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled or game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true
         
                                 task.wait(.5)
                                 -- else could return
                             end
+                            teleportingtoboard = false
                             -- repeat -- teleport to board
                             --     task.wait(.5);
                             --     if not checkdist(30, boardget.WorldPivot.Position) then 
@@ -40220,7 +40286,9 @@ elseif universeid == 4871329703 then -- type soul
                             --print('[is near board]')
                             gui = game.Players.LocalPlayer.PlayerGui:FindFirstChild('DialogueUI')
                             if gui and #gui:GetChildren() ~= 2 and game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
-                                fireclickdetector(boardget.Union.ClickDetector);
+                                if boardget.Union then 
+                                    fireclickdetector(boardget.Union.ClickDetector);
+                                end
                             end
                             if gui then 
                                 task.wait(1)
@@ -40316,7 +40384,9 @@ elseif universeid == 4871329703 then -- type soul
                         end;
                         if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == false and game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
                             quested = false;
+                            teleportingtoboard = false
                             if getstatus() ~= 'tweening' then 
+                                teleportingtoboard = false
                                 setstatus('idle')
                             end
                         end;    
@@ -40325,8 +40395,9 @@ elseif universeid == 4871329703 then -- type soul
                             --setstatus('attacking') -- farmimg
                             local holdfolder = {}
                             local bothdead = false
+                            teleportingtoboard = false
                             for i,v in next, workspace.Entities:GetChildren() do -- get closestenemies in 150
-                                if v:IsA('Model') and not game.Players:FindFirstChild(v.Name) and v.PrimaryPart and checkdist(300,v.PrimaryPart) and v:FindFirstChildWhichIsA('Highlight') and v:FindFirstChildWhichIsA('Humanoid') and v:FindFirstChildWhichIsA('Humanoid').Health > 0 then 
+                                if v:IsA('Model') and not game.Players:FindFirstChild(v.Name) and v.PrimaryPart and (v:FindFirstChildWhichIsA('BillboardGui') and checkdist(5000,v.PrimaryPart) or checkdist(300,v.PrimaryPart)) and (v:FindFirstChildWhichIsA('Highlight') or v:FindFirstChildWhichIsA('BillboardGui')) and v:FindFirstChildWhichIsA('Humanoid') and v:FindFirstChildWhichIsA('Humanoid').Health > 0 then 
                                     -- check if highlight maybe
                                     -- make function a repeat
                                     -- print(holdfolder)
@@ -40352,6 +40423,7 @@ elseif universeid == 4871329703 then -- type soul
                                     end;
                                     print('enter re')
                                     setstatus('attacking') -- farmimg
+                                    typesoulsettings.functions.removecurrenttweens()
                                     repeat 
                                         task.wait()
                                         cframecheck = CFrame.new(typesoulsettings.farmx,typesoulsettings.farmy,typesoulsettings.farmz) * CFrame.Angles(math.rad(typesoulsettings.farmrotation),math.rad(0),math.rad(0))
@@ -40446,6 +40518,14 @@ elseif universeid == 4871329703 then -- type soul
                                             gripped = false;
                                         end
                                     end
+                                    if typesoulsettings.goupafterdeath == true then 
+                                        task.delay(0.2,function()-- reeutnda
+                                            if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == false then 
+                                                azfake:returndata().humanoidrootpart.CFrame *= CFrame.new(0,25,0)
+                                            end
+                                        end)
+                                    end
+                                    --
                                     
                                     
                                     -- if typesoulsettings.autogrip and bothdead and v then  -- and not getstatus('gripping')        v:FindFirstChildWhichIsA('Humanoid').Health == 1 and 
