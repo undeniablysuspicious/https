@@ -6850,7 +6850,7 @@ local function setupAimbotTab(globaltable)
         globaltable['aimbotsettings']['aimbot'] = xstate
     end)
     pvpsector:AddSeperator('')
-    local aimbotrigger = pvpsector:AddKeybindAttachment('Aimbot Button'):AddKeybind(nil,'aimbotkeybind')
+    local aimbotrigger = pvpsector:AddKeybindAttachment('Aimbot Button'):AddKeybind(nil,'aimbotkeybind') -- nil,'aimbotkeybind'
     aimbotbutton:AddKeybind()
     pvpsector:AddToggle('Movement Prediction',false,function(xstate)
         globaltable['aimbotsettings']['movementpredictions'] = xstate
@@ -6936,7 +6936,7 @@ local function setupAimbotTab(globaltable)
                     pos = xpos
                 end
             end
-            if not globaltable['aimbotsettings']['currenttarget'] or globaltable['aimbotsettings']['currenttarget'] == nil or globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('Humanoid').Health == 0 then 
+            if not globaltable['aimbotsettings']['currenttarget'] or globaltable['aimbotsettings']['currenttarget'] == nil or globaltable['aimbotsettings']['currenttarget'] and globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild('Humanoid').Health == 0 then 
                 globaltable['aimbotsettings']['currenttarget'] = nil
                 globaltable['aimbotsettings']['currenttargetdistance'] = nil
             end
@@ -38750,7 +38750,7 @@ elseif universeid == 4871329703 then -- type soul
         if azfake:returndata().humanoidrootpart and pos then 
             local rootPart = azfake:returndata().humanoidrootpart;
             local dist = (pos.Position - azfake:returndata().humanoidrootpart.Position).Magnitude
-            local _time = dist / 300 --650;
+            local _time = dist / 250 --650;
             _time += 0.2
             if speed then 
                 _time -= (speed / 250) -- +=  1000
@@ -39674,6 +39674,9 @@ elseif universeid == 4871329703 then -- type soul
         return b
     end
 
+    espsector:AddToggle('Enable ESP', false, function(xstate)
+        esp_lib:Toggle(xstate)
+    end)
     espsector:AddToggle('Use Names', false, function(xstate)
         typesoulsettings.espnames = xstate;
         esp_lib.Names = xstate
@@ -40215,16 +40218,18 @@ elseif universeid == 4871329703 then -- type soul
                                 repeat 
                                     task.wait(1)
                                     if azfake:returndata().humanoidrootpart then 
-                                        boardget = getclosestboard()['board'].Board
-                                        typesoulsettings.functions.teleport(boardget.WorldPivot.Position, typesoulsettings.tweenspeed) --150)
-                                        if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then 
-                                            hasqueue = true;
-                                        end
-                                        if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true then 
-                                            hasqueue = true;
+                                        if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == false or game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
+                                            boardget = getclosestboard()['board'].Board
+                                            typesoulsettings.functions.teleport(boardget.WorldPivot.Position, typesoulsettings.tweenspeed) --150)
+                                            if game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true then 
+                                                hasqueue = true;
+                                            end
+                                            if game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true then 
+                                                hasqueue = true;
+                                            end
                                         end
                                     end
-                                until typesoulsettings.autofarm == false or hasqueue == true or checkdist(10, boardget.WorldPivot.Position) or game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled or game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true
+                                until typesoulsettings.autofarm == false or hasqueue == true or checkdist(10, boardget.WorldPivot.Position) or game.Players.LocalPlayer.PlayerGui:FindFirstChild('QueueUI').Enabled == true or game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == true
         
                                 task.wait(.5)
                                 -- else could return
@@ -40396,6 +40401,7 @@ elseif universeid == 4871329703 then -- type soul
                             local holdfolder = {}
                             local bothdead = false
                             teleportingtoboard = false
+                            --typesoulsettings.functions.removecurrenttweens()
                             for i,v in next, workspace.Entities:GetChildren() do -- get closestenemies in 150
                                 if v:IsA('Model') and not game.Players:FindFirstChild(v.Name) and v.PrimaryPart and (v:FindFirstChildWhichIsA('BillboardGui') and checkdist(5000,v.PrimaryPart) or checkdist(300,v.PrimaryPart)) and (v:FindFirstChildWhichIsA('Highlight') or v:FindFirstChildWhichIsA('BillboardGui')) and v:FindFirstChildWhichIsA('Humanoid') and v:FindFirstChildWhichIsA('Humanoid').Health > 0 then 
                                     -- check if highlight maybe
@@ -40426,6 +40432,7 @@ elseif universeid == 4871329703 then -- type soul
                                     typesoulsettings.functions.removecurrenttweens()
                                     repeat 
                                         task.wait()
+                                        typesoulsettings.functions.removecurrenttweens()
                                         cframecheck = CFrame.new(typesoulsettings.farmx,typesoulsettings.farmy,typesoulsettings.farmz) * CFrame.Angles(math.rad(typesoulsettings.farmrotation),math.rad(0),math.rad(0))
                                         if v:FindFirstChildWhichIsA('Humanoid').Health == 1 then 
                                             holdfolder[v.Name] = true;
@@ -40489,16 +40496,16 @@ elseif universeid == 4871329703 then -- type soul
                                         rootPart.CFrame = v.HumanoidRootPart.CFrame 
                                         repeat 
                                             task.wait(1) 
-                                            if azfake:returndata().character.Humanoid.WalkSpeed ~= 0 then 
+                                            if azfake:returndata().character.Humanoid.WalkSpeed ~= 0 and v:FindFirstChild('HumanoidRootPart') then 
                                                 rootPart.CFrame = v.HumanoidRootPart.CFrame
                                                 azfake:returndata().character.CharacterHandler.Remotes.Execute:FireServer()
                                             end
                                             task.wait(2)
-                                        until azfake:returndata().character.Humanoid.WalkSpeed == 0
+                                        until azfake:returndata().character.Humanoid.WalkSpeed == 0 or not v:FindFirstChild('HumanoidRootPart')
                                         print('MID GRIP')
                                         repeat 
                                             task.wait(1) 
-                                        until azfake:returndata().character.Humanoid.WalkSpeed ~= 0
+                                        until azfake:returndata().character.Humanoid.WalkSpeed ~= 0 or not v:FindFirstChild('HumanoidRootPart')
                                         print('FINISHED GRIP')
                                         if gripped == true then 
                                             setstatus('idle')
