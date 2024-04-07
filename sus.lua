@@ -40301,7 +40301,7 @@ elseif universeid == 4871329703 then -- type soul
                             --print('[is near board]')
                             gui = game.Players.LocalPlayer.PlayerGui:FindFirstChild('DialogueUI')
                             if gui and #gui:GetChildren() ~= 2 and game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible == false then 
-                                if boardget.Union then 
+                                if boardget:FindFirstChild('Union') then 
                                     fireclickdetector(boardget.Union.ClickDetector);
                                 end
                             end
@@ -40430,12 +40430,26 @@ elseif universeid == 4871329703 then -- type soul
                                     -- end
                                     -- if amount == #holdfolder then bothdead = true print('both dead') end;
                                     local dist = checkdist(45,v.PrimaryPart) -- 30
+                                    local function gethrp()
+                                        local _r = nil;
+                                        for __, gg in next, v:GetChildren() do
+                                            if gg.Name == 'HumanoidRootPart' and gg:IsA('BasePart') then 
+                                                _r = gg ;
+                                                break
+                                            end
+                                        end 
+                                        return _r
+                                    end
+                                    local HumanoidRootPart_Enemy = gethrp()
                                     local canAttack = true;
                                     if not dist then 
                                         repeat 
                                             task.wait(0.1)
-                                            typesoulsettings.functions.teleport(v.HumanoidRootPart.CFrame * cframecheck, typesoulsettings.tweenspeed) --150)
-                                        until not v or checkdist(45,v.PrimaryPart)
+                                            if v.PrimaryPart then 
+                                                typesoulsettings.functions.teleport(HumanoidRootPart_Enemy.CFrame * cframecheck, typesoulsettings.tweenspeed) --150)
+                                            end
+
+                                        until not v or checkdist(45,v.PrimaryPart) or not HumanoidRootPart_Enemy
                                     end;
                                     print('enter re')
                                     setstatus('attacking') -- farmimg
@@ -40462,7 +40476,7 @@ elseif universeid == 4871329703 then -- type soul
                                             end;
                                             if amount == amountinfolder then bothdead = true print('both dead') else print(amount,amountinfolder) end;
                                         end;
-                                        rootPart.CFrame = v.HumanoidRootPart.CFrame * cframecheck;
+                                        rootPart.CFrame = HumanoidRootPart_Enemy.CFrame * cframecheck; -- v.HumanoidRootPart
                                         -- if dist then 
                                         --     --rootPart.CFrame = v.HumanoidRootPart.CFrame * cframecheck;
                                         --     -- carry; tp to sky; grip
