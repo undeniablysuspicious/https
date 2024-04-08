@@ -1118,7 +1118,900 @@ if isV4 then
         end
     end)
 end
+--
+local function runDebugPanel()
+    -- Gui to Lua
+    -- Version: 3.2
 
+    -- Instances:
+    if game.CoreGui:FindFirstChild('AzfakeDebugMenu') then game.CoreGui:FindFirstChild('AzfakeDebugMenu'):Destroy() end;
+    if game.Lighting:FindFirstChild('AzfakianBlur') then game.Lighting:FindFirstChild('AzfakianBlur'):Destroy() end;
+
+    local AzfakeDebugMenu = Instance.new("ScreenGui")
+    local DiscordFrame = Instance.new("Frame")
+    local UICorner = Instance.new("UICorner")
+    local UIGradient = Instance.new("UIGradient")
+    local TextLabel = Instance.new("TextLabel")
+    local TextLabel_2 = Instance.new("TextLabel")
+    local DiscordButton = Instance.new("ImageButton")
+    local UICorner_2 = Instance.new("UICorner")
+    local GameFrame = Instance.new("Frame")
+    local UICorner_3 = Instance.new("UICorner")
+    local UIGradient_2 = Instance.new("UIGradient")
+    local JOBIDCOPY = Instance.new("ImageButton")
+    local UICorner_4 = Instance.new("UICorner")
+    local GameStatus = Instance.new("TextLabel")
+    local JOBIDLABAEL = Instance.new("TextLabel")
+    local PlaceIdCOPY = Instance.new("ImageButton")
+    local UICorner_5 = Instance.new("UICorner")
+    local PLACEIDLABEL = Instance.new("TextLabel")
+    local UniverseIDLABEL = Instance.new("TextLabel")
+    local UNIVERSECOPY = Instance.new("ImageButton")
+    local UICorner_6 = Instance.new("UICorner")
+    local __justdata = Instance.new("TextLabel")
+    local executor = Instance.new("TextLabel")
+    local version = Instance.new("TextLabel")
+    local __justdata_2 = Instance.new("TextLabel")
+    local playersingame = Instance.new("TextLabel")
+    local __justdata_3 = Instance.new("TextLabel")
+    local NotesFrame = Instance.new("Frame")
+    local UICorner_7 = Instance.new("UICorner")
+    local UIGradient_3 = Instance.new("UIGradient")
+    local ScrollingFrame = Instance.new("ScrollingFrame")
+    local TextBox = Instance.new("TextBox")
+    local ExecutionFrame = Instance.new("Frame")
+    local UICorner_8 = Instance.new("UICorner")
+    local UIGradient_4 = Instance.new("UIGradient")
+    local ScrollingFrame_2 = Instance.new("ScrollingFrame")
+    local ExecBox = Instance.new("TextBox")
+    local Execute = Instance.new("TextButton")
+    local PlayerDetailsFrame = Instance.new("Frame")
+    local UICorner_9 = Instance.new("UICorner")
+    local UIGradient_5 = Instance.new("UIGradient")
+    local Profile = Instance.new("ImageLabel")
+    local UICorner_10 = Instance.new("UICorner")
+    local PlayerUsername = Instance.new("TextLabel")
+    local PLAYERSTATUS = Instance.new("TextLabel")
+    local OpenPanelFrame = Instance.new("Frame")
+    local UICorner_11 = Instance.new("UICorner")
+    local UIGradient_6 = Instance.new("UIGradient")
+    local TextLabel_3 = Instance.new("TextLabel")
+    local TextLabel_4 = Instance.new("TextLabel")
+    local TextBox_2 = Instance.new("TextBox")
+    local UICorner_12 = Instance.new("UICorner")
+    local QuickCommandsFrame = Instance.new("Frame")
+    local UICorner_13 = Instance.new("UICorner")
+    local UIGradient_7 = Instance.new("UIGradient")
+    local Rejoin = Instance.new("ImageButton")
+    local UICorner_14 = Instance.new("UICorner")
+    local CloseGame = Instance.new("ImageButton")
+    local UICorner_15 = Instance.new("UICorner")
+    local SideFrame = Instance.new("Frame")
+    local ImageButton = Instance.new("ImageButton")
+    local UICorner_16 = Instance.new("UICorner")
+    local OutputFrame = Instance.new("Frame")
+    local UICorner_17 = Instance.new("UICorner")
+    local UIGradient_8 = Instance.new("UIGradient")
+    local ScrollingFrame_3 = Instance.new("ScrollingFrame")
+    local Output = Instance.new("TextBox")
+
+    --Properties:
+
+    AzfakeDebugMenu.Name = "AzfakeDebugMenu"
+    AzfakeDebugMenu.Parent = game.CoreGui
+    AzfakeDebugMenu.Enabled = false
+    AzfakeDebugMenu.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+    DiscordFrame.Name = "DiscordFrame"
+    DiscordFrame.Parent = AzfakeDebugMenu
+    DiscordFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    DiscordFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    DiscordFrame.BorderSizePixel = 0
+    DiscordFrame.Position = UDim2.new(0.0258620698, 0, 0.0536332019, 0)
+    DiscordFrame.Size = UDim2.new(0.18965517, 0, 0.321130902, 0)
+
+    UICorner.CornerRadius = UDim.new(0, 5)
+    UICorner.Parent = DiscordFrame
+
+    UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(40, 40, 40)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(47, 47, 47))}
+    UIGradient.Parent = DiscordFrame
+
+    TextLabel.Parent = DiscordFrame
+    TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel.BackgroundTransparency = 1.000
+    TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    TextLabel.BorderSizePixel = 0
+    TextLabel.Position = UDim2.new(-0.000295142556, 0, 0.0602409728, 0)
+    TextLabel.Size = UDim2.new(0.345356166, 0, 0.166821152, 0)
+    TextLabel.Font = Enum.Font.SourceSansBold
+    TextLabel.Text = "Discord"
+    TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel.TextSize = 18.000
+
+    TextLabel_2.Parent = DiscordFrame
+    TextLabel_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel_2.BackgroundTransparency = 1.000
+    TextLabel_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    TextLabel_2.BorderSizePixel = 0
+    TextLabel_2.Position = UDim2.new(0.0681818202, 0, 0.23169601, 0)
+    TextLabel_2.Size = UDim2.new(0.859090924, 0, 0.680259526, 0)
+    TextLabel_2.Font = Enum.Font.SourceSansBold
+    TextLabel_2.Text = "Mixous V4 : discord.gg/azfake, Come join the community!"
+    TextLabel_2.TextColor3 = Color3.fromRGB(230, 230, 230)
+    TextLabel_2.TextSize = 15.000
+    TextLabel_2.TextWrapped = true
+    TextLabel_2.TextXAlignment = Enum.TextXAlignment.Left
+    TextLabel_2.TextYAlignment = Enum.TextYAlignment.Top
+
+    DiscordButton.Name = "DiscordButton"
+    DiscordButton.Parent = DiscordFrame
+    DiscordButton.Active = false
+    DiscordButton.BackgroundColor3 = Color3.fromRGB(52, 52, 52)
+    DiscordButton.BackgroundTransparency = 0.400
+    DiscordButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    DiscordButton.BorderSizePixel = 0
+    DiscordButton.Position = UDim2.new(0.0636167005, 0, 0.472659886, 0)
+    DiscordButton.Selectable = false
+    DiscordButton.Size = UDim2.new(0.190397471, 0, 0.194624647, 0)
+    DiscordButton.Image = "rbxassetid://10825594179"
+    DiscordButton.ScaleType = Enum.ScaleType.Fit
+
+    UICorner_2.CornerRadius = UDim.new(0, 5)
+    UICorner_2.Parent = DiscordButton
+
+    GameFrame.Name = "GameFrame"
+    GameFrame.Parent = AzfakeDebugMenu
+    GameFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    GameFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    GameFrame.BorderSizePixel = 0
+    GameFrame.Position = UDim2.new(0.0258620698, 0, 0.383990347, 0)
+    GameFrame.Size = UDim2.new(0.18965517, 0, 0.346428543, 0)
+
+    UICorner_3.CornerRadius = UDim.new(0, 5)
+    UICorner_3.Parent = GameFrame
+
+    UIGradient_2.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(40, 40, 40)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(47, 47, 47))}
+    UIGradient_2.Parent = GameFrame
+
+    JOBIDCOPY.Name = "JOBIDCOPY"
+    JOBIDCOPY.Parent = GameFrame
+    JOBIDCOPY.Active = false
+    JOBIDCOPY.BackgroundColor3 = Color3.fromRGB(52, 52, 52)
+    JOBIDCOPY.BackgroundTransparency = 0.400
+    JOBIDCOPY.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    JOBIDCOPY.BorderSizePixel = 0
+    JOBIDCOPY.Position = UDim2.new(0.807733119, 0, 0.180563658, 0)
+    JOBIDCOPY.Selectable = false
+    JOBIDCOPY.Size = UDim2.new(0.158441544, 0, 0.153412804, 0)
+    JOBIDCOPY.Image = "rbxassetid://10825594179"
+    JOBIDCOPY.ScaleType = Enum.ScaleType.Fit
+
+    UICorner_4.CornerRadius = UDim.new(0, 5)
+    UICorner_4.Parent = JOBIDCOPY
+
+    GameStatus.Name = "Game Status"
+    GameStatus.Parent = GameFrame
+    GameStatus.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    GameStatus.BackgroundTransparency = 1.000
+    GameStatus.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    GameStatus.BorderSizePixel = 0
+    GameStatus.Position = UDim2.new(-0.000295142556, 0, 0.0433972292, 0)
+    GameStatus.Size = UDim2.new(0.687741101, 0, 0.166821137, 0)
+    GameStatus.Font = Enum.Font.SourceSansBold
+    GameStatus.Text = "Game Information"
+    GameStatus.TextColor3 = Color3.fromRGB(255, 255, 255)
+    GameStatus.TextSize = 18.000
+
+    JOBIDLABAEL.Name = "JOBIDLABAEL"
+    JOBIDLABAEL.Parent = GameFrame
+    JOBIDLABAEL.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    JOBIDLABAEL.BackgroundTransparency = 1.000
+    JOBIDLABAEL.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    JOBIDLABAEL.BorderSizePixel = 0
+    JOBIDLABAEL.Position = UDim2.new(0.0636166334, 0, 0.205922872, 0)
+    JOBIDLABAEL.Size = UDim2.new(0.703876495, 0, 0.106791869, 0)
+    JOBIDLABAEL.Font = Enum.Font.SourceSansBold
+    JOBIDLABAEL.Text = "Job Id: "
+    JOBIDLABAEL.TextColor3 = Color3.fromRGB(230, 230, 230)
+    JOBIDLABAEL.TextSize = 15.000
+    JOBIDLABAEL.TextWrapped = true
+    JOBIDLABAEL.TextXAlignment = Enum.TextXAlignment.Left
+    JOBIDLABAEL.TextYAlignment = Enum.TextYAlignment.Top
+
+    PlaceIdCOPY.Name = "PlaceIdCOPY"
+    PlaceIdCOPY.Parent = GameFrame
+    PlaceIdCOPY.Active = false
+    PlaceIdCOPY.BackgroundColor3 = Color3.fromRGB(52, 52, 52)
+    PlaceIdCOPY.BackgroundTransparency = 0.400
+    PlaceIdCOPY.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    PlaceIdCOPY.BorderSizePixel = 0
+    PlaceIdCOPY.Position = UDim2.new(0.807733119, 0, 0.339498371, 0)
+    PlaceIdCOPY.Selectable = false
+    PlaceIdCOPY.Size = UDim2.new(0.158441544, 0, 0.153412804, 0)
+    PlaceIdCOPY.Image = "rbxassetid://10825594179"
+    PlaceIdCOPY.ScaleType = Enum.ScaleType.Fit
+
+    UICorner_5.CornerRadius = UDim.new(0, 5)
+    UICorner_5.Parent = PlaceIdCOPY
+
+    PLACEIDLABEL.Name = "PLACEIDLABEL"
+    PLACEIDLABEL.Parent = GameFrame
+    PLACEIDLABEL.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    PLACEIDLABEL.BackgroundTransparency = 1.000
+    PLACEIDLABEL.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    PLACEIDLABEL.BorderSizePixel = 0
+    PLACEIDLABEL.Position = UDim2.new(0.0636166334, 0, 0.364857584, 0)
+    PLACEIDLABEL.Size = UDim2.new(0.703876495, 0, 0.106791869, 0)
+    PLACEIDLABEL.Font = Enum.Font.SourceSansBold
+    PLACEIDLABEL.Text = "Place Id:"
+    PLACEIDLABEL.TextColor3 = Color3.fromRGB(230, 230, 230)
+    PLACEIDLABEL.TextSize = 15.000
+    PLACEIDLABEL.TextWrapped = true
+    PLACEIDLABEL.TextXAlignment = Enum.TextXAlignment.Left
+    PLACEIDLABEL.TextYAlignment = Enum.TextYAlignment.Top
+
+    UniverseIDLABEL.Name = "UniverseIDLABEL"
+    UniverseIDLABEL.Parent = GameFrame
+    UniverseIDLABEL.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    UniverseIDLABEL.BackgroundTransparency = 1.000
+    UniverseIDLABEL.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    UniverseIDLABEL.BorderSizePixel = 0
+    UniverseIDLABEL.Position = UDim2.new(0.0636166334, 0, 0.540974438, 0)
+    UniverseIDLABEL.Size = UDim2.new(0.703876495, 0, 0.106791869, 0)
+    UniverseIDLABEL.Font = Enum.Font.SourceSansBold
+    UniverseIDLABEL.Text = "Universe Id:"
+    UniverseIDLABEL.TextColor3 = Color3.fromRGB(230, 230, 230)
+    UniverseIDLABEL.TextSize = 15.000
+    UniverseIDLABEL.TextWrapped = true
+    UniverseIDLABEL.TextXAlignment = Enum.TextXAlignment.Left
+    UniverseIDLABEL.TextYAlignment = Enum.TextYAlignment.Top
+
+    UNIVERSECOPY.Name = "UNIVERSECOPY"
+    UNIVERSECOPY.Parent = GameFrame
+    UNIVERSECOPY.Active = false
+    UNIVERSECOPY.BackgroundColor3 = Color3.fromRGB(52, 52, 52)
+    UNIVERSECOPY.BackgroundTransparency = 0.400
+    UNIVERSECOPY.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    UNIVERSECOPY.BorderSizePixel = 0
+    UNIVERSECOPY.Position = UDim2.new(0.807733119, 0, 0.515615225, 0)
+    UNIVERSECOPY.Selectable = false
+    UNIVERSECOPY.Size = UDim2.new(0.158441544, 0, 0.153412804, 0)
+    UNIVERSECOPY.Image = "rbxassetid://10825594179"
+    UNIVERSECOPY.ScaleType = Enum.ScaleType.Fit
+
+    UICorner_6.CornerRadius = UDim.new(0, 5)
+    UICorner_6.Parent = UNIVERSECOPY
+
+    __justdata.Name = "__justdata"
+    __justdata.Parent = GameFrame
+    __justdata.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    __justdata.BackgroundTransparency = 1.000
+    __justdata.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    __justdata.BorderSizePixel = 0
+    __justdata.Position = UDim2.new(0.0636166334, 0, 0.691318095, 0)
+    __justdata.Size = UDim2.new(0.263439655, 0, 0.0853141993, 0)
+    __justdata.Font = Enum.Font.SourceSansBold
+    __justdata.Text = "Executor:"
+    __justdata.TextColor3 = Color3.fromRGB(191, 191, 191)
+    __justdata.TextSize = 15.000
+    __justdata.TextWrapped = true
+    __justdata.TextXAlignment = Enum.TextXAlignment.Left
+    __justdata.TextYAlignment = Enum.TextYAlignment.Top
+
+    executor.Name = "executor"
+    executor.Parent = GameFrame
+    executor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    executor.BackgroundTransparency = 1.000
+    executor.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    executor.BorderSizePixel = 0
+    executor.Position = UDim2.new(0.364915341, 0, 0.691318095, 0)
+    executor.Size = UDim2.new(0.263439655, 0, 0.0853141993, 0)
+    executor.Font = Enum.Font.SourceSansBold
+    executor.Text = ""
+    executor.TextColor3 = Color3.fromRGB(230, 230, 230)
+    executor.TextSize = 15.000
+    executor.TextWrapped = true
+    executor.TextXAlignment = Enum.TextXAlignment.Left
+    executor.TextYAlignment = Enum.TextYAlignment.Top
+
+    version.Name = "version"
+    version.Parent = GameFrame
+    version.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    version.BackgroundTransparency = 1.000
+    version.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    version.BorderSizePixel = 0
+    version.Position = UDim2.new(0.364915341, 0, 0.764342129, 0)
+    version.Size = UDim2.new(0.263439655, 0, 0.0853141993, 0)
+    version.Font = Enum.Font.SourceSansBold
+    version.Text = ""
+    version.TextColor3 = Color3.fromRGB(230, 230, 230)
+    version.TextSize = 15.000
+    version.TextWrapped = true
+    version.TextXAlignment = Enum.TextXAlignment.Left
+    version.TextYAlignment = Enum.TextYAlignment.Top
+
+    __justdata_2.Name = "__justdata"
+    __justdata_2.Parent = GameFrame
+    __justdata_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    __justdata_2.BackgroundTransparency = 1.000
+    __justdata_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    __justdata_2.BorderSizePixel = 0
+    __justdata_2.Position = UDim2.new(0.0636166334, 0, 0.764342129, 0)
+    __justdata_2.Size = UDim2.new(0.263439655, 0, 0.0853141993, 0)
+    __justdata_2.Font = Enum.Font.SourceSansBold
+    __justdata_2.Text = "Version:"
+    __justdata_2.TextColor3 = Color3.fromRGB(191, 191, 191)
+    __justdata_2.TextSize = 15.000
+    __justdata_2.TextWrapped = true
+    __justdata_2.TextXAlignment = Enum.TextXAlignment.Left
+    __justdata_2.TextYAlignment = Enum.TextYAlignment.Top
+
+    playersingame.Name = "playersingame"
+    playersingame.Parent = GameFrame
+    playersingame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    playersingame.BackgroundTransparency = 1.000
+    playersingame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    playersingame.BorderSizePixel = 0
+    playersingame.Position = UDim2.new(0.360350192, 0, 0.845957279, 0)
+    playersingame.Size = UDim2.new(0.263439655, 0, 0.0853141993, 0)
+    playersingame.Font = Enum.Font.SourceSansBold
+    playersingame.Text = ""
+    playersingame.TextColor3 = Color3.fromRGB(230, 230, 230)
+    playersingame.TextSize = 15.000
+    playersingame.TextWrapped = true
+    playersingame.TextXAlignment = Enum.TextXAlignment.Left
+    playersingame.TextYAlignment = Enum.TextYAlignment.Top
+
+    __justdata_3.Name = "__justdata"
+    __justdata_3.Parent = GameFrame
+    __justdata_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    __justdata_3.BackgroundTransparency = 1.000
+    __justdata_3.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    __justdata_3.BorderSizePixel = 0
+    __justdata_3.Position = UDim2.new(0.0590515025, 0, 0.845957279, 0)
+    __justdata_3.Size = UDim2.new(0.263439655, 0, 0.0853141993, 0)
+    __justdata_3.Font = Enum.Font.SourceSansBold
+    __justdata_3.Text = "Players:"
+    __justdata_3.TextColor3 = Color3.fromRGB(191, 191, 191)
+    __justdata_3.TextSize = 15.000
+    __justdata_3.TextWrapped = true
+    __justdata_3.TextXAlignment = Enum.TextXAlignment.Left
+    __justdata_3.TextYAlignment = Enum.TextYAlignment.Top
+
+    NotesFrame.Name = "NotesFrame"
+    NotesFrame.Parent = AzfakeDebugMenu
+    NotesFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    NotesFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    NotesFrame.BorderSizePixel = 0
+    NotesFrame.Position = UDim2.new(0.0258620698, 0, 0.739645064, 0)
+    NotesFrame.Size = UDim2.new(0.18965517, 0, 0.132142812, 0)
+
+    UICorner_7.CornerRadius = UDim.new(0, 5)
+    UICorner_7.Parent = NotesFrame
+
+    UIGradient_3.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(40, 40, 40)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(47, 47, 47))}
+    UIGradient_3.Parent = NotesFrame
+
+    ScrollingFrame.Parent = NotesFrame
+    ScrollingFrame.Active = true
+    ScrollingFrame.BackgroundColor3 = Color3.fromRGB(48, 48, 48)
+    ScrollingFrame.BackgroundTransparency = 0.800
+    ScrollingFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    ScrollingFrame.BorderSizePixel = 0
+    ScrollingFrame.Position = UDim2.new(0.0446368828, 0, 0.0973122716, 0)
+    ScrollingFrame.Size = UDim2.new(0, 193, 0, 67)
+    ScrollingFrame.ScrollBarThickness = 7
+
+    TextBox.Parent = ScrollingFrame
+    TextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    TextBox.BackgroundTransparency = 1.000
+    TextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    TextBox.BorderSizePixel = 0
+    TextBox.Position = UDim2.new(1.18591622e-07, 0, 0, 0)
+    TextBox.Size = UDim2.new(0.99999994, 0, 2.65074539, 0)
+    TextBox.Font = Enum.Font.SourceSans
+    TextBox.PlaceholderText = "[NOTES]"
+    TextBox.Text = ""
+    TextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+    TextBox.TextSize = 14.000
+    TextBox.TextWrapped = true
+    TextBox.TextXAlignment = Enum.TextXAlignment.Left
+    TextBox.TextYAlignment = Enum.TextYAlignment.Top
+
+    ExecutionFrame.Name = "ExecutionFrame"
+    ExecutionFrame.Parent = AzfakeDebugMenu
+    ExecutionFrame.Active = true
+    ExecutionFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    ExecutionFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    ExecutionFrame.BorderSizePixel = 0
+    ExecutionFrame.Position = UDim2.new(0.220689654, 0, 0.0536330864, 0)
+    ExecutionFrame.Size = UDim2.new(0.310344815, 0, 0.321131051, 0)
+
+    UICorner_8.CornerRadius = UDim.new(0, 5)
+    UICorner_8.Parent = ExecutionFrame
+
+    UIGradient_4.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(40, 40, 40)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(47, 47, 47))}
+    UIGradient_4.Parent = ExecutionFrame
+
+    ScrollingFrame_2.Parent = ExecutionFrame
+    ScrollingFrame_2.Active = true
+    ScrollingFrame_2.BackgroundColor3 = Color3.fromRGB(48, 48, 48)
+    ScrollingFrame_2.BackgroundTransparency = 0.800
+    ScrollingFrame_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    ScrollingFrame_2.BorderSizePixel = 0
+    ScrollingFrame_2.Position = UDim2.new(0.0446368866, 0, 0.0973123312, 0)
+    ScrollingFrame_2.Size = UDim2.new(0.91784513, 0, 0.732159197, 0)
+    ScrollingFrame_2.ScrollBarThickness = 7
+
+    ExecBox.Name = "ExecBox"
+    ExecBox.Parent = ScrollingFrame_2
+    ExecBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    ExecBox.BackgroundTransparency = 1.000
+    ExecBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    ExecBox.BorderSizePixel = 0
+    ExecBox.Size = UDim2.new(0.97299999, 0, 1, 0)
+    ExecBox.ClearTextOnFocus = false
+    ExecBox.Font = Enum.Font.SourceSans
+    ExecBox.MultiLine = true
+    ExecBox.PlaceholderText = "[Quick Execution] [Will Support azfakecode - azfakescript] in the future"
+    ExecBox.Text = ""
+    ExecBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+    ExecBox.TextSize = 14.000
+    ExecBox.TextWrapped = true
+    ExecBox.TextXAlignment = Enum.TextXAlignment.Left
+    ExecBox.TextYAlignment = Enum.TextYAlignment.Top
+
+    Execute.Name = "Execute"
+    Execute.Parent = ExecutionFrame
+    Execute.BackgroundColor3 = Color3.fromRGB(48, 48, 48)
+    Execute.BackgroundTransparency = 0.500
+    Execute.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Execute.BorderSizePixel = 0
+    Execute.Position = UDim2.new(0.0446368866, 0, 0.875810683, 0)
+    Execute.Size = UDim2.new(0.440788835, 0, 0.0787766203, 0)
+    Execute.Font = Enum.Font.SourceSans
+    Execute.Text = "Execute"
+    Execute.TextColor3 = Color3.fromRGB(0, 0, 0)
+    Execute.TextSize = 16.000
+
+    PlayerDetailsFrame.Name = "PlayerDetailsFrame"
+    PlayerDetailsFrame.Parent = AzfakeDebugMenu
+    PlayerDetailsFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    PlayerDetailsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    PlayerDetailsFrame.BorderSizePixel = 0
+    PlayerDetailsFrame.Position = UDim2.new(0.220689654, 0, 0.383990228, 0)
+    PlayerDetailsFrame.Size = UDim2.new(0.225862071, 0, 0.108333409, 0)
+
+    UICorner_9.CornerRadius = UDim.new(0, 5)
+    UICorner_9.Parent = PlayerDetailsFrame
+
+    UIGradient_5.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(40, 40, 40)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(47, 47, 47))}
+    UIGradient_5.Parent = PlayerDetailsFrame
+
+    Profile.Name = "Profile"
+    Profile.Parent = PlayerDetailsFrame
+    Profile.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Profile.BackgroundTransparency = 1.000
+    Profile.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Profile.BorderSizePixel = 0
+    Profile.Position = UDim2.new(0.0344997719, 0, -0.0119890869, 0)
+    Profile.Size = UDim2.new(0.207098246, 0, 0.872198045, 0)
+    Profile.ScaleType = Enum.ScaleType.Fit
+
+    UICorner_10.CornerRadius = UDim.new(0, 500000)
+    UICorner_10.Parent = Profile
+
+    PlayerUsername.Name = "PlayerUsername"
+    PlayerUsername.Parent = PlayerDetailsFrame
+    PlayerUsername.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    PlayerUsername.BackgroundTransparency = 1.000
+    PlayerUsername.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    PlayerUsername.BorderSizePixel = 0
+    PlayerUsername.Position = UDim2.new(0.304170251, 0, 0.132417694, 0)
+    PlayerUsername.Size = UDim2.new(0, 170, 0, 23)
+    PlayerUsername.Font = Enum.Font.SourceSansBold
+    PlayerUsername.Text = "PlayerUsername"
+    PlayerUsername.TextColor3 = Color3.fromRGB(255, 255, 255)
+    PlayerUsername.TextSize = 14.000
+    PlayerUsername.TextXAlignment = Enum.TextXAlignment.Left
+
+    PLAYERSTATUS.Name = "PLAYERSTATUS"
+    PLAYERSTATUS.Parent = PlayerDetailsFrame
+    PLAYERSTATUS.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    PLAYERSTATUS.BackgroundTransparency = 1.000
+    PLAYERSTATUS.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    PLAYERSTATUS.BorderSizePixel = 0
+    PLAYERSTATUS.Position = UDim2.new(0.304170251, 0, 0.32472527, 0)
+    PLAYERSTATUS.Size = UDim2.new(0, 170, 0, 23)
+    PLAYERSTATUS.Font = Enum.Font.SourceSansBold
+    PLAYERSTATUS.Text = "Developer"
+    PLAYERSTATUS.TextColor3 = Color3.fromRGB(185, 185, 185)
+    PLAYERSTATUS.TextSize = 14.000
+    PLAYERSTATUS.TextXAlignment = Enum.TextXAlignment.Left
+
+    OpenPanelFrame.Name = "OpenPanelFrame"
+    OpenPanelFrame.Parent = AzfakeDebugMenu
+    OpenPanelFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    OpenPanelFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    OpenPanelFrame.BorderSizePixel = 0
+    OpenPanelFrame.Position = UDim2.new(0.220689654, 0, 0.50303787, 0)
+    OpenPanelFrame.Size = UDim2.new(0.171551719, 0, 0.086011976, 0)
+
+    UICorner_11.CornerRadius = UDim.new(0, 5)
+    UICorner_11.Parent = OpenPanelFrame
+
+    UIGradient_6.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(40, 40, 40)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(47, 47, 47))}
+    UIGradient_6.Parent = OpenPanelFrame
+
+    TextLabel_3.Parent = OpenPanelFrame
+    TextLabel_3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel_3.BackgroundTransparency = 1.000
+    TextLabel_3.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    TextLabel_3.BorderSizePixel = 0
+    TextLabel_3.Position = UDim2.new(0.0479944088, 0, 0.439308077, 0)
+    TextLabel_3.Size = UDim2.new(0.610297203, 0, 0.368841052, 0)
+    TextLabel_3.Font = Enum.Font.SourceSansBold
+    TextLabel_3.Text = "Change the keybind"
+    TextLabel_3.TextColor3 = Color3.fromRGB(230, 230, 230)
+    TextLabel_3.TextSize = 15.000
+    TextLabel_3.TextWrapped = true
+    TextLabel_3.TextXAlignment = Enum.TextXAlignment.Left
+    TextLabel_3.TextYAlignment = Enum.TextYAlignment.Top
+
+    TextLabel_4.Parent = OpenPanelFrame
+    TextLabel_4.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel_4.BackgroundTransparency = 1.000
+    TextLabel_4.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    TextLabel_4.BorderSizePixel = 0
+    TextLabel_4.Position = UDim2.new(-0.00247438485, 0, 0.0994771868, 0)
+    TextLabel_4.Size = UDim2.new(0.776844263, 0, 0.166821152, 0)
+    TextLabel_4.Font = Enum.Font.SourceSansBold
+    TextLabel_4.Text = "Debug Menu Opener"
+    TextLabel_4.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel_4.TextSize = 18.000
+
+    TextBox_2.Parent = OpenPanelFrame
+    TextBox_2.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+    TextBox_2.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    TextBox_2.BorderSizePixel = 0
+    TextBox_2.Position = UDim2.new(0.658291638, 0, 0.34602046, 0)
+    TextBox_2.Size = UDim2.new(0.302812755, 0, 0.536331713, 0)
+    TextBox_2.Font = Enum.Font.SourceSansBold
+    TextBox_2.PlaceholderColor3 = Color3.fromRGB(172, 172, 172)
+    TextBox_2.PlaceholderText = "RBracket"
+    TextBox_2.Text = ""
+    TextBox_2.TextColor3 = Color3.fromRGB(0, 0, 0)
+    TextBox_2.TextSize = 14.000
+
+    UICorner_12.CornerRadius = UDim.new(0, 5)
+    UICorner_12.Parent = TextBox_2
+
+    QuickCommandsFrame.Name = "QuickCommandsFrame"
+    QuickCommandsFrame.Parent = AzfakeDebugMenu
+    QuickCommandsFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    QuickCommandsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    QuickCommandsFrame.BorderSizePixel = 0
+    QuickCommandsFrame.Position = UDim2.new(0.220689654, 0, 0.607204556, 0)
+    QuickCommandsFrame.Size = UDim2.new(0.112931035, 0, 0.0711310282, 0)
+
+    UICorner_13.CornerRadius = UDim.new(0, 5)
+    UICorner_13.Parent = QuickCommandsFrame
+
+    UIGradient_7.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(40, 40, 40)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(47, 47, 47))}
+    UIGradient_7.Parent = QuickCommandsFrame
+
+    Rejoin.Name = "Rejoin"
+    Rejoin.Parent = QuickCommandsFrame
+    Rejoin.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+    Rejoin.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Rejoin.BorderSizePixel = 0
+    Rejoin.Position = UDim2.new(0, 0, 4.05385799e-06, 0)
+    Rejoin.Size = UDim2.new(0.329665244, 0, 0.981982887, 0)
+    Rejoin.Image = "rbxassetid://14876880208"
+    Rejoin.ImageTransparency = 0.200
+    Rejoin.ScaleType = Enum.ScaleType.Fit
+
+    UICorner_14.CornerRadius = UDim.new(0, 5)
+    UICorner_14.Parent = Rejoin
+
+    CloseGame.Name = "CloseGame"
+    CloseGame.Parent = QuickCommandsFrame
+    CloseGame.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+    CloseGame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    CloseGame.BorderSizePixel = 0
+    CloseGame.Position = UDim2.new(0.666997135, 0, 4.05385799e-06, 0)
+    CloseGame.Size = UDim2.new(0.329665244, 0, 0.981982887, 0)
+    CloseGame.Image = "rbxassetid://4773247381"
+    CloseGame.ImageTransparency = 0.200
+    CloseGame.ScaleType = Enum.ScaleType.Fit
+
+    UICorner_15.CornerRadius = UDim.new(0, 5)
+    UICorner_15.Parent = CloseGame
+
+    SideFrame.Name = "SideFrame"
+    SideFrame.Parent = AzfakeDebugMenu
+    SideFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    SideFrame.BackgroundTransparency = 1.000
+    SideFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    SideFrame.BorderSizePixel = 0
+    SideFrame.Position = UDim2.new(0.933333337, 0, 0.181547612, 0)
+    SideFrame.Size = UDim2.new(0, 51, 0, 181)
+    SideFrame.Visible = false
+
+    ImageButton.Parent = SideFrame
+    ImageButton.BackgroundColor3 = Color3.fromRGB(42, 42, 42)
+    ImageButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    ImageButton.BorderSizePixel = 0
+    ImageButton.Position = UDim2.new(0.0980392173, 0, 0, 0)
+    ImageButton.Size = UDim2.new(0, 46, 0, 44)
+    ImageButton.Image = "rbxassetid://14876880208"
+    ImageButton.ImageTransparency = 0.200
+    ImageButton.ScaleType = Enum.ScaleType.Fit
+
+    UICorner_16.CornerRadius = UDim.new(0, 5)
+    UICorner_16.Parent = ImageButton
+
+    OutputFrame.Name = "OutputFrame"
+    OutputFrame.Parent = AzfakeDebugMenu
+    OutputFrame.Active = true
+    OutputFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    OutputFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    OutputFrame.BorderSizePixel = 0
+    OutputFrame.Position = UDim2.new(0.537068963, 0, 0.0536331125, 0)
+    OutputFrame.Size = UDim2.new(0.179310352, 0, 0.321130991, 0)
+
+    UICorner_17.CornerRadius = UDim.new(0, 5)
+    UICorner_17.Parent = OutputFrame
+
+    UIGradient_8.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(40, 40, 40)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(47, 47, 47))}
+    UIGradient_8.Parent = OutputFrame
+
+    ScrollingFrame_3.Parent = OutputFrame
+    ScrollingFrame_3.Active = true
+    ScrollingFrame_3.BackgroundColor3 = Color3.fromRGB(48, 48, 48)
+    ScrollingFrame_3.BackgroundTransparency = 0.800
+    ScrollingFrame_3.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    ScrollingFrame_3.BorderSizePixel = 0
+    ScrollingFrame_3.Position = UDim2.new(0.0446368866, 0, 0.0973123312, 0)
+    ScrollingFrame_3.Size = UDim2.new(0.91784513, 0, 0.732159197, 0)
+    ScrollingFrame_3.ScrollBarThickness = 7
+
+    Output.Name = "Output"
+    Output.Parent = ScrollingFrame_3
+    Output.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Output.BackgroundTransparency = 1.000
+    Output.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Output.BorderSizePixel = 0
+    Output.Size = UDim2.new(0.97299999, 0, 1, 0)
+    Output.ClearTextOnFocus = false
+    Output.Font = Enum.Font.SourceSans
+    Output.MultiLine = true
+    Output.PlaceholderColor3 = Color3.fromRGB(255, 255, 255)
+    Output.PlaceholderText = "-- printed"
+    Output.Text = ""
+    Output.TextColor3 = Color3.fromRGB(0, 0, 0)
+    Output.TextSize = 14.000
+    Output.TextWrapped = true
+    Output.TextXAlignment = Enum.TextXAlignment.Left
+    Output.TextYAlignment = Enum.TextYAlignment.Top
+
+    local CanOpen = true
+    local function SetGUIState()
+        if CanOpen == false then return end;
+        CanOpen = false;
+        if AzfakeDebugMenu.Enabled == false then -- not game.Lighting:FindFirstChild('')
+            local AzfakeBlur = Instance.new('BlurEffect'); AzfakeBlur.Name = 'AzfakianBlur'; AzfakeBlur.Size = 0; AzfakeBlur.Parent = game.Lighting;
+            game:GetService('TweenService'):Create(AzfakeBlur,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {Size = 24}):Play()
+            local TableOfTransparencies = {};
+            for i,v in next, AzfakeDebugMenu:GetDescendants() do 
+                TableOfTransparencies[v.Name..'##'..tostring(i)] = {}
+                pcall(function() -- could already create a premade table then set it
+                    TableOfTransparencies[v.Name..'##'..tostring(i)].Transparency = v.BackgroundTransparency
+                    v.BackgroundTransparency = 1
+                end)
+                pcall(function() -- could already create a premade table then set it
+                    TableOfTransparencies[v.Name..'##'..tostring(i)].ImageTransparency = v.ImageTransparency
+                    v.ImageTransparency = 1
+                end)
+                pcall(function() -- could already create a premade table then set it
+                    TableOfTransparencies[v.Name..'##'..tostring(i)].TextTransparency = v.TextTransparency
+                    v.TextTransparency = 1
+                end)
+            end
+            AzfakeDebugMenu.Enabled = true;
+            task.wait(0.1);
+
+            local function getObjectfromIndex(n) 
+                local b = nil;
+                for i,v in next, AzfakeDebugMenu:GetDescendants() do 
+                    if tonumber(n) == i then 
+                        b = v;
+                        break
+                    end
+                end
+                return b
+            end
+
+            for i,v in next, TableOfTransparencies do 
+                -- content holds Transparency and ImageTransparency;
+                --print(string.split(tostring(i),'##'))
+                --print(getObjectfromIndex())
+                --print(v.ImageTransparency)
+                --print(v.Transparency)
+                local ObjectIndex = getObjectfromIndex(string.split(i,'##')[2]) --AzfakeDebugMenu:GetDescendants()[]
+                --if v.Transparency then 
+                --	game:GetService('TweenService'):Create(ObjectIndex,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {BackgroundTransparency = v.Transparency}):Play()
+                --end
+                pcall(function()
+                    game:GetService('TweenService'):Create(ObjectIndex,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {BackgroundTransparency = v.Transparency}):Play()
+                end)
+                pcall(function()
+                    game:GetService('TweenService'):Create(ObjectIndex,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {ImageTransparency = v.ImageTransparency}):Play()
+                end)
+                pcall(function()
+                    game:GetService('TweenService'):Create(ObjectIndex,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {TextTransparency = v.TextTransparency}):Play()
+                end)
+            end
+            task.wait(1.1)
+
+        else
+            if game.Lighting:FindFirstChild('AzfakianBlur') then 
+                local obj = game.Lighting:FindFirstChild('AzfakianBlur')
+                game:GetService('TweenService'):Create(obj,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {Size = 0}):Play()
+                local TableOfTransparencies = {};
+                for i,v in next, AzfakeDebugMenu:GetDescendants() do 
+                    TableOfTransparencies[v.Name..'##'..tostring(i)] = {}
+                    pcall(function() -- could already create a premade table then set it
+                        TableOfTransparencies[v.Name..'##'..tostring(i)].Transparency = v.BackgroundTransparency
+                        game:GetService('TweenService'):Create(v,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {BackgroundTransparency = 1}):Play()
+                    end)
+                    pcall(function() -- could already create a premade table then set it
+                        TableOfTransparencies[v.Name..'##'..tostring(i)].ImageTransparency = v.ImageTransparency
+                        game:GetService('TweenService'):Create(v,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {ImageTransparency = 1}):Play()
+                    end)
+                    pcall(function() -- could already create a premade table then set it
+                        TableOfTransparencies[v.Name..'##'..tostring(i)].TextTransparency = v.TextTransparency
+                        game:GetService('TweenService'):Create(v,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {TextTransparency = 1}):Play()
+                    end)
+                end
+
+                task.wait(1)
+                AzfakeDebugMenu.Enabled = false;
+                obj:Destroy()
+                local function getObjectfromIndex(n) 
+                    local b = nil;
+                    for i,v in next, AzfakeDebugMenu:GetDescendants() do 
+                        if tonumber(n) == i then 
+                            b = v;
+                            break
+                        end
+                    end
+                    return b
+                end
+                for i,v in next, TableOfTransparencies do 
+                    -- content holds Transparency and ImageTransparency;
+                    --print(getObjectfromIndex(string.split(i,'##')[2]))
+                    local ObjectIndex = getObjectfromIndex(string.split(i,'##')[2]) --AzfakeDebugMenu:GetDescendants()[]
+                    pcall(function()
+                        --game:GetService('TweenService'):Create(ObjectIndex,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {BackgroundTransparency = v.Transparency}):Play()
+                        ObjectIndex.BackgroundTransparency = v.Transparency
+                    end)
+                    pcall(function()
+                        --game:GetService('TweenService'):Create(ObjectIndex,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {ImageTransparency = v.ImageTransparency}):Play()
+                        ObjectIndex.ImageTransparency = v.ImageTransparency
+                    end)
+                    pcall(function()
+                        --game:GetService('TweenService'):Create(ObjectIndex,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {TextTransparency = v.TextTransparency}):Play()
+                        ObjectIndex.TextTransparency = v.TextTransparency
+                    end)
+                end
+                task.wait(0.05)
+
+            end
+        end
+        CanOpen = true;
+    end
+    local userinputservice = game:GetService('UserInputService');
+    userinputservice.InputBegan:Connect(function(key,detailed)
+        if detailed then return end;
+        if key.KeyCode == Enum.KeyCode.RightBracket then 
+            print('pressed opening')
+            SetGUIState()
+        end
+    end)
+
+    local dragToggle = nil
+    local dragSpeed = 0.1
+    local dragStart = nil
+    local startPos = nil
+
+    local function updateInput(input)
+        local delta = input.Position - dragStart
+        local position = UDim2.new(startPos.X.Scale,startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        game:GetService("TweenService"):Create(ExecutionFrame, TweenInfo.new(dragSpeed), {Position = position}):Play()
+    end
+
+    ExecutionFrame.InputBegan:Connect(function(input)
+        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+            dragToggle = true
+            dragStart = input.Position
+            startPos = ExecutionFrame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragToggle = false
+                end
+            end)
+        end
+    end)
+
+    userinputservice.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            if dragToggle then
+                updateInput(input)
+            end
+        end
+    end)
+
+    local success, image = pcall(function()
+        return game.Players:GetUserThumbnailAsync(game.Players.LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420) -- you can change the last two parameters to get a different type of image. See wiki page linked above for more!
+    end)
+    if image then Profile.Image = image end;
+
+    local vs = ''
+    --local identifyexecutor = nil
+    do 
+        PlayerUsername.Text = game.Players.LocalPlayer.Name..' AKA '..game.Players.LocalPlayer.DisplayName -- could add displayname
+        PLAYERSTATUS.Text = vs == 'debug' and 'Developer' or 'Script Buyer';
+        executor.Text = identifyexecutor and identifyexecutor() or 'Not Supported';
+        version.Text = 'AZFAKE';
+        JOBIDLABAEL.Text = `Job Id: {game.JobId}`;
+        PLACEIDLABEL.Text = `Place Id: {game.PlaceId}`;
+        local _get = game:HttpGet(`https://apis.roblox.com/universes/v1/places/{game.PlaceId}/universe`)
+        UniverseIDLABEL.Text = `Universe Id: {game.HttpService:JSONDecode(_get)['universeId']}`;
+        playersingame.Text = `{#game.Players:GetPlayers()}/{game.Players.MaxPlayers}` -- 1/20
+        Rejoin.MouseButton1Down:Connect(function()
+            game:GetService('TeleportService'):teleport(game.PlaceId)
+        end)
+        game.Players.PlayerAdded:Connect(function()
+            playersingame.Text = `{#game.Players:GetPlayers()}/{game.Players.MaxPlayers}`
+        end)
+        game.Players.PlayerRemoving:Connect(function()
+            playersingame.Text = `{#game.Players:GetPlayers()}/{game.Players.MaxPlayers}`
+        end)
+        JOBIDCOPY.MouseButton1Down:Connect(function()
+            setclipboard(game.JobId)
+        end)
+        PlaceIdCOPY.MouseButton1Down:Connect(function()
+            setclipboard(game.PlaceId)
+        end)
+        UNIVERSECOPY.MouseButton1Down:Connect(function()
+            setclipboard(game.HttpService:JSONDecode(_get)['universeId'])
+        end)
+        DiscordButton.MouseButton1Down:Connect(function()
+            Invite = 'azfake'
+            request(
+                {
+                    ['Method'] = 'POST',
+                    ['Headers'] = {
+                        ["origin"] = 'https://discord.com',
+                        ["Content-Type"] = "application/json"
+                    },
+                    ['Url'] = 'http://127.0.0.1:6463/rpc?v=1',
+                    ['Body'] = game:GetService('HttpService'):JSONEncode({cmd="INVITE_BROWSER",args={code=Invite},nonce=game:GetService('HttpService'):GenerateGUID(false):lower()})
+                }    
+            )
+        end)
+        CloseGame.MouseButton1Down:Connect(function()
+            game:Shutdown()
+        end)
+        Execute.MouseButton1Down:Connect(function()
+            loadstring(ExecBox.Text)()
+        end)
+        game.LogService.MessageOut:Connect(function(m)
+            Output.Text = Output.Text..m..'\n'
+        end)
+    end
+end
 
 --[[
     local library = { 
@@ -40042,6 +40935,32 @@ elseif universeid == 4871329703 then -- type soul
         -- gakia rekko
         parryAnims['14071674410'] = makeBlockRange(15, {delay = 0.7, holdtime = 1})
 
+        -- dropping fang
+        parryAnims['14071794187'] = 0.68
+
+        -- fast fang
+        parryAnims['14071795665'] = 0.34
+
+        -- waterfall dance  {0.4,0.3,0.3,0.3,0.3,0.25}
+        parryAnims['14071818194'] = function(mob, anim, id)
+            typesoulsettings.functions.parrylist({0.4,0.25,0.25,0.25,0.25,0.25}, mob, 10, anim) -- {0.4,0.3}
+        end;
+
+        -- timecut
+        parryAnims['15325122671'] = 0.2
+
+        -- strata strike
+        parryAnims['14071816805'] = 0.22
+
+        -- blooming cut
+        parryAnims['14071792688'] = 0.62
+        -- flash fakout
+        parryAnims['14071798998'] = 0.53
+
+        -- flash cut
+        parryAnims['14071797324'] = 0.48
+
+
     end
 
 
@@ -41535,10 +42454,12 @@ elseif universeid == 3734304510 then  -- south bronx
             task.spawn(function()
                 repeat 
                     task.wait()
-                    inputManager:SendMouseButtonEvent(m.X,m.Y,0,true,game,0) -- 1319,574
-                    --task.wait(0.05)
-                    inputManager:SendMouseButtonEvent(m.X,m.Y,0,false,game,0)
-                until released
+                    if released == false and southbroxsettings.holdtoshoot then 
+                        inputManager:SendMouseButtonEvent(m.X,m.Y,0,true,game,0) -- 1319,574
+                        --task.wait(0.05)
+                        inputManager:SendMouseButtonEvent(m.X,m.Y,0,false,game,0)
+                    end
+                until released or southbroxsettings.holdtoshoot == false
             end)
         end
     end)-- mouse 1 down
@@ -41939,3 +42860,5 @@ task.spawn(function()
     end)
     
 end)
+
+runDebugPanel()
