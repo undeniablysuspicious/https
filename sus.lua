@@ -7416,7 +7416,7 @@ sharedRequires['CreateNoclip'] = function(sector, gnvtable)
     end)
     ToggleBindNoclip:AddKeybind()
 end
-sharedRequires['SetupChatlogger'] = function()
+sharedRequires['SetupChatlogger'] = function(sector)
     local function createLogger()
         pcall(function() if game.CoreGui:FindFirstChild('ChatLogger') then game.CoreGui:FindFirstChild('ChatLogger'):Destroy() end end)
         
@@ -38729,6 +38729,7 @@ elseif universeid == 4871329703 then -- type soul
         goupafterdeath = false;
         fullbright = false;
         m2beforeparry = false;
+        goundermapforlootbox = false;
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -38850,6 +38851,19 @@ elseif universeid == 4871329703 then -- type soul
             end
         end
     end;
+
+    local function makeBlockRange(dist, info) -- makeBlockRange(15, {delay = 0.7, holdtime = 1})
+        if not typesoulsettings.functions.getentityfolder() then return print('no entity folder') end;
+        local rootPart = azfake:returndata().humanoidrootpart
+        --local dist
+        if not checkdist(dist, rootPart) then 
+            return;
+        end;
+        task.wait(info.delay); -- 0.7;
+        typesoulsettings.functions.parry(info.holdtime)
+    end
+
+    typesoulsettings.functions.makeBlockRange = makeBlockRange
 
     typesoulsettings.functions.flashstep = function()
         if workspace.Entities:FindFirstChild(game.Players.LocalPlayer.Name) then 
@@ -39310,6 +39324,9 @@ elseif universeid == 4871329703 then -- type soul
     lefttab:AddToggle('Lootbox Non-Blatant', false, function(e)
         typesoulsettings.lootnonblatant = e;
     end)
+    lefttab:AddToggle('Lootbox Non-Blatant', false, function(e)
+        typesoulsettings.goundermapforlootbox = e;
+    end)
     lefttab:AddToggle('Auto Lootbox', false, function(e)
         typesoulsettings.autolootlootbox = e;
         if not e then 
@@ -39435,6 +39452,17 @@ elseif universeid == 4871329703 then -- type soul
                                     end
                                 until not closestbounty or not tpPart or tpPart.Transparency == 1 or not  closestbounty:FindFirstChild('Items')
                                 --rootPart.Anchored = false;
+                            end)
+                        end
+                    elseif typesoulsettings.goundermapforlootbox == true then 
+                        local CframeBelow = tpPart.CFrame * CFrame.new(0,-15,0)
+                        if tpPart then 
+                            task.spawn(function()
+                                repeat 
+                                    task.wait()
+                                    game.Players.LocalPlayer.Character.PrimaryPart.CFrame = CframeBelow ;--tpPart.CFrame
+                                    claimLootbox(v.Name, closestbounty)
+                                until not closestbounty:FindFirstChild('Items')
                             end)
                         end
                     end
@@ -39940,6 +39968,11 @@ elseif universeid == 4871329703 then -- type soul
         parryAnims['14070073772'] = 0.33
         parryAnims['14070074688'] = 0.3 -- 0.33 matches eprfectly
 
+        -- hollow 
+        parryAnims['14070836033'] = 0.36 -- could do 0.4 (m1 1)
+        parryAnims['14070837481'] = 0.36 -- second
+        parryAnims['14070839321'] = 0.52 -- crit
+
 
 
         -- crits
@@ -40000,11 +40033,14 @@ elseif universeid == 4871329703 then -- type soul
         -- geki
         parryAnims['14071676388'] = 0.9 -- havent actually tested what geki does
 
-        -- hainawa
+        -- hainawa + raikoho
         parryAnims['14071708829'] = 0.8 -- attack at 0.9?? havent actually tested what hainawa does
 
         -- zangerin
         parryAnims['14071719657'] = 0.72
+
+        -- gakia rekko
+        parryAnims['14071674410'] = makeBlockRange(15, {delay = 0.7, holdtime = 1})
 
     end
 
@@ -40282,7 +40318,16 @@ elseif universeid == 4871329703 then -- type soul
                                             setstatus('idle')
                                             print('[anti quest bug triggered, potential fix]')
                                             justresettofix = true
-                                            game.Players.LocalPlayer.Character.Head:Destroy()
+                                            if game.Players.LocalPlayer.Character:FindFirstChild('Head') then 
+                                                game.Players.LocalPlayer.Character.Head:Destroy()
+                                            else
+                                                if game.Players.LocalPlayer.Character:FindFirstChild('Chest') then 
+                                                    if game.Players.LocalPlayer.Character:FindFirstChild('Chest'):FindFirstChild('Hollow Head') then 
+                                                        game.Players.LocalPlayer.Character.Humanoid.Health = 0
+                                                    end
+                                                end
+                                            end
+
                                             game.Players.LocalPlayer.PlayerGui:FindFirstChild('MissionsUI').Queueing.Visible = false;
                                             task.delay(5,function()
                                                 setstatus('idle')
@@ -40536,13 +40581,14 @@ elseif universeid == 4871329703 then -- type soul
                                     
                                     local function revertFarmingStatus()
                                         setstatus('idle')
+                                        bothdead = false;
                                         isfarming = false;
                                         made1godead = false;
                                         gripped = false;
                                         AmountOfGripped = 0
                                         AmountOfDeadEnemies = 0;
                                     end
-                                    if v:FindFirstChildWhichIsA('Humanoid').Health == 1 and AmountOfDeadEnemies >= AmountOfEnemies then -- typesoulsettings.autogrip only players
+                                    if v:FindFirstChildWhichIsA('Humanoid').Health == 1 and bothdead == true then -- and AmountOfDeadEnemies >= AmountOfEnemies then -- typesoulsettings.autogrip only players
                                         --if gripped == false then 
                                             --gripped = nil;
                                         --elseif gripped == nil then 
@@ -40572,7 +40618,7 @@ elseif universeid == 4871329703 then -- type soul
                                     else
                                         setstatus('idle')
                                         isfarming = false;
-                                        print('WASNT A HUMANOID MOB')
+                                        print('WASNT A HUMANOID MOB',AmountOfDeadEnemies,AmountOfEnemies)
                                         AmountOfGripped = 0
                                         AmountOfDeadEnemies = 0;
                                         if made1godead ~= nil then 
