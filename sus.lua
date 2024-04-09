@@ -39626,6 +39626,9 @@ elseif universeid == 4871329703 then -- type soul
         fullbright = false;
         m2beforeparry = false;
         goundermapforlootbox = false;
+        autoparrywhitelist = 'All';
+        whitelistap = {'All','Mobs'};
+        rollback = false;
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -39777,7 +39780,17 @@ elseif universeid == 4871329703 then -- type soul
 
     local parryAnims = {};
 
-
+    local parrywhitelist = sector:AddDropdown("Auto Parry Whitelist", typesoulsettings.whitelistap, "All", false, function(State) -- could change to quest  getWhitelsited
+        typesoulsettings.autoparrywhitelist = State 
+    end)
+    local playeraddedap; playeraddedap = game.Players.PlayerAdded:Connect(function(child)
+        task.wait(.1);
+        parrywhitelist:Add(child.Name)
+    end); table.insert(typesoulsettings.connections, playeraddedap);
+    local playerremovedap; playerremovedap = game.Players.PlayerRemoving:Connect(function(child)
+        task.wait(.1);
+        parrywhitelist:Remove(child.Name)
+    end); table.insert(typesoulsettings.connections, playerremovedap);
     sector:AddToggle('Auto Parry', false, function(e)
         typesoulsettings.autoparry = e;
         if not e then 
@@ -40220,7 +40233,7 @@ elseif universeid == 4871329703 then -- type soul
     lefttab:AddToggle('Lootbox Non-Blatant', false, function(e)
         typesoulsettings.lootnonblatant = e;
     end)
-    lefttab:AddToggle('Lootbox Non-Blatant', false, function(e)
+    lefttab:AddToggle('Lootbox Underground', false, function(e)
         typesoulsettings.goundermapforlootbox = e;
     end)
     lefttab:AddToggle('Auto Lootbox', false, function(e)
@@ -40562,6 +40575,67 @@ elseif universeid == 4871329703 then -- type soul
     newother:AddToggle('Auto Division 12',false,function(e)
         typesoulsettings.autodivision12 = e;
     end)
+    newother:AddToggle('Rollback Data',false,function(e)
+        typesoulsettings.rollback = e;
+        if e == false then 
+            maid.rollbackctn = nil;
+            return
+        end;
+        maid.rollbackctn = signals.heartbeat:connect('@duper', function()
+            local args = {
+                [1] = {
+                    ["SkillInputs"] = {
+                        [1] = "One",
+                        [2] = "Two",
+                        [3] = "Three",
+                        [4] = "Four",
+                        [5] = "Five",
+                        [6] = "Six",
+                        [7] = "Seven",
+                        [8] = "Eight",
+                        [9] = "Nine",
+                        [10] = "Zero",
+                        [11] = "Equals",
+                        [12] = "\255",
+                        [13] = "\255"
+                    },
+                    ["ShikaiInputs2"] = {
+                        ["X"] = "X",
+                        ["C"] = "C",
+                        ["Z"] = "Z"
+                    },
+                    ["BankaiInputs2"] = {
+                        ["G"] = "G",
+                        ["T"] = "T"
+                    },
+                    ["SkillInputs2"] = {
+                        ["Zero"] = "Zero",
+                        ["Equals"] = "Equals",
+                        ["Four"] = "Four",
+                        ["Seven"] = "Seven",
+                        ["Eight"] = "Eight",
+                        ["Nine"] = "Nine",
+                        ["Six"] = "Six",
+                        ["Two"] = "Two",
+                        ["Three"] = "Three",
+                        ["Five"] = "Five",
+                        ["One"] = "One"
+                    },
+                    ["ShikaiInputs"] = {
+                        [1] = "Z",
+                        [2] = "X",
+                        [3] = "C"
+                    },
+                    ["BankaiInputs"] = {
+                        [1] = "T",
+                        [2] = "G"
+                    }
+                }
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SendKeybindInfo"):FireServer(unpack(args))
+        end)
+    end)
     newother:AddToggle('Anti Void After Quest',false,function(e)
         typesoulsettings.goupafterdeath = e;
     end)
@@ -40878,6 +40952,14 @@ elseif universeid == 4871329703 then -- type soul
         parryAnims['14069288615'] = 0.2 -- m5
         parryAnims['14069267865'] = 0.56 -- crit
 
+        -- fist m1
+        parryAnims['14069449901'] = 0.25 --3 m1
+        parryAnims['14069451875'] = 0.25 -- m2
+        parryAnims['14069453052'] = 0.25; -- m3
+        parryAnims['14069454554'] = 0.2 -- m4
+        parryAnims['14069455958'] = 0.25 -- m5
+        parryAnims['14069440034'] = 0.33 -- crit
+
 
         -- crits
         parryAnims['14069224323'] = 0.4 -- might make funct
@@ -40984,6 +41066,12 @@ elseif universeid == 4871329703 then -- type soul
                -- print(animationId)
                 if parryAnims[animationId] and typesoulsettings.autoparry == true then 
                     --print('can parry')
+                    if typesoulsettings.autoparrywhitelist ~= 'All' and (typesoulsettings.autoparrywhitelist == 'Mobs' and game.Players:GetPlayerFromCharacter(child)) then 
+                        return
+                    end
+                    if typesoulsettings.autoparrywhitelist ~= 'All' and (typesoulsettings.autoparrywhitelist ~= 'Mobs' and child.Name ~= typesoulsettings.autoparrywhitelist) then 
+                        return
+                    end
                     local registry = parryAnims[animationId] -- parryregistration
                     if type(registry) == 'function' then 
                         print('parrying '..animationId)
