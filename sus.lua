@@ -6931,6 +6931,9 @@ end
 if (identifyexecutor() and identifyexecutor():find('Codex')) then
     ExpectedGlobalsOnLoad = 270 
 end
+if (identifyexecutor() and identifyexecutor():find('Wave')) then
+    ExpectedGlobalsOnLoad = 240 
+end
 local ExpectedGlobalRun = 0
 local ExpectedUnderscoreRun = 0
 
@@ -40866,6 +40869,14 @@ elseif universeid == 4871329703 then -- type soul
         parryAnims['14070837481'] = 0.36 -- second
         parryAnims['14070839321'] = 0.52 -- crit
 
+
+        -- dagger j m1
+        parryAnims['14069281959'] = 0.2 -- m1
+        parryAnims['14069283779'] = 0.22 -- m2
+        parryAnims['14069285542'] = 0.25 -- m3
+        parryAnims['14069287149'] = 0.25 -- m4 
+        parryAnims['14069288615'] = 0.2 -- m5
+        parryAnims['14069267865'] = 0.56 -- crit
 
 
         -- crits
