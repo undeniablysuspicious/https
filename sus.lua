@@ -40749,60 +40749,120 @@ elseif universeid == 4871329703 then -- type soul
         typesoulsettings.rollback = e;
         if e == false then 
             maid.rollbackctn = nil;
+            local args = {
+                [1] = {
+                    ["SkillInputs"] = {
+                        [1] = "One",
+                        [2] = "Two",
+                        [3] = "Three",
+                        [4] = "Four",
+                        [5] = "Five",
+                        [6] = "Six",
+                        [7] = "Seven",
+                        [8] = "Eight",
+                        [9] = "Nine",
+                        [10] = "Zero",
+                        [11] = "Minus",
+                        [12] = "Equals"
+                    },
+                    ["ShikaiInputs2"] = {
+                        ["E"] = "X",
+                        ["C"] = "C",
+                        ["Z"] = "Z"
+                    },
+                    ["BankaiInputs2"] = {
+                        ["LeftShift"] = "T",
+                        ["G"] = "G"
+                    },
+                    ["SkillInputs2"] = {
+                        ["Zero"] = "Zero",
+                        ["Equals"] = "Equals",
+                        ["Four"] = "Four",
+                        ["Seven"] = "Seven",
+                        ["Eight"] = "Eight",
+                        ["Nine"] = "Nine",
+                        ["Six"] = "Six",
+                        ["Two"] = "Two",
+                        ["Three"] = "Three",
+                        ["Five"] = "Five",
+                        ["One"] = "One"
+                    },
+                    ["ShikaiInputs"] = {
+                        [1] = "Z",
+                        [2] = "E",
+                        [3] = "C"
+                    },
+                    ["BankaiInputs"] = {
+                        [1] = "LeftShift",
+                        [2] = "G"
+                    }
+                }
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SendKeybindInfo"):FireServer(unpack(args))
+            azfakenotify('Removed rollback',2)
             return
         end;
         azfakenotify('Rolling back...',2)
+        local strs = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/general/main/megabyte'))()
         maid.rollbackctn = signals.heartbeat:connect('@duper', function()
-
-            local ohTable1 = {
-                ["SkillInputs"] = {
-                    [1] = "One",
-                    [2] = "Two",
-                    [3] = "Three",
-                    [4] = "Four",
-                    [5] = "Five",
-                    [6] = "E",
-                    [7] = "Seven",
-                    [8] = "Eight",
-                    [9] = "G",
-                    [10] = "Zero",
-                    [11] = "H",
-                    [12] = "Equals"
-                },
-                ["ShikaiInputs2"] = {
-                    ["C"] = "C",
-                    ["G"] = "X",
-                    ["Z"] = "Z"
-                },
-                ["BankaiInputs2"] = {
-                    ["H"] = "G"
-                },
-                ["SkillInputs2"] = {
-                    ["\255"] = "Zero",
-                    ["Equals"] = "Equals",
-                    ["Four"] = "Four",
-                    ["Seven"] = "Seven",
-                    ["Eight"] = "Eight",
-                    ["H"] = "Minus",
-                    ["G"] = "Nine",
-                    ["Two"] = "Two",
-                    ["Three"] = "Three",
-                    ["One"] = "One",
-                    ["Five"] = "Five",
-                    ["\255"] = "Six"
-                },
-                ["BankaiInputs"] = {
-                    [1] = "H",
-                    [2] = "H"
-                },
-                ["Shikai\255Inputs"] = {
-                    [1] = "Z",
-                    [2] = "G",
-                    [3] = "C"
+            local r = {}
+            r.SkillInputs = {
+                [1] = "One",
+                [2] = "Two",
+                [3] = "Three",
+                [4] = "Four",
+                [5] = "Five",
+                [6] = "Six",
+                [7] = "Seven",
+                [8] = "Eight",
+                [9] = "Nine",
+                [10] = "Zero",
+                [11] = "Minus",
+                [12] = "Equals"
+            }
+                
+            for i=1, 100000 do 
+                r.SkillInputs[i] = "One"
+            end
+            local args = {
+                [1] = {
+                    r.SkillInputs,
+                    ["ShikaiInputs2"] = {
+                        ["E"] = "X",
+                        ["C"] = "C",
+                        ["Z"] = "Z"
+                    },
+                    ["BankaiInputs2"] = {
+                        ["LeftShift"] = "T",
+                        ["G"] = "G"
+                    },
+                    ["SkillInputs2"] = {
+                        ["Zero"] = "Zero",
+                        ["Equals"] = "Equals",
+                        ["Four"] = "Four",
+                        ["Seven"] = "Seven",
+                        ["Eight"] = "Eight",
+                        ["Nine"] = "Nine",
+                        ["Six"] = "Six",
+                        ["Two"] = "Two",
+                        ["Three"] = "Three",
+                        ["Five"] = "Five",
+                        ["One"] = "One"
+                    },
+                    ["ShikaiInputs"] = {
+                        [1] = "Z",
+                        [2] = "E",
+                        [3] = "C"
+                    },
+                    ["BankaiInputs"] = {
+                        [1] = "LeftShift",
+                        [2] = "G"
+                    }
                 }
             }
-        
-            game:GetService("ReplicatedStorage").Remotes.SendKeybindInfo:FireServer(ohTable1)
+            --print(unpack(args))
+            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SendKeybindInfo"):FireServer(unpack(args))
         end)
         task.delay(3,function()
             azfakenotify('Successfully stopped data!','untilClick') -- rolled back!
