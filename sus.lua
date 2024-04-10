@@ -8072,7 +8072,15 @@ local signals = {
 	gamestepped = {};
 	heartbeat = {};
     connections = {};
+    events = {};
+    controlled = {};
 }
+-- setmetatable(signals.connections, signals.controlled)
+-- signals.controlled.__newindex = function(table_, key, value)
+--     if value == nil then 
+
+--     end
+-- end
 
 function signals.gamestepped:connect(desc,func)
 	print('@connecting '..desc);
@@ -8556,19 +8564,98 @@ function signals.new(f,uu)
     return DATA
 end;
 
-function signals.connections.new()
-    local ctn = {
-        funct = f
-    }
-    local connectionFunction = 'notASSIGN';
-    task.spawn(function()
-        repeat task.wait() until connectionFunction ~= 'notASSIGN'
-
-        --for i,v in next, 
-    end)
-
-    return connectionFunction
+function signals.cleanup()
+    for _, connection in next, signals.connections do 
+        if connection['event'] == nil then 
+            --@ cleanup task
+            if connection['instance'] then connection['instance']:Destroy() end;
+            table.remove(signals.connections, _)
+        end
+    end
 end
+function signals.init()
+    task.spawn(function()
+        while task.wait(1) do 
+            if #signals.connections >= 1 then 
+                signals.cleanup()
+            end
+        end
+    end)
+end
+
+function signals.connections.new(connection, bind, justInstance)
+    -- local ctn = {
+    --     funct = f
+    -- }
+    -- local connectionFunction = 'notASSIGN';
+    -- task.spawn(function()
+    --     repeat task.wait() until connectionFunction ~= 'notASSIGN'
+
+    --     --for i,v in next, 
+    -- end)
+    local oncallback;
+    if signals.events[bind] then 
+        oncallback = signals.events[bind].called
+    end
+
+    local data = {};
+    local InstanceFired = Instance.new('BindableEvent');
+    local ctn; ctn = InstanceFired.Event:Connect(function()
+        if oncallback then 
+            oncallback()
+        end
+    end);
+    if justInstance then 
+        if justInstance.ClassName == 'RemoteEvent' then 
+            local onEvent = hookfunction(justInstance.FireServer, newcclosure(function(a,...)
+                task.spawn(function()
+                    InstanceFired:Fire()
+                end)
+                return onEvent(a,...)
+            end))
+        end
+    end
+    data['connection'] = connection
+    data['event'] = ctn;
+    data['instance'] = InstanceFired;
+    local datacontrol = {};
+    setmetatable(data, datacontrol)
+    datacontrol.__newindex = function(table_, key, value)
+        if datacontrol[key] then 
+            if value == nil and key == 'event' then 
+                -- @ removing connection to
+                print('removing event')
+                InstanceFired:Destroy()
+            end
+        else
+            if value ~= nil then 
+                datacontrol[key] = value
+            end
+        end
+    end
+    table.insert(signals.connections, data)
+    return data
+end
+--[[
+    maid.test1 = signals.connections.new('Task1','onFire', game.RemoteEvent)['event']
+]]
+function signals.addalias(func,...)
+    for _, alias in next, {...} do 
+        signals.events[alias] = func
+    end
+end
+function signals.addevent(event, callback)
+    signals.events[event] = {}
+    signals.events[event].called = function()
+        callback()
+    end
+end; -- aliases
+-- signals.addevent('onParry', function() end)
+function signals.fire(event)
+    if signals.events[event] then 
+        signals.events[event].called()
+    end
+end;
 -- signals.connections.new() = function()
 -- check if function is set to nil
 -- local storefunction = signals.new(os.time()); storefunction.funct()
@@ -39726,12 +39813,15 @@ elseif universeid == 4871329703 then -- type soul
 
     typesoulsettings.functions.parry = function(hold)
         if not typesoulsettings.functions.getentityfolder() then return print('no entity folder') end;
+        typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Released")
         if typesoulsettings.m2beforeparry then 
             azfake:returndata().character.CharacterHandler.Remotes.M2:FireServer()
         end
         typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Pressed")
         if hold then 
             task.wait(hold) -- @shouldve concealed
+        else
+            task.wait(0.1)
         end
         typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Released")
     end;
@@ -40379,6 +40469,7 @@ elseif universeid == 4871329703 then -- type soul
             end);
         end
         maid.autolootbox = workspace.Lootboxes.ChildAdded:Connect(function(child)
+            task.wait(0.5)
             takeLootbox(child)
         end);
         for i,v in next, workspace.Lootboxes:GetChildren() do 
@@ -40582,58 +40673,56 @@ elseif universeid == 4871329703 then -- type soul
             return
         end;
         maid.rollbackctn = signals.heartbeat:connect('@duper', function()
-            local args = {
-                [1] = {
-                    ["SkillInputs"] = {
-                        [1] = "One",
-                        [2] = "Two",
-                        [3] = "Three",
-                        [4] = "Four",
-                        [5] = "Five",
-                        [6] = "Six",
-                        [7] = "Seven",
-                        [8] = "Eight",
-                        [9] = "Nine",
-                        [10] = "Zero",
-                        [11] = "Equals",
-                        [12] = "\255",
-                        [13] = "\255"
-                    },
-                    ["ShikaiInputs2"] = {
-                        ["X"] = "X",
-                        ["C"] = "C",
-                        ["Z"] = "Z"
-                    },
-                    ["BankaiInputs2"] = {
-                        ["G"] = "G",
-                        ["T"] = "T"
-                    },
-                    ["SkillInputs2"] = {
-                        ["Zero"] = "Zero",
-                        ["Equals"] = "Equals",
-                        ["Four"] = "Four",
-                        ["Seven"] = "Seven",
-                        ["Eight"] = "Eight",
-                        ["Nine"] = "Nine",
-                        ["Six"] = "Six",
-                        ["Two"] = "Two",
-                        ["Three"] = "Three",
-                        ["Five"] = "Five",
-                        ["One"] = "One"
-                    },
-                    ["ShikaiInputs"] = {
-                        [1] = "Z",
-                        [2] = "X",
-                        [3] = "C"
-                    },
-                    ["BankaiInputs"] = {
-                        [1] = "T",
-                        [2] = "G"
-                    }
+
+            local ohTable1 = {
+                ["SkillInputs"] = {
+                    [1] = "One",
+                    [2] = "Two",
+                    [3] = "Three",
+                    [4] = "Four",
+                    [5] = "Five",
+                    [6] = "E",
+                    [7] = "Seven",
+                    [8] = "Eight",
+                    [9] = "G",
+                    [10] = "Zero",
+                    [11] = "H",
+                    [12] = "Equals"
+                },
+                ["ShikaiInputs2"] = {
+                    ["C"] = "C",
+                    ["G"] = "X",
+                    ["Z"] = "Z"
+                },
+                ["BankaiInputs2"] = {
+                    ["H"] = "G"
+                },
+                ["SkillInputs2"] = {
+                    ["\255"] = "Zero",
+                    ["Equals"] = "Equals",
+                    ["Four"] = "Four",
+                    ["Seven"] = "Seven",
+                    ["Eight"] = "Eight",
+                    ["H"] = "Minus",
+                    ["G"] = "Nine",
+                    ["Two"] = "Two",
+                    ["Three"] = "Three",
+                    ["One"] = "One",
+                    ["Five"] = "Five",
+                    ["\255"] = "Six"
+                },
+                ["BankaiInputs"] = {
+                    [1] = "H",
+                    [2] = "H"
+                },
+                ["Shikai\255Inputs"] = {
+                    [1] = "Z",
+                    [2] = "G",
+                    [3] = "C"
                 }
             }
-            
-            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SendKeybindInfo"):FireServer(unpack(args))
+        
+            game:GetService("ReplicatedStorage").Remotes.SendKeybindInfo:FireServer(ohTable1)
         end)
     end)
     newother:AddToggle('Anti Void After Quest',false,function(e)
@@ -40969,8 +41058,8 @@ elseif universeid == 4871329703 then -- type soul
         end;
 
         -- piercing light
-        parryAnims['14071690484'] = function(mob, anim, id)
-            typesoulsettings.functions.parrylist({0.3,0.31}, mob, 10, anim) -- {0.4,0.3}
+        parryAnims['14071690484'] = function(mob, anim, id) -- {0.3,0.31
+            typesoulsettings.functions.parrylist({0.25,0.25}, mob, 10, anim) -- {0.4,0.3}
         end;
 
         parryAnims['14070060393'] = 0.45
@@ -41052,6 +41141,23 @@ elseif universeid == 4871329703 then -- type soul
 
         -- flash cut
         parryAnims['14071797324'] = 0.48
+    
+        -- rising shot
+        parryAnims['14071553774'] = function(mob, anim, id)
+            typesoulsettings.functions.parrylist({0.3,0.3}, mob, 10, anim) -- {0.4,0.3}
+        end;
+
+        -- grand entrance
+        parryAnims['14071538689'] = 0.93
+
+        -- catching dragon
+        parryAnims['14071527834'] = 0.38
+
+        -- ankle splitter
+        parryAnims['16804140650'] = 0.38 --
+
+        -- triple striker
+        parryAnims['14071562219'] = 0.27
 
 
     end
@@ -41754,7 +41860,16 @@ elseif universeid == 3734304510 then  -- south bronx
     local espsector = esptab:CreateSector('Cheats','left')
     esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
 
+    if getgenv().southbroxsettings ~= nil then 
+        for i,v in next, getgenv().southbroxsettings.assets do 
+            pcall(function()
+                v:Remove()
+            end)
+        end
+    end
     getgenv().southbroxsettings = {
+        assets = {};
+        objects = {};
         boxfarm = false;
         oneshotkill = false;
         headhitbox = false;
@@ -41793,6 +41908,10 @@ elseif universeid == 3734304510 then  -- south bronx
         maxbulletrange = false;
         holdtoshoot = false;
         fullbright = false;
+        silentaimradius = 90; --30;
+        silentaimthicky = 3;
+        silentaimcolor = Color3.fromRGB(255,255,255);
+        silentaimdistance = 100;
     }
     setupAimbotTab(getgenv().southbroxsettings)
     
@@ -42553,7 +42672,7 @@ elseif universeid == 3734304510 then  -- south bronx
             task.spawn(function()
                 repeat 
                     task.wait()
-                    if released == false and southbroxsettings.holdtoshoot then 
+                    if released == false and southbroxsettings.holdtoshoot and southbroxsettings.silentaim == false then 
                         inputManager:SendMouseButtonEvent(m.X,m.Y,0,true,game,0) -- 1319,574
                         --task.wait(0.05)
                         inputManager:SendMouseButtonEvent(m.X,m.Y,0,false,game,0)
@@ -42567,10 +42686,55 @@ elseif universeid == 3734304510 then  -- south bronx
             released = true;
         end
     end)-- mouse 1 down
+    leftsect:AddSlider('Silent Aim Distance', 0, 100, 250, 100, function(ztx)
+        southbroxsettings.silentaimdistance = ztx
+        -- if southbroxsettings.assets.silentaimcircle then 
+        --     southbroxsettings.assets.silentaimcircle.Thickness = southbroxsettings.silentaimdistance
+        --     -- upd
+        -- end
+    end)
     leftsect:AddToggle('Silent Aim', false, function(e)
         southbroxsettings.silentaim = e;
+        if not e then 
+            if southbroxsettings.assets.silentaimcircle then 
+                southbroxsettings.assets.silentaimcircle:Remove()
+            end
+            maid.silentaimcon = nil;
+            return
+        end
+        southbroxsettings.assets.silentaimcircle = Drawing.new('Circle') -- objects   fdov   fov
+        southbroxsettings.assets.silentaimcircle.Color = southbroxsettings['silentaimcolor']
+        --southbroxsettings.assets.silentaimcircle = Drawing.new('Circle')
+        local UserInputService = game.UserInputService
+        --southbroxsettings.assets.silentaimcircle.Visible = true
+        southbroxsettings.assets.silentaimcircle.Radius = southbroxsettings.silentaimradius; --90
+        southbroxsettings.assets.silentaimcircle.Position = Vector2.new(workspace.CurrentCamera.ViewportSize.X/2,workspace.CurrentCamera.ViewportSize.Y/2)
+        southbroxsettings.assets.silentaimcircle.Thickness = southbroxsettings.silentaimthicky; --3
+        southbroxsettings.assets.silentaimcircle.Visible = true
+        maid.silentaimcon = signals.gamestepped:connect('@radius', function()
+            southbroxsettings.assets.silentaimcircle.Position = Vector2.new(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y)
+        end)
     end);
-
+    leftsect:AddSlider('Silent Aim Radius', 0, 90, 360, 1, function(ztx)
+        southbroxsettings.silentaimradius = ztx
+        if southbroxsettings.assets.silentaimcircle then 
+            southbroxsettings.assets.silentaimcircle.Radius = southbroxsettings.silentaimradius
+            -- upd
+        end
+    end)
+    leftsect:AddSlider('Silent Aim Thickness', 0, 3, 5, 100, function(ztx)
+        southbroxsettings.silentaimthicky = ztx
+        if southbroxsettings.assets.silentaimcircle then 
+            southbroxsettings.assets.silentaimcircle.Thickness = southbroxsettings.silentaimthicky
+            -- upd
+        end
+    end)
+    leftsect:AddColorpicker('Silent Aim Color',Color3.fromRGB(255, 255,255), function(ztx)
+        southbroxsettings['silentaimcolor'] = ztx
+        if southbroxsettings.assets.silentaimcircle then 
+            southbroxsettings.assets.silentaimcircle.Color = ztx; --southbroxsettings.ztx
+        end
+    end)
     local function rayEsp(t)
         -- could set the global esp[flag] = {}
         local child = t.child
@@ -42744,12 +42908,40 @@ elseif universeid == 3734304510 then  -- south bronx
     --     return metaindex(self,reading)
     -- end)
 
+    local function getclosestotmouse()
+        local closestplayer = nil;
+        local closestdist = nil;
+        local mosue = game.Players.LocalPlayer:GetMouse()
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+            for i,v in next, game.Players:GetPlayers() do 
+                if v~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChildOfClass('Humanoid') and v.Character:FindFirstChildOfClass('Humanoid').Health > 0 then 
+                    local dist = (mosue.hit.p - v.Character.PrimaryPart.Position).Magnitude
+                    local hrpdist = (v.Character.PrimaryPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                    if hrpdist <= southbroxsettings.silentaimdistance then --100 then -- dist
+                        if dist <= southbroxsettings.silentaimradius then 
+                            if closestplayer == nil then 
+                                closestplayer = v;
+                                closestdist = dist
+                            else
+                                if closestdist > dist then 
+                                    closestplayer = v;
+                                    closestdist = dist
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        return closestplayer
+    end
+
     local metahook;
     metahook = hookmetamethod(game,'__namecall',function(self,...)
         local args = {...}
         local call_type = getnamecallmethod();
-
-        if southbroxsettings.alwayshitheadshots and call_type == 'FireServer' and tostring(self) == 'InflictTarget' then 
+        -- headhitbox  customh
+        if (southbroxsettings.alwayshitheadshots or southbroxsettings.headhitbox) and call_type == 'FireServer' and tostring(self) == 'InflictTarget' then 
             args[4] = args[4].Parent.Head
             args[8] = args[4]
         end
@@ -42766,7 +42958,7 @@ elseif universeid == 3734304510 then  -- south bronx
             metahook(self,unpack(args))
             metahook(self,unpack(args))
             return metahook(self,unpack(args))
-        elseif call_type == 'FireServer' and tostring(self) == 'VisualiseBullet' then -- and southbroxsettings.silentaim  then 
+        elseif call_type == 'FireServer' and tostring(self) == 'VisualizeBullet' then --'VisualiseBullet' then -- and southbroxsettings.silentaim  then 
             if southbroxsettings.silentaim then 
                 args[9][11] = Vector3.new(5,5,5)
             end
@@ -42781,6 +42973,35 @@ elseif universeid == 3734304510 then  -- south bronx
         end
         return metahook(self,...)
     end)
+
+
+
+    local mouse = game.Players.LocalPlayer:GetMouse()
+
+    --
+    -- local metaindex;
+    -- metaindex = hookmetamethod(game,'__index',function(self,reading)
+    --     if southbroxsettings.silentaim and (self and self:IsA('PlayerMouse')) and pcall(getclosestotmouse) and not checkcaller() then 
+    --         -- and (tostring(reading) == 'Hit' or tostring(reading) == 'Target')
+    --         local _,closestPlayer = pcall(getclosestotmouse)
+    --         print(_,closestPlayer)
+    --         if closestPlayer then 
+    --             --print(closestPlayer)
+    --             --return metaindex(self, closestPlayer.Character.HumanoidRootPart)
+    --             if tostring(reading) == 'Hit' then 
+    --                 return closestPlayer.Character.HumanoidRootPart.CFrame;
+    --             elseif tostring(reading) == 'Target' then 
+    --                 return closestPlayer.Character.HumanoidRootPart
+    --             end
+    --         end
+    --         return metaindex(self,reading) --Vector3.new(0,0,0)
+    --     end
+    --     return metaindex(self,reading)
+    -- end)
+    
+    
+    
+    
 
     local thelooted = {}
     local function findlooted(v)
