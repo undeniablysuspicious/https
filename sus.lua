@@ -40187,6 +40187,9 @@ elseif universeid == 4871329703 then -- type soul
             end
         end
     end)
+    lefttab:AddButton('Rejoin Same Server', function()
+        game.TeleportService:TeleportToPlaceInstance(game.PlaceId,game.JobId)
+    end)
     lefttab:AddToggle('Rainbow Cloak', false, function(e)
         typesoulsettings.rainbowcloak = e;
     end)
@@ -40745,128 +40748,144 @@ elseif universeid == 4871329703 then -- type soul
     newother:AddToggle('Auto Division 12',false,function(e)
         typesoulsettings.autodivision12 = e;
     end)
-    newother:AddToggle('Rollback Data',false,function(e)
-        typesoulsettings.rollback = e;
-        if e == false then 
-            maid.rollbackctn = nil;
-            local args = {
-                [1] = {
-                    ["SkillInputs"] = {
-                        [1] = "One",
-                        [2] = "Two",
-                        [3] = "Three",
-                        [4] = "Four",
-                        [5] = "Five",
-                        [6] = "Six",
-                        [7] = "Seven",
-                        [8] = "Eight",
-                        [9] = "Nine",
-                        [10] = "Zero",
-                        [11] = "Minus",
-                        [12] = "Equals"
-                    },
-                    ["ShikaiInputs2"] = {
-                        ["E"] = "X",
-                        ["C"] = "C",
-                        ["Z"] = "Z"
-                    },
-                    ["BankaiInputs2"] = {
-                        ["LeftShift"] = "T",
-                        ["G"] = "G"
-                    },
-                    ["SkillInputs2"] = {
-                        ["Zero"] = "Zero",
-                        ["Equals"] = "Equals",
-                        ["Four"] = "Four",
-                        ["Seven"] = "Seven",
-                        ["Eight"] = "Eight",
-                        ["Nine"] = "Nine",
-                        ["Six"] = "Six",
-                        ["Two"] = "Two",
-                        ["Three"] = "Three",
-                        ["Five"] = "Five",
-                        ["One"] = "One"
-                    },
-                    ["ShikaiInputs"] = {
-                        [1] = "Z",
-                        [2] = "E",
-                        [3] = "C"
-                    },
-                    ["BankaiInputs"] = {
-                        [1] = "LeftShift",
-                        [2] = "G"
-                    }
-                }
-            }
-            
-            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SendKeybindInfo"):FireServer(unpack(args))
-            azfakenotify('Removed rollback',2)
+    local rollbacktogfgl = newother:AddToggle('Rollback Data',false,function(e, clicked)
+        --library:CheckForPermission({ask = 'Rollback, Are you sure?'})
+        if clicked and typesoulsettings.rollback == false and library:CheckForPermission('Rollback, Are you sure?') == false then
+            rollbacktogfgl:Set(false) 
             return
-        end;
-        azfakenotify('Rolling back...',2)
-        local strs = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/general/main/megabyte'))()
-        maid.rollbackctn = signals.heartbeat:connect('@duper', function()
-            local r = {}
-            r.SkillInputs = {
-                [1] = "One",
-                [2] = "Two",
-                [3] = "Three",
-                [4] = "Four",
-                [5] = "Five",
-                [6] = "Six",
-                [7] = "Seven",
-                [8] = "Eight",
-                [9] = "Nine",
-                [10] = "Zero",
-                [11] = "Minus",
-                [12] = "Equals"
-            }
+        end
+        if clicked then 
+            typesoulsettings.rollback = e;
+        else
+            rollbacktogfgl:Set(false)
+        end
+        -- if e == false then 
+        --     maid.rollbackctn = nil;
+        --     local args = {
+        --         [1] = {
+        --             ["SkillInputs"] = {
+        --                 [1] = "One",
+        --                 [2] = "Two",
+        --                 [3] = "Three",
+        --                 [4] = "Four",
+        --                 [5] = "Five",
+        --                 [6] = "Six",
+        --                 [7] = "Seven",
+        --                 [8] = "Eight",
+        --                 [9] = "Nine",
+        --                 [10] = "Zero",
+        --                 [11] = "Minus",
+        --                 [12] = "Equals"
+        --             },
+        --             ["ShikaiInputs2"] = {
+        --                 ["E"] = "X",
+        --                 ["C"] = "C",
+        --                 ["Z"] = "Z"
+        --             },
+        --             ["BankaiInputs2"] = {
+        --                 ["LeftShift"] = "T",
+        --                 ["G"] = "G"
+        --             },
+        --             ["SkillInputs2"] = {
+        --                 ["Zero"] = "Zero",
+        --                 ["Equals"] = "Equals",
+        --                 ["Four"] = "Four",
+        --                 ["Seven"] = "Seven",
+        --                 ["Eight"] = "Eight",
+        --                 ["Nine"] = "Nine",
+        --                 ["Six"] = "Six",
+        --                 ["Two"] = "Two",
+        --                 ["Three"] = "Three",
+        --                 ["Five"] = "Five",
+        --                 ["One"] = "One"
+        --             },
+        --             ["ShikaiInputs"] = {
+        --                 [1] = "Z",
+        --                 [2] = "E",
+        --                 [3] = "C"
+        --             },
+        --             ["BankaiInputs"] = {
+        --                 [1] = "LeftShift",
+        --                 [2] = "G"
+        --             }
+        --         }
+        --     }
+            
+        --     game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SendKeybindInfo"):FireServer(unpack(args))
+        --     azfakenotify('Removed rollback',2)
+        --     return
+        -- end;
+        -- azfakenotify('Rolling back...',2)
+        -- local strs = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/general/main/megabyte'))()
+        -- maid.rollbackctn = signals.heartbeat:connect('@duper', function()
+        --     local r = {}
+        --     r.SkillInputs = {
+        --         [1] = "One",
+        --         [2] = "Two",
+        --         [3] = "Three",
+        --         [4] = "Four",
+        --         [5] = "Five",
+        --         [6] = "Six",
+        --         [7] = "Seven",
+        --         [8] = "Eight",
+        --         [9] = "Nine",
+        --         [10] = "Zero",
+        --         [11] = "Minus",
+        --         [12] = "Equals"
+        --     }
                 
-            for i=1, 100000 do 
-                r.SkillInputs[i] = "One"
-            end
-            local args = {
-                [1] = {
-                    r.SkillInputs,
-                    ["ShikaiInputs2"] = {
-                        ["E"] = "X",
-                        ["C"] = "C",
-                        ["Z"] = "Z"
-                    },
-                    ["BankaiInputs2"] = {
-                        ["LeftShift"] = "T",
-                        ["G"] = "G"
-                    },
-                    ["SkillInputs2"] = {
-                        ["Zero"] = "Zero",
-                        ["Equals"] = "Equals",
-                        ["Four"] = "Four",
-                        ["Seven"] = "Seven",
-                        ["Eight"] = "Eight",
-                        ["Nine"] = "Nine",
-                        ["Six"] = "Six",
-                        ["Two"] = "Two",
-                        ["Three"] = "Three",
-                        ["Five"] = "Five",
-                        ["One"] = "One"
-                    },
-                    ["ShikaiInputs"] = {
-                        [1] = "Z",
-                        [2] = "E",
-                        [3] = "C"
-                    },
-                    ["BankaiInputs"] = {
-                        [1] = "LeftShift",
-                        [2] = "G"
-                    }
-                }
-            }
-            --print(unpack(args))
-            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SendKeybindInfo"):FireServer(unpack(args))
-        end)
-        task.delay(3,function()
-            azfakenotify('Successfully stopped data!','untilClick') -- rolled back!
-        end)
+        --     for i=1, 100000 do 
+        --        -- r.SkillInputs[i] = "One"
+        --     end
+        --     local args = {
+        --         [1] = {
+        --             --r.SkillInputs,
+        --             -- Length
+        --             -- If its a string
+        --             -- if it isnt equal to nul
+
+        --             ['SkillInputs'] = {
+        --                 [nil] = nil
+        --             };
+        --             ["ShikaiInputs2"] = {
+        --                 ["E"] = "X",
+        --                 ["C"] = "C",
+        --                 ["Z"] = "Z"
+        --             },
+        --             ["BankaiInputs2"] = {
+        --                 ["LeftShift"] = "T",
+        --                 ["G"] = "G"
+        --             },
+        --             ["SkillInputs2"] = {
+        --                 ["Zero"] = "Zero",
+        --                 ["Equals"] = "Equals",
+        --                 ["Four"] = "Four",
+        --                 ["Seven"] = "Seven",
+        --                 ["Eight"] = "Eight",
+        --                 ["Nine"] = "Nine",
+        --                 ["Six"] = "Six",
+        --                 ["Two"] = "Two",
+        --                 ["Three"] = "Three",
+        --                 ["Five"] = "Five",
+        --                 ["One"] = "One"
+        --             },
+        --             ["ShikaiInputs"] = {
+        --                 [1] = "Z",
+        --                 [2] = "E",
+        --                 [3] = "C"
+        --             },
+        --             ["BankaiInputs"] = {
+        --                 [1] = "LeftShift",
+        --                 [2] = nil; --"G"
+        --             }
+        --         }
+        --     }
+        --     --print(unpack(args))
+        --     game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SendKeybindInfo"):FireServer(unpack(args))
+        -- end)
+        -- task.delay(3,function()
+        --     azfakenotify('Successfully stopped data!','untilClick') -- rolled back!
+        -- end)
     end)
     newother:AddToggle('Anti Void After Quest',false,function(e)
         typesoulsettings.goupafterdeath = e;
