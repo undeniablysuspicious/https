@@ -39903,7 +39903,9 @@ elseif universeid == 4871329703 then -- type soul
 
         local function onAdded(obj)
             local hardNames = {
-                'SchwertCritical' --,'Tenran','Byakurai'
+                'SchwertCritical'; --,'Tenran','Byakurai'
+                'HaienFireball';
+
             };
             local dontParry = {
                 'WaveshotProjectile'; -- already got parry down;
@@ -40748,145 +40750,145 @@ elseif universeid == 4871329703 then -- type soul
     newother:AddToggle('Auto Division 12',false,function(e)
         typesoulsettings.autodivision12 = e;
     end)
-    local rollbacktogfgl = newother:AddToggle('Rollback Data',false,function(e, clicked)
-        --library:CheckForPermission({ask = 'Rollback, Are you sure?'})
-        if clicked and typesoulsettings.rollback == false and library:CheckForPermission('Rollback, Are you sure?') == false then
-            rollbacktogfgl:Set(false) 
-            return
-        end
-        if clicked then 
-            typesoulsettings.rollback = e;
-        else
-            rollbacktogfgl:Set(false)
-        end
-        -- if e == false then 
-        --     maid.rollbackctn = nil;
-        --     local args = {
-        --         [1] = {
-        --             ["SkillInputs"] = {
-        --                 [1] = "One",
-        --                 [2] = "Two",
-        --                 [3] = "Three",
-        --                 [4] = "Four",
-        --                 [5] = "Five",
-        --                 [6] = "Six",
-        --                 [7] = "Seven",
-        --                 [8] = "Eight",
-        --                 [9] = "Nine",
-        --                 [10] = "Zero",
-        --                 [11] = "Minus",
-        --                 [12] = "Equals"
-        --             },
-        --             ["ShikaiInputs2"] = {
-        --                 ["E"] = "X",
-        --                 ["C"] = "C",
-        --                 ["Z"] = "Z"
-        --             },
-        --             ["BankaiInputs2"] = {
-        --                 ["LeftShift"] = "T",
-        --                 ["G"] = "G"
-        --             },
-        --             ["SkillInputs2"] = {
-        --                 ["Zero"] = "Zero",
-        --                 ["Equals"] = "Equals",
-        --                 ["Four"] = "Four",
-        --                 ["Seven"] = "Seven",
-        --                 ["Eight"] = "Eight",
-        --                 ["Nine"] = "Nine",
-        --                 ["Six"] = "Six",
-        --                 ["Two"] = "Two",
-        --                 ["Three"] = "Three",
-        --                 ["Five"] = "Five",
-        --                 ["One"] = "One"
-        --             },
-        --             ["ShikaiInputs"] = {
-        --                 [1] = "Z",
-        --                 [2] = "E",
-        --                 [3] = "C"
-        --             },
-        --             ["BankaiInputs"] = {
-        --                 [1] = "LeftShift",
-        --                 [2] = "G"
-        --             }
-        --         }
-        --     }
+    -- local rollbacktogfgl = newother:AddToggle('Rollback Data',false,function(e, clicked)
+    --     --library:CheckForPermission({ask = 'Rollback, Are you sure?'})
+    --     if clicked and typesoulsettings.rollback == false and library:CheckForPermission('Rollback, Are you sure?') == false then
+    --         rollbacktogfgl:Set(false) 
+    --         return
+    --     end
+    --     if clicked then 
+    --         typesoulsettings.rollback = e;
+    --     else
+    --         rollbacktogfgl:Set(false)
+    --     end
+    --     -- if e == false then 
+    --     --     maid.rollbackctn = nil;
+    --     --     local args = {
+    --     --         [1] = {
+    --     --             ["SkillInputs"] = {
+    --     --                 [1] = "One",
+    --     --                 [2] = "Two",
+    --     --                 [3] = "Three",
+    --     --                 [4] = "Four",
+    --     --                 [5] = "Five",
+    --     --                 [6] = "Six",
+    --     --                 [7] = "Seven",
+    --     --                 [8] = "Eight",
+    --     --                 [9] = "Nine",
+    --     --                 [10] = "Zero",
+    --     --                 [11] = "Minus",
+    --     --                 [12] = "Equals"
+    --     --             },
+    --     --             ["ShikaiInputs2"] = {
+    --     --                 ["E"] = "X",
+    --     --                 ["C"] = "C",
+    --     --                 ["Z"] = "Z"
+    --     --             },
+    --     --             ["BankaiInputs2"] = {
+    --     --                 ["LeftShift"] = "T",
+    --     --                 ["G"] = "G"
+    --     --             },
+    --     --             ["SkillInputs2"] = {
+    --     --                 ["Zero"] = "Zero",
+    --     --                 ["Equals"] = "Equals",
+    --     --                 ["Four"] = "Four",
+    --     --                 ["Seven"] = "Seven",
+    --     --                 ["Eight"] = "Eight",
+    --     --                 ["Nine"] = "Nine",
+    --     --                 ["Six"] = "Six",
+    --     --                 ["Two"] = "Two",
+    --     --                 ["Three"] = "Three",
+    --     --                 ["Five"] = "Five",
+    --     --                 ["One"] = "One"
+    --     --             },
+    --     --             ["ShikaiInputs"] = {
+    --     --                 [1] = "Z",
+    --     --                 [2] = "E",
+    --     --                 [3] = "C"
+    --     --             },
+    --     --             ["BankaiInputs"] = {
+    --     --                 [1] = "LeftShift",
+    --     --                 [2] = "G"
+    --     --             }
+    --     --         }
+    --     --     }
             
-        --     game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SendKeybindInfo"):FireServer(unpack(args))
-        --     azfakenotify('Removed rollback',2)
-        --     return
-        -- end;
-        -- azfakenotify('Rolling back...',2)
-        -- local strs = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/general/main/megabyte'))()
-        -- maid.rollbackctn = signals.heartbeat:connect('@duper', function()
-        --     local r = {}
-        --     r.SkillInputs = {
-        --         [1] = "One",
-        --         [2] = "Two",
-        --         [3] = "Three",
-        --         [4] = "Four",
-        --         [5] = "Five",
-        --         [6] = "Six",
-        --         [7] = "Seven",
-        --         [8] = "Eight",
-        --         [9] = "Nine",
-        --         [10] = "Zero",
-        --         [11] = "Minus",
-        --         [12] = "Equals"
-        --     }
+    --     --     game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SendKeybindInfo"):FireServer(unpack(args))
+    --     --     azfakenotify('Removed rollback',2)
+    --     --     return
+    --     -- end;
+    --     -- azfakenotify('Rolling back...',2)
+    --     -- local strs = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/general/main/megabyte'))()
+    --     -- maid.rollbackctn = signals.heartbeat:connect('@duper', function()
+    --     --     local r = {}
+    --     --     r.SkillInputs = {
+    --     --         [1] = "One",
+    --     --         [2] = "Two",
+    --     --         [3] = "Three",
+    --     --         [4] = "Four",
+    --     --         [5] = "Five",
+    --     --         [6] = "Six",
+    --     --         [7] = "Seven",
+    --     --         [8] = "Eight",
+    --     --         [9] = "Nine",
+    --     --         [10] = "Zero",
+    --     --         [11] = "Minus",
+    --     --         [12] = "Equals"
+    --     --     }
                 
-        --     for i=1, 100000 do 
-        --        -- r.SkillInputs[i] = "One"
-        --     end
-        --     local args = {
-        --         [1] = {
-        --             --r.SkillInputs,
-        --             -- Length
-        --             -- If its a string
-        --             -- if it isnt equal to nul
+    --     --     for i=1, 100000 do 
+    --     --        -- r.SkillInputs[i] = "One"
+    --     --     end
+    --     --     local args = {
+    --     --         [1] = {
+    --     --             --r.SkillInputs,
+    --     --             -- Length
+    --     --             -- If its a string
+    --     --             -- if it isnt equal to nul
 
-        --             ['SkillInputs'] = {
-        --                 [nil] = nil
-        --             };
-        --             ["ShikaiInputs2"] = {
-        --                 ["E"] = "X",
-        --                 ["C"] = "C",
-        --                 ["Z"] = "Z"
-        --             },
-        --             ["BankaiInputs2"] = {
-        --                 ["LeftShift"] = "T",
-        --                 ["G"] = "G"
-        --             },
-        --             ["SkillInputs2"] = {
-        --                 ["Zero"] = "Zero",
-        --                 ["Equals"] = "Equals",
-        --                 ["Four"] = "Four",
-        --                 ["Seven"] = "Seven",
-        --                 ["Eight"] = "Eight",
-        --                 ["Nine"] = "Nine",
-        --                 ["Six"] = "Six",
-        --                 ["Two"] = "Two",
-        --                 ["Three"] = "Three",
-        --                 ["Five"] = "Five",
-        --                 ["One"] = "One"
-        --             },
-        --             ["ShikaiInputs"] = {
-        --                 [1] = "Z",
-        --                 [2] = "E",
-        --                 [3] = "C"
-        --             },
-        --             ["BankaiInputs"] = {
-        --                 [1] = "LeftShift",
-        --                 [2] = nil; --"G"
-        --             }
-        --         }
-        --     }
-        --     --print(unpack(args))
-        --     game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SendKeybindInfo"):FireServer(unpack(args))
-        -- end)
-        -- task.delay(3,function()
-        --     azfakenotify('Successfully stopped data!','untilClick') -- rolled back!
-        -- end)
-    end)
+    --     --             ['SkillInputs'] = {
+    --     --                 [nil] = nil
+    --     --             };
+    --     --             ["ShikaiInputs2"] = {
+    --     --                 ["E"] = "X",
+    --     --                 ["C"] = "C",
+    --     --                 ["Z"] = "Z"
+    --     --             },
+    --     --             ["BankaiInputs2"] = {
+    --     --                 ["LeftShift"] = "T",
+    --     --                 ["G"] = "G"
+    --     --             },
+    --     --             ["SkillInputs2"] = {
+    --     --                 ["Zero"] = "Zero",
+    --     --                 ["Equals"] = "Equals",
+    --     --                 ["Four"] = "Four",
+    --     --                 ["Seven"] = "Seven",
+    --     --                 ["Eight"] = "Eight",
+    --     --                 ["Nine"] = "Nine",
+    --     --                 ["Six"] = "Six",
+    --     --                 ["Two"] = "Two",
+    --     --                 ["Three"] = "Three",
+    --     --                 ["Five"] = "Five",
+    --     --                 ["One"] = "One"
+    --     --             },
+    --     --             ["ShikaiInputs"] = {
+    --     --                 [1] = "Z",
+    --     --                 [2] = "E",
+    --     --                 [3] = "C"
+    --     --             },
+    --     --             ["BankaiInputs"] = {
+    --     --                 [1] = "LeftShift",
+    --     --                 [2] = nil; --"G"
+    --     --             }
+    --     --         }
+    --     --     }
+    --     --     --print(unpack(args))
+    --     --     game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SendKeybindInfo"):FireServer(unpack(args))
+    --     -- end)
+    --     -- task.delay(3,function()
+    --     --     azfakenotify('Successfully stopped data!','untilClick') -- rolled back!
+    --     -- end)
+    -- end)
     newother:AddToggle('Anti Void After Quest',false,function(e)
         typesoulsettings.goupafterdeath = e;
     end)
@@ -41191,7 +41193,7 @@ elseif universeid == 4871329703 then -- type soul
         parryAnims['14774768876'] = 0.24 --0.31
         parryAnims['14774820991'] = 0.24 --0.33
         parryAnims['14776252587'] = 0.22;
-        parryAnims['14776880646'] = 0.22
+        parryAnims['14776880646'] = 0.22;
         
         -- gun
         do 
@@ -41213,9 +41215,9 @@ elseif universeid == 4871329703 then -- type soul
         parryAnims['14070074688'] = 0.3 -- 0.33 matches eprfectly
 
         -- hollow 
-        parryAnims['14070836033'] = 0.36 -- could do 0.4 (m1 1)
-        parryAnims['14070837481'] = 0.36 -- second
-        parryAnims['14070839321'] = 0.52 -- crit
+        parryAnims['14070836033'] = 0.32; --0.36 -- could do 0.4 (m1 1)
+        parryAnims['14070837481'] = 0.32; --0.36 -- second
+        parryAnims['14070839321'] = 0.45; --0.52 -- crit
 
 
         -- dagger j m1
@@ -41234,6 +41236,34 @@ elseif universeid == 4871329703 then -- type soul
         parryAnims['14069455958'] = 0.25 -- m5
         parryAnims['14069440034'] = 0.33 -- crit
 
+        -- claw - cang
+        parryAnims['14069185844'] = 0.18; -- 1
+        parryAnims['14069186980'] = 0.18; -- 2
+        parryAnims['14069188532'] = 0.2; -- 3
+        parryAnims['14069190199'] = 0.2; -- 4
+        parryAnims['14069191458'] = 0.2; -- 5
+        parryAnims['14069170145'] = 0.18; -- crit
+
+        -- idek what weapon this is
+        parryAnims['14070163707'] = 0.32 -- 1
+        parryAnims['14070164504'] = 0.32 -- 2
+        parryAnims['14070165536'] = 0.32; -- 3
+        parryAnims['14070166724'] = 0.32; -- 4
+        parryAnims['14070167474'] = 0.32; -- 5
+
+        -- some uql ult
+        parryAnims['14068264382'] = 0.26; -- 1
+        parryAnims['14068263374'] = 0.26; -- 2
+        parryAnims['14081676773'] = 0.26; -- 3
+        parryAnims['14081673698'] = 0.24; -- 4
+        parryAnims['14068257009'] = 0.24; -- 5
+        parryAnims['14068255583'] = 0.25; -- crit
+
+        -- some executioners blade typa weapon
+        parryAnims['16990963565'] = 0.34; --  1 and 3
+        parryAnims['16990965363'] = 0.32 -- 2 and 4
+        parryAnims['16990967955'] = 0.34 -- 5
+        parryAnims['16990945760'] = 0.38 -- crit
 
         -- crits
         parryAnims['14069224323'] = 0.4 -- might make funct
@@ -41300,7 +41330,9 @@ elseif universeid == 4871329703 then -- type soul
         parryAnims['14071719657'] = 0.72
 
         -- gakia rekko
-        parryAnims['14071674410'] = makeBlockRange(15, {delay = 0.7, holdtime = 1})
+        parryAnims['14071674410'] = function(mob, anim, id) --makeBlockRange(15, {delay = 0.7, holdtime = 1})
+            typesoulsettings.functions.parrylist({0.0.7,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2}, mob, 15, anim)
+        end
 
         -- dropping fang
         parryAnims['14071794187'] = 0.68
@@ -41344,6 +41376,44 @@ elseif universeid == 4871329703 then -- type soul
         -- triple striker
         parryAnims['14071562219'] = 0.27
 
+        -- heavenly cannon
+        parryAnims['14071682948'] = 1.3
+
+        -- fushibi
+        parryAnims['14071673176'] = 1.63
+
+        --sokatsui
+        parryAnims['14071701914'] = 1.5
+
+        -- danku
+        parryAnims['14071670402'] = 0.58
+
+        -- mortal ties
+        parryAnims['14071642506'] = 0.7
+
+        -- flower passage
+        parryAnims['14068932670'] = function(mob, anim ,id)
+            task.spawn(function()
+                repeat task.wait() until checkdist(8, mob.PrimaryPart)
+                typesoulsettings.functions.parrylist({0}, mob, 10, anim)
+            end)
+        end;
+
+        -- delayed crossings
+        parryAnims['14071632343'] = 0.65
+
+        -- flowing petals
+        parryAnims['16889680733'] = function(mob, anim, id)
+            typesoulsettings.functions.parrylist({0.34,0.5}, mob, 35, anim)
+        end
+
+        -- tora reach
+        parryAnims['14071559270'] = function(mob, anim, id)
+            typesoulsettings.functions.parrylist({0.24,0.34}, mob, 15, anim)
+        end
+
+        -- spine rend
+        parryAnims['14071558168'] = 0.55
 
     end
 
@@ -42872,11 +42942,79 @@ elseif universeid == 3734304510 then  -- south bronx
     --          end
     --      end)
     --  end)
+    local function getclosestotmouse()
+        local closestplayer = nil;
+        local closestdist = nil;
+        local mosue = game.Players.LocalPlayer:GetMouse()
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+            for i,v in next, game.Players:GetPlayers() do 
+                if v~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChildOfClass('Humanoid') and v.Character:FindFirstChildOfClass('Humanoid').Health > 0 then 
+                    local dist = (mosue.hit.p - v.Character.PrimaryPart.Position).Magnitude
+                    local hrpdist = (v.Character.PrimaryPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                    if hrpdist <= southbroxsettings.silentaimdistance then --100 then -- dist
+                        if dist <= southbroxsettings.silentaimradius then 
+                            if closestplayer == nil then 
+                                closestplayer = v;
+                                closestdist = hrpdist
+                            else
+                                if closestdist > dist then 
+                                    closestplayer = v;
+                                    closestdist = hrpdist
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        return closestplayer
+    end
     local inputManager = game:GetService('VirtualInputManager')
     local m = game.Players.LocalPlayer:GetMouse()
     local released = false
     game.Players.LocalPlayer:GetMouse().Button1Down:Connect(function()
         released = false;
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA('Tool') and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA('Tool') :FindFirstChild('GunScript_Server') then 
+            local _, v = pcall(getclosestotmouse)
+            if not v then return end;
+            local ohInstance1 = game.Players.LocalPlayer.Character:FindFirstChildWhichIsA('Tool') --["Hi-Point"]
+            local ohInstance2 = game:GetService("Players").LocalPlayer
+            local ohInstance3 = v.Character.Humanoid
+            local ohInstance4 = v.Character.HumanoidRootPart
+            local ohNumber5 = 20
+            local ohTable6 = {
+                [1] = 0,
+                [2] = 0,
+                [3] = false,
+                [4] = false,
+                [5] = game.Players.LocalPlayer.Character:FindFirstChildWhichIsA('Tool').GunScript_Server.IgniteScript,
+                [6] = game.Players.LocalPlayer.Character:FindFirstChildWhichIsA('Tool').GunScript_Server.IcifyScript,
+                [7] = 100,
+                [8] = 100
+            }
+            local ohTable7 = {
+                [1] = false,
+                [2] = 0,
+                [3] = 0
+            }
+            local ohInstance8 = v.Character.Head
+            local ohTable9 = {
+                [1] = false,
+                [2] = {
+                    [1] = 3734304510
+                },
+                [3] = 0,
+                [4] = 10,
+                [5] = game.Players.LocalPlayer.Character:FindFirstChildWhichIsA('Tool').GunScript_Local.HeadshotEffect
+            }
+            local ohVector310 = ohInstance8.Position
+            local ohVector311 = Vector3.new(-0.9115819931030273, 0.23721949756145477, -0.3357754945755005)
+            local ohNumber12 = os.time()
+            local ohVector313 = Vector3.new(0.7709456086158752, 0.6844817399978638, 1.2795101404190063)
+            
+            game:GetService("ReplicatedStorage").RemoteEvents.InflictTarget:FireServer(ohInstance1, ohInstance2, ohInstance3, ohInstance4, ohNumber5, ohTable6, ohTable7, ohInstance8, ohTable9, ohVector310, ohVector311, ohNumber12, ohVector313)
+            
+        end;    
         if southbroxsettings.holdtoshoot then 
             task.spawn(function()
                 repeat 
@@ -43069,28 +43207,28 @@ elseif universeid == 3734304510 then  -- south bronx
         southbroxsettings['atmespdistance'] = State
     end)
 
-    local function getclosetomouse(originalargs)
-        local wasclose = nil;
-        local closedist = nil;
-        for i,v in next, game.Players:GetPlayers() do 
-            if v ~= game.Players.LocalPlayer and v.Character then 
-                local mouseget = game.Players.LocalPlayer:GetMouse().hit.p 
-                local dist = (mouseget - v.Character.PrimaryPart.Position)
-                if dist.Magnitude < 15 then 
-                    if wasclose == nil then 
-                        wasclose = v;
-                        closedist = dist;
-                    else
-                        if closedist > dist then 
-                            wasclose = v;
-                            closedist = dist;
-                        end
-                    end
-                end
-            end
-        end;    
-        return {closest = wasclose}
-    end;
+    -- local function getclosetomouse(originalargs)
+    --     local wasclose = nil;
+    --     local closedist = nil;
+    --     for i,v in next, game.Players:GetPlayers() do 
+    --         if v ~= game.Players.LocalPlayer and v.Character then 
+    --             local mouseget = game.Players.LocalPlayer:GetMouse().hit.p 
+    --             local dist = (mouseget - v.Character.PrimaryPart.Position)
+    --             if dist.Magnitude < 15 then 
+    --                 if wasclose == nil then 
+    --                     wasclose = v;
+    --                     closedist = dist;
+    --                 else
+    --                     if closedist > dist then 
+    --                         wasclose = v;
+    --                         closedist = dist;
+    --                     end
+    --                 end
+    --             end
+    --         end
+    --     end;    
+    --     return {closest = wasclose}
+    -- end;
 
     --setupEspTab(getgenv().southbroxsettings)
     
@@ -43117,33 +43255,33 @@ elseif universeid == 3734304510 then  -- south bronx
     --     return metaindex(self,reading)
     -- end)
 
-    local function getclosestotmouse()
-        local closestplayer = nil;
-        local closestdist = nil;
-        local mosue = game.Players.LocalPlayer:GetMouse()
-        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
-            for i,v in next, game.Players:GetPlayers() do 
-                if v~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChildOfClass('Humanoid') and v.Character:FindFirstChildOfClass('Humanoid').Health > 0 then 
-                    local dist = (mosue.hit.p - v.Character.PrimaryPart.Position).Magnitude
-                    local hrpdist = (v.Character.PrimaryPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
-                    if hrpdist <= southbroxsettings.silentaimdistance then --100 then -- dist
-                        if dist <= southbroxsettings.silentaimradius then 
-                            if closestplayer == nil then 
-                                closestplayer = v;
-                                closestdist = dist
-                            else
-                                if closestdist > dist then 
-                                    closestplayer = v;
-                                    closestdist = dist
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        return closestplayer
-    end
+    -- local function getclosestotmouse()
+    --     local closestplayer = nil;
+    --     local closestdist = nil;
+    --     local mosue = game.Players.LocalPlayer:GetMouse()
+    --     if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then 
+    --         for i,v in next, game.Players:GetPlayers() do 
+    --             if v~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChildOfClass('Humanoid') and v.Character:FindFirstChildOfClass('Humanoid').Health > 0 then 
+    --                 local dist = (mosue.hit.p - v.Character.PrimaryPart.Position).Magnitude
+    --                 local hrpdist = (v.Character.PrimaryPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+    --                 if hrpdist <= southbroxsettings.silentaimdistance then --100 then -- dist
+    --                     if dist <= southbroxsettings.silentaimradius then 
+    --                         if closestplayer == nil then 
+    --                             closestplayer = v;
+    --                             closestdist = dist
+    --                         else
+    --                             if closestdist > dist then 
+    --                                 closestplayer = v;
+    --                                 closestdist = dist
+    --                             end
+    --                         end
+    --                     end
+    --                 end
+    --             end
+    --         end
+    --     end
+    --     return closestplayer
+    -- end
 
     local metahook;
     metahook = hookmetamethod(game,'__namecall',function(self,...)
