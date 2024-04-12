@@ -41331,7 +41331,7 @@ elseif universeid == 4871329703 then -- type soul
 
         -- gakia rekko
         parryAnims['14071674410'] = function(mob, anim, id) --makeBlockRange(15, {delay = 0.7, holdtime = 1})
-            typesoulsettings.functions.parrylist({0.0.7,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2}, mob, 15, anim)
+            typesoulsettings.functions.parrylist({0.7,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2}, mob, 15, anim)
         end
 
         -- dropping fang
