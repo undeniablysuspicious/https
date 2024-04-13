@@ -39729,6 +39729,7 @@ elseif universeid == 4871329703 then -- type soul
         antiaagun = false;
         speecchanger = false;
         flashstepspeed = 55;
+        breakais = false;
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -40765,6 +40766,28 @@ elseif universeid == 4871329703 then -- type soul
                 setPlatform(azfake:returndata().humanoidrootpart)
             end)
         end)
+        newother:AddToggle('Break Mob Ais',false,function(e)
+            typesoulsettings.breakais = e;
+            if not e then 
+                maid.mobaibreak1 = nil; -- mobaibrwak
+                maid.mobaibreak2 = nil;
+                return
+            end;
+            oldHRPVelo = azfake:returndata().humanoidrootpart.Velocity;
+            maid.mobaibreak1 = signals.heartbeat:connect('no anims', function()--game.RunService:Connect(function())
+                if not  azfake:returndata().character then return end;
+                if not  azfake:returndata().humanoid then return end;
+                if not azfake:returndata().humanoidrootpart then return end;
+                local rootPart = azfake:returndata().humanoidrootpart
+                rootPart.Velocity = (rootPart.CFrame.LookVector.Unit * 20) + Vector3.new(0,-1000,0);
+            end)
+            maid.mobaibreak2 = signals.gamestepped:connect('no anims', function()--game.RunService:Connect(function())
+                if not  azfake:returndata().character then return end;
+                if not  azfake:returndata().humanoid then return end;
+                if not azfake:returndata().humanoidrootpart then return end;
+                azfake:returndata().humanoidrootpart.Velocity = oldHRPVelo;
+            end)
+        end)
     end
  
     newother:AddToggle('Flashstep Speed Changer',false,function(e)
@@ -40789,7 +40812,8 @@ elseif universeid == 4871329703 then -- type soul
     newother:AddSlider("Flashstep Speed", 0, 55, 500, 1, function(State)
         typesoulsettings['flashstepspeed'] = State
     end)
-    if LRM_UserNote and string.find(LRM_UserNote, 'beta') or vs == 'debug' then 
+    print(LRM_UserNote)
+    if string.find(LRM_UserNote, 'beta') or vs == 'debug' then 
         local wasinsta = newother:AddToggle('Insta Kill Mobs',false,function(e, wasclicked)
             -- if wasclicked then 
             --     if typesoulsettings.instakill == false then 
