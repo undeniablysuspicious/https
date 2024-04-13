@@ -8619,22 +8619,18 @@ function signals.connections.new(connection, bind, justInstance)
     data['event'] = ctn;
     data['instance'] = InstanceFired;
     local datacontrol = {};
-    setmetatable(data, datacontrol)
-    datacontrol.__newindex = function(table_, key, value)
-        if datacontrol[key] then 
-            if value == nil and key == 'event' then 
-                -- @ removing connection to
-                print('removing event')
-                InstanceFired:Destroy()
-            end
-        else
-            if value ~= nil then 
-                datacontrol[key] = value
-            end
+    datacontrol.__index = data;
+    datacontrol.__newindex = function(table, key, value)
+        if key == 'event' and value == nil then 
+            -- @ disconnect ;
+            if signals.debugger then print('[setting event to nil; disconnection]') end;
+            ctn:Disconnect()
+            -- table remove
         end
-    end
+    end;
+    local maintable = setmetatable({}, datacontrol); -- the table that we can set to nil
     table.insert(signals.connections, data)
-    return data
+    return maintable; --data
 end
 --[[
     maid.test1 = signals.connections.new('Task1','onFire', game.RemoteEvent)['event']
@@ -39729,6 +39725,7 @@ elseif universeid == 4871329703 then -- type soul
         rollback = false;
         serverhopafterlootbox = false;
         m1hold = false;
+        instakill = false;
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -40725,6 +40722,44 @@ elseif universeid == 4871329703 then -- type soul
     newother:AddToggle('M1 Hold',false,function(e)
         typesoulsettings.m1hold = e;
     end)
+    if LRM_UserNote and LRM_UserNote == 'beta' or vs == 'debug' then 
+        local wasinsta = newother:AddToggle('Insta Kill Mobs',false,function(e, wasclicked)
+            -- if wasclicked then 
+            --     if typesoulsettings.instakill == false then 
+            --         library:CheckForPermission('This might only work on bosses. Still use?')
+            --     else
+            --         -- @clicked when it was true; destined to set to false.
+            --     end
+            -- else
+            --     wasinsta:Set(false)
+            --     return
+            -- end
+            typesoulsettings.instakill = e;
+            if not e then 
+                maid.instakillctn = nil;
+                return
+            end;
+            maid.instakillctn = signals.gamestepped:connect('no anims', function()--game.RunService:Connect(function())
+                if not  azfake:returndata().character then return end;
+                for i,v in next, workspace.Entities:GetChildren() do 
+                    if not game.Players:GetPlayerFromCharacter(v) then 
+                        if v.PrimaryPart and v.PrimaryPart.ReceiveAge == 0 then
+                            local cf = v.PrimaryPart.CFrame
+                            v.PrimaryPart.Velocity = Vector3.new(14.465, 14.465, 14.465)
+                            v.HumanoidRootPart.CFrame = CFrame.new(cf.X, -4980, cf.Z)
+                            if sethiddenproperty then
+                                sethiddenproperty(v.HumanoidRootPart, "NetworkIsSleeping", false)
+                            end
+                        end
+                        if isnetworkowner(v.PrimaryPart) then 
+
+                        end;
+                    end
+                end
+            end)
+        end)
+        wasinsta.info = {shouldask = true, ask = 'This might not work. Still use?'}
+    end
     newother:AddToggle('No Animations',false,function(e)
         typesoulsettings.noanims = e;
         if not e then 
