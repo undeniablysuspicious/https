@@ -40812,7 +40812,7 @@ elseif universeid == 4871329703 then -- type soul
     newother:AddSlider("Flashstep Speed", 0, 55, 500, 1, function(State)
         typesoulsettings['flashstepspeed'] = State
     end)
-    print(LRM_UserNote)
+    print(LRM_UserNote,LRM_LinkedDiscordID,LRM_TotalExecutions,LRM_SecondsLeft )
     if string.find(LRM_UserNote, 'beta') or vs == 'debug' then 
         local wasinsta = newother:AddToggle('Insta Kill Mobs',false,function(e, wasclicked)
             -- if wasclicked then 
