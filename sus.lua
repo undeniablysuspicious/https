@@ -40751,8 +40751,8 @@ elseif universeid == 4871329703 then -- type soul
                                 sethiddenproperty(v.HumanoidRootPart, "NetworkIsSleeping", false)
                             end
                         end
-                        if isnetworkowner(v.PrimaryPart) then 
-
+                        if v.PrimaryPart and isnetworkowner(v.PrimaryPart) and v:FindFirstChildWhichIsA('Humanoid') then 
+                            v:FindFirstChildWhichIsA('Humanoid').Health = 0
                         end;
                     end
                 end
