@@ -40758,7 +40758,7 @@ elseif universeid == 4871329703 then -- type soul
                 end
             end)
         end)
-        wasinsta.info = {shouldcheck true, ask = 'This might not work. Still use?'} -- shouldask
+        wasinsta.info = {shouldcheck =  true, ask = 'This might not work. Still use?'} -- shouldask
     end
     newother:AddToggle('No Animations',false,function(e)
         typesoulsettings.noanims = e;
