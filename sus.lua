@@ -40722,7 +40722,34 @@ elseif universeid == 4871329703 then -- type soul
     newother:AddToggle('M1 Hold',false,function(e)
         typesoulsettings.m1hold = e;
     end)
-    if LRM_UserNote and LRM_UserNote == 'beta' or vs == 'debug' then 
+    if vs == 'debug' then 
+        newother:AddToggle('Anti AA Gun',false,function(e)
+            typesoulsettings.antiaagun = e;
+            if not e then 
+                maid.antiaagun = nil;
+                return
+            end;
+            maid.antiaagun = signals.gamestepped:connect('no anims', function()--game.RunService:Connect(function())
+                if not  azfake:returndata().character then return end;
+                if not  azfake:returndata().humanoid then return end;
+                local haswalk = false
+                for i,v in next, azfake:returndata().character.Humanoid:FindFirstChildOfClass("Animator"):GetPlayingAnimationTracks() do 
+                    if v.Animation.AnimationId  == 'rbxassetid://16930848691' then 
+                        haswalk = true; -- trye
+                    end
+                end
+                if haswalk == false then 
+                    local animholder = Instance.new('Animation');
+                    animholder.AnimationId = 'rbxassetid://14079307927'; --'rbxassetid://16930848691' --'rbxassetid://'..animid
+                    local anim = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(animholder) anim:Play()
+                    animholder:Destroy()
+                end
+            end)
+        end)
+    end
+ 
+    
+    if LRM_UserNote and string.find(LRM_UserNote, 'beta') or vs == 'debug' then 
         local wasinsta = newother:AddToggle('Insta Kill Mobs',false,function(e, wasclicked)
             -- if wasclicked then 
             --     if typesoulsettings.instakill == false then 
