@@ -39726,6 +39726,9 @@ elseif universeid == 4871329703 then -- type soul
         serverhopafterlootbox = false;
         m1hold = false;
         instakill = false;
+        antiaagun = false;
+        speecchanger = false;
+        flashstepspeed = 55;
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -39926,7 +39929,7 @@ elseif universeid == 4871329703 then -- type soul
                     repeat task.wait() until not hurtPart or checkdist(14,hurtPart)
                     if hurtPart and checkdist(13,hurtPart) then 
                         print(':parrying hardname '..obj.Name)
-                        typesoulsettings.functions.parry()
+                        typesoulsettings.functions.parry(0.3)
                     end
                 end)
             -- elseif obj:IsA('BasePart') then 
@@ -39943,6 +39946,7 @@ elseif universeid == 4871329703 then -- type soul
         maid.autoparrycheck = workspace.Effects.ChildAdded:Connect(function(child)
             if child.Name ~= game.Players.LocalPlayer.Name then 
                 local ctn; ctn = child.ChildAdded:Connect(function(obj)
+                    task.wait(0.05)
                     onAdded(obj)
                 end)
                 table.insert(typesoulsettings.connections,ctn);
@@ -39954,6 +39958,7 @@ elseif universeid == 4871329703 then -- type soul
         for i,v in next, workspace.Effects:GetChildren() do 
             if v.Name ~= game.Players.LocalPlayer.Name then 
                 local ctn; ctn = v.ChildAdded:Connect(function(obj)
+                    task.wait(0.05)
                     onAdded(obj)
                 end)
                 table.insert(typesoulsettings.connections,ctn);
@@ -40744,11 +40749,46 @@ elseif universeid == 4871329703 then -- type soul
                     local anim = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(animholder) anim:Play()
                     animholder:Destroy()
                 end
+                local function createPlatform()
+                    local part = Instance.new('Part'); part.Size = Vector3.new(15,1,15);part.Transparency = 0.5
+                    part.Parent = workspace; part.Name = 'myplatform';part.Anchored = true
+                end
+                
+                local function setPlatform(cfr)
+                    if workspace:FindFirstChild('myplatform') then 
+                        workspace:FindFirstChild('myplatform').CFrame = cfr.CFrame * CFrame.new(0,-3,0)
+                    else
+                        createPlatform()
+                        workspace:WaitForChild('myplatform').CFrame = cfr.CFrame * CFrame.new(0,-3,0)
+                    end
+                end
+                setPlatform(azfake:returndata().humanoidrootpart)
             end)
         end)
     end
  
-    
+    newother:AddToggle('Flashstep Speed Changer',false,function(e)
+        typesoulsettings.speecchanger = e;
+        if not e then 
+            maid.speedchange = nil;
+            return
+        end;
+        maid.speedchange = signals.gamestepped:connect('no anims', function()--game.RunService:Connect(function())
+            if not  azfake:returndata().character then return end;
+            if not  azfake:returndata().humanoid then return end;
+            if azfake:returndata().character:FindFirstChild('Head') then 
+                if azfake:returndata().character.Head.Transparency == 1 then 
+                    if azfake:returndata().character['Left Leg'].Transparency == 1 and azfake:returndata().character['Right Leg'].Transparency == 1 then 
+                        -- @flashstep
+                        azfake:returndata().humanoid.WalkSpeed = typesoulsettings.flashstepspeed
+                    end
+                end
+            end
+        end)
+    end)
+    newother:AddSlider("Flashstep Speed", 0, 55, 500, 1, function(State)
+        typesoulsettings['flashstepspeed'] = State
+    end)
     if LRM_UserNote and string.find(LRM_UserNote, 'beta') or vs == 'debug' then 
         local wasinsta = newother:AddToggle('Insta Kill Mobs',false,function(e, wasclicked)
             -- if wasclicked then 
@@ -41319,7 +41359,7 @@ elseif universeid == 4871329703 then -- type soul
         parryAnims['14081676773'] = 0.26; -- 3
         parryAnims['14081673698'] = 0.24; -- 4
         parryAnims['14068257009'] = 0.24; -- 5
-        parryAnims['14068255583'] = 0.25; -- crit
+        parryAnims['14068255583'] = 0.22; -- crit - 0.25
 
         -- some executioners blade typa weapon
         parryAnims['16990963565'] = 0.34; --  1 and 3
