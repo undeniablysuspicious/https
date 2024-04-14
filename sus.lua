@@ -40918,6 +40918,27 @@ elseif universeid == 4871329703 then -- type soul
                     if game.PlaceId == raidWorld then 
                         if playedIt == false then 
                             playedIt = true;
+
+                            task.spawn(function()
+                                repeat task.wait()
+                                until azfake:returndata().humanoid
+                                azfake:returndata().humanoid.Died:Connect(function()
+                                    local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer("Karakura Town")
+                                    if not GetTable then return end;
+                                    local foundTP = nil;
+                                    for i,jobIdTable in next, GetTable do 
+                                        local shouldbreak = false
+                                        if jobIdTable['JobID'] ~= game.JobId then 
+                                            task.wait(1)
+                                            pcall(function()
+                                                game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
+                                            end)
+                                        end
+                                    end
+                                end)   
+                            end)
+
+                            
                             local enemy = nil
                             local usestop = false
                             repeat task.wait() until #workspace:WaitForChild('Entities'):GetChildren() >= 2
