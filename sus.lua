@@ -40925,17 +40925,17 @@ elseif universeid == 4871329703 then -- type soul
                                 if not game.Players:GetPlayerFromCharacter(v) and v.PrimaryPart then 
                                     enemy = v;
                                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
+                                    local inputManager = game.VirtualInputManager
+                                    inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
+                                    task.wait(.1)
+                                    inputManager:SendKeyEvent(false,Enum.KeyCode.W,false,game)
                                 end
                             end
                             local diddie = false;
                             task.spawn(function()
                                 repeat 
-                                    task.wait(1)
+                                    task.wait(7)
                                     pcall(function()
-                                        local inputManager = game.VirtualInputManager
-                                        --inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
-                                        --task.wait(.1)
-                                        --inputManager:SendKeyEvent(false,Enum.KeyCode.W,false,game)
                                         game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = enemy.PrimaryPart.CFrame * CFrame.new(0,5,0) --)
                                     end)
                                 until diddie == true
@@ -40943,7 +40943,7 @@ elseif universeid == 4871329703 then -- type soul
                             enemy.Humanoid.Died:Connect(function()
                                 diddie = true;
                                 azfakenotify('wow killed boss', 'untilClick')
-                                task.delay(2,function()
+                                task.delay(1,function()
                                     local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer("Karakura Town")
                                     if not GetTable then return end;
                                     local foundTP = nil;
