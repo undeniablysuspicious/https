@@ -8780,6 +8780,7 @@ local azfakebuild = {
     code = '1';
 }
 if vs == 'debug' then azfakebuild.build = 'v4' end;
+if luraphsettings and LRM_UserNote and string.find(LRM_UserNote, 'beta') and vs ~= 'debug' then azfakebuild.build = 'beta v3' end;
 local compiledVersion = azfakebuild['build']..'.'..azfakebuild.vs..azfakebuild.code
 
 if game.PlaceId == 0 then 
