@@ -40930,7 +40930,7 @@ elseif universeid == 4871329703 then -- type soul
                             local diddie = false;
                             task.spawn(function()
                                 repeat 
-                                    task.wait(3)
+                                    task.wait(1)
                                     pcall(function()
                                         local inputManager = game.VirtualInputManager
                                         --inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
