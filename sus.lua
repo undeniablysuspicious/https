@@ -40919,12 +40919,22 @@ elseif universeid == 4871329703 then -- type soul
                         if playedIt == false then 
                             playedIt = true;
                             local enemy = nil
+                            local usestop = false
                             repeat task.wait() until #workspace:WaitForChild('Entities'):GetChildren() >= 2
                             task.wait(0.1)
                             for i,v in next, workspace:WaitForChild('Entities'):GetChildren() do 
                                 if not game.Players:GetPlayerFromCharacter(v) and v.PrimaryPart then 
                                     enemy = v;
                                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
+                                    task.delay(3,function()
+                                        usestop = false
+                                    end)
+                                    task.spawn(function()
+                                        repeat 
+                                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
+                                            task.wait()
+                                        until usestop == true
+                                    end)
                                     local inputManager = game.VirtualInputManager
                                     inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
                                     task.wait(.1)
