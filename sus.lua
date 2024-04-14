@@ -68,6 +68,7 @@ local LRM_UserNote
 local LRM_LinkedDiscordID 
 local LRM_TotalExecutions 
 local LRM_SecondsLeft 
+local AccessToLoadstring = getgenv().dephdaLLoura
 if luraphsettings then 
     LRM_UserNote = luraphsettings.LRM_UserNote;
     LRM_LinkedDiscordID = luraphsettings.LRM_LinkedDiscordID;
@@ -6953,7 +6954,7 @@ local LengthOf_G = 0
 local FinishedLoadingAllVariables = false
 local LoadedLibrary = false
 
-local ExpectedGlobalsOnLoad = 213 --206 --206 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
+local ExpectedGlobalsOnLoad = 226 --213 --206 --206 --186 + 6 -- remove getgenv().teleportkey from all deadass versions - admin premium deluxe
 local ExpectedUnderscoreGsOnLoad = 4 + 2 --  2 for little script                                                    4 is normal --1 -- _G.wl_key 
 if (KRNL_LOADED) then 
     ExpectedGlobalsOnLoad = 251 + 7
