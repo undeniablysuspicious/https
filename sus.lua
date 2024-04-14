@@ -39771,6 +39771,7 @@ elseif universeid == 4871329703 then -- type soul
         breakais = false;
         sendtowebhook = false;
         sendurl = '';
+        parrynotifications = false;
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -41796,6 +41797,9 @@ elseif universeid == 4871329703 then -- type soul
                     local registry = parryAnims[animationId] -- parryregistration
                     if type(registry) == 'function' then 
                         print('parrying '..animationId)
+                        if typesoulsettings.parrynotifications and checkdist(typesoulsettings.autoparrydistance) then 
+                            azfakenotify(`parrying {parryAnims[animationId]}`,5)
+                        end
                         registry(child, anim, animationId);
                         return;
                     elseif type(registry) == 'table' then 
@@ -41809,6 +41813,9 @@ elseif universeid == 4871329703 then -- type soul
                     end;
                     if checkdist(typesoulsettings.autoparrydistance,objdist) then 
                         print('parrying ',animationId);
+                        if typesoulsettings.parrynotifications then 
+                            azfakenotify(`parrying {parryAnims[animationId]}`,5)
+                        end
                         signals.conceal(function()
                             local timetowait = registry
                             if typesoulsettings.pingadjuster > 0  then 
