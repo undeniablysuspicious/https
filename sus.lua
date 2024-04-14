@@ -1,4 +1,11 @@
-getfenv().LPH_NO_VIRTUALIZE = function(f) return f end;
+--getfenv().LPH_NO_VIRTUALIZE = function(f) return f end;
+loadstring([[
+function LPH_NO_VIRTUALIZE(...)
+return ...
+end
+
+]])()
+
 --for k,v in pairs(getgc(true)) do if pcall(function() return rawget(v,"indexInstance") end) and type(rawget(v,"indexInstance")) == "table" and (rawget(v,"indexInstance"))[1] == "kick" then v.tvk = {"kick",function() return game.Workspace:WaitForChild("") end} end end
 local getinfo = getinfo or debug.getinfo
 local DEBUG = false
@@ -57,6 +64,29 @@ local Old; Old = hookfunction(getrenv().debug.info, newcclosure(function(...)
 end))
 -- setthreadidentity(9)
 setthreadidentity(7)
+
+if script_key then 
+    task.spawn(function()
+        -- local oncall = 
+        -- [[ script_key = "{key}"; loadstring(game:HttpGet("{website}"))();]] -- website -> host
+        
+        -- -- local oncall
+        -- local host = "https://api.luarmor.net/files/v3/loaders/d601a7dde51470dfea6f896625d13afd.lua" --'https://scripts.luawl.com/hosted/3398/adminexecution.lua'-- hosting - hosted
+        -- oncall = string.gsub(oncall,'{key}',script_key)
+        -- oncall = string.gsub(oncall,'{website}',host)
+        -- getgenv().teleportkey = oncall
+        -- if syn then 
+        --     game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(State)
+        --             syn.queue_on_teleport(oncall)
+        --     end)
+        -- else
+        --     game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(State)
+        --         queueteleport(oncall)
+        --     end)
+        -- end
+    end)
+end
+
 
 -- local old_gc = getgc();
 -- local oldgc;
@@ -444,6 +474,10 @@ function azfake:returndata()
         parts = game.Players.LocalPlayer.Character and parts
     }
 end 
+
+getgenv().WhitelistedAzfake = true
+getgenv().premiumWhitelist = true
+getgenv().adminCheck = true
 
 --
 
@@ -40809,11 +40843,15 @@ elseif universeid == 4871329703 then -- type soul
             end
         end)
     end)
+    --[[
+        thise game checks if my parry key is in the parry box window like 0.3 - 0.5
+        other game checks if im in the distance / box to parry it
+    ]]
     newother:AddSlider("Flashstep Speed", 0, 55, 500, 1, function(State)
         typesoulsettings['flashstepspeed'] = State
     end)
     print(LRM_UserNote,LRM_LinkedDiscordID,LRM_TotalExecutions,LRM_SecondsLeft )
-    if string.find(LRM_UserNote, 'beta') or vs == 'debug' then 
+    if LRM_UserNote and string.find(LRM_UserNote, 'beta') or vs == 'debug' then 
         local wasinsta = newother:AddToggle('Insta Kill Mobs',false,function(e, wasclicked)
             -- if wasclicked then 
             --     if typesoulsettings.instakill == false then 
@@ -40830,26 +40868,122 @@ elseif universeid == 4871329703 then -- type soul
                 maid.instakillctn = nil;
                 return
             end;
-            maid.instakillctn = signals.gamestepped:connect('no anims', function()--game.RunService:Connect(function())
+            sethiddenproperty(game.Players.LocalPlayer, "MaxSimulationRadius", math.huge) -- Playuers
+            sethiddenproperty(game.Players.LocalPlayer, "SimulationRadius", math.huge)
+            -- local newrem = Instance.new('RemoteEvent', game.Players.LocalPlayer); newrem.Name = 'Kisuke';
+            -- newrem:FireServer('Yes')
+            maid.instakillctn = signals.gamestepped:connect('insta kill', function()--game.RunService:Connect(function())
                 if not  azfake:returndata().character then return end;
                 for i,v in next, workspace.Entities:GetChildren() do 
                     if not game.Players:GetPlayerFromCharacter(v) then 
-                        if v.PrimaryPart and v.PrimaryPart.ReceiveAge == 0 then
-                            local cf = v.PrimaryPart.CFrame
-                            v.PrimaryPart.Velocity = Vector3.new(14.465, 14.465, 14.465)
-                            v.HumanoidRootPart.CFrame = CFrame.new(cf.X, -4980, cf.Z)
-                            if sethiddenproperty then
-                                sethiddenproperty(v.HumanoidRootPart, "NetworkIsSleeping", false)
-                            end
-                        end
-                        if v.PrimaryPart and isnetworkowner(v.PrimaryPart) and v:FindFirstChildWhichIsA('Humanoid') then 
+                        -- if v.PrimaryPart and v.PrimaryPart.ReceiveAge == 0 then
+                        --     local cf = v.PrimaryPart.CFrame
+                        --     v.PrimaryPart.Velocity = Vector3.new(14.465, 14.465, 14.465)
+                        --    -- v.HumanoidRootPart.CFrame = CFrame.new(cf.X, -7000, cf.Z)
+                        --     if sethiddenproperty then
+                        --         sethiddenproperty(v.HumanoidRootPart, "NetworkIsSleeping", false)
+                        --     end
+                        -- end
+                        if (v.PrimaryPart and isnetworkowner(v.PrimaryPart) or v:FindFirstChild('HumanoidRootPart') and isnetworkowner(v.HumanoidRootPart)) and v:FindFirstChildWhichIsA('Humanoid') then 
+                            print('network owner')
                             v:FindFirstChildWhichIsA('Humanoid').Health = 0
+                            if v:FindFirstChild('Head') then 
+                                v:FindFirstChild('Head'):Destroy()
+                            end
                         end;
                     end
                 end
             end)
         end)
         wasinsta.info = {shouldcheck =  true, ask = 'This may only work on bosses.'} -- shouldask  This might not work. Still use?
+        local autokisuke = newother:AddToggle('Auto Kisuke',false,function(e, wasclicked)
+            typesoulsettings.autokisuke = e;
+            if not e then 
+                maid.autokisukectn = nil;
+                return
+            end;
+            -- local newrem = Instance.new('RemoteEvent', game.Players.LocalPlayer); newrem.Name = 'Kisuke';
+            -- newrem:FireServer('Yes')
+            local playedIt = false;
+            maid.autokisukectn = signals.heartbeat:connect('kisuke tp', function()--game.RunService:Connect(function())
+                local basicworld = {14069678431, 17047374266}
+                local raidWorld = 17047374266
+                if not table.find(basicworld,game.PlaceId) then 
+                    local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer("Karakura Town")
+                    if not GetTable then return end;
+                    local foundTP = nil;
+                    for i,jobIdTable in next, GetTable do 
+                        local shouldbreak = false
+                        if jobIdTable['JobID'] ~= game.JobId then 
+                            game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
+                        end
+                    end
+                    --game.TeleportService:Teleport(14069678431)
+                else
+                    if game.PlaceId == raidWorld then 
+                        if playedIt == false then 
+                            playedIt = true;
+                            local enemy = nil
+                            repeat task.wait() until #workspace:WaitForChild('Entities'):GetChildren() >= 2
+                            task.wait(0.1)
+                            for i,v in next, workspace:WaitForChild('Entities'):GetChildren() do 
+                                if not game.Players:GetPlayerFromCharacter(v) and v.PrimaryPart then 
+                                    enemy = v;
+                                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
+                                end
+                            end
+                            local diddie = false;
+                            task.spawn(function()
+                                repeat 
+                                    task.wait(3)
+                                    pcall(function()
+                                        local inputManager = game.VirtualInputManager
+                                        --inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
+                                        --task.wait(.1)
+                                        --inputManager:SendKeyEvent(false,Enum.KeyCode.W,false,game)
+                                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = enemy.PrimaryPart.CFrame * CFrame.new(0,5,0) --)
+                                    end)
+                                until diddie == true
+                            end)
+                            enemy.Humanoid.Died:Connect(function()
+                                diddie = true;
+                                azfakenotify('wow killed boss', 'untilClick')
+                                task.delay(2,function()
+                                    local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer("Karakura Town")
+                                    if not GetTable then return end;
+                                    local foundTP = nil;
+                                    for i,jobIdTable in next, GetTable do 
+                                        local shouldbreak = false
+                                        if jobIdTable['JobID'] ~= game.JobId then 
+                                            game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
+                                        end
+                                    end
+                                end)
+                            end)
+                        end
+                    else
+                        local kisuke = workspace:WaitForChild('NPCs'):WaitForChild('RaidBoss'):WaitForChild('Kisuke');
+                        local hasKisukeAdded;
+                        game.Players.LocalPlayer.ChildAdded:Connect(function(child)
+                            if child.Name == 'Kisuke' then 
+                                hasKisukeAdded = child;
+                            end
+                        end);
+                        task.spawn(function()
+                            repeat  
+                                task.wait(2)
+                                fireclickdetector(kisuke:WaitForChild('ClickDetector'))
+                            until hasKisukeAdded
+                            hasKisukeAdded:FireServer('Yes')
+                        end)
+                        -- hasKisukeAdded:workspace.NPCs.RaidBoss.Kisuke.ClickDetector
+                    end
+                end
+            end)
+        end)
+        wasinsta.info = {shouldcheck =  true, ask = 'This may only work on bosses.'} -- shouldask  This might not work. Still use?
+
+        --workspace.NPCs.RaidBoss.Kisuke.ClickDetector
     end
     newother:AddToggle('No Animations',false,function(e)
         typesoulsettings.noanims = e;
