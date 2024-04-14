@@ -71,23 +71,6 @@ local LRM_SecondsLeft = luraphsettings.LRM_SecondsLeft;
 
 if script_key then 
     task.spawn(function()
-        -- local oncall = 
-        -- [[ script_key = "{key}"; loadstring(game:HttpGet("{website}"))();]] -- website -> host
-        
-        -- -- local oncall
-        -- local host = "https://api.luarmor.net/files/v3/loaders/d601a7dde51470dfea6f896625d13afd.lua" --'https://scripts.luawl.com/hosted/3398/adminexecution.lua'-- hosting - hosted
-        -- oncall = string.gsub(oncall,'{key}',script_key)
-        -- oncall = string.gsub(oncall,'{website}',host)
-        -- getgenv().teleportkey = oncall
-        -- if syn then 
-        --     game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(State)
-        --             syn.queue_on_teleport(oncall)
-        --     end)
-        -- else
-        --     game:GetService("Players").LocalPlayer.OnTeleport:Connect(function(State)
-        --         queueteleport(oncall)
-        --     end)
-        -- end
     end)
 end
 
@@ -475,9 +458,14 @@ function azfake:returndata()
         humanoidrootpart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
         health = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health or nil;
         cframe =  game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame or nil;
-        parts = game.Players.LocalPlayer.Character and parts
+        parts = game.Players.LocalPlayer.Character and parts;
     }
 end 
+local services = {
+    vis = game.VirtualInputManager;
+    tws = game.TweenService
+}
+--local localPlayer = {}
 
 getgenv().WhitelistedAzfake = true
 getgenv().premiumWhitelist = true
@@ -40919,7 +40907,10 @@ elseif universeid == 4871329703 then -- type soul
                     for i,jobIdTable in next, GetTable do 
                         local shouldbreak = false
                         if jobIdTable['JobID'] ~= game.JobId then 
-                            game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
+                            task.wait(1)
+                            pcall(function()
+                                game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
+                            end)
                         end
                     end
                     --game.TeleportService:Teleport(14069678431)
