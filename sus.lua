@@ -64,6 +64,10 @@ local Old; Old = hookfunction(getrenv().debug.info, newcclosure(function(...)
 end))
 -- setthreadidentity(9)
 setthreadidentity(7)
+local LRM_UserNote = luraphsettings.LRM_UserNote;
+local LRM_LinkedDiscordID = luraphsettings.LRM_LinkedDiscordID;
+local LRM_TotalExecutions = luraphsettings.LRM_TotalExecutions;
+local LRM_SecondsLeft = luraphsettings.LRM_SecondsLeft;
 
 if script_key then 
     task.spawn(function()
