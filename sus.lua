@@ -64,10 +64,17 @@ local Old; Old = hookfunction(getrenv().debug.info, newcclosure(function(...)
 end))
 -- setthreadidentity(9)
 setthreadidentity(7)
-local LRM_UserNote = luraphsettings.LRM_UserNote;
-local LRM_LinkedDiscordID = luraphsettings.LRM_LinkedDiscordID;
-local LRM_TotalExecutions = luraphsettings.LRM_TotalExecutions;
-local LRM_SecondsLeft = luraphsettings.LRM_SecondsLeft;
+local LRM_UserNote
+local LRM_LinkedDiscordID 
+local LRM_TotalExecutions 
+local LRM_SecondsLeft 
+if luraphsettings then 
+    LRM_UserNote = luraphsettings.LRM_UserNote;
+    LRM_LinkedDiscordID = luraphsettings.LRM_LinkedDiscordID;
+    LRM_TotalExecutions = luraphsettings.LRM_TotalExecutions;
+    LRM_SecondsLeft = luraphsettings.LRM_SecondsLeft;
+end
+
 
 if script_key then 
     task.spawn(function()
@@ -39756,6 +39763,8 @@ elseif universeid == 4871329703 then -- type soul
         speecchanger = false;
         flashstepspeed = 55;
         breakais = false;
+        sendtowebhook = false;
+        sendurl = '';
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -40843,6 +40852,53 @@ elseif universeid == 4871329703 then -- type soul
         typesoulsettings['flashstepspeed'] = State
     end)
     print(LRM_UserNote,LRM_LinkedDiscordID,LRM_TotalExecutions,LRM_SecondsLeft )
+    local KisukeTime = 0
+    game.Players.LocalPlayer.PlayerGui.ScreenEffects.ChildAdded:Connect(function(child)
+        task.wait(.2)
+        if child.Name == 'ItemFrame' and typesoulsettings.autokisuke and typesoulsettings.sendtowebhook then
+            local KisukeData = {
+                ['content'] = '';
+                ['embeds'] = {{
+                    ['title'] = 'AZFAKE WEBHOOK';
+                    ['description'] = 'powered by azfake';
+                    ['type'] = 'rich';
+                    ['color'] = tonumber(0xffffff);
+                    ['fields'] = {
+                        {
+                            ['name'] = 'Date';
+                            ['value'] = os.date();
+                            ['inline'] = true;
+                        };
+                        {
+                            ['name'] = 'Item Received';
+                            ['value'] = child:FindFirstChildWhichIsA('TextLabel').Text;
+                            ['inline'] = true;
+                        };
+                        {
+                            ['name'] = 'Time Elasped';
+                            ['value'] = tostring(KisukeTime);
+                            ['inline'] = true;
+                        };
+                        -- { -- amount of skillboxes
+                        --     ['name'] = 'Current Gyakusatsu Sacs';
+                        --     ['value'] = game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value;
+                        --     ['inline'] = true;
+                        -- };
+                    }
+                }}
+            }
+            request(
+                {
+                    Url = typesoulsettings.sendurl,
+                    Method = 'POST',
+                    Headers = {
+                        ['Content-Type'] = 'application/json'
+                    }, -- AZFAKE WEBHOOK
+                    Body = game:GetService('HttpService'):JSONEncode(KisukeData) -- {data.title; content = data.content} CDOE
+                }
+            );
+        end
+    end)
     if LRM_UserNote and string.find(LRM_UserNote, 'beta') or vs == 'debug' then 
         local wasinsta = newother:AddToggle('Insta Kill Mobs',false,function(e, wasclicked)
             -- if wasclicked then 
@@ -40888,6 +40944,12 @@ elseif universeid == 4871329703 then -- type soul
             end)
         end)
         wasinsta.info = {shouldcheck =  true, ask = 'This may only work on bosses.'} -- shouldask  This might not work. Still use?
+        newother:AddTextbox('Kisuke Webhook',nil,function(e)
+            typesoulsettings.sendurl = e;
+        end)
+        local webhooksend = newother:AddToggle('Send to Webhook',false,function(e, wasclicked)
+            typesoulsettings.sendtowebhook = e;
+        end)
         local autokisuke = newother:AddToggle('Auto Kisuke',false,function(e, wasclicked)
             typesoulsettings.autokisuke = e;
             if not e then 
@@ -40918,6 +40980,12 @@ elseif universeid == 4871329703 then -- type soul
                     if game.PlaceId == raidWorld then 
                         if playedIt == false then 
                             playedIt = true;
+
+                            task.spawn(function()
+                                while task.wait(1) do 
+                                    KisukeTime += 1
+                                end
+                            end)
 
                             task.spawn(function()
                                 repeat task.wait()
