@@ -39645,6 +39645,11 @@ elseif universeid == 4871329703 then -- type soul
         end
     end
     local tab = window:CreateTab(gameName)
+    if game.PlaceId == 14067600077 then 
+        azfakenotify('Waiting to join game.','untilClick')
+        azfakenotify('nah but wtf u expecting executing here','untilClick')
+        return
+    end
     local esptab = window:CreateTab('ESP')
     local sector = tab:CreateSector('Cheats','left')
     local newother = tab:CreateSector('Cheats','left')
@@ -43049,6 +43054,7 @@ elseif universeid == 3734304510 then  -- south bronx
             local function checkdist(cf)
                 return (cf.Position - azfake:returndata().humanoidrootpart.Position).Magnitude < 8
             end
+            local inputManager = game.VirtualInputManager
             while task.wait() do 
                 if getgenv().loopsUnload == true or southbroxsettings.cardfarm == false then  break end;
                 if game.Players.LocalPlayer.Character then 
@@ -43056,6 +43062,7 @@ elseif universeid == 3734304510 then  -- south bronx
                     --if azfake:returndata().character.Humanoid.FloorMaterial == Enum.Material.Air then 
                         --setPlatform(root)
                     --end
+                    inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
                     local DealerCFrame = CFrame.new(217.7833709716797,3.7371320724487305,-334.5723876953125);
                     local bankNPCcFRAME = CFrame.new(-49.11941146850586,3.7371387481689453,-322.2247619628906);
                     local checkCardCFrame = CFrame.new(-42.873199462890625,3.7371387481689453,-331.6510925292969);
@@ -43069,6 +43076,7 @@ elseif universeid == 3734304510 then  -- south bronx
                             task.wait(1)
                             if not game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') and not game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') then 
                                 tweento(DealerCFrame, 4)
+                                inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
                                 fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
                             end
                         until checkdist(DealerCFrame) and (game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') or game.Players.LocalPlayer.Character:FindFirstChild('Fake ID')) or getgenv().loopsUnload == true or southbroxsettings.cardfarm == false
@@ -43090,9 +43098,11 @@ elseif universeid == 3734304510 then  -- south bronx
                     if game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
                         game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Fake ID'))
                     end
+                    inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
                     print('[teleporting to banekr]') -- Character:FindFirstChild('Backpack')
                     repeat 
                         task.wait()
+                        inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
                         tweento(bankNPCcFRAME, 2)
                         if game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') then 
                             fireproximityprompt(workspace.NPCs["Bank Teller"].UpperTorso.Attachment.ProximityPrompt)
@@ -43108,6 +43118,7 @@ elseif universeid == 3734304510 then  -- south bronx
                     local checkingText = game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning --Frame
                     local CompletedMessage = 'Your application was successful. Please allow 30 seconds for the bank to prepare your card.'
                     if checkingText.Text:find('was successful.') and getgenv().loopsUnload == false and southbroxsettings.cardfarm == true then 
+                        inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
                         print('[card application was a success]')
                         print('[tweening to nearest atm]')
                         tweento(checkCardCFrame)
