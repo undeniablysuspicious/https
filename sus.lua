@@ -40947,7 +40947,7 @@ elseif universeid == 4871329703 then -- type soul
                                 if not game.Players:GetPlayerFromCharacter(v) and v.PrimaryPart then 
                                     enemy = v;
                                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
-                                    task.delay(3,function()
+                                    task.delay(4,function()
                                         usestop = false
                                     end)
                                     task.spawn(function()
@@ -40974,7 +40974,7 @@ elseif universeid == 4871329703 then -- type soul
                             enemy.Humanoid.Died:Connect(function()
                                 diddie = true;
                                 azfakenotify('wow killed boss', 'untilClick')
-                                task.delay(1,function()
+                                task.delay(0.5,function()
                                     local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer("Karakura Town")
                                     if not GetTable then return end;
                                     local foundTP = nil;
