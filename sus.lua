@@ -469,10 +469,38 @@ function azfake:returndata()
         parts = game.Players.LocalPlayer.Character and parts;
     }
 end 
+
+local localPlayer = {};
+local metaforit = {};
+setmetatable(localPlayer,metaforit);
+metaforit.__index = function(table, key)
+    local quickuses = {
+        character = game.Players.LocalPlayer.Character;
+        humanoid = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') or nil;
+        humanoidrootpart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
+        health = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health or nil;
+        cframe =  game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame or nil;
+        parts = game.Players.LocalPlayer.Character and parts;
+        rootPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
+    }
+    for i,v in next, quickuses do 
+        if tostring(i) == tostring(key) then 
+            return v
+        end
+    end
+    -- if key == 'rootPart' then 
+    --     return game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
+    -- end -- rootart
+end
+
+
 local services = {
-    vis = game.VirtualInputManager;
-    tws = game.TweenService
+    vis = game:GetService('VirtualInputManager');
+    tws = game:GetService('TweenService')
 }
+function encorporate(f)
+    return f()
+end
 --local localPlayer = {}
 
 getgenv().WhitelistedAzfake = true
@@ -710,6 +738,8 @@ else
     -- Loaded
 end
 
+-- detect idle or teleport failed frame
+-- change title text
 
 
 
@@ -8102,61 +8132,7 @@ game:GetService('UserInputService').InputEnded:Connect(function(key,istyping) --
     getgenv().istyping = false --//could make it so it sets a global variable for holding a key to true instead of getstat
 end)
 
-local signals = {
-	gamestepped = {};
-	heartbeat = {};
-    connections = {};
-    events = {};
-    controlled = {};
-}
--- setmetatable(signals.connections, signals.controlled)
--- signals.controlled.__newindex = function(table_, key, value)
---     if value == nil then 
-
---     end
--- end
-
-function signals.gamestepped:connect(desc,func)
-	print('@connecting '..desc);
-	local connection = game.RunService.RenderStepped:Connect(function()
-		func()
-	end)
-	return connection
-end
-function signals.heartbeat:connect(desc,func)
-	print('@connecting '..desc);
-	local connection = game.RunService.Heartbeat:Connect(function()
-		func()
-	end)
-	return connection
-end
-
-function signals.compile(raw)
-	local modules = {}
-	if raw:find('httpservice') then 
-		modules['http'] = game:GetService('HttpService');
-	end
-	if raw:find('replicatedstorage') then 
-		modules['rep'] = game:GetService('ReplicatedStorage');
-	end
-	if raw:find('exec') then 
-		modules['exec'] = identifyexecutor();
-	end
-	if raw:find('char') then 
-		modules['char'] = game.Players.LocalPlayer.Character;
-	end
-    local stored = {} --0
-    for i,v in next, modules do 
-        table.insert(stored,i) --+= 1
-    end
-	if #stored == 1 then modules = modules[stored[1]] end;
-	return modules
-end
-function signals.conceal(f)
-    task.spawn(function()
-        f()
-    end)
-end
+--
 
 -- signals.new()
 -- print bad if no good
@@ -8566,6 +8542,78 @@ sharedRequires['smartlog'] = function(...)
     end)
     return print(...)
 end
+local signals = {
+	gamestepped = {};
+	heartbeat = {};
+    connections = {};
+    events = {};
+    controlled = {};
+    services = {};
+    env = {};
+    fenv = {};
+    senv = {};
+}
+
+signals.fenv.create_service = function(service)
+    local usage = {};
+    table.insert(signals.env, usage)
+    return usage
+end;    
+
+signals.services.betausage = function()
+    -- do something, unload modules and variables into env
+    -- local usage = {};
+    -- table.insert(signal.env, usage)
+    signals.env.getmouse = game.Players.LocalPlayer:GetMouse()
+end;
+-- setmetatable(signals.connections, signals.controlled)
+-- signals.controlled.__newindex = function(table_, key, value)
+--     if value == nil then 
+
+--     end
+-- end
+
+function signals.gamestepped:connect(desc,func)
+	print('@connecting '..desc);
+	local connection = game.RunService.RenderStepped:Connect(function()
+		func()
+	end)
+	return connection
+end
+function signals.heartbeat:connect(desc,func)
+	print('@connecting '..desc);
+	local connection = game.RunService.Heartbeat:Connect(function()
+		func()
+	end)
+	return connection
+end
+
+function signals.compile(raw)
+	local modules = {}
+	if raw:find('httpservice') then 
+		modules['http'] = game:GetService('HttpService');
+	end
+	if raw:find('replicatedstorage') then 
+		modules['rep'] = game:GetService('ReplicatedStorage');
+	end
+	if raw:find('exec') then 
+		modules['exec'] = identifyexecutor();
+	end
+	if raw:find('char') then 
+		modules['char'] = game.Players.LocalPlayer.Character;
+	end
+    local stored = {} --0
+    for i,v in next, modules do 
+        table.insert(stored,i) --+= 1
+    end
+	if #stored == 1 then modules = modules[stored[1]] end;
+	return modules
+end
+function signals.conceal(f)
+    task.spawn(function()
+        f()
+    end)
+end
 
 function signals.new(f,uu)
     local random = Random.new()
@@ -8693,7 +8741,210 @@ end;
 -- signals.connections.new() = function()
 -- check if function is set to nil
 -- local storefunction = signals.new(os.time()); storefunction.funct()
+function signals.loadprotection(x, key)
+    if key ~= '~1~1~1' then return end;
+    signals.services[x]()
+end
+function using(___)
+    key = dec('')
+    local getmodule  = ___
+    signals.loadprotection(___, key) -- signals new key
+end
+-- > using('betausage')  imports mouse into env
+local function GetObjectParentsDir(obj,wl)
+	local BaseParent = obj.Parent
+	local Offsets = {}
+	local OffsetOfHomeAdress = 0
+	while true do
+		task.wait()
+		if BaseParent.Parent ~= game then -- and BaseParent.Parent ~= wl
+			BaseParent = BaseParent.Parent
+		else
+			break
+		end
+	end
+	for i,v in next, BaseParent.Parent:GetChildren() do
+		if v == BaseParent then
+			OffsetOfHomeAdress = i
+		end
+	end
+	return BaseParent, OffsetOfHomeAdress --Offsets
+end
+local function getOffset(basePoint,obj,BaseAddress)
+	local offset = 0
+	for i,v in next, basePoint:GetDescendants() do
+		if v == obj then
+			offset = i
+		end
+	end
+	local digit = tostring(offset+math.random(1,10)):sub(1,1)
+	local fivedigit = digit..'00'..digit..'0'
+	return '0x'..tostring(offset)..'A'..tostring(BaseAddress)..'E'..fivedigit --..'00000' --..obj.Name:sub(1,2)
+end
+local function getOffsetProperties(offset)
+	local str = offset
+	local result = nil
+	str = string.gsub(str,'0x','')
+	local number = tonumber(string.split(str,'A')[1])
+	local lenOfNumber = string.len(tostring(number))
+	str = str:sub(lenOfNumber+1,string.len(str))
+	str = string.gsub(str,'A','')
+	str = string.gsub(str,'E','')
 
+	str = str:sub(1,string.len(str)-5) -- added 5 zeros
+	local baseIndex = tonumber(str)
+	return {base = baseIndex, index = number}
+end
+
+local function getBaseInstance(n)
+	local BaseInstance = nil
+	for i,v in next, game:GetChildren() do
+		if i == n then
+			BaseInstance = v
+			break
+		end
+	end
+	return BaseInstance
+end
+local function readMemoryOffset(offset)
+	local str = offset
+	local result = nil
+	str = string.gsub(str,'0x','')
+	local number = tonumber(string.split(str,'A')[1])
+	local lenOfNumber = string.len(tostring(number))
+	str = str:sub(lenOfNumber+1,string.len(str))
+	str = string.gsub(str,'A','')
+	str = string.gsub(str,'E','')
+	str = str:sub(1,string.len(str)-5) -- added 5 zeros
+	local baseIndex = tonumber(str)
+	local BaseInstance = nil
+	for i,v in next, game:GetChildren() do
+		if i == baseIndex then
+			BaseInstance = v
+			break
+		end
+	end
+    if BaseInstance then 
+        for i,v in next, BaseInstance:GetDescendants() do
+            if i == number then
+                result = v
+                break
+            end
+        end
+    end
+	return result
+end
+function signals.calculateoffset(instance)
+    local BaseParent,baseaddress = GetObjectParentsDir(instance)
+    local newoffset = getOffset(BaseParent,instance,baseaddress)
+    --newoffset = convertOffsetToCE(newoffset)
+    return newoffset
+end; -- signals.calculateoffset(workspace.Part) -- > 0x1
+function signals.getoffset(offset)
+    
+end; -- signals.getoffset('0x593924') --> ServerScriptService.Folder9.Part
+function signals.offloadoffsets(tablevalue)
+    local __calc = {};
+    for i,v in next, tablevalue do 
+        __calc[tostring(v)] = signals.getoffset(tostring(v))
+    end;
+    return __calc
+end; -- table1 = {'0x5b9322'}; local conversion = signals.offloadoffsets(table1)
+function signals.tolist(tablevalue)
+    local __calc = {};
+    local index = 0
+    for i,v in next, tablevalue do 
+        index += 1
+        __calc[index] = signals.getoffset(tostring(v))
+    end;
+    return __calc
+end; -- local conversion = signals.offloadoffsets(table1); signals.tolist(conversion) 
+--> instead of {'0x1' = workspace.Part} it converts to {[1] = workspace.Part}
+--> get offset in character conversion
+function signals.goic_cnv(character, object)
+    local descendantIndex = {};
+    descendantIndex.index = 0;
+    descendantIndex.object = nil;
+    descendantIndex.offset = nil;
+    if type(object) == 'string' then 
+        -- passed string
+    end
+    for i,v in next, character:GetDescendants() do 
+        if object and (not type(object) == 'string' and v == object or type(object) == 'string' and v.Name == object) then 
+            descendantIndex.index = i;
+            descendantIndex.object = v
+            break
+        end
+    end;
+    if descendantIndex.index >= 1 then 
+        descendantIndex.offset = signals.calculateoffset(descendantIndex.object)
+    end;
+    return descendantIndex
+end; 
+--> decompile offset in character
+function signals.doic_cnv(character, object, so) --> supposed name
+    local descendantIndex = 0;
+    for i,v in next, character:GetDescendants() do 
+        if i == object then 
+            descendantIndex = v; --i;
+            if so and tostring(so) ~= tostring(v.Name) then 
+                warn('@ decompiler warning, name isnt equal to said value')
+                warn('@ checking if found in name')
+            end
+            break
+        end
+    end;
+    return descendantIndex
+end; 
+function signals.toOffset(offset, descendant)
+    -- @ priority (waffle)
+end;    
+function signals.useDescendant(character, descendant) -- toDesc
+    -- @ priority (waffle)
+    return signals.doic_cnv(character, descendant)
+end;   
+function signals.looptojump(text) -- signals.looptojump
+    local loopers = {}
+    for i,v in next, string.split(text,',') do 
+        table.insert(loopers,#loopers+1, tonumber(v))
+    end;
+    -- 1,2,3,4
+    -- loopers = {1,2,3,4}
+    local currentUsage = game
+    local oldUsage = nil
+    -- repeat 
+    --     task.wait()
+    
+    -- until currentUsage == oldUsage
+    for _, v in next, loopers do 
+        currentUsage = currentUsage:GetDescendants()[v]
+    end;
+    -- currentUsage = game[1] -- workspace
+    -- (workspace) currentUsage = currentUsage[2]
+    -- (workspace.Folder)
+    return currentUsage
+end;    
+function signals.loadIDE()
+
+end;    
+
+--[[
+    > character : ml_xy
+    >> Player Folder
+    >>> String Value, ['no']
+    ~
+    local PlayerFolder = signals.goic_cnv(character, 'Player Folder') --> table
+    PlayerFolder
+]]
+--> signal explorer
+--> list of everyone like dex
+--> inside it lists offset, classname and name
+--[[
+    {
+        0x1
+        0x2
+    }
+]]
 getgenv().__shared = sharedRequires
 
 local IsFriendWith = LocalPlayer.IsFriendsWith;
@@ -8777,12 +9028,14 @@ local universeid = signals.compile('httpservice'):JSONDecode(game:HttpGet(`https
 -- setclipboard(game.HttpService:JSONDecode(game:HttpGet(`https://apis.roblox.com/universes/v1/places/{game.PlaceId}/universe`))['universeId'])
 local azfakebuild = {
     build = 'v3';
-    vs = 'a';
+    vs = 'a'; -- get github version
     code = '1';
 }
 if vs == 'debug' then azfakebuild.build = 'v4' end;
 if luraphsettings and LRM_UserNote and string.find(LRM_UserNote, 'beta') and vs ~= 'debug' then azfakebuild.build = 'beta v3' end;
 local compiledVersion = azfakebuild['build']..'.'..azfakebuild.vs..azfakebuild.code
+local myScriptId = debug.info(1, 's');
+
 
 if game.PlaceId == 0 then 
 
@@ -40015,6 +40268,9 @@ elseif universeid == 4871329703 then -- type soul
     sector:AddToggle('Feint Before Parry', false, function(e)
         typesoulsettings.m2beforeparry = e;
     end)
+    sector:AddToggle('Parry Notifications', false, function(e)
+        typesoulsettings.parrynotifications = e;
+    end)
     -- sector:AddToggle('Auto Feint', false, function(e)
     --     typesoulsettings.m2beforeparry = e;
     -- end)
@@ -43801,6 +44057,12 @@ else
     weirdsector:AddButton('Rejoin',function()
         game:GetService('TeleportService'):teleport(game.PlaceId)
     end)
+    weirdsector:AddToggle('Testing Toggle', false, function(on)
+        --if not on 
+    end)
+    local offsetsforbaseplate = {
+        '0x648A82E60060'; -- BC_TriggerPunishment
+    }
     setupEspTab(getgenv().nogamesettings)
     AddConfigurations()
 end
