@@ -8552,19 +8552,60 @@ local signals = {
     env = {};
     fenv = {};
     senv = {};
+    game = {};
 }
-
-signals.fenv.create_service = function(service)
+signals.services.UnloadService = {};
+signals.services.UnloadService.WrapFunction = function(x)
+    return function()
+        x()
+    end
+end;
+function signals:getservice(service, isenv)
+    local getservice = nil; -- servcice
+    -- could rewrite to make 'signals.services' a variable and set it if env
+    if not isenv then 
+        for i,v in next, signals.services do 
+            if v.identifier == service then 
+                getservice = v;
+            end;
+        end
+    else
+        for i,v in next, signals.env do 
+            if v.identifier == service then 
+                getservice = v; -- sevrvice
+            end;
+        end
+    end;
+    return getservice
+end;
+signals.fenv.create_service = function(service, env)
     local usage = {};
-    table.insert(signals.env, usage)
+    usage.identifier = service;
+    if env then 
+        table.insert(signals.env, usage)
+    else
+        table.insert(signals.services, usage)
+    end
     return usage
-end;    
+end;  -- could create custom service, signals.fenv.create_service('Replicator')
+-- signals.env  
 
 signals.services.betausage = function()
     -- do something, unload modules and variables into env
     -- local usage = {};
     -- table.insert(signal.env, usage)
     signals.env.getmouse = game.Players.LocalPlayer:GetMouse()
+end;
+signals.findinstring = function(x, ...)
+    local args = {...}; -- arga
+    local b = false
+    for i,v in next, args do 
+        if x:find(tostring(v)) then 
+            b = true
+            break
+        end
+    end
+    return b
 end;
 -- setmetatable(signals.connections, signals.controlled)
 -- signals.controlled.__newindex = function(table_, key, value)
@@ -8746,7 +8787,7 @@ function signals.loadprotection(x, key)
     signals.services[x]()
 end
 function using(___)
-    key = dec('')
+    key = '~1~1~1' --dec('')
     local getmodule  = ___
     signals.loadprotection(___, key) -- signals new key
 end
@@ -34597,38 +34638,7 @@ elseif game.PlaceId == 8884043854 then
             end
         end
     end)
-elseif table.find(shindogames,tostring(game.PlaceId)) then 
-    local tab = window:CreateTab(gameName)
-    local sector = tab:CreateSector('Cheats','left')
-    getgenv().shindo1settings = {
-        instakill = false;
-        autoquest = false;
-        autorebirth = false;
-        autostats = {
-            on = false;
-            chakra = false;
-            ninjutsu = false;
-            taijutsu = false;
-            health = false;
-        };
 
-    };
-
-    local MissionRepo = game:GetService("Workspace").missiongivers
-
-    local function addstat(x,a) -- chakra,ninjutsu,taijutsu,health
-        local ohString1 = "addstat"
-        local ohString2 = x
-        local ohNumber3 = a
-
-        game:GetService("Players").LocalPlayer.startevent:FireServer(ohString1, ohString2, ohNumber3)
-    end
-
-    task.spawn(function()
-        while task.wait(0) do 
-            --if getgenv()
-        end
-    end)
 elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.PlaceId)) then -- fromdon war
 
 
@@ -41604,6 +41614,7 @@ elseif universeid == 4871329703 then -- type soul
             if v.Parent:FindFirstChild('Humanoid') then 
                 rayEsp{
                     child = v.Parent;
+                    usepivot = true;
                     Name = function()
                         return v.Parent.Name
                     end;
@@ -44031,6 +44042,251 @@ elseif universeid == 3734304510 then  -- south bronx
         end
     end)
 
+    AddConfigurations()
+elseif universeid == 1511883870 then --  shindo life
+    local tab = window:CreateTab(gameName)
+    local sector = tab:CreateSector('Cheats','left')
+
+    getgenv().shindolifesettings = {
+        rollback = false;
+        spinfor = '';
+        infinitespin = false;
+        ['kg1'] = true; -- false : dont spin
+        ['kg2'] = true; -- false : dont spin
+        ['kg3'] = true; -- false : dont spin
+        ['kg4'] = true; -- false : dont spin
+        el1 = true;
+        el2 = true;
+        el3 = true;
+        el4 = true;
+        default = '';
+    }
+
+    --using('UnloadService')
+    setupAimbotTab(getgenv().shindolifesettings)
+    
+    --AddConfigurations()
+    sharedRequires['CreateFlySystem'](sector, shindolifesettings)
+    sharedRequires['CreateWalkSpeedSystem'](sector, shindolifesettings)
+    sharedRequires['CreateNoclip'](sector, shindolifesettings)
+    task.spawn(function()
+        sharedRequires['SetupChatlogger'](sector, shindolifesettings)
+    end)
+
+    -- sector:AddTextbox('Spin For',nil,function(xstate)
+    --     shindolifesettings.spinfor = xstate;
+    -- end)
+
+    if game.PlaceId == 4616652839 then 
+        local spinning = {};
+        for i,v in next, game:GetService("ReplicatedStorage").alljutsu:GetChildren() do  -- STYLESD
+            if not signals.findinstring(v.Name,'BOSS','spec','SPEC','powers','CUSTOMSUSANOO','JINSPO','STYLES','MENTOR','NPC','SUBABILITY') then 
+                table.insert(spinning,v.Name)
+            end;
+        end
+        sector:AddDropdown('KG Spin', spinning, shindolifesettings.default, true, function(xtstae)
+            if type(xstate) == 'string' then 
+                shindolifesettings.spinfor = {xtstae}
+            else
+                shindolifesettings.spinfor = xtstae
+            end;    
+            print(shindolifesettings.spinfor)
+        end)
+        sector:AddToggle('Infinite Spin', false, function(opn)
+            shindolifesettings.infinitespin = opn
+            if not opn then return end;
+            game:GetService("Players").LocalPlayer:WaitForChild('statz'):WaitForChild('main'):WaitForChild('kg1')
+            repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild('Main'):WaitForChild('startupframe'):WaitForChild('arrowup1').Visible == true
+            firesignal(game:GetService("Players").LocalPlayer.PlayerGui.Main.startupframe.arrowup1.MouseButton1Down)
+            firesignal(game:GetService("Players").LocalPlayer.PlayerGui.Main.startupframe.mode.MouseButton1Down)
+            firesignal(game:GetService("Players").LocalPlayer.PlayerGui.Main.Customization.KG.MouseButton1Down)
+        end)
+        sector:AddToggle('Spin KG1', true, function(opn)
+            shindolifesettings.kg1 = opn
+        end)
+        sector:AddToggle('Spin KG2', true, function(opn)
+            shindolifesettings.kg2 = opn
+        end)
+        sector:AddToggle('Spin KG3', true, function(opn)
+            shindolifesettings.kg3 = opn
+        end)
+        sector:AddToggle('Spin KG4', true, function(opn)
+            shindolifesettings.kg4 = opn
+        end)
+        sector:AddSeperator('-')
+        sector:AddToggle('Spin Element1', true, function(opn)
+            shindolifesettings.el1 = opn
+        end)
+        sector:AddToggle('Spin Element2', true, function(opn)
+            shindolifesettings.el2 = opn
+        end)
+        sector:AddToggle('Spin Element3', true, function(opn)
+            shindolifesettings.el3 = opn
+        end)
+        sector:AddToggle('Spin Element4', true, function(opn)
+            shindolifesettings.el4 = opn
+        end)
+    
+    end
+    sector:AddToggle('Rollback Data', false, function(opn)
+        shindolifesettings.rollback = opn
+        if not opn then 
+            maid.rollbackdata = nil;
+            return
+        end;
+        local backed = false;
+        maid.rollbackdata = signals.heartbeat:connect('@', function()
+            pcall(function()
+                if backed == false then 
+                    backed = true; 
+                    game:GetService("Players").LocalPlayer.startevent:FireServer("mouth", "\255")
+                    task.delay(2,function()
+                        backed = false;
+                    end)
+                end
+            end)
+        end)
+    end)
+    game:GetService("Players").LocalPlayer:WaitForChild('statz'):WaitForChild('main')
+    local WantedBloodlines = {
+        'RELL';
+        -- 'Code-Gaiden';
+        -- 'Kamaki-Akuma';
+        -- 'Kamaki-Inferno';
+        -- 'Aizden-Reverse'
+    
+    }
+    local function CheckForGenkai()
+        local AchievedGenkai = false;
+        local K1 = game:GetService("Players").LocalPlayer.statz.main.kg1
+        local K2 = game:GetService("Players").LocalPlayer.statz.main.kg2
+        local K3 = game:GetService("Players").LocalPlayer.statz.main.kg3
+        local K4 = game:GetService("Players").LocalPlayer.statz.main.kg4
+        local CurrentBloodlines = {}
+        for _,v in next, game:GetService("Players").LocalPlayer.statz.main:GetChildren() do 
+            if v.Name:sub(1,2) == 'kg' then 
+                table.insert(CurrentBloodlines, v.Value)
+            end
+        end
+        if type(shindolifesettings.spinfor) == 'table' and shindolifesettings.spinfor ~= '' then 
+            for _,v in next, shindolifesettings.spinfor do 
+                if table.find(CurrentBloodlines, v) then 
+                    AchievedGenkai = true
+                    azfakenotify('got bloodline '..v,3) -- seeking after
+                end
+                for __,vv in next, game:GetService("Players").LocalPlayer.statz.genkailevel:GetChildren() do 
+                    if v == vv.Name or string.lower(v) == vv.Name then  
+                        AchievedGenkai = true
+                    end
+                    local nosub = string.gsub(v,' ','')
+                    nosub = string.gsub(nosub,'-','')
+                    if string.lower(nosub) == string.lower(vv.Name) then 
+                        AchievedGenkai = true
+                    end
+                end
+            end
+        end
+        return AchievedGenkai
+    end
+
+    local GotBloodlines = false;
+    local MANUALSPIN = false
+    local function SetRollback()
+        task.spawn(function()
+            game:GetService("Players").LocalPlayer.startevent:FireServer("mouth", "\255")
+            tttick = 0
+            repeat task.wait(); tttick += 0.1; game:GetService("Players").LocalPlayer.startevent:FireServer("mouth", "\255") until tttick >= 1
+        end)
+    end
+    local function Spin()
+        if MANUALSPIN == false then 
+            for i = 1, 4 do 
+                if shindolifesettings['kg'..i] == true then 
+                    local ohString1 = "spin"
+                    local ohString2 = "kg"..i
+                    game:GetService("Players").LocalPlayer.startevent:FireServer(ohString1, ohString2)
+                end
+            end
+        else
+            -- game:GetService("Players").rawrssz1.PlayerGui.Main.Customization.KGTab.Frame2.KG2.spins : the button
+            for _,v in next, game:GetService("Players").LocalPlayer.PlayerGui.Main.Customization.KGTab:GetChildren() do 
+                -- Frame2.KG2.spins
+                for i,kg in next, v:GetChildren() do 
+                    if shindolifesettings[string.lower(kg.Name)] == true and kg.ImageTransparency ~= 0.5 then 
+                        task.spawn(function()
+                            firesignal(kg.spins.MouseButton1Down)
+                        end)
+                    end
+                end
+            end
+        end
+    end
+    local function RevertRollback()
+        task.spawn(function()
+            repeat task.wait() 	game:GetService("Players").LocalPlayer.startevent:FireServer("mouth", "http://www.roblox.com/asset/?id=5262168414") until 1 == 2
+        end)
+    end
+    --[[
+        elseif table.find(shindogames,tostring(game.PlaceId)) then 
+        local tab = window:CreateTab(gameName)
+        local sector = tab:CreateSector('Cheats','left')
+        getgenv().shindo1settings = {
+            instakill = false;
+            autoquest = false;
+            autorebirth = false;
+            autostats = {
+                on = false;
+                chakra = false;
+                ninjutsu = false;
+                taijutsu = false;
+                health = false;
+            };
+
+        };
+
+        local MissionRepo = game:GetService("Workspace").missiongivers
+
+        local function addstat(x,a) -- chakra,ninjutsu,taijutsu,health
+            local ohString1 = "addstat"
+            local ohString2 = x
+            local ohNumber3 = a
+
+            game:GetService("Players").LocalPlayer.startevent:FireServer(ohString1, ohString2, ohNumber3)
+        end
+
+        task.spawn(function()
+            while task.wait(0) do 
+                --if getgenv()
+            end
+        end)
+    ]]
+    game:GetService("Players").LocalPlayer.statz.genkailevel.ChildAdded:Connect(function(x)
+        print('new bloodline: '..x.Name)
+        azfakenotify('bloodline '..x.Name,'untilClick')
+    end)
+    task.spawn(function()
+        while task.wait() do 
+            if shindolifesettings.infinitespin then 
+                shindolifesettings.infinitespin = nil
+
+                -- game:GetService("TeleportService"):teleport(game.PlaceId)
+                SetRollback()
+                --Spin()
+                
+                
+                repeat 
+                    task.wait(1) 
+                    Spin()
+                until CheckForGenkai() == true or game:GetService("Players").LocalPlayer.statz.spins.Value == 0 or shindolifesettings.infinitespin == false
+                
+                if shindolifesettings.infinitespin == nil then 
+                    game:GetService("TeleportService"):teleport(game.PlaceId)
+                else
+                    RevertRollback()
+                end
+            end
+        end
+    end)
     AddConfigurations()
 else
 
