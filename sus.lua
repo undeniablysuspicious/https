@@ -470,37 +470,7 @@ function azfake:returndata()
     }
 end 
 
-local localPlayer = {};
-local metaforit = {};
-setmetatable(localPlayer,metaforit);
-metaforit.__index = function(table, key)
-    local quickuses = {
-        character = game.Players.LocalPlayer.Character;
-        humanoid = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') or nil;
-        humanoidrootpart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
-        health = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health or nil;
-        cframe =  game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame or nil;
-        parts = game.Players.LocalPlayer.Character and parts;
-        rootPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
-    }
-    for i,v in next, quickuses do 
-        if tostring(i) == tostring(key) then 
-            return v
-        end
-    end
-    -- if key == 'rootPart' then 
-    --     return game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
-    -- end -- rootart
-end
 
-
-local services = {
-    vis = game:GetService('VirtualInputManager');
-    tws = game:GetService('TweenService')
-}
-function encorporate(f)
-    return f()
-end
 --local localPlayer = {}
 
 getgenv().WhitelistedAzfake = true
@@ -8542,6 +8512,106 @@ sharedRequires['smartlog'] = function(...)
     end)
     return print(...)
 end
+local localPlayer = {};
+local metaforit = {};
+localPlayer.destroy = function(wehat, where)
+
+end;
+setmetatable(localPlayer,metaforit);
+metaforit.__index = function(table, key)
+    local quickuses = {
+        character = game.Players.LocalPlayer.Character;
+        humanoid = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') or nil;
+        humanoidrootpart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
+        health = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health or nil;
+        cframe =  game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame or nil;
+        parts = game.Players.LocalPlayer.Character and parts;
+        rootPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
+    }
+    for i,v in next, quickuses do 
+        if tostring(i) == tostring(key) then 
+            return v
+        end
+    end
+    -- if key == 'rootPart' then 
+    --     return game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
+    -- end -- rootart
+end
+metaforit.__call = function(table,  ...) -- in our case the arguments are going to be a number and a string
+    local args = {...} -- ./.
+    local whereabouts = {
+        character = localPlayer.character;
+    }
+    if args[1] == 'destroy' then 
+        local dest = whereabouts[tostring(args[3])]
+        if not dest and typeof(args[3]) ~= 'Instance' then return warn(args[3],'not valid') end;
+        if typeof(args[3]) == 'Instance' then dest = args[3] end;
+        -- descendant
+        local somethingDestroyed = false;
+        local function playRemove(obj)
+            if obj.Name == args[2] then 
+                -- @ remove;
+                if args[5] == 'debug' then print('@removing '..obj.Name) end;
+                obj:Destroy();
+                somethingDestroyed = true;
+            end
+        end;    
+        if not args[4] or args[4] ~= 'descendant' and args[4] ~= 'all' then 
+            for i,v in next, dest:GetChildren() do  
+                playRemove(v)
+            end;
+        elseif args[4] and args[4] == 'descendant' then -- another arg for all
+            for i,v in next, dest:GetDescendants() do 
+                playRemove(v)
+            end;
+        elseif args[4] and args[4] == 'all' then -- another arg for all
+            for i,v in next, dest:GetChildren() do  
+                playRemove(v)
+            end;
+            for i,v in next, dest:GetDescendants() do 
+                playRemove(v)
+            end;
+        else
+            warn('@called with no remove')
+        end
+        if somethingDestroyed == false then 
+            warn('@destroyed nothing')
+        end
+    elseif args[1] == 'cframe' then 
+        return localPlayer.rootPart and localPlayer.rootPart.CFrame or nil
+    elseif args[1] == 'fire' then 
+        local remote = args[2] -- if string then search for it in destination (argument for destination)
+        -- or loop in script for a name on this remote
+        local function unpacked()
+            local otherArgs = args;
+            table.remove(args, 1)
+            table.remove(args, 2)
+            return otherArgs
+        end
+        local NewArguments = unpacked()
+        if remote.ClassName == 'RemoteEvent' then 
+            remote:FireServer(unpack(NewArguments))
+        elseif remote.ClassName == 'RemoteFunction' then 
+            remote:InvokeServer(unpack(NewArguments))
+        end;    
+
+        return true
+    end;
+end
+-- localPlayer('destroy','head', 'character','all')
+-- localPlayer('cframe')
+-- localPlayer('fire', game.RemoteEvent, 'nig')
+-- localPlayer({nothing})
+
+
+local services = {
+    vis = game:GetService('VirtualInputManager');
+    tws = game:GetService('TweenService')
+}
+function encorporate(f)
+    return f()
+end -- @ econcorporate(newfunct)
+
 local signals = {
 	gamestepped = {};
 	heartbeat = {};
@@ -8560,6 +8630,15 @@ signals.services.UnloadService.WrapFunction = function(x)
         x()
     end
 end;
+signals.services.Delay = {};
+signals.services.Delay.DelayRemovement = function(obj, time)
+    task.spawn(function()
+        task.wait(time);
+        if obj then 
+            obj:Destroy()
+        end;    
+    end);
+end;    
 function signals:getservice(service, isenv)
     local getservice = nil; -- servcice
     -- could rewrite to make 'signals.services' a variable and set it if env
@@ -8589,6 +8668,23 @@ signals.fenv.create_service = function(service, env)
     return usage
 end;  -- could create custom service, signals.fenv.create_service('Replicator')
 -- signals.env  
+function signals.loadprotection(x, key, loadon, env)
+    if key ~= '~1~1~1' then return false end;
+    local signalget = signals:getservice(x,env) --signals.services[x]()
+    if type(signalget) == 'function' then 
+        signalget();
+        return true
+    else
+        return signalget
+    end;    
+end
+function using(___, loadon, env)
+    key = '~1~1~1' --dec('')
+    local getmodule  = ___
+    return signals.loadprotection(___, key, loadon, env) -- signals new key
+end
+-- > using('betausage')  imports mouse into env
+
 
 signals.services.betausage = function()
     -- do something, unload modules and variables into env
@@ -8782,16 +8878,7 @@ end;
 -- signals.connections.new() = function()
 -- check if function is set to nil
 -- local storefunction = signals.new(os.time()); storefunction.funct()
-function signals.loadprotection(x, key)
-    if key ~= '~1~1~1' then return end;
-    signals.services[x]()
-end
-function using(___)
-    key = '~1~1~1' --dec('')
-    local getmodule  = ___
-    signals.loadprotection(___, key) -- signals new key
-end
--- > using('betausage')  imports mouse into env
+--
 local function GetObjectParentsDir(obj,wl)
 	local BaseParent = obj.Parent
 	local Offsets = {}
@@ -8967,8 +9054,86 @@ function signals.looptojump(text) -- signals.looptojump
 end;    
 function signals.loadIDE()
 
-end;    
+end;  
 
+signals.ENCODEMENT = {
+}
+signals.LETTERS = {
+    a = '+';
+    b = '=';
+    c = '~';
+    d = '[';
+    e = ']';
+    f = '1';
+    g = '0';
+    h = '2';
+    i = '6';
+    j = '5';
+    k = '8';
+    l = '9';
+    m = '3';
+
+    n = 'j';
+    o = ';';
+    p = 'G';
+    q = 'B';
+    r = 'f';
+    s = 'Q';
+    t = 'x';
+    u = 'z';
+    v = 'A';
+
+    w = 'u';
+    x = 'Y';
+    y = 't';
+    z = 'C'; -- v
+    space = 'K';
+    ['('] = '{';
+    [')'] = '}';
+}
+for i,v in next, signals.LETTERS do 
+    signals.ENCODEMENT[tostring(i)] = {
+        original = i == 'space' and ' ' or i;
+        new = v
+    };
+    -- [tostring(v)] = 
+end;
+function signals.compilelua(string)
+
+end;
+function signals.decompile(string)
+    
+end;
+function signals.encode(string)
+    local newstring = '';
+    for i=1, string.len(string) do 
+        local letter = string:sub(i,i);
+        local inTable = letter == ' ' and 'space' or letter;
+        local tValue = signals.ENCODEMENT[inTable] and signals.ENCODEMENT[inTable].new or letter;
+        newstring = newstring..tValue;
+    end
+    return newstring
+end;
+function signals.decode(string)
+    local newstring = '';
+    for i=1, string.len(string) do 
+        local letter = string:sub(i,i);
+        local inTable = letter;
+        local tValue = letter; --nil; 
+        for index, value in next, signals.ENCODEMENT do 
+            if value.new == letter then 
+                --print(value.original)
+                tValue = value; --signals.ENCODEMENT[inTable];
+            end;
+        end
+        if type(tValue) == 'table' and tValue ~= letter then -- true if supported character
+            tValue = tValue.original
+            --print('swapping',letter,'to',tValue)
+        end;
+        newstring = newstring..tValue; 
+    end
+    return newstring
+end;
 --[[
     > character : ml_xy
     >> Player Folder
@@ -12261,157 +12426,161 @@ elseif game.PlaceId == 10266164381 then --// shitlines
         getgenv().DynamicPicker = e
     end)
 
-    local ToggleBindSpeed = sector:AddToggle("WalkSpeed", false, function(e)
-        getgenv().Speeding = e
-    end)
-    local ToggleBindFlySpeed = sector:AddToggle("Fly Speed", false, function(e)
-        getgenv().flying = e
-        if getgenv().flying == false and getgenv().istyping == false  then 
-            getgenv().CFloop:Disconnect()
-            --game.Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
-            local Head = game.Players.LocalPlayer.Character:WaitForChild("Head")
-            Head.Anchored = false
-            getgenv().CFloop = nil
-        elseif getgenv().flying == true and getgenv().istyping == false then
+    -- local ToggleBindSpeed = sector:AddToggle("WalkSpeed", false, function(e)
+    --     getgenv().Speeding = e
+    -- end)
+    -- local ToggleBindFlySpeed = sector:AddToggle("Fly Speed", false, function(e)
+    --     getgenv().flying = e
+    --     if getgenv().flying == false and getgenv().istyping == false  then 
+    --         getgenv().CFloop:Disconnect()
+    --         --game.Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+    --         local Head = game.Players.LocalPlayer.Character:WaitForChild("Head")
+    --         Head.Anchored = false
+    --         getgenv().CFloop = nil
+    --     elseif getgenv().flying == true and getgenv().istyping == false then
 
-            Players = game.Players
-            getgenv().flying = true
-            task.spawn(function()
-                repeat wait()
-                until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:findFirstChild("Torso") and game.Players.LocalPlayer.Character:findFirstChild("Humanoid")
-                local mouse = game.Players.LocalPlayer:GetMouse()
-                repeat wait() until mouse
-                local plr = game.Players.LocalPlayer
-                local torso = plr.Character.HumanoidRootPart
-                local deb = true
-                local ctrl = {f = 0, b = 0, l = 0, r = 0}
-                local lastctrl = {f = 0, b = 0, l = 0, r = 0}
-                local maxspeed = getgenv().CFspeed
-                local speed = maxspeed  
-                function Fly()
-                    local bv = Instance.new("BodyVelocity", torso);bv.Name ='exploitation'
-                    bv.velocity = Vector3.new(0,0.1,0)
-                    bv.maxForce = Vector3.new(9e9, 9e9, 9e9) -- 9e9
-                    pcall(function()
-                        repeat task.wait(0.1)
-                            if not torso:FindFirstChild('exploitation') then 
-                                bv = Instance.new("BodyVelocity", torso);bv.Name ='exploitation'
-                                bv.velocity = Vector3.new(0,0.1,0)
-                                bv.maxForce = Vector3.new(9e9, 9e9, 9e9) -- 9e9
-                            end
-                            local prevRotation = game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation
-                            speed = getgenv().CFspeed --Options.FlySpeedSlide.Value
-                            maxspeed = getgenv().CFspeed
-                            if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
-                                speed = maxspeed * 10
-                                -- if speed > maxspeed then
-                                --     speed = maxspeed
-                                -- end
-                                if speed ~= maxspeed * 10 then
-                                    speed = maxspeed * 10
-                                end
-                            elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
-                                speed = 0
-                                if speed < 0 then
-                                    speed = 0
-                                end
-                            end
-                             -- elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
-                            --     bv.velocity = ((game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.lookVector  )) *speed/2
-                            if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
-                                bv.velocity = (( game.Workspace.CurrentCamera.CoordinateFrame.lookVector  *  (ctrl.f+ctrl.b)  )) * speed -- ((game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.p))
-                                -- lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
-                                if (ctrl.r) ~= 0  then 
-                                    --repeat task.wait(0.005) until game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation ~= prevRotation
-                                    ctrl.r = ctrl.r - ctrl.l
-                                    bv.velocity += (( game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.lookVector  )) --* speed
-                                end
-                                if (ctrl.l) ~= 0 then 
-                                    --repeat task.wait(0.005) until game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation ~= prevRotation
-                                    ctrl.l = ctrl.l - ctrl.r
-                                    bv.velocity += (( game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.lookVector    )) -- * speed
-                                end
+    --         Players = game.Players
+    --         getgenv().flying = true
+    --         task.spawn(function()
+    --             repeat wait()
+    --             until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:findFirstChild("Torso") and game.Players.LocalPlayer.Character:findFirstChild("Humanoid")
+    --             local mouse = game.Players.LocalPlayer:GetMouse()
+    --             repeat wait() until mouse
+    --             local plr = game.Players.LocalPlayer
+    --             local torso = plr.Character.HumanoidRootPart
+    --             local deb = true
+    --             local ctrl = {f = 0, b = 0, l = 0, r = 0}
+    --             local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+    --             local maxspeed = getgenv().CFspeed
+    --             local speed = maxspeed  
+    --             function Fly()
+    --                 local bv = Instance.new("BodyVelocity", torso);bv.Name ='exploitation'
+    --                 bv.velocity = Vector3.new(0,0.1,0)
+    --                 bv.maxForce = Vector3.new(9e9, 9e9, 9e9) -- 9e9
+    --                 pcall(function()
+    --                     repeat task.wait(0.1)
+    --                         if not torso:FindFirstChild('exploitation') then 
+    --                             bv = Instance.new("BodyVelocity", torso);bv.Name ='exploitation'
+    --                             bv.velocity = Vector3.new(0,0.1,0)
+    --                             bv.maxForce = Vector3.new(9e9, 9e9, 9e9) -- 9e9
+    --                         end
+    --                         local prevRotation = game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation
+    --                         speed = getgenv().CFspeed --Options.FlySpeedSlide.Value
+    --                         maxspeed = getgenv().CFspeed
+    --                         if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+    --                             speed = maxspeed * 10
+    --                             -- if speed > maxspeed then
+    --                             --     speed = maxspeed
+    --                             -- end
+    --                             if speed ~= maxspeed * 10 then
+    --                                 speed = maxspeed * 10
+    --                             end
+    --                         elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
+    --                             speed = 0
+    --                             if speed < 0 then
+    --                                 speed = 0
+    --                             end
+    --                         end
+    --                          -- elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
+    --                         --     bv.velocity = ((game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.lookVector  )) *speed/2
+    --                         if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
+    --                             bv.velocity = (( game.Workspace.CurrentCamera.CoordinateFrame.lookVector  *  (ctrl.f+ctrl.b)  )) * speed -- ((game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.p))
+    --                             -- lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
+    --                             if (ctrl.r) ~= 0  then 
+    --                                 --repeat task.wait(0.005) until game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation ~= prevRotation
+    --                                 ctrl.r = ctrl.r - ctrl.l
+    --                                 bv.velocity += (( game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.lookVector  )) --* speed
+    --                             end
+    --                             if (ctrl.l) ~= 0 then 
+    --                                 --repeat task.wait(0.005) until game.Players.LocalPlayer.Character.HumanoidRootPart.Rotation ~= prevRotation
+    --                                 ctrl.l = ctrl.l - ctrl.r
+    --                                 bv.velocity += (( game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.lookVector    )) -- * speed
+    --                             end
     
-                            else
-                                bv.velocity = Vector3.new(0,0.1,0)
-                            end
-                             --* CFrame.new((ctrl.l+ctrl.r),0,0) -- *50*speed/maxspeed * Vector3.new(0,0,0) --  
-                        until getgenv().flying == false
-                    end)
+    --                         else
+    --                             bv.velocity = Vector3.new(0,0.1,0)
+    --                         end
+    --                          --* CFrame.new((ctrl.l+ctrl.r),0,0) -- *50*speed/maxspeed * Vector3.new(0,0,0) --  
+    --                     until getgenv().flying == false
+    --                 end)
 
-                    ctrl = {f = 0, b = 0, l = 0, r = 0}
-                    lastctrl = {f = 0, b = 0, l = 0, r = 0}
-                    speed = 0
-                    bv:Destroy()
-                    plr.Character:WaitForChild('Humanoid').PlatformStand = false
-                end
-                mouse.KeyDown:connect(function(key)
-                    if key:lower() == "w" then
-                        ctrl.f = 1
-                    elseif key:lower() == "s" then
-                        ctrl.b = -1
-                    elseif key:lower() == "a" then
-                        ctrl.l = -1
-                    elseif key:lower() == "d" then
-                        ctrl.r = 1
-                    end
-                end)
-                mouse.KeyUp:connect(function(key)
-                    if key:lower() == "w" then
-                        ctrl.f = 0
-                        speed = 0
-                    elseif key:lower() == "s" then
-                        ctrl.b = 0
-                    elseif key:lower() == "a" then
-                        ctrl.l = 0
-                    elseif key:lower() == "d" then
-                        ctrl.r = 0
-                    end
-                end)
-                Fly()  
-            end)
-        end
-    end)
-    local ToggleBindNoclip= sector:AddToggle("Noclip", false, function(e)
-        getgenv().NoClip = e 
-        if getgenv().NoClip ==false and getgenv().istyping == false then
-            getgenv().NoclipFunction:Disconnect()
-        elseif getgenv().NoClip == true and getgenv().istyping == false then --  
-            task.wait(0.1)
-            local function NoclipLoop()
-                pcall(function()
-                    if getgenv().NoClip == true and game.Players.LocalPlayer.Character  and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >= 0 then
-                        for _, child in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
-                            pcall(function()
-                                if child:IsA("BasePart") and child.CanCollide == true then
-                                    child.CanCollide = false
-                                end
-                            end)
-                        end
-                    else
-                        getgenv().NoClip = false
-                        ToggleBindNoclip:Set(false)
-                    end
-                end)
-            end
-            getgenv().NoclipFunction = RunService.Stepped:Connect(NoclipLoop)
-        end
-    end)
+    --                 ctrl = {f = 0, b = 0, l = 0, r = 0}
+    --                 lastctrl = {f = 0, b = 0, l = 0, r = 0}
+    --                 speed = 0
+    --                 bv:Destroy()
+    --                 plr.Character:WaitForChild('Humanoid').PlatformStand = false
+    --             end
+    --             mouse.KeyDown:connect(function(key)
+    --                 if key:lower() == "w" then
+    --                     ctrl.f = 1
+    --                 elseif key:lower() == "s" then
+    --                     ctrl.b = -1
+    --                 elseif key:lower() == "a" then
+    --                     ctrl.l = -1
+    --                 elseif key:lower() == "d" then
+    --                     ctrl.r = 1
+    --                 end
+    --             end)
+    --             mouse.KeyUp:connect(function(key)
+    --                 if key:lower() == "w" then
+    --                     ctrl.f = 0
+    --                     speed = 0
+    --                 elseif key:lower() == "s" then
+    --                     ctrl.b = 0
+    --                 elseif key:lower() == "a" then
+    --                     ctrl.l = 0
+    --                 elseif key:lower() == "d" then
+    --                     ctrl.r = 0
+    --                 end
+    --             end)
+    --             Fly()  
+    --         end)
+    --     end
+    -- end)
+    -- local ToggleBindNoclip= sector:AddToggle("Noclip", false, function(e)
+    --     getgenv().NoClip = e 
+    --     if getgenv().NoClip ==false and getgenv().istyping == false then
+    --         getgenv().NoclipFunction:Disconnect()
+    --     elseif getgenv().NoClip == true and getgenv().istyping == false then --  
+    --         task.wait(0.1)
+    --         local function NoclipLoop()
+    --             pcall(function()
+    --                 if getgenv().NoClip == true and game.Players.LocalPlayer.Character  and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChild('Humanoid').Health >= 0 then
+    --                     for _, child in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+    --                         pcall(function()
+    --                             if child:IsA("BasePart") and child.CanCollide == true then
+    --                                 child.CanCollide = false
+    --                             end
+    --                         end)
+    --                     end
+    --                 else
+    --                     getgenv().NoClip = false
+    --                     ToggleBindNoclip:Set(false)
+    --                 end
+    --             end)
+    --         end
+    --         getgenv().NoclipFunction = RunService.Stepped:Connect(NoclipLoop)
+    --     end
+    -- end)
 
-    sector:AddSlider("Speed", 0, 0, 200, 1, function(State)
-        getgenv().Speed = State
-    end)
-    sector:AddSlider("Fly Speed", 0, 200, 300, 1, function(State)
-        getgenv().FlySpeedSlide = State
-        getgenv().CFspeed = State
-    end)
-    sector:AddSlider("Jump Height", 0, 0, 100, 1, function(State)
-        getgenv().JHeight = State
-    end)
-    ToggleBindLion:AddKeybind()
-    ToggleBindDynamic:AddKeybind()
-    ToggleBindSpeed:AddKeybind()
-    ToggleBindFlySpeed:AddKeybind()
+    -- sector:AddSlider("Speed", 0, 0, 200, 1, function(State)
+    --     getgenv().Speed = State
+    -- end)
+    -- sector:AddSlider("Fly Speed", 0, 200, 300, 1, function(State)
+    --     getgenv().FlySpeedSlide = State
+    --     getgenv().CFspeed = State
+    -- end)
+    -- sector:AddSlider("Jump Height", 0, 0, 100, 1, function(State)
+    --     getgenv().JHeight = State
+    -- end)
+    -- ToggleBindLion:AddKeybind()
+    -- ToggleBindDynamic:AddKeybind()
+    -- ToggleBindSpeed:AddKeybind()
+    -- ToggleBindFlySpeed:AddKeybind()
+
+    sharedRequires['CreateFlySystem'](sector, getgenv().AzfakeGlobalTables)
+    sharedRequires['CreateWalkSpeedSystem'](sector, getgenv().AzfakeGlobalTables)
+    sharedRequires['CreateNoclip'](sector, getgenv().AzfakeGlobalTables)
 
     getgenv().selectedPlayer = ''
 
@@ -43268,6 +43437,7 @@ elseif universeid == 3734304510 then  -- south bronx
         --game.Players.LocalPlayer.Character.PrimaryPart.Anchored = e;
         if not e then return end;
         game.Players.LocalPlayer.Character.PrimaryPart.CFrame *= CFrame.new(0,-12,0)
+        local inputManager = game.VirtualInputManager
         task.spawn(function()
             local function tweento(b,g)
                 local root = game.Players.LocalPlayer.Character.PrimaryPart
@@ -43288,6 +43458,14 @@ elseif universeid == 3734304510 then  -- south bronx
                     jumpVehicle(); --jumpVehice()
                 else
                     local t = game.TweenService:Create(root,TweenInfo.new(timing,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{CFrame = b}); t:Play()
+                    local timer = 0
+                    task.spawn(function()
+                        repeat 
+                            task.wait(1);
+                            timer += 1
+                            inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
+                        until timer >= timing
+                    end);
                     task.wait(timing+0.01)
                     --repeat task.wait() until t.Completed
                     print('done tween')
@@ -43337,7 +43515,7 @@ elseif universeid == 3734304510 then  -- south bronx
                     --if azfake:returndata().character.Humanoid.FloorMaterial == Enum.Material.Air then 
                         --setPlatform(root)
                     --end
-                    inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
+                    --inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
                     local DealerCFrame = CFrame.new(217.7833709716797,3.7371320724487305,-334.5723876953125);
                     local bankNPCcFRAME = CFrame.new(-49.11941146850586,3.7371387481689453,-322.2247619628906);
                     local checkCardCFrame = CFrame.new(-42.873199462890625,3.7371387481689453,-331.6510925292969);
@@ -43354,7 +43532,7 @@ elseif universeid == 3734304510 then  -- south bronx
                                 inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
                                 fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
                             end
-                        until checkdist(DealerCFrame) and (game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') or game.Players.LocalPlayer.Character:FindFirstChild('Fake ID')) or getgenv().loopsUnload == true or southbroxsettings.cardfarm == false
+                        until checkdist(DealerCFrame) and (game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') or game.Players.LocalPlayer.Character:FindFirstChild('Fake ID')) or game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') or getgenv().loopsUnload == true or southbroxsettings.cardfarm == false
 
                         --fireproximityprompt(workspace.NPCs.FakeIDSeller.UpperTorso.Attachment.ProximityPrompt)
                         print('[got fake id]')
@@ -43373,11 +43551,11 @@ elseif universeid == 3734304510 then  -- south bronx
                     if game.Players.LocalPlayer.Backpack:FindFirstChild('Fake ID') then 
                         game.Players.LocalPlayer.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:WaitForChild('Fake ID'))
                     end
-                    inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
+                    --inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
                     print('[teleporting to banekr]') -- Character:FindFirstChild('Backpack')
                     repeat 
                         task.wait()
-                        inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
+                        --inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
                         tweento(bankNPCcFRAME, 2)
                         if game.Players.LocalPlayer.Character:FindFirstChild('Fake ID') then 
                             fireproximityprompt(workspace.NPCs["Bank Teller"].UpperTorso.Attachment.ProximityPrompt)
@@ -43393,7 +43571,7 @@ elseif universeid == 3734304510 then  -- south bronx
                     local checkingText = game:GetService("Players").LocalPlayer.PlayerGui.Main.Message.Warning --Frame
                     local CompletedMessage = 'Your application was successful. Please allow 30 seconds for the bank to prepare your card.'
                     if checkingText.Text:find('was successful.') and getgenv().loopsUnload == false and southbroxsettings.cardfarm == true then 
-                        inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
+                        --inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
                         print('[card application was a success]')
                         print('[tweening to nearest atm]')
                         tweento(checkCardCFrame)
@@ -44316,9 +44494,25 @@ else
     weirdsector:AddToggle('Testing Toggle', false, function(on)
         --if not on 
     end)
+    local beenx = ''
+    weirdsector:AddTextbox('whats da word',nil, function(x)
+        beenx = x
+    end)
+    weirdsector:AddButton('compile',function()
+        setclipboard(signals.encode(beenx))
+    end)
+    weirdsector:AddButton('decompile',function()
+        setclipboard(signals.decode(beenx))
+    end)
+    weirdsector:AddButton('load compiled text',function()
+        loadstring(signals.decode(beenx))();
+    end)
     local offsetsforbaseplate = {
         '0x648A82E60060'; -- BC_TriggerPunishment
     }
+    local encoded = signals.encode('wow THIS is a random generated string encoded')
+    print(encoded)
+    print(signals.decode(encoded))
     setupEspTab(getgenv().nogamesettings)
     AddConfigurations()
 end
