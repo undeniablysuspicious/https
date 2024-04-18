@@ -8586,7 +8586,17 @@ metaforit.__call = function(_table,  ...) -- in our case the arguments are going
         local function unpacked()
             local otherArgs = args;
             table.remove(otherArgs, 1)
-            table.remove(otherArgs, 2)
+            for i,v in next, otherArgs do 
+                if v == remote then 
+                    --print('[removing]',i,v)
+                    table.remove(otherArgs, i)
+                    break ;-- nre
+                end
+            end
+            for i,v in next, otherArgs do 
+                print(i,v)
+            end
+            --table.remove(otherArgs, 2)
             return otherArgs
         end
         local NewArguments = unpacked()
@@ -41625,7 +41635,7 @@ elseif universeid == 4871329703 then -- type soul
         --     typesoulsettings.selecttradeitem = {};
         --     azfakenotify(`Cleared List.`, 3)
         -- end)
-        earlyaccess:AddButton('Spoof Trade', function()
+        local spof = earlyaccess:AddButton('Spoof Trade', function()
             local formatted = table.concat(typesoulsettings.selecttradeitem,',')
             local res = library:CheckForPermission(`Are you sure you want to Spoof {formatted}?`)
             if res == false then return end;
@@ -41668,6 +41678,8 @@ elseif universeid == 4871329703 then -- type soul
                 end;
                 --:FireServer(ohString1, ohString2, ohNumber3)
             end;
+            spof:AddKnowledge('Uses 1 of the item, Make sure u have only 1')
+            spof:ActivateKnowledge()
         end);   -- {shouldcheck = true, ask = 'Are you sure you want to spoof?'}
         --workspace.NPCs.RaidBoss.Kisuke.ClickDetector
     end
