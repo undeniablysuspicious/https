@@ -8527,6 +8527,7 @@ metaforit.__index = function(table, key)
         cframe =  game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame or nil;
         parts = game.Players.LocalPlayer.Character and parts;
         rootPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
+        instance = game.Players.LocalPlayer;
     }
     for i,v in next, quickuses do 
         if tostring(i) == tostring(key) then 
@@ -8537,7 +8538,7 @@ metaforit.__index = function(table, key)
     --     return game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
     -- end -- rootart
 end
-metaforit.__call = function(table,  ...) -- in our case the arguments are going to be a number and a string
+metaforit.__call = function(_table,  ...) -- in our case the arguments are going to be a number and a string
     local args = {...} -- ./.
     local whereabouts = {
         character = localPlayer.character;
@@ -8584,8 +8585,8 @@ metaforit.__call = function(table,  ...) -- in our case the arguments are going 
         -- or loop in script for a name on this remote
         local function unpacked()
             local otherArgs = args;
-            table.remove(args, 1)
-            table.remove(args, 2)
+            table.remove(otherArgs, 1)
+            table.remove(otherArgs, 2)
             return otherArgs
         end
         local NewArguments = unpacked()
@@ -40078,6 +40079,7 @@ elseif universeid == 4871329703 then -- type soul
         end
     end
     local tab = window:CreateTab(gameName)
+    local betatab = window:CreateTab('Beta Features')
     if game.PlaceId == 14067600077 then 
         azfakenotify('Waiting to join game.','untilClick')
         azfakenotify('nah but wtf u expecting executing here','untilClick')
@@ -40085,6 +40087,7 @@ elseif universeid == 4871329703 then -- type soul
     end
     local esptab = window:CreateTab('ESP')
     local sector = tab:CreateSector('Cheats','left')
+    local earlyaccess = betatab:CreateSector('Beta Cheats','left')
     local newother = tab:CreateSector('Cheats','left')
     local lefttab = tab:CreateSector('Cheats','left')
     local rightsect = tab:CreateSector('Cheats','right')
@@ -40207,6 +40210,9 @@ elseif universeid == 4871329703 then -- type soul
         parrynotifications = false;
         timetowait = 30;
         kisukedelay = false;
+        teleportKisukeBeforeUse = false;
+        selecttradeitem = {};
+        slotselected = {};
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -40284,6 +40290,29 @@ elseif universeid == 4871329703 then -- type soul
         task.spawn(function()
             f()
         end )
+    end
+    local function getskilltreegui()
+        if not game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('SkillTree') then return end;
+        local tree = nil;
+        for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui:GetChildren() do 
+            if v.Name == 'SkillTree' and v:FindFirstChild('MainFrame') then 
+                if #v.MainFrame.page1Frame.Hakuda.hakudaMain:GetChildren() > 1 then 
+                    tree = v;
+                end
+            end
+        end;
+        return tree; --.MainFrame.page1Frame.Hakuda.hakudaMain
+    end;    
+    local function getInventory()
+        local inventory = {};
+        local treegui = getskilltreegui();
+        if not treegui then return end;
+        for i,v in next, treegui.MainFrame.page3Frame.itemsFrame.itemsMain:GetChildren() do 
+            if v:IsA('TextButton') then 
+                table.insert(inventory, v.Name) -- treegui.MainFrame.page3Frame.itemsFrame.itemsMain
+            end;    
+        end;
+        return inventory
     end
 
     --[[
@@ -40666,7 +40695,7 @@ elseif universeid == 4871329703 then -- type soul
         local foundTP = nil;
         for i,jobIdTable in next, GetTable do 
             local shouldbreak = false
-            if jobIdTable['JobID'] ~= game.JobId then 
+            if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] then 
                 game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(GameName,jobIdTable['JobID'])
                 break
             end
@@ -41345,7 +41374,7 @@ elseif universeid == 4871329703 then -- type soul
         end
     end)
     if LRM_UserNote and string.find(LRM_UserNote, 'beta') or vs == 'debug' then 
-        local wasinsta = newother:AddToggle('Insta Kill Mobs',false,function(e, wasclicked)
+        local wasinsta = earlyaccess:AddToggle('Insta Kill Mobs',false,function(e, wasclicked)
             -- if wasclicked then 
             --     if typesoulsettings.instakill == false then 
             --         library:CheckForPermission('This might only work on bosses. Still use?')
@@ -41395,19 +41424,23 @@ elseif universeid == 4871329703 then -- type soul
             end)
         end)
         wasinsta.info = {shouldcheck =  true, ask = 'This may only work on bosses.'} -- shouldask  This might not work. Still use?
-        newother:AddTextbox('Kisuke Webhook',nil,function(e)
+        earlyaccess:AddTextbox('Kisuke Webhook',nil,function(e)
             typesoulsettings.sendurl = e;
         end)
-        local webhooksend = newother:AddToggle('Send to Webhook',false,function(e, wasclicked)
+        local webhooksend = earlyaccess:AddToggle('Send to Webhook',false,function(e, wasclicked)
             typesoulsettings.sendtowebhook = e;
         end)
-        newother:AddSlider("Time To Wait", 0, 30, 120, 1, function(State)
+        earlyaccess:AddSlider("Time To Wait", 0, 30, 120, 1, function(State)
             typesoulsettings['timetowait'] = State
         end)
-        newother:AddToggle('Wait Time Before Killing',false,function(e, wasclicked)
+        earlyaccess:AddToggle('Wait Time Before Killing',false,function(e, wasclicked)
             typesoulsettings.kisukedelay = e;
         end)
-        local autokisuke = newother:AddToggle('Auto Kisuke',false,function(e, wasclicked)
+        earlyaccess:AddToggle('TP To NPC before Boss',false,function(e, wasclicked)
+            typesoulsettings.teleportKisukeBeforeUse = e;
+        end)
+        
+        local autokisuke = earlyaccess:AddToggle('Auto Kisuke',false,function(e, wasclicked)
             typesoulsettings.autokisuke = e;
             if not e then 
                 maid.autokisukectn = nil;
@@ -41530,6 +41563,24 @@ elseif universeid == 4871329703 then -- type soul
                             end)
                         end
                     else
+                        localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+                        game.Players.LocalPlayer.Character.Head:Destroy()
+                        canUseKisuke = true;
+                        if typesoulsettings.teleportKisukeBeforeUse then 
+                            canUseKisuke = false;
+                        end;    
+                        local newAdd; newAdd = workspace.Entities.ChildAdded:Connect(function(b)
+                            if b.Name == game.Players.LocalPlayer.Name then 
+                                task.delay(0.7,function()
+                                    canUseKisuke = true;
+                                end)
+                                repeat 
+                                    task.wait()
+                                    b.PrimaryPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
+                                until not b
+                            end
+                        end)
+                        repeat task.wait(.5) until canUseKisuke == true;
                         local kisuke = workspace:WaitForChild('NPCs'):WaitForChild('RaidBoss'):WaitForChild('Kisuke');
                         local hasKisukeAdded;
                         game.Players.LocalPlayer.ChildAdded:Connect(function(child)
@@ -41550,7 +41601,74 @@ elseif universeid == 4871329703 then -- type soul
             end)
         end)
         wasinsta.info = {shouldcheck =  true, ask = 'This may only work on bosses.'} -- shouldask  This might not work. Still use?
-
+        earlyaccess:AddSeperator('-')
+        --
+        local inventory = getInventory();
+        -- earlyaccess:AddSlider("Trade Slot (1-4)", 0, 30, 120, 1, function(State)
+        --     typesoulsettings['tradeslot'] = State
+        -- end)
+        local tradeslots = earlyaccess:AddDropdown("Trade Slots", {'Slot 1', 'Slot 2', 'Slot 3', 'Slot 4'}, "", true, function(State) -- could change to quest
+            local toState = State;
+            if type(toState) == 'string' then toState = {State} end;
+            typesoulsettings.slotselected = toState -- useskillselection 
+        end)
+        local inventorysafe = earlyaccess:AddDropdown("Inventory", inventory, "", true, function(State) -- could change to quest
+            local toState = State;
+            if type(toState) == 'string' then toState = {State} end;
+            typesoulsettings.selecttradeitem = toState -- useskillselection 
+        end)
+        -- earlyaccess:AddTextbox('Item To Spoof', nil, function(wasitem)
+        --     table.insert(typesoulsettings.selecttradeitem, wasitem)
+        --     azfakenotify(`Added {wasitem} to trade.`, 3)
+        -- end);
+        -- earlyaccess:AddButton('Clear Trade Spoof List', function()
+        --     typesoulsettings.selecttradeitem = {};
+        --     azfakenotify(`Cleared List.`, 3)
+        -- end)
+        earlyaccess:AddButton('Spoof Trade', function()
+            local formatted = table.concat(typesoulsettings.selecttradeitem,',')
+            local res = library:CheckForPermission(`Are you sure you want to Spoof {formatted}?`)
+            if res == false then return end;
+            local lengthofitem = #typesoulsettings.selecttradeitem
+            local lengthofslot = #typesoulsettings.slotselected
+            print(lengthofslot,lengthofitem)
+            local amountAssigned = 0;
+            local function getsameIndex(item) 
+                local toAssign = nil;
+                for i,v in next, typesoulsettings.slotselected do 
+                   -- print(i,v)
+                    if i == item then 
+                        --print(i,v)
+                        toAssign = v;
+                        break
+                    end;
+                end;
+                return toAssign
+            end;
+            --[[
+                table preview
+                itemselect = {'Hogyoku','Skill Box'}
+                slotselect = {'Slot 3', 'Slot 4'}
+                getsameindex returns what slot it should put it
+                v is the item name
+            ]]
+            local entityfolder = typesoulsettings.functions.getentityfolder();
+            local tradeEvent = entityfolder.CharacterHandler.Remotes.TradeEvent
+            for i,v in next, typesoulsettings.selecttradeitem do 
+                local objectReplacement = getsameIndex(i+1) 
+                --print(objectReplacement)
+                if objectReplacement then --string.find(objectr)
+                    objectReplacement = string.gsub(objectReplacement,'Slot','')
+                    objectReplacement = string.gsub(objectReplacement,' ','')
+                    objectReplacement = tonumber(objectReplacement);
+                    --print(objectReplacement)
+                    -- gives us 1 2 3 or 4
+                    localPlayer('fire', tradeEvent, 'AddItem', v, objectReplacement)
+                    print('spooffed')
+                end;
+                --:FireServer(ohString1, ohString2, ohNumber3)
+            end;
+        end);   -- {shouldcheck = true, ask = 'Are you sure you want to spoof?'}
         --workspace.NPCs.RaidBoss.Kisuke.ClickDetector
     end
     newother:AddToggle('No Animations',false,function(e)
