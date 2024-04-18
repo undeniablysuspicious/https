@@ -40205,6 +40205,8 @@ elseif universeid == 4871329703 then -- type soul
         sendtowebhook = false;
         sendurl = '';
         parrynotifications = false;
+        timetowait = 30;
+        kisukedelay = false;
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -41375,7 +41377,13 @@ elseif universeid == 4871329703 then -- type soul
                         --         sethiddenproperty(v.HumanoidRootPart, "NetworkIsSleeping", false)
                         --     end
                         -- end
-                        if (v.PrimaryPart and isnetworkowner(v.PrimaryPart) or v:FindFirstChild('HumanoidRootPart') and isnetworkowner(v.HumanoidRootPart)) and v:FindFirstChildWhichIsA('Humanoid') then 
+                        local isPrimaryPartOwner = false;
+                        for indexpart, part in next, v:GetChildren() do 
+                            if part:IsA('BasePart') and signals.findinstring(part.Name, 'Leg', 'Arm', 'Head', 'RootPart') then 
+                                isPrimaryPartOwner = true;
+                            end
+                        end;
+                        if (isPrimaryPartOwner == true or v.PrimaryPart and isnetworkowner(v.PrimaryPart) or v:FindFirstChild('HumanoidRootPart') and isnetworkowner(v.HumanoidRootPart)) and v:FindFirstChildWhichIsA('Humanoid') then 
                             print('network owner')
                             v:FindFirstChildWhichIsA('Humanoid').Health = 0
                             if v:FindFirstChild('Head') then 
@@ -41392,6 +41400,12 @@ elseif universeid == 4871329703 then -- type soul
         end)
         local webhooksend = newother:AddToggle('Send to Webhook',false,function(e, wasclicked)
             typesoulsettings.sendtowebhook = e;
+        end)
+        newother:AddSlider("Time To Wait", 0, 30, 120, 1, function(State)
+            typesoulsettings['timetowait'] = State
+        end)
+        newother:AddToggle('Wait Time Before Killing',false,function(e, wasclicked)
+            typesoulsettings.kisukedelay = e;
         end)
         local autokisuke = newother:AddToggle('Auto Kisuke',false,function(e, wasclicked)
             typesoulsettings.autokisuke = e;
@@ -41423,10 +41437,24 @@ elseif universeid == 4871329703 then -- type soul
                     if game.PlaceId == raidWorld then 
                         if playedIt == false then 
                             playedIt = true;
+                            local willTP = false;
+                            local saveEnemy = nil;
 
                             task.spawn(function()
                                 while task.wait(1) do 
                                     KisukeTime += 1
+                                    if typesoulsettings.kisukedelay == true and typesoulsettings. KisukeTime < typesoulsettings.timetowait and saveEnemy ~= nil then 
+                                        typesoulsettings.instakill = false;
+                                        localPlayer.rootPart.CFrame = saveEnemy.PrimaryPart.CFrame * CFrame.new(50,0,50)
+                                    else
+                                        if KisukeTime >= typesoulsettings.timetowait and typesoulsettings.kisukedelay == true then 
+                                            willTP = true;
+                                            typesoulsettings.instakill = true;
+                                        elseif typesoulsettings.kisukedelay == false then 
+                                            willTP = true;
+                                            typesoulsettings.instakill = true;
+                                        end
+                                    end;
                                 end
                             end)
 
@@ -41457,13 +41485,16 @@ elseif universeid == 4871329703 then -- type soul
                             for i,v in next, workspace:WaitForChild('Entities'):GetChildren() do 
                                 if not game.Players:GetPlayerFromCharacter(v) and v.PrimaryPart then 
                                     enemy = v;
+                                    saveEnemy = v;
                                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
                                     task.delay(4,function()
                                         usestop = false
                                     end)
                                     task.spawn(function()
                                         repeat 
-                                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
+                                            if willTP == true then 
+                                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
+                                            end
                                             task.wait()
                                         until usestop == true
                                     end)
