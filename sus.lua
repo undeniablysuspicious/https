@@ -8594,7 +8594,7 @@ metaforit.__call = function(_table,  ...) -- in our case the arguments are going
                 end
             end
             for i,v in next, otherArgs do 
-                print(i,v)
+                --print(i,v)
             end
             --table.remove(otherArgs, 2)
             return otherArgs
@@ -9144,6 +9144,13 @@ function signals.decode(string)
         newstring = newstring..tValue; 
     end
     return newstring
+end;
+function signals.findpartindir(dir)
+    local part = nil;
+    for i,v in next, dir:GetDescendants() do 
+        if v:IsA('BasePart') then part = v; break end;
+    end;   
+    return part; 
 end;
 --[[
     > character : ml_xy
@@ -40223,6 +40230,7 @@ elseif universeid == 4871329703 then -- type soul
         teleportKisukeBeforeUse = false;
         selecttradeitem = {};
         slotselected = {};
+        instateleport = false;
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -40521,6 +40529,9 @@ elseif universeid == 4871329703 then -- type soul
     sector:AddDropdown("NPC Teleport List", npclist, "", false, function(State)
         typesoulsettings.selectednpc = State 
     end)
+    sector:AddToggle("Instant NPC Teleport", false, function(State)
+        typesoulsettings.instateleport = State 
+    end)
     sector:AddButton("Teleport To NPC", function()
         if typesoulsettings.selectednpc == '' then return end;
         local obj = nil; --workspace.NPCs:FindFirstChild(typesoulsettings.selectednpc);
@@ -40533,7 +40544,25 @@ elseif universeid == 4871329703 then -- type soul
         if not tpPart then 
             tpPart = obj:FindFirstChildOfClass('BasePart')
         end;
-        typesoulsettings.functions.teleport(tpPart, 100)
+        if not tpPart then tpPart = signals.findpartindir(obj) end;
+        if not tpPart then
+            tpPart = obj.WorldPivot
+        end;
+        if typesoulsettings.instateleport == false then 
+            typesoulsettings.functions.teleport(tpPart, 100)
+        else
+            game.Players.LocalPlayer.Character.Head:Destroy()
+            local newAdd; newAdd = workspace.Entities.ChildAdded:Connect(function(b)
+                if b.Name == game.Players.LocalPlayer.Name then 
+                    local beentick = tick() --os.tick()
+                    repeat 
+                        task.wait()
+                        b.PrimaryPart.CFrame = tpPart; --workspace.NPCs.RaidBoss.Kisuke.WorldPivot
+                    until (tick() - beentick ) > 1
+                    newAdd:Disconnect()
+                end
+            end)
+        end
     end)
     sector:AddSeperator('-')
     local forentity = rightsect:AddDropdown("Entity List", entitylist, "Mobs", false, function(State) -- could change to quest
@@ -41639,13 +41668,19 @@ elseif universeid == 4871329703 then -- type soul
             local formatted = table.concat(typesoulsettings.selecttradeitem,',')
             local res = library:CheckForPermission(`Are you sure you want to Spoof {formatted}?`)
             if res == false then return end;
-            local lengthofitem = #typesoulsettings.selecttradeitem
-            local lengthofslot = #typesoulsettings.slotselected
-            print(lengthofslot,lengthofitem)
+            local lengthofitem = typesoulsettings.selecttradeitem
+            local lengthofslot = typesoulsettings.slotselected
+            --print(lengthofslot,lengthofitem)
+            for i,v in next, lengthofitem do 
+                if string.len(tostring(v)) <= 2 then table.remove(lengthofitem,i) print('rem',v) end
+            end
+            for i,v in next, lengthofslot do 
+                if string.len(tostring(v)) <= 2 then table.remove(lengthofslot,i)  print('rem',v) end -- lengthlengthofslotofitem
+            end
             local amountAssigned = 0;
             local function getsameIndex(item) 
                 local toAssign = nil;
-                for i,v in next, typesoulsettings.slotselected do 
+                for i,v in next, lengthofslot do 
                    -- print(i,v)
                     if i == item then 
                         --print(i,v)
@@ -41664,23 +41699,35 @@ elseif universeid == 4871329703 then -- type soul
             ]]
             local entityfolder = typesoulsettings.functions.getentityfolder();
             local tradeEvent = entityfolder.CharacterHandler.Remotes.TradeEvent
-            for i,v in next, typesoulsettings.selecttradeitem do 
-                local objectReplacement = getsameIndex(i+1) 
+            local justBreak = false;
+            for i,v in next, lengthofitem do
+                if justBreak == true then print(':justbreak') break end; 
+                local objectReplacement = getsameIndex(i) 
                 --print(objectReplacement)
-                if objectReplacement then --string.find(objectr)
+                if objectReplacement and string.len(tostring(v)) > 2 then --string.find(objectr)
+                    print(`{string.len(tostring(v))} Adding {v} To`,objectReplacement)
                     objectReplacement = string.gsub(objectReplacement,'Slot','')
                     objectReplacement = string.gsub(objectReplacement,' ','')
                     objectReplacement = tonumber(objectReplacement);
                     --print(objectReplacement)
                     -- gives us 1 2 3 or 4
                     localPlayer('fire', tradeEvent, 'AddItem', v, objectReplacement)
-                    print('spooffed')
+                    if #lengthofitem == 1 then 
+                        justBreak = true; --rtru
+                        for i=1,4 do 
+                            if i ~= objectReplacement then 
+                                localPlayer('fire', tradeEvent, 'AddItem', v, i)
+                            end
+                        end
+                    end
+                    --print('spooffed')
+                    task.wait(.5)
                 end;
                 --:FireServer(ohString1, ohString2, ohNumber3)
             end;
-            spof:AddKnowledge('Uses 1 of the item, Make sure u have only 1')
-            spof:ActivateKnowledge()
         end);   -- {shouldcheck = true, ask = 'Are you sure you want to spoof?'}
+        spof:AddKnowledge('Uses 1 of the item\nMake sure u have only 1')
+        spof:ActivateKnowledge()
         --workspace.NPCs.RaidBoss.Kisuke.ClickDetector
     end
     newother:AddToggle('No Animations',false,function(e)
