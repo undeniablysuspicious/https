@@ -9066,6 +9066,10 @@ end;
 function signals.loadIDE()
 
 end;  
+function signals.VirtualiseKeypress(letter, onoroff)
+    local inputManager = game.VirtualInputManager; --UserInputService
+    inputManager:SendKeyEvent(onoroff,Enum.KeyCode[letter],false,game)
+end;    
 
 signals.ENCODEMENT = {
 }
@@ -40231,6 +40235,7 @@ elseif universeid == 4871329703 then -- type soul
         selecttradeitem = {};
         slotselected = {};
         instateleport = false;
+        useparryvirtualiser = false;
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -40355,13 +40360,21 @@ elseif universeid == 4871329703 then -- type soul
         if typesoulsettings.m2beforeparry then 
             azfake:returndata().character.CharacterHandler.Remotes.M2:FireServer()
         end
-        typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Pressed")
+        if typesoulsettings.useparryvirtualiser == false then 
+            typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Pressed")
+        else
+            signals.VirtualiseKeypress('F', true)
+        end
         if hold then 
             task.wait(hold) -- @shouldve concealed
         else
             task.wait(0.1)
         end
-        typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Released")
+        if typesoulsettings.useparryvirtualiser == false then
+            typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Released")
+        else
+            signals.VirtualiseKeypress('F', false)
+        end
     end;
     typesoulsettings.functions.parrylist = function(tbl,  mob, dist ,anim)
         if not typesoulsettings.functions.getentityfolder() then return print('no entity folder') end;
@@ -40498,6 +40511,9 @@ elseif universeid == 4871329703 then -- type soul
     end)
     sector:AddToggle('Parry Notifications', false, function(e)
         typesoulsettings.parrynotifications = e;
+    end)
+    sector:AddToggle('Virtualise Parry Keypress', false, function(e)
+        typesoulsettings.useparryvirtualiser = e;
     end)
     -- sector:AddToggle('Auto Feint', false, function(e)
     --     typesoulsettings.m2beforeparry = e;
@@ -40940,7 +40956,7 @@ elseif universeid == 4871329703 then -- type soul
                     local function claimLootbox(item, lootbox)
                         if tpPart and checkdist(10, tpPart) then 
                             print('[pciked]')
-                            local inputManager = game.UserInputService
+                            local inputManager = game.VirtualInputManager; --UserInputService
                             inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
                             task.wait(.03)
                             inputManager:SendKeyEvent(false,Enum.KeyCode.W,false,game)
