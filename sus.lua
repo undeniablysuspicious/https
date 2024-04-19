@@ -40297,7 +40297,7 @@ elseif universeid == 4871329703 then -- type soul
                 pos = pos:FindFirstChildOfClass('BasePart').Position
             end
         end;
-        if not pos then print('aint no way u checking distance with no pos') end;
+        if not pos then print('aint no way u checking distance with no pos, ',tostring(range)) return end;
         local b = false;
         if azfake:returndata().humanoidrootpart then 
             local rootPart = azfake:returndata().humanoidrootpart
@@ -40395,6 +40395,7 @@ elseif universeid == 4871329703 then -- type soul
     local function makeBlockRange(dist, info) -- makeBlockRange(15, {delay = 0.7, holdtime = 1})
         if not typesoulsettings.functions.getentityfolder() then return print('no entity folder') end;
         local rootPart = azfake:returndata().humanoidrootpart
+        if not rootPart then return end;
         --local dist
         if not checkdist(dist, rootPart) then 
             return;
@@ -42416,8 +42417,10 @@ elseif universeid == 4871329703 then -- type soul
         -- flower passage
         parryAnims['14068932670'] = function(mob, anim ,id)
             task.spawn(function()
-                repeat task.wait() until checkdist(8, mob.PrimaryPart)
-                typesoulsettings.functions.parrylist({0}, mob, 10, anim)
+                repeat task.wait() until checkdist(8, mob.PrimaryPart) or not mob.PrimaryPart
+                if mob.PrimaryPart and anim.IsPlaying then 
+                    typesoulsettings.functions.parrylist({0}, mob, 10, anim)
+                end
             end)
         end;
 
