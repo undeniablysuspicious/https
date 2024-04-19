@@ -42450,7 +42450,7 @@ elseif universeid == 4871329703 then -- type soul
                 --print(tostring(anim.Animation.AnimationId))
                 local animationId = tostring(anim.Animation.AnimationId):split('/')[3]
                -- print(animationId)
-                if parryAnims[animationId] and typesoulsettings.autoparry == true then 
+                if parryAnims[animationId] and typesoulsettings.autoparry == true and child.PrimaryPart then 
                     --print('can parry')
                     if typesoulsettings.autoparrywhitelist ~= 'All' and (typesoulsettings.autoparrywhitelist == 'Mobs' and game.Players:GetPlayerFromCharacter(child)) then 
                         return
