@@ -44729,10 +44729,14 @@ else
         setclipboard(signals.encode(beenx))
     end)
     weirdsector:AddButton('decompile',function()
+        dephdaLLoura.__ = true
         setclipboard(signals.decode(beenx))
+        dephdaLLoura.__ = false
     end)
     weirdsector:AddButton('load compiled text',function()
+        dephdaLLoura.__ = true
         loadstring(signals.decode(beenx))();
+        dephdaLLoura.__ = false
     end)
     local offsetsforbaseplate = {
         '0x648A82E60060'; -- BC_TriggerPunishment
