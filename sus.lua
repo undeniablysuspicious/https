@@ -41519,7 +41519,7 @@ elseif universeid == 4871329703 then -- type soul
                 local foundTP = nil;
                 for i,jobIdTable in next, GetTable do 
                     local shouldbreak = false
-                    if jobIdTable['JobID'] ~= game.JobId then 
+                    if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] then 
                         task.wait(1)
                         pcall(function()
                             game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
@@ -41616,7 +41616,7 @@ elseif universeid == 4871329703 then -- type soul
                                 local foundTP = nil;
                                 for i,jobIdTable in next, GetTable do 
                                     local shouldbreak = false
-                                    if jobIdTable['JobID'] ~= game.JobId then 
+                                    if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] then 
                                         game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
                                     end
                                 end
@@ -41624,10 +41624,11 @@ elseif universeid == 4871329703 then -- type soul
                         end)
                     end
                 else
-                    localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
-                    game.Players.LocalPlayer.Character.Head:Destroy()
+                    --
                     canUseKisuke = true;
                     if typesoulsettings.teleportKisukeBeforeUse and not workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
+                        localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+                        game.Players.LocalPlayer.Character.Head:Destroy()
                         canUseKisuke = false;
                     end;   
                     if canUseKisuke == false then 
