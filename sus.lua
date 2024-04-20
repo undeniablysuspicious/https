@@ -41648,9 +41648,11 @@ elseif universeid == 4871329703 then -- type soul
                         local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer("Karakura Town")
                         if not GetTable then return end;
                         local foundTP = nil;
+                        local ind = 0
                         for i,jobIdTable in next, GetTable do 
                             local shouldbreak = false
-                            if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] and i > 10 and jobIdTable['ServerPlayers'] < 15 then 
+                            ind += 1
+                            if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] and ind > 10 and jobIdTable['ServerPlayers'] < 15 then 
                                 game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
                             end
                         end
