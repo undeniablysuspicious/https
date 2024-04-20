@@ -41650,7 +41650,7 @@ elseif universeid == 4871329703 then -- type soul
                         local foundTP = nil;
                         for i,jobIdTable in next, GetTable do 
                             local shouldbreak = false
-                            if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] and jobIdTable then 
+                            if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] and jobIdTable['ServerPlayers'] < 15 then 
                                 game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
                             end
                         end
