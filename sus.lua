@@ -40237,6 +40237,7 @@ elseif universeid == 4871329703 then -- type soul
         instateleport = false;
         useparryvirtualiser = false;
         useparrytiming = false;
+        listoneitemonfour = false;
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -41734,6 +41735,9 @@ elseif universeid == 4871329703 then -- type soul
             if type(toState) == 'string' then toState = {State} end;
             typesoulsettings.selecttradeitem = toState -- useskillselection 
         end)
+        newother:AddToggle('List One Item All Four',false,function(e, wasclicked)
+            typesoulsettings.listoneitemonfour = e;
+        end)
         -- earlyaccess:AddTextbox('Item To Spoof', nil, function(wasitem)
         --     table.insert(typesoulsettings.selecttradeitem, wasitem)
         --     azfakenotify(`Added {wasitem} to trade.`, 3)
@@ -41790,7 +41794,7 @@ elseif universeid == 4871329703 then -- type soul
                     --print(objectReplacement)
                     -- gives us 1 2 3 or 4
                     localPlayer('fire', tradeEvent, 'AddItem', v, objectReplacement)
-                    if #lengthofitem == 1 then 
+                    if #lengthofitem == 1 and typesoulsettings.listoneitemonfour == true then -- t yep  tep    t y e  p s o
                         justBreak = true; --rtru
                         for i=1,4 do 
                             if i ~= objectReplacement then 
