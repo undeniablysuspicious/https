@@ -41389,6 +41389,7 @@ elseif universeid == 4871329703 then -- type soul
     end)
     print(LRM_UserNote,LRM_LinkedDiscordID,LRM_TotalExecutions,LRM_SecondsLeft )
     local KisukeTime = 0
+    local EnemyTime = 0;
     game.Players.LocalPlayer.PlayerGui.ScreenEffects.ChildAdded:Connect(function(child)
         task.wait(.2)
         if child.Name == 'ItemFrame' and typesoulsettings.autokisuke and typesoulsettings.sendtowebhook then
@@ -41413,6 +41414,11 @@ elseif universeid == 4871329703 then -- type soul
                         {
                             ['name'] = 'Time Elasped';
                             ['value'] = tostring(KisukeTime);
+                            ['inline'] = true;
+                        };
+                        {
+                            ['name'] = 'Time After Enemy Spawned';
+                            ['value'] = tostring(EnemyTime);
                             ['inline'] = true;
                         };
                         -- { -- amount of skillboxes
@@ -41537,6 +41543,9 @@ elseif universeid == 4871329703 then -- type soul
                         task.spawn(function()
                             while task.wait(1) do 
                                 KisukeTime += 1
+                                if saveEnemy then 
+                                    EnemyTime += 1
+                                end;
                                 if typesoulsettings.kisukedelay == true and typesoulsettings. KisukeTime < typesoulsettings.timetowait and saveEnemy ~= nil then 
                                     typesoulsettings.instakill = false;
                                     localPlayer.rootPart.CFrame = saveEnemy.PrimaryPart.CFrame * CFrame.new(50,0,50)
