@@ -41415,7 +41415,7 @@ elseif universeid == 4871329703 then -- type soul
     newother:AddSeperator('-')
     local KisukeTime = 0
     local EnemyTime = 0;
-    game.Players.LocalPlayer.PlayerGui.ScreenEffects.ChildAdded:Connect(function(child)
+    game.Players.LocalPlayer.PlayerGui:WaitForChild('ScreenEffects').ChildAdded:Connect(function(child)
         task.wait(.2)
         if child.Name == 'ItemFrame' and typesoulsettings.autokisuke and typesoulsettings.sendtowebhook then
             local KisukeData = {
@@ -41758,7 +41758,16 @@ elseif universeid == 4871329703 then -- type soul
             local toState = State;
             if type(toState) == 'string' then toState = {State} end;
             typesoulsettings.selecttradeitem = toState -- useskillselection 
-        end, 'AUTOLOADNOSAVEMENT') -- DONTSAVE AUTOLOADNOSAVEMENT  DONTSAVE
+        end) -- DONTSAVE AUTOLOADNOSAVEMENT  DONTSAVE
+        earlyaccess:AddButton('Update Inventory', function()
+            for i,v in next, inventorysafe.defaultitems do 
+                inventorysafe:Remove(v);
+            end
+            for i,v in next, getInventory() do 
+                inventorysafe:Add(v)
+            end
+        end)
+        inventorysafe.dontsave = true;
         earlyaccess:AddToggle('List One Item All Four',false,function(e, wasclicked)
             typesoulsettings.listoneitemonfour = e;
         end)
