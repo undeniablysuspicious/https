@@ -40242,6 +40242,10 @@ elseif universeid == 4871329703 then -- type soul
         useparryvirtualiser = false;
         useparrytiming = false;
         listoneitemonfour = false;
+        autobongbong = false;
+        skipserver = 0;
+        skipservertgl = false;
+        lookataxiszyxy = false;
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -40522,6 +40526,9 @@ elseif universeid == 4871329703 then -- type soul
     sector:AddToggle('Virtualise Parry Keypress', false, function(e)
         typesoulsettings.useparryvirtualiser = e;
     end)
+    sector:AddToggle('Look AXIS XZ', false, function(e)
+        typesoulsettings.lookataxiszyxy = e;
+    end)
     sector:AddToggle('Automatic Timings', false, function(e)
         typesoulsettings.useparrytiming = e;
     end)
@@ -40734,6 +40741,12 @@ elseif universeid == 4871329703 then -- type soul
             azfake:returndata().character:FindFirstChild('Head'):Destroy();
         end;
     end)
+    lefttab:AddSlider("Servers to Skip", 0, 0, 300, 1, function(State) -- 150
+        typesoulsettings.skipserver = State -- farmrot
+    end)
+    lefttab:AddToggle('Use Skip Server', false, function(e)
+        typesoulsettings.skipservertgl = e;
+    end)
     lefttab:AddButton('Serverhop', function()
         local gameIDS = {}
         gameIDS[14069122388] = "Hueco Mundo"
@@ -40760,9 +40773,15 @@ elseif universeid == 4871329703 then -- type soul
             print('waited get cooldown')
         end
         local foundTP = nil;
+        local index = 0
         for i,jobIdTable in next, GetTable do 
+            index += 1
             local shouldbreak = false
-            if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] then 
+            if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] and (typesoulsettings.skipservertgl == false and true or index > typesoulsettings.skipserver) then 
+                if typesoulsettings.skipservertgl == true then 
+                    azfakenotify(`skipping {typesoulsettings.skipserver} servers. [{typesoulsettings.skipserver}vs{index}:{index>typesoulsettings.skipserver}]`, 3) 
+                    task.wait(.5)
+                end
                 game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(GameName,jobIdTable['JobID'])
                 break
             end
@@ -41393,6 +41412,7 @@ elseif universeid == 4871329703 then -- type soul
         typesoulsettings['flashstepspeed'] = State
     end)
     print(LRM_UserNote,LRM_LinkedDiscordID,LRM_TotalExecutions,LRM_SecondsLeft )
+    newother:AddSeperator('-')
     local KisukeTime = 0
     local EnemyTime = 0;
     game.Players.LocalPlayer.PlayerGui.ScreenEffects.ChildAdded:Connect(function(child)
@@ -42737,8 +42757,24 @@ elseif universeid == 4871329703 then -- type soul
                         --print(child.Name..' has no part to detect distance')
                         return
                     end;
+                    local function attemptLookat()
+                        if typesoulsettings.lookataxiszyxy then 
+                            signals.conceal(function()
+                                for i = 1, 10 do 
+                                    task.wait(0.05);
+                                    local targetPosition = objdist.Position;
+                                    local sourcePosition = localPlayer.rootPart.Position
+                                    local targetVector = Vector3.new(targetPosition.X, sourcePosition.Y, targetPosition.Z);
+                                    --local cframe = CFrame.lookAt(sourcePosition, targetVector)
+                                    localPlayer.rootPart.CFrame = CFrame.new(localPlayer.rootPart.Position, targetVector)
+                                end
+                            end)
+                        end
+                    end;
                     if IsAnimationIdRegistered == false and hasHitframe or typesoulsettings.useparrytiming and hasHitframe then 
                         if objdist and checkdist(typesoulsettings.autoparrydistance,objdist) then 
+                            --
+                            attemptLookat();
                             signals.conceal(function()
                                 local timetowait = hasHitframe - 0.15
                                 if typesoulsettings.pingadjuster > 0  then 
@@ -42774,6 +42810,7 @@ elseif universeid == 4871329703 then -- type soul
                     end
                     -- where objdist was
                     if objdist and checkdist(typesoulsettings.autoparrydistance,objdist) then 
+                        attemptLookat()
                         print('parrying ',animationId);
                         if typesoulsettings.parrynotifications then 
                             azfakenotify(`parrying {parryAnims[animationId]}`,5)
