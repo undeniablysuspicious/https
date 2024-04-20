@@ -41802,10 +41802,11 @@ elseif universeid == 4871329703 then -- type soul
                                     X = workspace.CurrentCamera.ViewportSize.X/2;
                                     Y = workspace.CurrentCamera.ViewportSize.Y/2;
                                 }
+                                inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,true,game,0) -- 1319,574
+                                task.wait(0.1)
+                                inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,false,game,0)
                                 for i=1, 10 do 
-                                    inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,true,game,0) -- 1319,574
-                                    task.wait(0.1)
-                                    inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,false,game,0)
+                                    task.wait(.1)
                                 end
                                 print('prssed')
                                 --task.wait(1)
