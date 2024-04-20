@@ -41627,8 +41627,11 @@ elseif universeid == 4871329703 then -- type soul
                     --
                     canUseKisuke = true;
                     if typesoulsettings.teleportKisukeBeforeUse and not workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
-                        localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
-                        game.Players.LocalPlayer.Character.Head:Destroy()
+                        --
+                        if localPlayer.character:FindFirstChild('Head') then 
+                            localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+                            game.Players.LocalPlayer.Character.Head:Destroy()
+                        end
                         canUseKisuke = false;
                     end;   
                     if canUseKisuke == false then 
