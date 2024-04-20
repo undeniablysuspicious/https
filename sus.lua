@@ -41525,6 +41525,7 @@ elseif universeid == 4871329703 then -- type soul
         -- local newrem = Instance.new('RemoteEvent', game.Players.LocalPlayer); newrem.Name = 'Kisuke';
         -- newrem:FireServer('Yes')
         local playedIt = false;
+        local hasAttemptedToTeleport = false;
         maid.autokisukectn = signals.heartbeat:connect('kisuke tp', function()--game.RunService:Connect(function())
             local basicworld = {14069678431, 17047374266}
             local raidWorld = 17047374266
@@ -41643,8 +41644,20 @@ elseif universeid == 4871329703 then -- type soul
                     end
                 else
                     --
+                    task.delay(10,function()
+                        local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer("Karakura Town")
+                        if not GetTable then return end;
+                        local foundTP = nil;
+                        for i,jobIdTable in next, GetTable do 
+                            local shouldbreak = false
+                            if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] then 
+                                game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
+                            end
+                        end
+                    end)
                     canUseKisuke = true;
-                    if typesoulsettings.teleportKisukeBeforeUse and not workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
+                    if hasAttemptedToTeleport == false and typesoulsettings.teleportKisukeBeforeUse and not workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
+                        hasAttemptedToTeleport = true
                         --
                         if localPlayer.character:FindFirstChild('Head') then 
                             localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
@@ -41664,6 +41677,7 @@ elseif universeid == 4871329703 then -- type soul
                                 until not b or workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')
                                 if workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
                                     canUseKisuke = true;
+                                    hasAttemptedToTeleport = false;
                                 end
                             end
                         end)
