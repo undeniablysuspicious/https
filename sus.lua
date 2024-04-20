@@ -41746,6 +41746,26 @@ elseif universeid == 4871329703 then -- type soul
         --     typesoulsettings.selecttradeitem = {};
         --     azfakenotify(`Cleared List.`, 3)
         -- end)
+        local bong = earlyaccess:AddButton('Bong Bong Item', function()
+            local newtable = typesoulsettings.selecttradeitem;
+            table.remove(newtable,1)
+            local formatted = table.concat(newtable,',')
+            local res = library:CheckForPermission(`Are you sure you want to use bong bong on {formatted}? Make sure you only have 1 of the item.`)
+            if res == false then return end;
+            local ohTable1 = {
+
+            }
+            for i=1, 10 do 
+                ohTable1[i] = {
+                    ["ID"] = game.HttpService:GenerateGUID(false),
+                    ["ItemName"] = newtable[1],
+                    ["Rarity"] = "Legendary"
+                }
+            end
+            local exnchanger = game:GetService("Players").LocalPlayer.PlayerGui["EXECHANGE ITEM"].RemoteEvent; --:FireServer(ohTable1)
+            localPlayer('fire', exnchanger, ohTable1)
+            azfakenotify('BONG BONGED '..newtable[1], 3)
+        end);
         local spof = earlyaccess:AddButton('Spoof Trade', function()
             local formatted = table.concat(typesoulsettings.selecttradeitem,',')
             local res = library:CheckForPermission(`Are you sure you want to Spoof {formatted}?`)
