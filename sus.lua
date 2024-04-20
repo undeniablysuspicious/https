@@ -40634,7 +40634,7 @@ elseif universeid == 4871329703 then -- type soul
         typesoulsettings.autouseskills = e;
     end)
     local concurrentdialogueframe
-    game.Players.LocalPlayer.PlayerGui.DialogueUI.ChildAdded:Connect(function(child)
+    game.Players.LocalPlayer.PlayerGui:WaitForChild('DialogueUI').ChildAdded:Connect(function(child)
         concurrentdialogueframe = child;
     end)
     local justresettofix = false;
@@ -41491,6 +41491,15 @@ elseif universeid == 4871329703 then -- type soul
         end)
     end)
     wasinsta.info = {shouldcheck =  true, ask = 'This may only work on bosses.'} -- shouldask  This might not work. Still use?
+
+    local butokw = newother:AddButton('Method 2 Instant Ownership', function()
+        local res = library:CheckForPermission(`Are you sure you want attempt to insta kill? This kills you.`)
+        if res == false then return end;
+        if localPlayer.character:FindFirstChild('Head') then 
+            localPlayer.character:FindFirstChild('Head'):Destroy()
+        end;    
+    end)
+    newother:CreateHintOnItem(butokw,'This tries to kill you to gain ownership.')
     newother:AddTextbox('Kisuke Webhook',nil,function(e)
         typesoulsettings.sendurl = e;
     end)
