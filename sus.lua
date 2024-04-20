@@ -41632,10 +41632,10 @@ elseif universeid == 4871329703 then -- type soul
                             task.delay(0.5,function()
                                 local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer("Karakura Town")
                                 if not GetTable then return end;
-                                local foundTP = nil;
+                                local foundTP = nil; -- GameVersion
                                 for i,jobIdTable in next, GetTable do 
                                     local shouldbreak = false
-                                    if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] then 
+                                    if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] and tonumber(jobIdTable['ServerPlayers']) < 15 then 
                                         game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
                                     end
                                 end
@@ -41650,7 +41650,7 @@ elseif universeid == 4871329703 then -- type soul
                         local foundTP = nil;
                         for i,jobIdTable in next, GetTable do 
                             local shouldbreak = false
-                            if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] then 
+                            if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] and jobIdTable then 
                                 game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
                             end
                         end
