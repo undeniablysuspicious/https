@@ -8604,6 +8604,10 @@ metaforit.__call = function(_table,  ...) -- in our case the arguments are going
             remote:FireServer(unpack(NewArguments))
         elseif remote.ClassName == 'RemoteFunction' then 
             remote:InvokeServer(unpack(NewArguments))
+        elseif remote.ClassName == 'ClickDetector' then 
+            fireclickdetector(remote) -- remtoe;
+        elseif remote.ClassName == 'ProximityPrompt' then 
+            fireproximityprompt(remote) -- remtoe;
         end;    
 
         return true
@@ -40560,7 +40564,7 @@ elseif universeid == 4871329703 then -- type soul
         if typesoulsettings.selectednpc == '' then return end;
         local obj = nil; --workspace.NPCs:FindFirstChild(typesoulsettings.selectednpc);
         for i,v in next, workspace.NPCs:GetDescendants() do 
-            if v.Name == typesoulsettings.selectednpc then obj = v break end;
+            if v.Name == typesoulsettings.selectednpc and v:IsA('Model') then obj = v break end;
         end;
         if not obj then return azfakenotify('couldnt find npc??', 3) end;
         azfakenotify('Teleporting to, '..obj.Name,3)
@@ -41735,7 +41739,7 @@ elseif universeid == 4871329703 then -- type soul
             if type(toState) == 'string' then toState = {State} end;
             typesoulsettings.selecttradeitem = toState -- useskillselection 
         end, 'AUTOLOADNOSAVEMENT') -- DONTSAVE AUTOLOADNOSAVEMENT  DONTSAVE
-        newother:AddToggle('List One Item All Four',false,function(e, wasclicked)
+        earlyaccess:AddToggle('List One Item All Four',false,function(e, wasclicked)
             typesoulsettings.listoneitemonfour = e;
         end)
         -- earlyaccess:AddTextbox('Item To Spoof', nil, function(wasitem)
@@ -41746,12 +41750,175 @@ elseif universeid == 4871329703 then -- type soul
         --     typesoulsettings.selecttradeitem = {};
         --     azfakenotify(`Cleared List.`, 3)
         -- end)
+        earlyaccess:AddToggle('Auto BONG BONG',false,function(e, wasclicked)
+            if not wasclicked then return end;
+            local newtable = typesoulsettings.selecttradeitem;
+            if #newtable >= 2 then table.remove(newtable,1) end;
+            -- local formatted = table.concat(newtable,',')
+            -- local res = library:CheckForPermission(`Are you sure you want to use bong bong on\n{newtable[1]}? Make sure you only have 1\nof the item.`)
+            -- if res == false then return end;
+            if #newtable == 0 then azfakenotify('no item sdelect', 3) return end;
+            local toBong = newtable[1]
+
+            typesoulsettings.autobongbong = e;
+            if not e then 
+                maid.bonging = nil;
+                -- game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, game.JobId)
+                return;
+            end
+            local bongfarm = 'nothing'
+            local bongdelay = false;
+            local nelnpc = workspace:WaitForChild('NPCs'):WaitForChild('Nel'):WaitForChild('Nel')
+            local bongnpc = workspace:WaitForChild('NPCs'):WaitForChild('Exechange'):WaitForChild('BONG BONG')
+            local inputManager = game.VirtualInputManager
+            local m = game.Players.LocalPlayer:GetMouse()
+            game.Players.LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
+                task.wait(.1)
+                if child.Name == 'Storing' then 
+                    child:WaitForChild('MainFrame').Size = UDim2.new(1,1,1,1)
+                    child:WaitForChild('MainFrame').Position = UDim2.new(0.5,0,0.5,0)
+                    child:WaitForChild('MainFrame'):WaitForChild('StorageFrame').ZIndex = 1000
+                    child:WaitForChild('MainFrame'):WaitForChild('StorageFrame').Size = UDim2.new(2,2,2,2)
+                    child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List').Size = UDim2.new(0.5,0,0.5,0) --UDim2.new(2,2,2,2)
+                    child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List').ZIndex = 1000
+                    --child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):FindFirstChild('UIListLayout'):Destroy(); --LiS
+                    if child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):FindFirstChild('UIGridLayout') then 
+                        child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):FindFirstChild('UIGridLayout'):Destroy()
+                    end
+                    -- {0, 500}, {0, 200} StoraegFrame
+                    child:WaitForChild('MainFrame'):WaitForChild('StorageFrame').Position = UDim2.new(0.5, 0, 0.5, 0)
+                    child:WaitForChild('MainFrame'):WaitForChild('StorageFrame').List.Position = UDim2.new(0.5,0,0.5,0)
+                    for i,v in next, child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):GetChildren() do 
+                        if v:FindFirstChild('AddItem') then 
+                            if v.AddItem.Text:find(toBong) then -- 
+                                print('found')
+                                v.Size = UDim2.new(1,1,1,1)
+                                --v.AddItem.
+                                --v.AddItem.Size = UDim2.new(4,4,4,4)
+                                v.ZIndex = 999
+                                --v.AddItem.ZIndex = 1000
+                                task.wait(0.1)
+                                local toPress = {
+                                    X = workspace.CurrentCamera.ViewportSize.X/2;
+                                    Y = workspace.CurrentCamera.ViewportSize.Y/2;
+                                }
+                                for i=1, 10 do 
+                                    inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,true,game,0) -- 1319,574
+                                    task.wait(0.1)
+                                    inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,false,game,0)
+                                end
+                                print('prssed')
+                                --task.wait(1)
+                                child:Destroy()
+                                break
+                            end
+                        end
+                    end
+                    --child:WaitForChild('MainFrame').Size = UDim2.new(5,5,5,5)
+                end
+            end)
+            local function instantTeleport(teleportNpc)
+                -- if teleportNpc == nelnpc  then 
+                --     r = workspace:WaitForChild('NPCs'):WaitForChild('Nel'):WaitForChild('Nel')
+                --     local inputManager = game:GetService('VirtualInputManager')  
+                --     t = tick()
+                --     repeat
+                --     if game.Players.LocalPlayer:FindFirstChild('Nel') then 
+                --     game.Players.LocalPlayer:FindFirstChild('Nel'):FireServer('Yes')
+                --     game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
+                --     else
+
+                --     fireclickdetector(r.ClickDetector)
+                --     end
+
+                --     game.Players.LocalPlayer.Character.PrimaryPart.CFrame = r.WorldPivot
+
+                --     task.wait()
+                --     until tick() - t > 1
+                --     --fireclickdetecotr
+                --     return;
+                -- end;
+                -- if teleportNpc == nelnpc then 
+                --     repeat 
+                --         task.wait() 
+                --         localPlayer.character.PrimaryPart.CFrame = teleportNpc.WorldPivot; -- chaa racter
+                --         game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
+                --     until localPlayer.character.Humanoid.Health <= 0
+                --     print('shouldve got')
+                -- end
+                localPlayer.character.Head:Destroy();
+                local completed = false;
+                local ctn; ctn = workspace.Entities.ChildAdded:Connect(function(xyzc)
+                    task.wait(.1)
+                    if xyzc.Name == localPlayer.instance.Name then 
+                        local timeTakebnk = tick();
+                        repeat
+                            task.wait()
+                            if xyzc.PrimaryPart then 
+                                xyzc.PrimaryPart.CFrame = teleportNpc.WorldPivot;
+                            end; -- ajnd
+                        until tick() - timeTakebnk > 0.5 and teleportNpc:FindFirstChild('HumanoidRootPart')
+                        completed = true;
+                    end;
+                end)
+                repeat task.wait() until completed == true;
+            end;    
+            localPlayer.instance.ChildAdded:Connect(function(remote)
+                if bongfarm == 'teleportedtonel' then 
+                    azfakenotify('on nel dialogue', 2)
+                    bongfarm:FireServer('Yes')
+                elseif bongfarm == 'teleportedtobong' then 
+                    azfakenotify('on bong dialogue', 2)
+                    remote:FireServer('Yes')       
+                end
+            end)
+            maid.bonging = signals.heartbeat:connect('@bonging', function()
+                if bongfarm == 'nothing' and bongdelay == false then 
+                    bongdelay = true;
+                    bongfarm = 'teleportingtonel'
+                    -- get 1 of item;
+                    instantTeleport(nelnpc)
+                    
+                    bongfarm = 'teleportedtonel';
+                    game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
+                    --localPlayer('fire', nelnpc.ClickDetector); --fireclickdetector(nelnpc.ClickDetector);
+                    task.wait(.2);
+                    azfakenotify('shouldve taken item!!!!!!!', 2)
+                    bongfarm = 'teleportotbong';
+                    bongdelay = false;
+                elseif bongfarm == 'teleportotbong' and bongdelay == false then 
+                    bongdelay = true;
+                    bongfarm = 'willtptobong';
+                    instantTeleport(bongnpc); -- bonnp
+                    bongfarm = 'teleportedtobong';
+                    localPlayer('fire', bongnpc.ClickDetector); --
+                    task.wait(.2);
+                    repeat task.wait() localPlayer('fire', bongnpc.ClickDetector); until localPlayer.instance.PlayerGui:FindFirstChild('EXECHANGE ITEM')
+                    local exchangeGui = localPlayer.instance.PlayerGui:FindFirstChild('EXECHANGE ITEM');
+                    local exchangeRemote = exchangeGui.RemoteEvent;
+                    local fire_bvong = { }
+                    for i=1, 10 do 
+                        fire_bvong[i] = {
+                            ["ID"] = game.HttpService:GenerateGUID(false),
+                            ["ItemName"] = toBong,
+                            ["Rarity"] = "Legendary"
+                        }
+                    end
+                    localPlayer('fire', exchangeRemote, fire_bvong)
+                    task.wait(.1)
+                    azfakenotify('bongged', 2);
+                    task.wait(.5);
+                    bongfarm = 'nothing';
+                    bongdelay = false;
+                end;
+            end);
+        end)
         local bong = earlyaccess:AddButton('Bong Bong Item', function()
             local newtable = typesoulsettings.selecttradeitem;
             if #newtable >= 2 then table.remove(newtable,1) end;
-            local formatted = table.concat(newtable,',')
-            local res = library:CheckForPermission(`Are you sure you want to use bong bong on\n{newtable[1]}? Make sure you only have 1\nof the item.`)
-            if res == false then return end;
+            -- local formatted = table.concat(newtable,',')
+            -- local res = library:CheckForPermission(`Are you sure you want to use bong bong on\n{newtable[1]}? Make sure you only have 1\nof the item.`)
+            -- if res == false then return end;
             local ohTable1 = {
 
             }
@@ -41766,6 +41933,7 @@ elseif universeid == 4871329703 then -- type soul
             localPlayer('fire', exnchanger, ohTable1)
             azfakenotify('BONG BONGED '..newtable[1], 3)
         end);
+        bong.info = {shouldcheck =  true, ask = 'Are you sure?'}
         local spof = earlyaccess:AddButton('Spoof Trade', function()
             local formatted = table.concat(typesoulsettings.selecttradeitem,',')
             local res = library:CheckForPermission(`Are you sure you want to Spoof {formatted}?`)
