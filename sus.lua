@@ -41734,7 +41734,7 @@ elseif universeid == 4871329703 then -- type soul
             local toState = State;
             if type(toState) == 'string' then toState = {State} end;
             typesoulsettings.selecttradeitem = toState -- useskillselection 
-        end)
+        end, 'AUTOLOADNOSAVEMENT') -- DONTSAVE AUTOLOADNOSAVEMENT  DONTSAVE
         newother:AddToggle('List One Item All Four',false,function(e, wasclicked)
             typesoulsettings.listoneitemonfour = e;
         end)
@@ -41748,9 +41748,9 @@ elseif universeid == 4871329703 then -- type soul
         -- end)
         local bong = earlyaccess:AddButton('Bong Bong Item', function()
             local newtable = typesoulsettings.selecttradeitem;
-            table.remove(newtable,1)
+            if #newtable >= 2 then table.remove(newtable,1) end;
             local formatted = table.concat(newtable,',')
-            local res = library:CheckForPermission(`Are you sure you want to use bong bong on {formatted}? Make sure you only have 1 of the item.`)
+            local res = library:CheckForPermission(`Are you sure you want to use bong bong on\n{newtable[1]}? Make sure you only have 1\nof the item.`)
             if res == false then return end;
             local ohTable1 = {
 
