@@ -68,7 +68,7 @@ local LRM_UserNote
 local LRM_LinkedDiscordID 
 local LRM_TotalExecutions 
 local LRM_SecondsLeft 
-local AccessToLoadstring = getgenv().dephdaLLoura
+local AccessToLoadstring = getgenv().dephdaLLoura or {}
 if luraphsettings then 
     LRM_UserNote = luraphsettings.LRM_UserNote;
     LRM_LinkedDiscordID = luraphsettings.LRM_LinkedDiscordID;
@@ -40236,6 +40236,7 @@ elseif universeid == 4871329703 then -- type soul
         slotselected = {};
         instateleport = false;
         useparryvirtualiser = false;
+        useparrytiming = false;
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -40516,18 +40517,23 @@ elseif universeid == 4871329703 then -- type soul
     sector:AddToggle('Virtualise Parry Keypress', false, function(e)
         typesoulsettings.useparryvirtualiser = e;
     end)
+    sector:AddToggle('Automatic Timings', false, function(e)
+        typesoulsettings.useparrytiming = e;
+    end)
     -- sector:AddToggle('Auto Feint', false, function(e)
     --     typesoulsettings.m2beforeparry = e;
     -- end)
     sector:AddSlider("Auto Parry Distance", 0, 0, 100, 1, function(State)
         typesoulsettings.autoparrydistance = State -- deepwtykensettings  typesoulsettings
     end)
-    sector:AddSlider("Parry Ping Adjuster", 0, 0, 100, 1, function(State)
+    local pingadjust = sector:AddSlider("Parry Ping Adjuster", 0, 0, 100, 1, function(State)
         typesoulsettings.pingadjuster = State -- deepwtykensettings  typesoulsettings pingadjust
     end)
-    sector:AddSlider("Parry Latency Adjuster", 0, 0, 100, 1, function(State)
+    local latency = sector:AddSlider("Parry Latency Adjuster", 0, 0, 100, 1, function(State)
         typesoulsettings.latencyadjuster = State -- deepwtykensettings  typesoulsettings pingadjust
     end)
+    sector:CreateHintOnItem(latency,'How late it will parry')
+    sector:CreateHintOnItem(pingadjust,'How early it will parry')
     --
     --
 
@@ -42450,7 +42456,12 @@ elseif universeid == 4871329703 then -- type soul
                 --print(tostring(anim.Animation.AnimationId))
                 local animationId = tostring(anim.Animation.AnimationId):split('/')[3]
                -- print(animationId)
-                if parryAnims[animationId] and typesoulsettings.autoparry == true and child.PrimaryPart then 
+                local IsAnimationIdRegistered = parryAnims[animationId]; --false
+                local hasHitframe = nil;
+                pcall(function()
+                    hasHitframe = anim:GetTimeOfKeyframe('HitFrame');
+                end)
+                if (IsAnimationIdRegistered or hasHitframe) and typesoulsettings.autoparry == true and child.PrimaryPart then 
                     --print('can parry')
                     if typesoulsettings.autoparrywhitelist ~= 'All' and (typesoulsettings.autoparrywhitelist == 'Mobs' and game.Players:GetPlayerFromCharacter(child)) then 
                         return
@@ -42458,6 +42469,34 @@ elseif universeid == 4871329703 then -- type soul
                     if typesoulsettings.autoparrywhitelist ~= 'All' and (typesoulsettings.autoparrywhitelist ~= 'Mobs' and child.Name ~= typesoulsettings.autoparrywhitelist) then 
                         return
                     end
+                    -- where i moved it to
+                    local objdist = child.PrimaryPart
+                    if not objdist then objdist = child:FindFirstChildOfClass('BasePart') end
+                    if not objdist then 
+                        --print(child.Name..' has no part to detect distance')
+                        return
+                    end;
+                    if IsAnimationIdRegistered == false and hasHitframe or typesoulsettings.useparrytiming and hasHitframe then 
+                        if checkdist(typesoulsettings.autoparrydistance,objdist) then 
+                            signals.conceal(function()
+                                local timetowait = hasHitframe - 0.15
+                                if typesoulsettings.pingadjuster > 0  then 
+                                    timetowait -= typesoulsettings.pingadjuster / 1400 -- 100 
+                                end;
+                                if typesoulsettings.latencyadjuster > 0 then 
+                                    timetowait += typesoulsettings.latencyadjuster / 1400 -- 100 
+                                end
+                                task.spawn(function()
+                                    azfakenotify(`autoparry {hasHitframe}`,3)
+                                end)
+                                task.wait(timetowait);
+                                if anim.IsPlaying then 
+                                    typesoulsettings.functions.parry()
+                                end
+                            end)
+                        end
+                        return
+                    end;
                     local registry = parryAnims[animationId] -- parryregistration
                     if type(registry) == 'function' then 
                         print('parrying '..animationId)
@@ -42469,12 +42508,7 @@ elseif universeid == 4871329703 then -- type soul
                     elseif type(registry) == 'table' then 
                         return;
                     end
-                    local objdist = child.PrimaryPart
-                    if not objdist then objdist = child:FindFirstChildOfClass('BasePart') end
-                    if not objdist then 
-                        --print(child.Name..' has no part to detect distance')
-                        return
-                    end;
+                    -- where objdist was
                     if checkdist(typesoulsettings.autoparrydistance,objdist) then 
                         print('parrying ',animationId);
                         if typesoulsettings.parrynotifications then 
@@ -42488,7 +42522,7 @@ elseif universeid == 4871329703 then -- type soul
                             if typesoulsettings.latencyadjuster > 0 then 
                                 timetowait += typesoulsettings.latencyadjuster / 1400 -- 100 
                             end
-                            task.wait(registry);
+                            task.wait(timetowait);
                             if anim.IsPlaying then 
                                 typesoulsettings.functions.parry()
                             end
