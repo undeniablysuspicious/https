@@ -41628,20 +41628,25 @@ elseif universeid == 4871329703 then -- type soul
                         localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
                         game.Players.LocalPlayer.Character.Head:Destroy()
                         canUseKisuke = true;
-                        if typesoulsettings.teleportKisukeBeforeUse then 
+                        if typesoulsettings.teleportKisukeBeforeUse and not workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
                             canUseKisuke = false;
-                        end;    
-                        local newAdd; newAdd = workspace.Entities.ChildAdded:Connect(function(b)
-                            if b.Name == game.Players.LocalPlayer.Name then 
-                                task.delay(0.7,function()
-                                    canUseKisuke = true;
-                                end)
-                                repeat 
-                                    task.wait()
-                                    b.PrimaryPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
-                                until not b
-                            end
-                        end)
+                        end;   
+                        if canUseKisuke == false then 
+                            local newAdd; newAdd = workspace.Entities.ChildAdded:Connect(function(b)
+                                if b.Name == game.Players.LocalPlayer.Name then 
+                                    -- task.delay(0.7,function()
+                                    --     canUseKisuke = true;
+                                    -- end)
+                                    repeat 
+                                        task.wait()
+                                        b.PrimaryPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
+                                    until not b or workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')
+                                    if workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
+                                        canUseKisuke = true;
+                                    end
+                                end
+                            end)
+                        end
                         repeat task.wait(.5) until canUseKisuke == true;
                         local kisuke = workspace:WaitForChild('NPCs'):WaitForChild('RaidBoss'):WaitForChild('Kisuke');
                         local hasKisukeAdded;
