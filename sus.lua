@@ -41882,6 +41882,12 @@ elseif universeid == 4871329703 then -- type soul
                     
                     bongfarm = 'teleportedtonel';
                     game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
+                    repeat 
+                        task.wait(1.5)
+                        if not localPlayer.instance.PlayerGui:FindFirstChild('Storage') then 
+                            game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
+                        end
+                    until localPlayer.instance.PlayerGui:FindFirstChild('Storage')
                     --localPlayer('fire', nelnpc.ClickDetector); --fireclickdetector(nelnpc.ClickDetector);
                     task.wait(.2);
                     azfakenotify('shouldve taken item!!!!!!!', 2)
