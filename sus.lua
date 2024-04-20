@@ -40231,7 +40231,7 @@ elseif universeid == 4871329703 then -- type soul
         parrynotifications = false;
         timetowait = 30;
         kisukedelay = false;
-        teleportKisukeBeforeUse = false;
+        teleportKisukeBeforeUse = true;
         selecttradeitem = {};
         slotselected = {};
         instateleport = false;
@@ -41512,7 +41512,7 @@ elseif universeid == 4871329703 then -- type soul
     newother:AddToggle('Wait Time Before Killing',false,function(e, wasclicked)
         typesoulsettings.kisukedelay = e;
     end)
-    newother:AddToggle('TP To NPC before Boss',false,function(e, wasclicked)
+    newother:AddToggle('TP To NPC before Boss',true,function(e, wasclicked)
         typesoulsettings.teleportKisukeBeforeUse = e;
     end)
     
