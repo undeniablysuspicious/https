@@ -41656,15 +41656,26 @@ elseif universeid == 4871329703 then -- type soul
                         end
                     end)
                     canUseKisuke = true;
-                    if hasAttemptedToTeleport == false and typesoulsettings.teleportKisukeBeforeUse and not workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
-                        hasAttemptedToTeleport = true
-                        --
-                        if localPlayer.character:FindFirstChild('Head') then 
-                            localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
-                            game.Players.LocalPlayer.Character.Head:Destroy()
+                    if typesoulsettings.teleportKisukeBeforeUse and not workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
+                        if hasAttemptedToTeleport == false then 
+                            hasAttemptedToTeleport = true
+                            --
+                            if localPlayer.character:FindFirstChild('Head') then 
+                                localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+                                game.Players.LocalPlayer.Character.Head:Destroy()
+                            end
                         end
                         canUseKisuke = false;
-                    end;   
+                    end;  
+                    if canUseKisuke == true and workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
+                        if not checkdist(10, workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')) then 
+                            canUseKisuke = false;
+                            if localPlayer.character:FindFirstChild('Head') then 
+                                localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+                                game.Players.LocalPlayer.Character.Head:Destroy()
+                            end
+                        end
+                    end;    
                     if canUseKisuke == false then 
                         local newAdd; newAdd = workspace.Entities.ChildAdded:Connect(function(b)
                             if b.Name == game.Players.LocalPlayer.Name then 
