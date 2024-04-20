@@ -40592,7 +40592,7 @@ elseif universeid == 4871329703 then -- type soul
                     local beentick = tick() --os.tick()
                     repeat 
                         task.wait()
-                        b.PrimaryPart.CFrame = tpPart; --workspace.NPCs.RaidBoss.Kisuke.WorldPivot
+                        b.PrimaryPart.CFrame = obj.WorldPivot; --tpPart.CFrame; --workspace.NPCs.RaidBoss.Kisuke.WorldPivot
                     until (tick() - beentick ) > 1
                     newAdd:Disconnect()
                 end
@@ -41802,6 +41802,7 @@ elseif universeid == 4871329703 then -- type soul
             local bongnpc = workspace:WaitForChild('NPCs'):WaitForChild('Exechange'):WaitForChild('BONG BONG')
             local inputManager = game.VirtualInputManager
             local m = game.Players.LocalPlayer:GetMouse()
+            local isTaken = false;
             game.Players.LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
                 task.wait(.1)
                 if child.Name == 'Storing' then 
@@ -41835,6 +41836,7 @@ elseif universeid == 4871329703 then -- type soul
                                 inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,true,game,0) -- 1319,574
                                 task.wait(0.1)
                                 inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,false,game,0)
+                                isTaken = true;
                                 for i=1, 10 do 
                                     task.wait(.1)
                                 end
@@ -41912,12 +41914,15 @@ elseif universeid == 4871329703 then -- type soul
                     
                     bongfarm = 'teleportedtonel';
                     game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
-                    repeat 
+                    if not localPlayer.instance.PlayerGui:FindFirstChild('Storage') then 
                         task.wait(1.5)
-                        if not localPlayer.instance.PlayerGui:FindFirstChild('Storage') then 
-                            game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
-                        end
-                    until localPlayer.instance.PlayerGui:FindFirstChild('Storage')
+                        repeat 
+                            task.wait(1.5)
+                            if not localPlayer.instance.PlayerGui:FindFirstChild('Storage') then 
+                                game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
+                            end
+                        until localPlayer.instance.PlayerGui:FindFirstChild('Storage') or isTaken == true
+                    end
                     --localPlayer('fire', nelnpc.ClickDetector); --fireclickdetector(nelnpc.ClickDetector);
                     task.wait(.2);
                     azfakenotify('shouldve taken item!!!!!!!', 2)
@@ -41947,6 +41952,7 @@ elseif universeid == 4871329703 then -- type soul
                     task.wait(.5);
                     bongfarm = 'nothing';
                     bongdelay = false;
+                    isTaken = false;
                 end;
             end);
         end)
