@@ -41056,7 +41056,7 @@ elseif universeid == 4871329703 then -- type soul
                                     ID = closestbounty:GetAttribute('ID')
                                 end
                             end
-                        until not closestbounty or not closestbounty and closestbounty:FindFirstChild('Items')  or not  closestbounty:FindFirstChild('Items')
+                        until not closestbounty or not tpPart or tpPart.Transparency == 1 or not  closestbounty:FindFirstChild('Items'); --not closestbounty or not closestbounty and closestbounty:FindFirstChild('Items')  or not  closestbounty:FindFirstChild('Items')
                         if typesoulsettings.serverhopafterlootbox  then 
                             local gameIDS = {}
                             gameIDS[14069122388] = "Hueco Mundo"
@@ -41086,7 +41086,8 @@ elseif universeid == 4871329703 then -- type soul
                             for i,jobIdTable in next, GetTable do 
                                 local shouldbreak = false
                                 if jobIdTable['JobID'] ~= game.JobId then -- check if not max 
-                                    game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(GameName,jobIdTable['JobID'])
+                                    game.TeleportService:TeleportToPlaceInstance(game.PlaceId,jobIdTable['JobID'])
+                                    --game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(GameName,jobIdTable['JobID'])
                                 end
                             end
                         end
