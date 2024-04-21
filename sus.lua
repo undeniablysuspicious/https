@@ -41552,6 +41552,7 @@ elseif universeid == 4871329703 then -- type soul
         -- newrem:FireServer('Yes')
         local playedIt = false;
         local hasAttemptedToTeleport = false;
+        local canUseKisuke = 0;
         maid.autokisukectn = signals.heartbeat:connect('kisuke tp', function()--game.RunService:Connect(function())
             local basicworld = {14069678431, 17047374266}
             local raidWorld = 17047374266
@@ -41688,7 +41689,10 @@ elseif universeid == 4871329703 then -- type soul
                             end
                         end
                     end)
-                    canUseKisuke = true;
+                    if canUseKisuke == 0 then 
+                        canUseKisuke = true;
+                        print('[newly swet kisuke]')
+                    end
                     if typesoulsettings.teleportKisukeBeforeUse and not workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
                         local didKillself = true;
                         if hasAttemptedToTeleport == false then 
@@ -41699,14 +41703,16 @@ elseif universeid == 4871329703 then -- type soul
                                     if not checkdist(10, workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')) then 
                                         localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
                                         game.Players.LocalPlayer.Character.Head:Destroy()
+                                        didKillself = true;
+                                    else
+                                        didKillself = 'dialogue'
                                     end
-                                    didKillself = true;
                                 else
                                     didKillself = false;
                                 end
                             end
+                            canUseKisuke = (didKillself == true and false or didKillself == 'dialogue' and 1 or  nil); --false; 
                         end
-                        canUseKisuke = (didKillself == true and false or nil); --false;
                     end;  
                     if canUseKisuke == true and workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
                         if not checkdist(10, workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')) then 
@@ -41749,9 +41755,12 @@ elseif universeid == 4871329703 then -- type soul
                                 localPlayer.rootPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
                             end
                             task.wait()
-                        until tick() - wasTicked > 0.3
+                        until tick() - wasTicked > 1.5
                         canUseKisuke = true;
                     end
+                    if canUseKisuke == 'dialogue' then 
+                        canUseKisuke = true;
+                    end;
                     repeat task.wait(.5) until canUseKisuke == true;
                     local kisuke = workspace:WaitForChild('NPCs'):WaitForChild('RaidBoss'):WaitForChild('Kisuke');
                     local hasKisukeAdded;
