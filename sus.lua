@@ -41670,7 +41670,7 @@ elseif universeid == 4871329703 then -- type soul
                     end
                 else
                     --
-                    task.delay(10,function()
+                    task.delay(10,function() -- could make toReach and have a counter and up toreach
                         local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer("Karakura Town")
                         if not GetTable then return end;
                         local foundTP = nil;
@@ -41685,15 +41685,21 @@ elseif universeid == 4871329703 then -- type soul
                     end)
                     canUseKisuke = true;
                     if typesoulsettings.teleportKisukeBeforeUse and not workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
+                        local didKillself = true;
                         if hasAttemptedToTeleport == false then 
                             hasAttemptedToTeleport = true
                             --
                             if localPlayer.character:FindFirstChild('Head') then 
-                                localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
-                                game.Players.LocalPlayer.Character.Head:Destroy()
+                                if not localPlayer.character:FindFirstChildWhichIsA('Highlight') then  -- HeWad
+                                    localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+                                    game.Players.LocalPlayer.Character.Head:Destroy()
+                                    didKillself = true;
+                                else
+                                    didKillself = false;
+                                end
                             end
                         end
-                        canUseKisuke = false;
+                        canUseKisuke = (didKillself == true and false or nil); --false;
                     end;  
                     if canUseKisuke == true and workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
                         if not checkdist(10, workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')) then 
@@ -41704,6 +41710,7 @@ elseif universeid == 4871329703 then -- type soul
                             end
                         end
                     end;    
+                    --
                     if canUseKisuke == false then 
                         local newAdd; newAdd = workspace.Entities.ChildAdded:Connect(function(b)
                             if b.Name == game.Players.LocalPlayer.Name then 
@@ -41720,6 +41727,14 @@ elseif universeid == 4871329703 then -- type soul
                                 end
                             end
                         end)
+                    end
+                    if canUseKisuke == nil then 
+                        local wasTicked = tick();
+                        repeat 
+                            localPlayer.rootPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
+                            task.wait()
+                        until tick() - wasTicked > 0.3
+                        canUseKisuke = true;
                     end
                     repeat task.wait(.5) until canUseKisuke == true;
                     local kisuke = workspace:WaitForChild('NPCs'):WaitForChild('RaidBoss'):WaitForChild('Kisuke');
