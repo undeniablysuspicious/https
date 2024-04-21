@@ -41705,8 +41705,12 @@ elseif universeid == 4871329703 then -- type soul
                         if not checkdist(10, workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')) then 
                             canUseKisuke = false;
                             if localPlayer.character:FindFirstChild('Head') then 
-                                localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
-                                game.Players.LocalPlayer.Character.Head:Destroy()
+                                if not localPlayer.character:FindFirstChildWhichIsA('Highlight') then
+                                    localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+                                    game.Players.LocalPlayer.Character.Head:Destroy()
+                                else
+                                    canUseKisuke = nil;
+                                end
                             end
                         end
                     end;    
@@ -41728,7 +41732,10 @@ elseif universeid == 4871329703 then -- type soul
                             end
                         end)
                     end
-                    if canUseKisuke == nil then 
+                    if canUseKisuke == nil or localPlayer.character:FindFirstChildWhichIsA('Highlight') then 
+                        -- if hasAttemptedToTeleport == false then 
+                        --     hasAttemptedToTeleport = true;
+                        -- end
                         local wasTicked = tick();
                         repeat 
                             localPlayer.rootPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
