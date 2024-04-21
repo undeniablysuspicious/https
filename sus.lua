@@ -41656,15 +41656,20 @@ elseif universeid == 4871329703 then -- type soul
                             diddie = true;
                             azfakenotify('wow killed boss', 'untilClick')
                             task.delay(0.5,function()
-                                local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer("Karakura Town")
-                                if not GetTable then return end;
-                                local foundTP = nil; -- GameVersion
-                                for i,jobIdTable in next, GetTable do 
-                                    local shouldbreak = false
-                                    if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] and tonumber(jobIdTable['ServerPlayers']) < 15 then 
-                                        game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
-                                    end
-                                end
+                                task.spawn(function()
+                                    repeat
+                                        task.wait(.5)
+                                        local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer("Karakura Town")
+                                        if not GetTable then return end;
+                                        local foundTP = nil; -- GameVersion
+                                        for i,jobIdTable in next, GetTable do 
+                                            local shouldbreak = false
+                                            if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] and tonumber(jobIdTable['ServerPlayers']) < 15 then 
+                                                game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
+                                            end
+                                        end
+                                    until 1 == 2
+                                end)
                             end)
                         end)
                     end
@@ -41691,8 +41696,10 @@ elseif universeid == 4871329703 then -- type soul
                             --
                             if localPlayer.character:FindFirstChild('Head') then 
                                 if not localPlayer.character:FindFirstChildWhichIsA('Highlight') then  -- HeWad
-                                    localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
-                                    game.Players.LocalPlayer.Character.Head:Destroy()
+                                    if not checkdist(10, workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')) then 
+                                        localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+                                        game.Players.LocalPlayer.Character.Head:Destroy()
+                                    end
                                     didKillself = true;
                                 else
                                     didKillself = false;
@@ -41738,7 +41745,9 @@ elseif universeid == 4871329703 then -- type soul
                         -- end
                         local wasTicked = tick();
                         repeat 
-                            localPlayer.rootPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
+                            if not checkdist(10, workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')) then 
+                                localPlayer.rootPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
+                            end
                             task.wait()
                         until tick() - wasTicked > 0.3
                         canUseKisuke = true;
