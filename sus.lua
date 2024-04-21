@@ -41767,6 +41767,7 @@ elseif universeid == 4871329703 then -- type soul
             for i,v in next, getInventory() do 
                 inventorysafe:Add(v)
             end
+            inventorysafe:Set('')
         end)
         inventorysafe.dontsave = true;
         earlyaccess:AddToggle('List One Item All Four',false,function(e, wasclicked)
@@ -41892,6 +41893,7 @@ elseif universeid == 4871329703 then -- type soul
                             end; -- ajnd
                         until tick() - timeTakebnk > 0.5 and teleportNpc:FindFirstChild('HumanoidRootPart')
                         completed = true;
+                        ctn:Disconnect()
                     end;
                 end)
                 repeat task.wait() until completed == true;
@@ -41900,7 +41902,7 @@ elseif universeid == 4871329703 then -- type soul
                 if bongfarm == 'teleportedtonel' then 
                     azfakenotify('on nel dialogue', 2)
                     bongfarm:FireServer('Yes')
-                elseif bongfarm == 'teleportedtobong' then 
+                elseif bongfarm == 'teleportedtobong' and remote:IsA('RemoteEvent') then 
                     azfakenotify('on bong dialogue', 2)
                     remote:FireServer('Yes')       
                 end
@@ -41910,6 +41912,7 @@ elseif universeid == 4871329703 then -- type soul
                     bongdelay = true;
                     bongfarm = 'teleportingtonel'
                     -- get 1 of item;
+                    azfakenotify('tp to nel',3)
                     instantTeleport(nelnpc)
                     
                     bongfarm = 'teleportedtonel';
@@ -41923,14 +41926,16 @@ elseif universeid == 4871329703 then -- type soul
                             end
                         until localPlayer.instance.PlayerGui:FindFirstChild('Storage') or isTaken == true
                     end
+                    bongfarm = 'teleportotbong';
                     --localPlayer('fire', nelnpc.ClickDetector); --fireclickdetector(nelnpc.ClickDetector);
-                    task.wait(.2);
+                    task.wait(.2); 
                     azfakenotify('shouldve taken item!!!!!!!', 2)
                     bongfarm = 'teleportotbong';
                     bongdelay = false;
                 elseif bongfarm == 'teleportotbong' and bongdelay == false then 
                     bongdelay = true;
                     bongfarm = 'willtptobong';
+                    azfakenotify('tp to bong npc',3)
                     instantTeleport(bongnpc); -- bonnp
                     bongfarm = 'teleportedtobong';
                     localPlayer('fire', bongnpc.ClickDetector); --
