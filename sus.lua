@@ -40798,9 +40798,58 @@ elseif universeid == 4871329703 then -- type soul
             azfake:returndata().character:FindFirstChild('Head'):Destroy();
         end;
     end)
+    local willTeleportID = '';
+    lefttab:AddTextbox('Server JobId', nil, function(toTeleport)
+        local replacement = toTeleport;
+        if string.find(replacement, 'mixous') then 
+            print('has mixous',replacement)
+            local mainTable = {};
+            replacement = replacement:sub(2, string.len(replacement))
+            replacement = string.gsub(toTeleport, ']' , '') -- [mixous,10000,gggg-hhhh-gggg]
+            -- [mixous[10000[gggg-hhhh-gggg
+            -- replacement = string.gsub(toTeleport, '[' , ',')
+            print(replacement)
+            -- ,mixous,10000,gggg-hhhh-gggg
+            local mainSplit = string.split(replacement, '[') -- concat
+            -- [1] = placeId
+            -- [2] = jobid
+            for i,v in next, mainSplit do 
+                print(i,v)
+            end
+            mainTable['placeid'] = tonumber(mainSplit[3])
+            mainTable['jobid'] = mainSplit[4]:sub(1, string.len(mainSplit[4]))
+            print(mainTable['jobid'], mainTable['placeid'])
+            replacement = mainTable;
+        end;
+        willTeleportID = replacement; -- [mixous][10000][gggg-hhhh-gggg]
+    end)
+    lefttab:AddButton('Join Server ID', function()
+        local teleportId = true;
+        local teleportInstance = willTeleportID;
+        if type(willTeleportID) == 'table' then 
+            teleportId = willTeleportID['placeid']
+            teleportInstance = willTeleportID['jobid']
+        end; -- teleportId = type(willtpid) == 'table' and willtpid['placeid']
+        localPlayer.teleport.toInstance(teleportId, teleportInstance)
+    end)
+    lefttab:AddButton('Get Server Details', function()
+        local mainstring = '[mixous][placeid][jobid]' -- could have a table to loop for placeid, jobid
+        mainstring = string.gsub(mainstring, 'placeid', game.PlaceId)
+        mainstring = string.gsub(mainstring, 'jobid', game.JobId)
+        -- setclipboard(mainstring);
+        local maintable = {
+            ['placeid'] = game.PlaceId;
+            ['jobid'] = game.JobId;
+            --'jobid'
+        }
+        pcall(setclipboard, mainstring)
+        azfakenotify('Copied server details to clipboard.', 3)
+    end)
+    lefttab:AddSeperator('-')
     lefttab:AddSlider("Servers to Skip", 0, 0, 300, 1, function(State) -- 150
         typesoulsettings.skipserver = State -- farmrot
     end)
+    --
     lefttab:AddToggle('Use Skip Server', false, function(e)
         typesoulsettings.skipservertgl = e;
     end)
