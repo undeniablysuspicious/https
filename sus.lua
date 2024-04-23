@@ -42996,6 +42996,7 @@ elseif universeid == 4871329703 then -- type soul
     local function attachAnimationPlayed(child)
         signals.conceal(function()
             child:WaitForChild('Humanoid')
+            child:WaitForChild('HumanoidRootPart')
             local hasAnimationPlayed = false; -- = 0
             for i,v in next, typesoulsettings.connections do 
                 if i == child.Name and v ~= nil then 
