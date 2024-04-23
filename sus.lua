@@ -40830,7 +40830,18 @@ elseif universeid == 4871329703 then -- type soul
             teleportId = willTeleportID['placeid']
             teleportInstance = willTeleportID['jobid']
         end; -- teleportId = type(willtpid) == 'table' and willtpid['placeid']
-        localPlayer.teleport.toInstance(teleportId, teleportInstance)
+        if typesoulsettings.usemanualteleport then 
+            localPlayer.teleport.toInstance(teleportId, teleportInstance)
+        else
+            local gameIDS = {}
+            gameIDS[14069122388] = "Hueco Mundo"
+            gameIDS[14069678431] = "Karakura Town"
+            gameIDS[14069956183] = "Rukon District"
+            gameIDS[14070029709] = "Soul Society"
+            gameIDS[14069866342] = "Las Noches"
+            gameIDS[14071822972] = "Wandenreich City"
+            game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(gameIDS[teleportId],teleportInstance)
+        end
     end)
     lefttab:AddButton('Get Server Details', function()
         local mainstring = '[mixous][placeid][jobid]' -- could have a table to loop for placeid, jobid
