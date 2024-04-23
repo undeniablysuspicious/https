@@ -41621,18 +41621,65 @@ elseif universeid == 4871329703 then -- type soul
                     Body = game:GetService('HttpService'):JSONEncode(KisukeData) -- {data.title; content = data.content} CDOE
                 }
             );
-            if typesoulsettings.publicwebhook == true then 
-                request(
-                    {
-                        Url = 'https://discord.com/api/webhooks/1232362857010827264/mUDiigqcsTsH6YNIG0U_IJB3L3wpIXfnRZDzPIVBQ__zV3B8X6MnYslUmCaxNl3gdUd2',
-                        Method = 'POST',
-                        Headers = {
-                            ['Content-Type'] = 'application/json'
-                        }, -- AZFAKE WEBHOOK
-                        Body = game:GetService('HttpService'):JSONEncode(KisukeData) -- {data.title; content = data.content} CDOE
+            -- if typesoulsettings.publicwebhook == true then 
+            --     request(
+            --         {
+            --             Url = 'https://discord.com/api/webhooks/1232362857010827264/mUDiigqcsTsH6YNIG0U_IJB3L3wpIXfnRZDzPIVBQ__zV3B8X6MnYslUmCaxNl3gdUd2',
+            --             Method = 'POST',
+            --             Headers = {
+            --                 ['Content-Type'] = 'application/json'
+            --             }, -- AZFAKE WEBHOOK
+            --             Body = game:GetService('HttpService'):JSONEncode(KisukeData) -- {data.title; content = data.content} CDOE
+            --         }
+            --     );
+            -- end
+        elseif child.Name == 'ItemFrame' and typesoulsettings.autokisuke and typesoulsettings.publicwebhook then
+            local KisukeData = {
+                ['content'] = '';
+                ['embeds'] = {{
+                    ['title'] = 'AZFAKE WEBHOOK';
+                    ['description'] = 'powered by azfake';
+                    ['type'] = 'rich';
+                    ['color'] = tonumber(0xffffff);
+                    ['fields'] = {
+                        {
+                            ['name'] = 'Date';
+                            ['value'] = os.date();
+                            ['inline'] = true;
+                        };
+                        {
+                            ['name'] = 'Item Received';
+                            ['value'] = child:FindFirstChildWhichIsA('TextLabel').Text;
+                            ['inline'] = true;
+                        };
+                        {
+                            ['name'] = 'Time Elasped';
+                            ['value'] = tostring(KisukeTime);
+                            ['inline'] = true;
+                        };
+                        {
+                            ['name'] = 'Time After Enemy Spawned';
+                            ['value'] = tostring(EnemyTime);
+                            ['inline'] = true;
+                        };
+                        -- { -- amount of skillboxes
+                        --     ['name'] = 'Current Gyakusatsu Sacs';
+                        --     ['value'] = game:GetService("Players").LocalPlayer.PlayerFolder.Inventory.GyaSacs.Value;
+                        --     ['inline'] = true;
+                        -- };
                     }
-                );
-            end
+                }}
+            }
+            request(
+                {
+                    Url = 'https://discord.com/api/webhooks/1232362857010827264/mUDiigqcsTsH6YNIG0U_IJB3L3wpIXfnRZDzPIVBQ__zV3B8X6MnYslUmCaxNl3gdUd2',
+                    Method = 'POST',
+                    Headers = {
+                        ['Content-Type'] = 'application/json'
+                    }, -- AZFAKE WEBHOOK
+                    Body = game:GetService('HttpService'):JSONEncode(KisukeData) -- {data.title; content = data.content} CDOE
+                }
+            );
         end
     end)
     local wasinsta = newother:AddToggle('Insta Kill Mobs',false,function(e, wasclicked)
