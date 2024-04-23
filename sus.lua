@@ -43032,9 +43032,9 @@ elseif universeid == 4871329703 then -- type soul
                         --print(child.Name..' has no part to detect distance')
                         return
                     end;
-                    if typesoulsettings.m2beforeparry and azfake:returndata().character then 
-                        azfake:returndata().character.CharacterHandler.Remotes.M2:FireServer()
-                    end
+                    -- if typesoulsettings.m2beforeparry and azfake:returndata().character then 
+                    --     azfake:returndata().character.CharacterHandler.Remotes.M2:FireServer()
+                    -- end
                     local function attemptLookat()
                         if typesoulsettings.lookataxiszyxy then 
                             signals.conceal(function()
@@ -43052,6 +43052,9 @@ elseif universeid == 4871329703 then -- type soul
                     if IsAnimationIdRegistered == false and hasHitframe or typesoulsettings.useparrytiming and hasHitframe then 
                         if objdist and checkdist(typesoulsettings.autoparrydistance,objdist) then 
                             --
+                            if typesoulsettings.m2beforeparry and azfake:returndata().character then 
+                                azfake:returndata().character.CharacterHandler.Remotes.M2:FireServer()
+                            end
                             attemptLookat();
                             signals.conceal(function()
                                 local timetowait = hasHitframe - 0.2; -- 0.25; -- 0.15
@@ -43092,6 +43095,9 @@ elseif universeid == 4871329703 then -- type soul
                         print('parrying ',animationId);
                         if typesoulsettings.parrynotifications then 
                             azfakenotify(`parrying {parryAnims[animationId]}`,5)
+                        end
+                        if typesoulsettings.m2beforeparry and azfake:returndata().character then 
+                            azfake:returndata().character.CharacterHandler.Remotes.M2:FireServer()
                         end
                         signals.conceal(function()
                             local timetowait = registry;
