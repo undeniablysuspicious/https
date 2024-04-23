@@ -8528,7 +8528,8 @@ metaforit.waitforchildwhichisa = function(obj, classname, name)
         task.wait()
         toObject = obj:FindFirstChildWhichIsA(classname) and (not name and true or obj:FindFirstChildWhichIsA(classname).Name == name and true) and obj:FindFirstChildWhichIsA(classname) 
     until toObject; --obj:FindFirstChildWhichIsA(classname) and (not name and true or obj:FindFirstChildWhichIsA(classname).Name == name and true)
-    print('@waitforchild whichisa',obj.Name,obj.ClassName)
+    print('@waitforchild whichisa',toObject.Name,toObject.ClassName)
+    return toObject
 end
 metaforit.teleport.serverHop = function(id)
     local serverId = (id == true and game.PlaceId or id)
@@ -41578,9 +41579,13 @@ elseif universeid == 4871329703 then -- type soul
         if typesoulsettings.autokisuke and child.Name == 'ItemFrame' then 
             signals.conceal(function()
                 pcall(function()
-                    task.wait(1)
+                    task.wait(0.25)
                     local newItem = localPlayer.waitforchildwhichisa(child, 'TextLabel').Text
-                    typesoulsettings.getentityfolder().CharacterHandler.Remotes.EquipSkill:FireServer('Equals', newItem)
+                    print('@item set',newItem)
+                    repeat 
+                        typesoulsettings.getentityfolder().CharacterHandler.Remotes.EquipSkill:FireServer('Equals', newItem)
+                        task.wait(0.2)
+                    until 1 == 2
                     --localPlayer.character.CharacterHandler.Remotes.EquipSkill:FireServer("Equals", child:FindFirstChildWhichIsA('TextLabel').Text)
                 end)  
             end)
