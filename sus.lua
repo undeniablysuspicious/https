@@ -40543,6 +40543,7 @@ elseif universeid == 4871329703 then -- type soul
         maid.autoparrycheck2 = workspace.Effects.ChildRemoved:Connect(function(child)
             if typesoulsettings.connections[child.Name] then 
                 typesoulsettings.connections[child.Name]:Disconnect()
+                typesoulsettings.connections[child.Name] = nil;
             end
         end)
         for i,v in next, workspace.Effects:GetChildren() do 
@@ -42997,7 +42998,7 @@ elseif universeid == 4871329703 then -- type soul
             child:WaitForChild('Humanoid')
             local hasAnimationPlayed = false; -- = 0
             for i,v in next, typesoulsettings.connections do 
-                if i == child.Name then 
+                if i == child.Name and v ~= nil then 
                     hasAnimationPlayed = true;
                 end
             end
@@ -43133,7 +43134,13 @@ elseif universeid == 4871329703 then -- type soul
             attachAnimationPlayed(v)
         end;
     end)
-
+    workspace.Entities.ChildRemoved:Connect(function(v)
+        if typesoulsettings.connections[v.Name] then 
+            pcall(function()
+                typesoulsettings.connections[v.Name]:Disconnect()
+            end)
+        end
+    end)
 
     -- game.Players.PlayerAdded:Connect(function(opp)
     --     if opp ~= game.Players.LocalPlayer then 
