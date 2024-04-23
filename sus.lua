@@ -41859,7 +41859,8 @@ elseif universeid == 4871329703 then -- type soul
                         canUseKisuke = true;
                         print('[newly swet kisuke]')
                     end
-                    if typesoulsettings.teleportKisukeBeforeUse and not workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
+                    local didTeleportHighlight = localPlayer.character:FindFirstChildWhichIsA('Highlight')
+                    if not didTeleportHighlight and typesoulsettings.teleportKisukeBeforeUse and not workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
                         local didKillself = true;
                         if hasAttemptedToTeleport == false then 
                             hasAttemptedToTeleport = true
@@ -41880,7 +41881,7 @@ elseif universeid == 4871329703 then -- type soul
                             canUseKisuke = (didKillself == true and false or didKillself == 'dialogue' and 1 or  nil); --false; 
                         end
                     end;  
-                    if canUseKisuke == true and workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
+                    if not didTeleportHighlight and canUseKisuke == true and workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
                         if not checkdist(10, workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')) then 
                             canUseKisuke = false;
                             if localPlayer.character:FindFirstChild('Head') then 
@@ -41894,7 +41895,7 @@ elseif universeid == 4871329703 then -- type soul
                         end
                     end;    
                     --
-                    if canUseKisuke == false then 
+                    if not didTeleportHighlight and canUseKisuke == false then 
                         local newAdd; newAdd = workspace.Entities.ChildAdded:Connect(function(b)
                             if b.Name == game.Players.LocalPlayer.Name then 
                                 -- task.delay(0.7,function()
@@ -41911,19 +41912,26 @@ elseif universeid == 4871329703 then -- type soul
                             end
                         end)
                     end
-                    if canUseKisuke == nil or localPlayer.character:FindFirstChildWhichIsA('Highlight') then 
-                        -- if hasAttemptedToTeleport == false then 
-                        --     hasAttemptedToTeleport = true;
-                        -- end
-                        local wasTicked = tick();
-                        repeat 
-                            if not checkdist(10, workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')) then 
-                                localPlayer.rootPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
-                            end
-                            task.wait()
-                        until tick() - wasTicked > 1.5
-                        canUseKisuke = true;
+                    if localPlayer.character:FindFirstChildWhichIsA('Highlight') then 
+                        localPlayer.rootPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
+                        task.wait(.5)
+                        canUseKisuke = true; -- -=
                     end
+                    -- if canUseKisuke == nil and localPlayer.character:FindFirstChildWhichIsA('Highlight') then 
+                    --     -- if hasAttemptedToTeleport == false then 
+                    --     --     hasAttemptedToTeleport = true;
+                    --     -- end
+                    --     local wasTicked = tick();
+                    --     -- repeat 
+                    --     --     if not checkdist(10, workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')) then 
+                    --     --         localPlayer.rootPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
+                    --     --     end
+                    --     --     task.wait()
+                    --     -- until tick() - wasTicked > 1.5
+                    --     localPlayer.rootPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
+                    --     task.wait(1)
+                    --     canUseKisuke = true;
+                    -- end
                     if canUseKisuke == 'dialogue' then 
                         canUseKisuke = true;
                     end;
