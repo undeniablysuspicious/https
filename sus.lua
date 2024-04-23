@@ -41920,7 +41920,7 @@ elseif universeid == 4871329703 then -- type soul
                             --
                             if localPlayer.character:FindFirstChild('Head') then 
                                 if not localPlayer.character:FindFirstChildWhichIsA('Highlight') and hasAttemptedToTeleport ~= 0 then  -- HeWad
-                                    if not checkdist(10, workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')) then 
+                                    if not checkdist(10, workspace.NPCs.RaidBoss.Kisuke.WorldPivot) then -- workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')
                                         localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
                                         game.Players.LocalPlayer.Character.Head:Destroy()
                                         didKillself = true;
@@ -41991,6 +41991,10 @@ elseif universeid == 4871329703 then -- type soul
                     if canUseKisuke == 'dialogue' then 
                         canUseKisuke = true;
                     end;
+                    if not checkdist(15, workspace.NPCs.RaidBoss.Kisuke.WorldPivot) and hasAttemptedToTeleport == false then 
+                        hasAttemptedToTeleport = false;
+                        canUseKisuke = false;
+                    end
                     repeat task.wait(.5) until canUseKisuke == true;
                     local kisuke = workspace:WaitForChild('NPCs'):WaitForChild('RaidBoss'):WaitForChild('Kisuke');
                     local hasKisukeAdded;
