@@ -43023,6 +43023,9 @@ elseif universeid == 4871329703 then -- type soul
                         --print(child.Name..' has no part to detect distance')
                         return
                     end;
+                    if typesoulsettings.m2beforeparry and azfake:returndata().character then 
+                        azfake:returndata().character.CharacterHandler.Remotes.M2:FireServer()
+                    end
                     local function attemptLookat()
                         if typesoulsettings.lookataxiszyxy then 
                             signals.conceal(function()
