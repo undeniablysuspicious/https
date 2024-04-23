@@ -43054,7 +43054,7 @@ elseif universeid == 4871329703 then -- type soul
                             --
                             attemptLookat();
                             signals.conceal(function()
-                                local timetowait = hasHitframe - 0.25; -- 0.15
+                                local timetowait = hasHitframe - 0.2; -- 0.25; -- 0.15
                                 if typesoulsettings.pingadjuster > 0  then 
                                     timetowait -= typesoulsettings.pingadjuster / 1400 -- 100 
                                 end;
