@@ -42019,8 +42019,12 @@ elseif universeid == 4871329703 then -- type soul
                     if canUseKisuke == 'dialogue' then 
                         canUseKisuke = true;
                     end;
-                    if not checkdist(15, workspace.NPCs.RaidBoss.Kisuke.WorldPivot) and hasAttemptedToTeleport == false then 
+                    if not checkdist(15, workspace.NPCs.RaidBoss.Kisuke.WorldPivot) then  --  and hasAttemptedToTeleport == false
                         task.wait(1)
+                        hasAttemptedToTeleport = false;
+                        canUseKisuke = false;
+                    end
+                    if not workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
                         hasAttemptedToTeleport = false;
                         canUseKisuke = false;
                     end
