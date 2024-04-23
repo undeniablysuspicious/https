@@ -41566,10 +41566,15 @@ elseif universeid == 4871329703 then -- type soul
     local EnemyTime = 0;
     game.Players.LocalPlayer.PlayerGui:WaitForChild('ScreenEffects').ChildAdded:Connect(function(child)
         task.wait(.2)
-        if child.Name == 'ItemFrame' and typesoulsettings.autokisuke and typesoulsettings.sendtowebhook then
+        if typesoulsettings.autokisuke then 
             pcall(function()
                 localPlayer.character.CharacterHandler.Remotes.EquipSkill:FireServer("Equals", child:FindFirstChildWhichIsA('TextLabel').Text)
             end)
+        end
+        if child.Name == 'ItemFrame' and typesoulsettings.autokisuke and typesoulsettings.sendtowebhook then
+            -- pcall(function()
+            --     localPlayer.character.CharacterHandler.Remotes.EquipSkill:FireServer("Equals", child:FindFirstChildWhichIsA('TextLabel').Text)
+            -- end)
             local KisukeData = {
                 ['content'] = '';
                 ['embeds'] = {{
