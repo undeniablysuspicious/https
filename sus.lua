@@ -43001,6 +43001,12 @@ elseif universeid == 4871329703 then -- type soul
         signals.conceal(function()
             child:WaitForChild('Humanoid')
             child:WaitForChild('HumanoidRootPart')
+            pcall(function()
+                typesoulsettings.connections[child.Name]:Disconnect();
+            end)
+            pcall(function()
+                typesoulsettings.connections[child.Name] = nil;
+            end)
             local hasAnimationPlayed = false; -- = 0
             for i,v in next, typesoulsettings.connections do 
                 if i == child.Name and v ~= nil then 
@@ -43010,6 +43016,14 @@ elseif universeid == 4871329703 then -- type soul
             if hasAnimationPlayed == true then return print('already has animation played',child.Name) end;
             local ctn; ctn = child.Humanoid.AnimationPlayed:Connect(function(anim)
                 --print(tostring(anim.Animation.AnimationId))
+                if child.Humanoid.Health <= 0 then 
+                    --ctn:Disconnect();
+                    pcall(function()
+                        typesoulsettings.connections[i]:Disconnect();
+                        typesoulsettings.connections[i] = nil;
+                    end)
+                    return;
+                end;
                 local animationId = tostring(anim.Animation.AnimationId):split('/')[3]
                -- print(animationId)
                 local IsAnimationIdRegistered = parryAnims[animationId]; --false
