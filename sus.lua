@@ -8517,12 +8517,12 @@ local metaforit = {};
 localPlayer.destroy = function(wehat, where)
 
 end;
-localPlayer.teleport = {};
-localPlayer.teleport.toInstance = function(id, job)
+metaforit.teleport = {};
+metaforit.teleport.toInstance = function(id, job)
     local teleportId = (id == true and game.PlaceId or id)
     game.TeleportService:TeleportToPlaceInstance(teleportId, job)
 end;
-localPlayer.teleport.serverHop = function(id)
+metaforit.teleport.serverHop = function(id)
     local serverId = (id == true and game.PlaceId or id)
     local Http = game:GetService("HttpService")
     local Api = "https://games.roblox.com/v1/games/"
@@ -8560,7 +8560,7 @@ metaforit.__index = function(table, key)
             return v
         end
     end
-    return localPlayer[key]
+    return metaforit[key]
     -- if key == 'rootPart' then 
     --     return game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
     -- end -- rootart
@@ -40785,7 +40785,7 @@ elseif universeid == 4871329703 then -- type soul
         if typesoulsettings.useaagun then 
             task.spawn(function()
                 repeat
-                    task.wait()
+                    task.wait(1)
                     local toX = math.random(1,1500);
                     local toY = math.random(1,1500)
                     local toZ = math.random(1,1500)
@@ -40914,9 +40914,23 @@ elseif universeid == 4871329703 then -- type soul
     lefttab:AddButton('Rejoin Same Server', function()
         game.TeleportService:TeleportToPlaceInstance(game.PlaceId,game.JobId)
     end)
-    lefttab:AddButton('Join Karakura Town', function()
-        game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town")
+    local savedGames = {
+        "Hueco Mundo";
+        "Karakura Town";
+        "Rukon District";
+        "Soul Society";
+        "Las Noches";
+        "Wandenreich City";
+    }
+    local bworld = lefttab:AddDropdown("Worlds", savedGames, "", false, function(State) -- true would join every game in list, use queueteleport
+        --
     end)
+    lefttab:AddButton('Join World', function() -- Join Game
+        game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(bworld:Get())
+    end)
+    -- lefttab:AddButton('Join Karakura Town', function()
+    --     game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town")
+    -- end)
     lefttab:AddSeperator('-')
     --
     lefttab:AddButton('Join Raid Server', function()
