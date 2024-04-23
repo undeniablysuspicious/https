@@ -41918,7 +41918,7 @@ elseif universeid == 4871329703 then -- type soul
                             hasAttemptedToTeleport = true
                             --
                             if localPlayer.character:FindFirstChild('Head') then 
-                                if not localPlayer.character:FindFirstChildWhichIsA('Highlight') then  -- HeWad
+                                if not localPlayer.character:FindFirstChildWhichIsA('Highlight') and hasAttemptedToTeleport ~= 0 then  -- HeWad
                                     if not checkdist(10, workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')) then 
                                         localPlayer.humanoid:ChangeState(Enum.HumanoidStateType.Dead)
                                         game.Players.LocalPlayer.Character.Head:Destroy()
@@ -41966,7 +41966,7 @@ elseif universeid == 4871329703 then -- type soul
                     end
                     if localPlayer.character:FindFirstChildWhichIsA('Highlight') then 
                         if not checkdist(15, workspace.NPCs.RaidBoss.Kisuke.WorldPivot) and hasAttemptedToTeleport == false then 
-                            hasAttemptedToTeleport = true;
+                            hasAttemptedToTeleport = 0;
                             localPlayer.rootPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
                         end
                         task.wait(.5)
