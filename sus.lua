@@ -40334,14 +40334,15 @@ elseif universeid == 4871329703 then -- type soul
     end -- tp(part, 100)
 
     local function checkdist(range, pos)
-        if typeof(pos) ~= 'Vector3' and pos and pos:IsA('BasePart') then pos = pos.Position end;
-        if typeof(pos) ~= 'Vector3' and pos and pos:IsA('Model') then 
+        if typeof(pos) ~= 'Vector3' and typeof(pos) ~= 'CFrame' and pos and pos:IsA('BasePart') then pos = pos.Position end;
+        if typeof(pos) ~= 'Vector3' and typeof(pos) ~= 'CFrame' and pos and pos:IsA('Model') then 
             if pos.PrimaryPart then 
                 pos = pos.PrimaryPart.Position
             else
                 pos = pos:FindFirstChildOfClass('BasePart').Position
             end
         end;
+        if typeof(pos) == 'CFrame' then pos = pos.Position end;
         if not pos then print('aint no way u checking distance with no pos, ',tostring(range)) return end;
         local b = false;
         if azfake:returndata().humanoidrootpart then 
