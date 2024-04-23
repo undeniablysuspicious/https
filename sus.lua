@@ -41584,7 +41584,7 @@ elseif universeid == 4871329703 then -- type soul
                     newItem = string.gsub(newItem,' obtained.','')
                     print('@item set',newItem)
                     repeat 
-                        typesoulsettings.getentityfolder().CharacterHandler.Remotes.EquipSkill:FireServer('Equals', newItem)
+                        typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.EquipSkill:FireServer('Equals', newItem)
                         task.wait(0.2)
                     until 1 == 2
                     --localPlayer.character.CharacterHandler.Remotes.EquipSkill:FireServer("Equals", child:FindFirstChildWhichIsA('TextLabel').Text)
