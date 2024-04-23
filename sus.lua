@@ -8522,6 +8522,14 @@ metaforit.teleport.toInstance = function(id, job)
     local teleportId = (id == true and game.PlaceId or id)
     game.TeleportService:TeleportToPlaceInstance(teleportId, job)
 end;
+metaforit.waitforchildwhichisa = function(obj, classname, name)
+    local toObject = nil;
+    repeat 
+        task.wait()
+        toObject = obj:FindFirstChildWhichIsA(classname) and (not name and true or obj:FindFirstChildWhichIsA(classname).Name == name and true) and obj:FindFirstChildWhichIsA(classname) 
+    until toObject; --obj:FindFirstChildWhichIsA(classname) and (not name and true or obj:FindFirstChildWhichIsA(classname).Name == name and true)
+    print('@waitforchild whichisa',obj.Name,obj.ClassName)
+end
 metaforit.teleport.serverHop = function(id)
     local serverId = (id == true and game.PlaceId or id)
     local Http = game:GetService("HttpService")
@@ -41568,9 +41576,13 @@ elseif universeid == 4871329703 then -- type soul
     game.Players.LocalPlayer.PlayerGui:WaitForChild('ScreenEffects').ChildAdded:Connect(function(child)
         task.wait(.2)
         if typesoulsettings.autokisuke and child.Name == 'ItemFrame' then 
-            pcall(function()
-                task.wait(1)
-                localPlayer.character.CharacterHandler.Remotes.EquipSkill:FireServer("Equals", child:FindFirstChildWhichIsA('TextLabel').Text)
+            signals.conceal(function()
+                pcall(function()
+                    task.wait(1)
+                    local newItem = localPlayer.waitforchildwhichisa(child, 'TextLabel').Text
+                    typesoulsettings.getentityfolder().CharacterHandler.Remotes.EquipSkill:FireServer('Equals', newItem)
+                    --localPlayer.character.CharacterHandler.Remotes.EquipSkill:FireServer("Equals", child:FindFirstChildWhichIsA('TextLabel').Text)
+                end)  
             end)
         end -- game.Players.LocalPlayer.Character.CharacterHandler.Remotes.EquipSkill:FireServer("Equals", 'Hogyoku Fragment')
         if child.Name == 'ItemFrame' and typesoulsettings.autokisuke and typesoulsettings.sendtowebhook then
@@ -41728,6 +41740,9 @@ elseif universeid == 4871329703 then -- type soul
                         if v:FindFirstChild('Head') then 
                             v:FindFirstChild('Head'):Destroy()
                         end
+                        pcall(function()
+                            v:BreakJoints()
+                        end)
                     end;
                 end
             end
