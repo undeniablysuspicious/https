@@ -41735,8 +41735,13 @@ elseif universeid == 4871329703 then -- type soul
                     -- end
                     local isPrimaryPartOwner = false;
                     for indexpart, part in next, v:GetChildren() do 
-                        if part:IsA('BasePart') and signals.findinstring(part.Name, 'Leg', 'Arm', 'Head', 'RootPart') then 
+                        if part:IsA('BasePart') and signals.findinstring(part.Name, 'Leg', 'Arm', 'Head', 'RootPart') then -- isnetworkowner
                             isPrimaryPartOwner = true;
+                            if isnetworkowner(part) then 
+                                for i,v in next, part:GetChildren() do 
+                                    if v:IsA('Motor6D') or v:IsA('Weld') then v:Destroy() end;
+                                end
+                            end
                         end
                     end;
                     if (isPrimaryPartOwner == true or v.PrimaryPart and isnetworkowner(v.PrimaryPart) or v:FindFirstChild('HumanoidRootPart') and isnetworkowner(v.HumanoidRootPart)) and v:FindFirstChildWhichIsA('Humanoid') then 
