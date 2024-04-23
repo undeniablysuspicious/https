@@ -41913,7 +41913,10 @@ elseif universeid == 4871329703 then -- type soul
                         end)
                     end
                     if localPlayer.character:FindFirstChildWhichIsA('Highlight') then 
-                        localPlayer.rootPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
+                        if not checkdist(15, workspace.NPCs.RaidBoss.Kisuke.WorldPivot) and hasAttemptedToTeleport == false then 
+                            hasAttemptedToTeleport = true;
+                            localPlayer.rootPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
+                        end
                         task.wait(.5)
                         canUseKisuke = true; -- -=
                     end
