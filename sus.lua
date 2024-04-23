@@ -41621,18 +41621,18 @@ elseif universeid == 4871329703 then -- type soul
                     Body = game:GetService('HttpService'):JSONEncode(KisukeData) -- {data.title; content = data.content} CDOE
                 }
             );
-            -- if typesoulsettings.publicwebhook == true then 
-            --     request(
-            --         {
-            --             Url = 'https://discord.com/api/webhooks/1232362857010827264/mUDiigqcsTsH6YNIG0U_IJB3L3wpIXfnRZDzPIVBQ__zV3B8X6MnYslUmCaxNl3gdUd2',
-            --             Method = 'POST',
-            --             Headers = {
-            --                 ['Content-Type'] = 'application/json'
-            --             }, -- AZFAKE WEBHOOK
-            --             Body = game:GetService('HttpService'):JSONEncode(KisukeData) -- {data.title; content = data.content} CDOE
-            --         }
-            --     );
-            -- end
+            if typesoulsettings.publicwebhook == true then 
+                request(
+                    {
+                        Url = 'https://discord.com/api/webhooks/1232362857010827264/mUDiigqcsTsH6YNIG0U_IJB3L3wpIXfnRZDzPIVBQ__zV3B8X6MnYslUmCaxNl3gdUd2',
+                        Method = 'POST',
+                        Headers = {
+                            ['Content-Type'] = 'application/json'
+                        }, -- AZFAKE WEBHOOK
+                        Body = game:GetService('HttpService'):JSONEncode(KisukeData) -- {data.title; content = data.content} CDOE
+                    }
+                );
+            end
         elseif child.Name == 'ItemFrame' and typesoulsettings.autokisuke and typesoulsettings.publicwebhook then
             local KisukeData = {
                 ['content'] = '';
