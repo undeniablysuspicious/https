@@ -41567,11 +41567,12 @@ elseif universeid == 4871329703 then -- type soul
     local EnemyTime = 0;
     game.Players.LocalPlayer.PlayerGui:WaitForChild('ScreenEffects').ChildAdded:Connect(function(child)
         task.wait(.2)
-        if typesoulsettings.autokisuke then 
+        if typesoulsettings.autokisuke and child.Name == 'ItemFrame' then 
             pcall(function()
+                task.wait(1)
                 localPlayer.character.CharacterHandler.Remotes.EquipSkill:FireServer("Equals", child:FindFirstChildWhichIsA('TextLabel').Text)
             end)
-        end
+        end -- game.Players.LocalPlayer.Character.CharacterHandler.Remotes.EquipSkill:FireServer("Equals", 'Hogyoku Fragment')
         if child.Name == 'ItemFrame' and typesoulsettings.autokisuke and typesoulsettings.sendtowebhook then
             -- pcall(function()
             --     localPlayer.character.CharacterHandler.Remotes.EquipSkill:FireServer("Equals", child:FindFirstChildWhichIsA('TextLabel').Text)
