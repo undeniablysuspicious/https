@@ -40279,7 +40279,8 @@ elseif universeid == 4871329703 then -- type soul
         animationspeed = 1;
         usemanualteleport = false;
         publicwebhook = false;
-        scrapeamount = 1500
+        scrapeamount = 1500;
+        autoparryholdtime = 0.1;
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -40412,7 +40413,7 @@ elseif universeid == 4871329703 then -- type soul
         if hold then 
             task.wait(hold) -- @shouldve concealed
         else
-            task.wait(0.1)
+            task.wait(typesoulsettings.autoparryholdtime); --(0.1)
         end
         if typesoulsettings.useparryvirtualiser == false then
             typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Released")
@@ -40579,6 +40580,9 @@ elseif universeid == 4871329703 then -- type soul
     -- end)
     sector:AddSlider("Auto Parry Distance", 0, 0, 100, 1, function(State)
         typesoulsettings.autoparrydistance = State -- deepwtykensettings  typesoulsettings
+    end)
+    sector:AddSlider("Hold Time", 0, 0.2, 1, 100, function(State)
+        typesoulsettings.autoparryholdtime = State -- deepwtykensettings  typesoulsettings
     end)
     local pingadjust = sector:AddSlider("Parry Ping Adjuster", 0, 0, 100, 1, function(State)
         typesoulsettings.pingadjuster = State -- deepwtykensettings  typesoulsettings pingadjust
@@ -43003,7 +43007,7 @@ elseif universeid == 4871329703 then -- type soul
                     hasAnimationPlayed = true;
                 end
             end
-            if hasAnimationPlayed == true then return print('already has animation played') end;
+            if hasAnimationPlayed == true then return print('already has animation played',child.Name) end;
             local ctn; ctn = child.Humanoid.AnimationPlayed:Connect(function(anim)
                 --print(tostring(anim.Animation.AnimationId))
                 local animationId = tostring(anim.Animation.AnimationId):split('/')[3]
@@ -43114,11 +43118,14 @@ elseif universeid == 4871329703 then -- type soul
                     index += 1
                     if i == child.Name then 
                         table.remove(typesoulsettings.connections, index)
+                        typesoulsettings.connections[i]:Disconnect()
                         typesoulsettings.connections[i] = nil; --['noway']
                         print('removing',child.Name)
                     end
                 end
-                ctn:Disconnect();
+                pcall(function()
+                    ctn:Disconnect();
+                end)
                 diedctn:Disconnect()
             end)
         end)
