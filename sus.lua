@@ -8517,6 +8517,32 @@ local metaforit = {};
 localPlayer.destroy = function(wehat, where)
 
 end;
+localPlayer.teleport = {};
+localPlayer.teleport.toInstance = function(id, job)
+    local teleportId = (id == true and game.PlaceId or id)
+    game.TeleportService:TeleportToPlaceInstance(teleportId, job)
+end;
+localPlayer.teleport.serverHop = function(id)
+    local serverId = (id == true and game.PlaceId or id)
+    local Http = game:GetService("HttpService")
+    local Api = "https://games.roblox.com/v1/games/"
+    local _servers = Api..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+    local _servers = Api..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+    function ListServers(cursor)
+       local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
+       return Http:JSONDecode(Raw)
+    end
+    local listed = 0
+    local reg = {}
+    for _,server in next, ListServers(nil).data do 
+        pcall(function()
+            if server.id ~= game.JobId then 
+                table.insert(reg,server.id)  
+            end
+        end)
+    end
+    game:GetService("TeleportService"):TeleportToPlaceInstance(serverId,reg[math.random(1,#reg)],game.Players.LocalPlayer)
+end;
 setmetatable(localPlayer,metaforit);
 metaforit.__index = function(table, key)
     local quickuses = {
@@ -8534,6 +8560,7 @@ metaforit.__index = function(table, key)
             return v
         end
     end
+    return localPlayer[key]
     -- if key == 'rootPart' then 
     --     return game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
     -- end -- rootart
@@ -8613,6 +8640,7 @@ metaforit.__call = function(_table,  ...) -- in our case the arguments are going
         return true
     end;
 end
+
 -- localPlayer('destroy','head', 'character','all')
 -- localPlayer('cframe')
 -- localPlayer('fire', game.RemoteEvent, 'nig')
@@ -40246,6 +40274,12 @@ elseif universeid == 4871329703 then -- type soul
         skipserver = 0;
         skipservertgl = false;
         lookataxiszyxy = false;
+        useaagun = false;
+        fasteranimations = false;
+        animationspeed = 1;
+        usemanualteleport = false;
+        publicwebhook = false;
+        scrapeamount = 1500
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -40447,6 +40481,7 @@ elseif universeid == 4871329703 then -- type soul
         typesoulsettings.autoparry = e;
         if not e then 
             maid.autoparrycheck = nil;
+            maid.autoparrycheck2 = nil;
             return;
         end;
 
@@ -40498,11 +40533,17 @@ elseif universeid == 4871329703 then -- type soul
                     task.wait(0.05)
                     onAdded(obj)
                 end)
-                table.insert(typesoulsettings.connections,ctn);
+                typesoulsettings.connections[child.Name] = ctn;
+                --table.insert(typesoulsettings.connections,ctn);
                 child.Destroying:Connect(function()
                     ctn:Disconnect()
                 end)
             end;
+        end)
+        maid.autoparrycheck2 = workspace.Effects.ChildRemoved:Connect(function(child)
+            if typesoulsettings.connections[child.Name] then 
+                typesoulsettings.connections[child.Name]:Disconnect()
+            end
         end)
         for i,v in next, workspace.Effects:GetChildren() do 
             if v.Name ~= game.Players.LocalPlayer.Name then 
@@ -40735,8 +40776,24 @@ elseif universeid == 4871329703 then -- type soul
     end)
     bkeytroll:ActivateKnowledge()
     bkeytroll:AddKnowledge('Put Key On 1')
+    lefttab:AddToggle('Use AA Gun', false, function(e)
+        typesoulsettings.useaagun = e; -- useaagan
+    end)
     lefttab:AddButton('Kill Self', function()
         if not azfake:returndata().character then return end;
+        if not localPlayer.rootPart then return end;
+        if typesoulsettings.useaagun then 
+            task.spawn(function()
+                repeat
+                    task.wait()
+                    local toX = math.random(1,1500);
+                    local toY = math.random(1,1500)
+                    local toZ = math.random(1,1500)
+                    localPlayer.rootPart.CFrame = CFrame.new(toX,toY,toZ)
+                until localPlayer.humanoid.Health <= 0
+            end)
+            return;
+        end;
         if azfake:returndata().character:FindFirstChild('Head') then 
             azfake:returndata().character:FindFirstChild('Head'):Destroy();
         end;
@@ -40747,6 +40804,9 @@ elseif universeid == 4871329703 then -- type soul
     lefttab:AddToggle('Use Skip Server', false, function(e)
         typesoulsettings.skipservertgl = e;
     end)
+    lefttab:AddToggle('Use Manual Teleport', false, function(e)
+        typesoulsettings.usemanualteleport = e;
+    end)
     lefttab:AddButton('Serverhop', function()
         local gameIDS = {}
         gameIDS[14069122388] = "Hueco Mundo"
@@ -40755,6 +40815,10 @@ elseif universeid == 4871329703 then -- type soul
         gameIDS[14070029709] = "Soul Society"
         gameIDS[14069866342] = "Las Noches"
         gameIDS[14071822972] = "Wandenreich City"
+        if typesoulsettings.usemanualteleport then 
+            localPlayer.teleport.serverHop(true);
+            return;
+        end;
         local GameName = ''
         for i,v in next, gameIDS do 
             if i == game.PlaceId then 
@@ -40790,14 +40854,19 @@ elseif universeid == 4871329703 then -- type soul
     lefttab:AddButton('Rejoin Same Server', function()
         game.TeleportService:TeleportToPlaceInstance(game.PlaceId,game.JobId)
     end)
-    lefttab:AddToggle('Rainbow Cloak', false, function(e)
-        typesoulsettings.rainbowcloak = e;
+    lefttab:AddButton('Join Karakura Town', function()
+        game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town")
     end)
+    lefttab:AddSeperator('-')
+    --
     lefttab:AddButton('Join Raid Server', function()
         if not azfake:returndata().character then return end;
         print('raid func hash '..RaidJoin.hash)
         local raidresult = RaidJoin.func()
         azfakenotify(tostring(statusafter),3)
+    end)
+    lefttab:AddToggle('Rainbow Cloak', false, function(e)
+        typesoulsettings.rainbowcloak = e;
     end)
     local WasARaidServer = false
     lefttab:AddToggle('Auto Join Raid', false, function(e)
@@ -41465,6 +41534,18 @@ elseif universeid == 4871329703 then -- type soul
                     Body = game:GetService('HttpService'):JSONEncode(KisukeData) -- {data.title; content = data.content} CDOE
                 }
             );
+            if typesoulsettings.publicwebhook == true then 
+                request(
+                    {
+                        Url = 'https://discord.com/api/webhooks/1232362857010827264/mUDiigqcsTsH6YNIG0U_IJB3L3wpIXfnRZDzPIVBQ__zV3B8X6MnYslUmCaxNl3gdUd2',
+                        Method = 'POST',
+                        Headers = {
+                            ['Content-Type'] = 'application/json'
+                        }, -- AZFAKE WEBHOOK
+                        Body = game:GetService('HttpService'):JSONEncode(KisukeData) -- {data.title; content = data.content} CDOE
+                    }
+                );
+            end
         end
     end)
     local wasinsta = newother:AddToggle('Insta Kill Mobs',false,function(e, wasclicked)
@@ -41531,6 +41612,9 @@ elseif universeid == 4871329703 then -- type soul
     end)
     local webhooksend = newother:AddToggle('Send to Webhook',false,function(e, wasclicked)
         typesoulsettings.sendtowebhook = e;
+    end)
+    newother:AddToggle('Send to Public Webhook',false,function(e, wasclicked)
+        typesoulsettings.publicwebhook = e; -- need to make security on this
     end)
     newother:AddSlider("Time To Wait", 0, 30, 120, 1, function(State)
         typesoulsettings['timetowait'] = State
@@ -42088,6 +42172,26 @@ elseif universeid == 4871329703 then -- type soul
         spof:ActivateKnowledge()
         --workspace.NPCs.RaidBoss.Kisuke.ClickDetector
     end
+    newother:AddSlider("Animation Speed", 0, 1, 10, 100, function(State)
+        typesoulsettings['animationspeed'] = State
+    end)
+    newother:AddToggle('Faster Animations',false,function(e)
+        typesoulsettings.fasteranimations = e;
+        if not e then 
+            maid.fastanim = nil;
+            maid.fastanim2 = nil;
+            return
+        end;
+        maid.fastanim = signals.gamestepped:connect('no anims', function()--game.RunService:Connect(function())
+            if not  azfake:returndata().character then return end;
+            if not  azfake:returndata().humanoid then return end;
+            if not maid.fastanim2 and typesoulsettings.fasteranimations == true then -- azfake:returndata().character and
+                maid.fastanim2 = azfake:returndata().character.Humanoid.AnimationPlayed:Connect(function(anim)
+                    anim:AdjustSpeed(typesoulsettings.animationspeed)
+                end)
+            end
+        end)
+    end)
     newother:AddToggle('No Animations',false,function(e)
         typesoulsettings.noanims = e;
         if not e then 
@@ -42098,7 +42202,7 @@ elseif universeid == 4871329703 then -- type soul
         maid.noanims = signals.gamestepped:connect('no anims', function()--game.RunService:Connect(function())
             if not  azfake:returndata().character then return end;
             if not  azfake:returndata().humanoid then return end;
-            if not maid.noanims2 then -- azfake:returndata().character and
+            if not maid.noanims2 and typesoulsettings.noanims == true then -- azfake:returndata().character and
                 maid.noanims2 = azfake:returndata().character.Humanoid.AnimationPlayed:Connect(function(anim)
                     anim:AdjustSpeed(0)
                     anim:Stop()
@@ -42258,6 +42362,33 @@ elseif universeid == 4871329703 then -- type soul
     newother:AddToggle('Full Bright',false,function(e)
         typesoulsettings.fullbright = e;
     end)
+    farmrightsect:AddSlider('Scrape Amount', 0 , 1500, 10000, 1, function(x) -- scrape
+        typesoulsettings.scrapeamount = x;
+    end)
+    farmrightsect:AddButton('Redeem All Codes', function()
+        if not typesoulsettings.functions.getentityfolder() then return end;
+        local enTi = typesoulsettings.functions.getentityfolder() -- lenTi
+        local codeRemote = enTi.CharacterHandler.Remotes.Codes
+        local response = game:HttpGet("https://www.escapistmagazine.com/type-soul-codes/")
+        response = string.gsub(response,' ','')
+        local basecodeoffset = 688086 -- string.find(code) in response gets u base line, code has to be first
+        response = response:sub(basecodeoffset,basecodeoffset+typesoulsettings.scrapeamount)
+        local codes = response:split('<strong>') -- </strong>:
+        for i,v in next, codes do 
+            local realCode = '';
+            for index = 1, string.len(v) do -- index, _v in next, string.len(v)
+                local value = v:sub(index,index)
+                if value == '<' or value == '>' then 
+                    print('broke to',realCode)
+                    break; -- ene
+                else
+                    realCode = realCode..value
+                end
+            end;
+            codeRemote:InvokeServer(realCode)
+            task.wait(.25)
+        end
+    end);
     --
     local isUp = true;
     local m1con; m1con = game.Players.LocalPlayer:GetMouse().Button1Down:Connect(function()
