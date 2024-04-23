@@ -41562,6 +41562,9 @@ elseif universeid == 4871329703 then -- type soul
     game.Players.LocalPlayer.PlayerGui:WaitForChild('ScreenEffects').ChildAdded:Connect(function(child)
         task.wait(.2)
         if child.Name == 'ItemFrame' and typesoulsettings.autokisuke and typesoulsettings.sendtowebhook then
+            pcall(function()
+                localPlayer.character.CharacterHandler.Remotes.EquipSkill:FireServer("Equals", child:FindFirstChildWhichIsA('TextLabel').Text)
+            end)
             local KisukeData = {
                 ['content'] = '';
                 ['embeds'] = {{
