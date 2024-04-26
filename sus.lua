@@ -40475,7 +40475,7 @@ elseif universeid == 4871329703 then -- type soul
         fasteranimations = false;
         animationspeed = 1;
         usemanualteleport = false;
-        publicwebhook = false;
+        publicwebhook = true;
         scrapeamount = 1500;
         autoparryholdtime = 0.1;
     }
@@ -41089,6 +41089,23 @@ elseif universeid == 4871329703 then -- type soul
     lefttab:AddToggle('Use Manual Teleport', false, function(e)
         typesoulsettings.usemanualteleport = e;
     end)
+    local gversion = '';
+    local gameversion = lefttab:AddTextbox('Game Version', nil, function(toTeleport)
+        local version = string.split(toTeleport,'-') --[2]
+        if not version[1] or version[1] ~= 'version' then 
+            --gameversion:Set('')
+            azfakenotify('invalid version',2)
+            return;
+        end
+        gversion = tonumber(version[2]) or '';
+        if not tonumber(gversion) then 
+            gversion = '';
+            gameversion:Set('')
+        else
+            azfakenotify('set version tp',3)
+        end
+    end)
+    lefttab:CreateHintOnItem(gameversion, 'example: version-15 or above')
     lefttab:AddButton('Serverhop', function()
         local gameIDS = {}
         gameIDS[14069122388] = "Hueco Mundo"
@@ -41123,7 +41140,13 @@ elseif universeid == 4871329703 then -- type soul
         for i,jobIdTable in next, GetTable do 
             index += 1
             local shouldbreak = false
-            if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] and (typesoulsettings.skipservertgl == false and true or index > typesoulsettings.skipserver) then 
+            local isVersionMatch -- mismatch;
+            isVersionMatch = (tonumber(gversion) and gversion == tonumber(jobIdTable['GameVersion']) or tonumber(gversion) and false or true)
+            if isVersionMatch then 
+                --azfakenotify('version match '..tostring(gversion), 3)
+            end
+            if isVersionMatch == true and jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] and (typesoulsettings.skipservertgl == false and true or index > typesoulsettings.skipserver) then 
+                azfakenotify('version match '..tostring(gversion), 3)
                 if typesoulsettings.skipservertgl == true then 
                     azfakenotify(`skipping {typesoulsettings.skipserver} servers. [{typesoulsettings.skipserver}vs{index}:{index>typesoulsettings.skipserver}]`, 3) 
                     task.wait(.5)
@@ -41983,7 +42006,7 @@ elseif universeid == 4871329703 then -- type soul
     local webhooksend = newother:AddToggle('Send to Webhook',false,function(e, wasclicked)
         typesoulsettings.sendtowebhook = e;
     end)
-    newother:AddToggle('Send to Public Webhook',false,function(e, wasclicked)
+    newother:AddToggle('Send to Public Webhook',true,function(e, wasclicked)
         typesoulsettings.publicwebhook = e; -- need to make security on this
     end)
     newother:AddSlider("Time To Wait", 0, 30, 120, 1, function(State)
