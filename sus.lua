@@ -8107,6 +8107,25 @@ end)
 -- signals.new()
 -- print bad if no good
 
+-- local b = {}
+-- setmetatable(b, {
+--     __call = function(table, arg)
+--         local quick = arg;
+--         if type(quick) == 'string' then 
+--             quick = game:GetService(quick)
+--         end
+--         return cloneref(quick)
+--     end
+-- })
+-- local metaindex;
+-- metaindex = hookmetamethod(game,'__index',function(self,...) 
+--     local args = {...}
+--     if args[1] == 'get' then 
+--         return b --cloneref(game:GetService(args[2]))
+--     end
+--     return metaindex(self,...)
+-- end)
+
 local Mouse = game.Players.LocalPlayer:GetMouse()
 
 local sharedRequires = {};
@@ -8531,6 +8550,49 @@ metaforit.waitforchildwhichisa = function(obj, classname, name)
     print('@waitforchild whichisa',toObject.Name,toObject.ClassName)
     return toObject
 end
+metaforit.awaitnewcharacterinstance = function(customDirectory, useLoop) -- useName
+    local currentCharacter = game.Players.LocalPlayer.Character;
+    local directory = customDirectory or workspace  -- .Live
+    if useLoop then 
+        local isFound = false;
+        repeat 
+            task.wait()
+            for i,v in next, directory:GetChildren() do 
+                if v.Name == currentCharacter.Name and game.Players:GetPlayerFromCharacter(v) then 
+                    isFound = true;
+                end
+                if i % 20 == 0 then task.wait() end;
+            end;
+        until isFound == true;
+    end
+    local isDone = false;
+    repeat 
+        task.wait() 
+        if game.Players.LocalPlayer.Character ~= currentCharacter then 
+            if game.Players.LocalPlayer.Character ~= nil and game.Players.LocalPlayer.Character.PrimaryPart then 
+                isDone = true;
+            end;
+        end;    
+    until isDone == true; --directory:FindFirstChild
+
+end-- localPlayer.awaitnewcharacterinstance()
+metaforit.cframeteleport = function(tocframe, info) -- isdist, yield
+    if not game.Players.LocalPlayer.Character then return warn('no character') end;
+    local data = info or {isdist = 10; yield = true}
+    if not data.yield then data.yield = true end;
+    if not data.isdist then data.isdist = 10 end; -- could have a defualt properties table and set the values
+    local function teleportCFrame()
+        repeat 
+            task.wait()
+            game.Players.LocalPlayer.Character.PrimaryPart.CFrame = tocframe
+        until (game.Players.LocalPlayer.Character.PrimaryPart.Position - tocframe.Position).Magnitude <= data.isdist
+    end;
+    if data.yield then 
+        teleportCFrame()
+    else
+        task.spawn(teleportCFrame)
+    end
+end;
 metaforit.teleport.serverHop = function(id)
     local serverId = (id == true and game.PlaceId or id)
     local Http = game:GetService("HttpService")
@@ -8563,6 +8625,7 @@ metaforit.__index = function(table, key)
         parts = game.Players.LocalPlayer.Character and parts;
         rootPart = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
         instance = game.Players.LocalPlayer;
+        mouse = game.Players.LocalPlayer:GetMouse();
     }
     for i,v in next, quickuses do 
         if tostring(i) == tostring(key) then 
@@ -8574,6 +8637,7 @@ metaforit.__index = function(table, key)
     --     return game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
     -- end -- rootart
 end
+print(localPlayer.instance)
 metaforit.__call = function(_table,  ...) -- in our case the arguments are going to be a number and a string
     local args = {...} -- ./.
     local whereabouts = {
@@ -8654,7 +8718,7 @@ end
 -- localPlayer('cframe')
 -- localPlayer('fire', game.RemoteEvent, 'nig')
 -- localPlayer({nothing})
-
+-- [][]
 
 local services = {
     vis = game:GetService('VirtualInputManager');
@@ -8675,7 +8739,131 @@ local signals = {
     fenv = {};
     senv = {};
     game = {};
-}
+    coroutine = {
+        threads = {};
+    };
+    flask = {
+        running = {};
+    };
+};
+signals.get = function(a1)
+    if type(a1) == 'string' then a1 = game:GetService(a1) end;
+    return cloneref(a1)
+end;
+signals.flask.start = function(...)
+    -- runs functions simultanuelyksdios
+    local flaskfunctioninmemory = signals.get(game:GetService('HttpService')):GenerateGUID(false)
+    local wasFlasked = {}
+    if vs == 'debug' then print('started flask') end;
+    for index, funct in next, {...} do 
+        -- flash.running[flaskfunctioninmemory] = {}
+        flask.running[flaskfunctioninmemory] = {};
+        local flaskid = game:GetService('HttpService'):GenerateGUID(false)
+        flask.running[flaskfunctioninmemory][flaskid] = task.spawn(funct)
+        wasFlasked[index] = flaskid
+    end;
+    -- could return table with indexes as the flask id or could do both
+    return flaskfunctioninmemory, wasFlasked
+end; -- local functiontable = signals.flask.start(f1,f2,f3)
+-- signals.flask.get(2, functiontable, true) --: want to stop function 2 (f2)
+signals.flask.get = function(index, mainFlask, stop) 
+    local tbl = nil;
+    local mainIndex = nil;
+    if type(mainFlask) == 'string' then 
+        tbl = flask.running[mainFlask];
+    elseif type(mainFlask) == 'table' then 
+        tbl = mainFlask
+    end;
+    if tbl == nil then 
+        return error('Invalid value apps, passed to thread (flask)')
+    end
+    if type(index) ~= 'number' and type(index) ~= 'string' then 
+        return error('Invalid index passed as argument 1. Not a string or a number.')
+    end
+    if type(index) == 'string' then 
+        local indexCount = 0
+        for i,v in next, tbl do 
+            indexCount += 1
+            if tostring(i) == index then 
+                mainIndex = indexCount;
+            end;
+        end
+    else
+        mainIndex = index;
+    end;
+    local willreturn = nil;
+    local indexCount = 0
+    for i,v in next, tbl do 
+        indexCount += 1
+        if indexCount == mainIndex then 
+            willreturn = v;
+        end
+    end
+    if willreturn and stop then 
+        task.cancel(willreturn) -- signals.flask.running.
+    end
+    return willreturn;
+end;
+--signals.coroutine = {};
+signals.coroutine.new = function(name, f)  --embed
+    signals.coroutine.threads[name] = task.spawn(f)
+end;
+signals.coroutine.isrunning = function(name, stringinput)  --embed
+    local output = true;
+    if signals.coroutine.threads[name] ~= nil and type(signals.coroutine.threads[name]) == 'table' then 
+        output = nil;
+    end
+    if signals.coroutine.threads[name] == nil then 
+        output = false;
+    end
+    if stringinput then 
+        if output == true then 
+            output = 'running'
+        end
+        if output == nil then 
+            output = 'paused' -- p  a s u e d
+        end
+        if output == false then 
+            output = 'disregarded' -- stopped
+        end
+    end
+    return (not stringinput and output or stringconv)
+end;
+signals.coroutine.pause = function(name)
+    local functionSave = signals.coroutine.threads[name]
+    task.cancel(signals.coroutine.threads[name])
+    signals.coroutine.threads[name] = {
+        functionSave
+    }
+end;
+signals.coroutine.stop = function(name) -- hault
+    if type(signals.coroutine.threads[name]) == 'table' then 
+        error('Cannot stop thread, thread is paused.')
+        return
+    end
+    task.cancel(signals.coroutine.threads[name])
+    signals.coroutine.threads[name] = nil;
+end;
+signals.coroutine.restart = function(name) -- hault
+    if type(signals.coroutine.threads[name]) == 'table' then 
+        -- can go through
+        warn('Restarting thread',name)
+    else
+        error('Cannot restart a thread when it is not paused.')
+        return
+    end
+    -- task.cancel(signals.coroutine.threads[name])
+    signals.coroutine.new(name, signals.coroutine.threads[name][1])
+    -- signals.coroutine.threads[name]
+end;
+-- signals.coroutine.new('loop1', function() while true do task.wait(1) print('loop 1') end end)
+-- task.wait(2)
+-- signals.coroutine.pause('loop1')
+-- task.wait(1)
+-- signals.coroutine.restart('loop1')
+-- task.wait(1)
+-- signals.coroutine.stop('loop1')
+
 signals.services.UnloadService = {};
 signals.services.UnloadService.WrapFunction = function(x)
     return function()
@@ -40475,6 +40663,25 @@ elseif universeid == 4871329703 then -- type soul
         game:GetService("ReplicatedStorage").Remotes.ServerCombatHandler:FireServer('CriticalAttack')
     end;
 
+    typesoulsettings.functions.clickguiobject = function(obj)
+        local inputManager = game:GetService('VirtualInputManager')
+        local replicateGui = Instance.new('ScreenGui')
+        replicateGui.Parent = game.CoreGui
+        local virtualFrame = Instance.new('Frame');
+        virtualFrame.BackgroundTransparency = 1;
+        virtualFrame.Parent = replicateGui;
+        virtualFrame.Size = UDim2.new(1,0,10)
+        obj.Parent = virtualFrame;
+        local toPress = {
+            X = workspace.CurrentCamera.ViewportSize.X/2;
+            Y = workspace.CurrentCamera.ViewportSize.Y/2;
+        }
+        inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,true,game,0) -- 1319,574
+        task.wait(0.05)
+        inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,false,game,0)
+        task.wait(.05)
+        replicateGui:Destroy();
+    end;
     local parryAnims = {};
 
     local parrywhitelist = sector:AddDropdown("Auto Parry Whitelist", typesoulsettings.whitelistap, "All", false, function(State) -- could change to quest  getWhitelsited
@@ -41575,7 +41782,7 @@ elseif universeid == 4871329703 then -- type soul
     local KisukeTime = 0
     local EnemyTime = 0;
     game.Players.LocalPlayer.PlayerGui:WaitForChild('ScreenEffects').ChildAdded:Connect(function(child)
-        task.wait(.2)
+        task.wait(.2) --  check if game placeid is raid world to send webhoom cuzx rhey might do get codes with kisuke on and send a webhoiok for whqt the codes ghave them not us
         if typesoulsettings.autokisuke and child.Name == 'ItemFrame' then 
             signals.conceal(function()
                 pcall(function()
@@ -41737,8 +41944,9 @@ elseif universeid == 4871329703 then -- type soul
                     local isPrimaryPartOwner = false;
                     for indexpart, part in next, v:GetChildren() do 
                         if part:IsA('BasePart') and signals.findinstring(part.Name, 'Leg', 'Arm', 'Head', 'RootPart') then -- isnetworkowner
-                            isPrimaryPartOwner = true;
+                            --isPrimaryPartOwner = true;
                             if isnetworkowner(part) then 
+                                isPrimaryPartOwner = true;
                                 for i,v in next, part:GetChildren() do 
                                     if v:IsA('Motor6D') or v:IsA('Weld') then v:Destroy() end;
                                 end
@@ -41746,7 +41954,7 @@ elseif universeid == 4871329703 then -- type soul
                         end
                     end;
                     if (isPrimaryPartOwner == true or v.PrimaryPart and isnetworkowner(v.PrimaryPart) or v:FindFirstChild('HumanoidRootPart') and isnetworkowner(v.HumanoidRootPart)) and v:FindFirstChildWhichIsA('Humanoid') then 
-                        print('network owner')
+                        --print('network owner')
                         v:FindFirstChildWhichIsA('Humanoid').Health = 0
                         if v:FindFirstChild('Head') then 
                             v:FindFirstChild('Head'):Destroy()
@@ -41961,7 +42169,7 @@ elseif universeid == 4871329703 then -- type soul
                             canUseKisuke = (didKillself == true and false or didKillself == 'dialogue' and 1 or  nil); --false; 
                         end
                     end;  
-                    if not didTeleportHighlight and canUseKisuke == true and workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
+                    if not didTeleportHighlight and typesoulsettings.teleportKisukeBeforeUse and canUseKisuke == true and workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
                         if not checkdist(10, workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart')) then 
                             canUseKisuke = false;
                             if localPlayer.character:FindFirstChild('Head') then 
@@ -41975,7 +42183,7 @@ elseif universeid == 4871329703 then -- type soul
                         end
                     end;    
                     --
-                    if not didTeleportHighlight and canUseKisuke == false then 
+                    if not didTeleportHighlight and canUseKisuke == false and typesoulsettings.teleportKisukeBeforeUse then 
                         local newAdd; newAdd = workspace.Entities.ChildAdded:Connect(function(b)
                             if b.Name == game.Players.LocalPlayer.Name then 
                                 -- task.delay(0.7,function()
@@ -41992,7 +42200,7 @@ elseif universeid == 4871329703 then -- type soul
                             end
                         end)
                     end
-                    if localPlayer.character:FindFirstChildWhichIsA('Highlight') then 
+                    if localPlayer.character:FindFirstChildWhichIsA('Highlight') and typesoulsettings.teleportKisukeBeforeUse  then 
                         if not checkdist(15, workspace.NPCs.RaidBoss.Kisuke.WorldPivot) and hasAttemptedToTeleport == false then 
                             hasAttemptedToTeleport = 0;
                             localPlayer.rootPart.CFrame = workspace.NPCs.RaidBoss.Kisuke.WorldPivot
@@ -42019,12 +42227,12 @@ elseif universeid == 4871329703 then -- type soul
                     if canUseKisuke == 'dialogue' then 
                         canUseKisuke = true;
                     end;
-                    if not checkdist(15, workspace.NPCs.RaidBoss.Kisuke.WorldPivot) then  --  and hasAttemptedToTeleport == false
+                    if not checkdist(15, workspace.NPCs.RaidBoss.Kisuke.WorldPivot) and typesoulsettings.teleportKisukeBeforeUse then  --  and hasAttemptedToTeleport == false
                         task.wait(1)
                         hasAttemptedToTeleport = false;
                         canUseKisuke = false;
                     end
-                    if not workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') then 
+                    if not workspace.NPCs.RaidBoss.Kisuke:FindFirstChild('HumanoidRootPart') and typesoulsettings.teleportKisukeBeforeUse then 
                         hasAttemptedToTeleport = false;
                         canUseKisuke = false;
                     end
@@ -42067,6 +42275,10 @@ elseif universeid == 4871329703 then -- type soul
             if type(toState) == 'string' then toState = {State} end;
             typesoulsettings.selecttradeitem = toState -- useskillselection 
         end) -- DONTSAVE AUTOLOADNOSAVEMENT  DONTSAVE
+        local speicif = ''
+        local specifictitem = earlyaccess:AddTextbox('Specific Item', nil, function(x)
+            speicif = x;
+        end) earlyaccess:CreateHintOnItem(specifictitem, 'Overides Inventory Selection')
         earlyaccess:AddButton('Update Inventory', function()
             for i,v in next, inventorysafe.defaultitems do 
                 inventorysafe:Remove(v);
@@ -42091,12 +42303,14 @@ elseif universeid == 4871329703 then -- type soul
         earlyaccess:AddToggle('Auto BONG BONG',false,function(e, wasclicked)
             if not wasclicked then return end;
             local newtable = typesoulsettings.selecttradeitem;
+            if speicif ~= '' then newtable = {speicif} end
             if #newtable >= 2 then table.remove(newtable,1) end;
             -- local formatted = table.concat(newtable,',')
             -- local res = library:CheckForPermission(`Are you sure you want to use bong bong on\n{newtable[1]}? Make sure you only have 1\nof the item.`)
             -- if res == false then return end;
             if #newtable == 0 then azfakenotify('no item sdelect', 3) return end;
             local toBong = newtable[1]
+            azfakenotify(toBong, 3)
 
             typesoulsettings.autobongbong = e;
             if not e then 
@@ -42108,55 +42322,124 @@ elseif universeid == 4871329703 then -- type soul
             local bongdelay = false;
             local nelnpc = workspace:WaitForChild('NPCs'):WaitForChild('Nel'):WaitForChild('Nel')
             local bongnpc = workspace:WaitForChild('NPCs'):WaitForChild('Exechange'):WaitForChild('BONG BONG')
+            local cframes = {
+                cf1 = CFrame.new(-133.713409, -3.85735607, -4285.55273, 0.97488749, 8.87291094e-08, -0.222698003, -1.03375548e-07, 1, -5.41110268e-08, 0.222698003, 7.57736913e-08, 0.97488749) * CFrame.Angles(math.rad(180),math.rad(0),math.rad(0)); --CFrame.new(-138.708649, -8.00775719, -4291.89746, 0.933075011, -1.54349546e-08, 0.359681785, -6.10972495e-10, 1, 4.44977708e-08, -0.359681785, -4.1739515e-08, 0.933075011);
+                cf2 = CFrame.new(2698.11841, 21.1437988, -3256.04761, 0.290198535, -2.34895001e-08, -0.95696646, 3.25070637e-08, 1, -1.46880774e-08, 0.95696646, -2.68457114e-08, 0.290198535);
+
+            }
             local inputManager = game.VirtualInputManager
             local m = game.Players.LocalPlayer:GetMouse()
             local isTaken = false;
-            game.Players.LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
-                task.wait(.1)
-                if child.Name == 'Storing' then 
-                    child:WaitForChild('MainFrame').Size = UDim2.new(1,1,1,1)
-                    child:WaitForChild('MainFrame').Position = UDim2.new(0.5,0,0.5,0)
-                    child:WaitForChild('MainFrame'):WaitForChild('StorageFrame').ZIndex = 1000
-                    child:WaitForChild('MainFrame'):WaitForChild('StorageFrame').Size = UDim2.new(2,2,2,2)
-                    child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List').Size = UDim2.new(0.5,0,0.5,0) --UDim2.new(2,2,2,2)
-                    child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List').ZIndex = 1000
-                    --child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):FindFirstChild('UIListLayout'):Destroy(); --LiS
-                    if child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):FindFirstChild('UIGridLayout') then 
-                        child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):FindFirstChild('UIGridLayout'):Destroy()
-                    end
-                    -- {0, 500}, {0, 200} StoraegFrame
-                    child:WaitForChild('MainFrame'):WaitForChild('StorageFrame').Position = UDim2.new(0.5, 0, 0.5, 0)
-                    child:WaitForChild('MainFrame'):WaitForChild('StorageFrame').List.Position = UDim2.new(0.5,0,0.5,0)
-                    for i,v in next, child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):GetChildren() do 
-                        if v:FindFirstChild('AddItem') then 
-                            if v.AddItem.Text:find(toBong) then -- 
-                                print('found')
-                                v.Size = UDim2.new(1,1,1,1)
-                                --v.AddItem.
-                                --v.AddItem.Size = UDim2.new(4,4,4,4)
-                                v.ZIndex = 999
-                                --v.AddItem.ZIndex = 1000
-                                task.wait(0.1)
-                                local toPress = {
-                                    X = workspace.CurrentCamera.ViewportSize.X/2;
-                                    Y = workspace.CurrentCamera.ViewportSize.Y/2;
-                                }
-                                inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,true,game,0) -- 1319,574
-                                task.wait(0.1)
-                                inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,false,game,0)
-                                isTaken = true;
-                                for i=1, 10 do 
-                                    task.wait(.1)
+            -- game.Players.LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
+            --     --task.wait(.1)
+            --     if child.Name == 'Storing' and isTaken == false then 
+            --         child:WaitForChild('MainFrame').Size = UDim2.new(1,1,1,1)
+            --         child:WaitForChild('MainFrame').Position = UDim2.new(0.5,0,0.5,0)
+            --         child:WaitForChild('MainFrame'):WaitForChild('StorageFrame').ZIndex = 1000
+            --         child:WaitForChild('MainFrame'):WaitForChild('StorageFrame').Size = UDim2.new(2,2,2,2)
+            --         child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List').Size = UDim2.new(0.5,0,0.5,0) --UDim2.new(2,2,2,2)
+            --         child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List').ZIndex = 1000
+            --         --child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):FindFirstChild('UIListLayout'):Destroy(); --LiS
+            --         if child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):FindFirstChild('UIGridLayout') then 
+            --             child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):FindFirstChild('UIGridLayout'):Destroy()
+            --         end
+            --         -- {0, 500}, {0, 200} StoraegFrame
+            --         child:WaitForChild('MainFrame'):WaitForChild('StorageFrame').Position = UDim2.new(0.5, 0, 0.5, 0)
+            --         child:WaitForChild('MainFrame'):WaitForChild('StorageFrame').List.Position = UDim2.new(0.5,0,0.5,0)
+            --         --repeat task.wait() until #child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):GetChildren() > 1
+            --         local function getItem()
+            --             local item
+            --             for i,v in next, child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):GetChildren() do 
+            --                 if v:FindFirstChild('AddItem') then 
+            --                     if v.AddItem.Text:find(toBong) then -- 
+            --                         --print('storing',toBong)
+            --                         azfakenotify('found item',3)
+            --                         item = v
+            --                     else
+            --                         --print('nope_'..toBong..'_'..v.AddItem.Text)
+            --                     end
+            --                 end
+            --             end
+            --             return item
+            --         end
+            --         local itemSaved
+            --         repeat task.wait() itemSaved = getItem() until itemSaved
+            --         local wasText = itemSaved.AddItem.Text
+            --         print('found', wasText)
+            --         itemSaved.Size = UDim2.new(1,1,1,1)
+            --         itemSaved.ZIndex = 999
+            --         task.wait()
+            --         local toPress = {
+            --             X = workspace.CurrentCamera.ViewportSize.X/2;
+            --             Y = workspace.CurrentCamera.ViewportSize.Y/2;
+            --         }
+            --         inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,true,game,0) -- 1319,574
+            --         task.wait(0.05)
+            --         inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,false,game,0)
+            --         isTaken = true;
+            --         repeat task.wait() until itemSaved.AddItem.Text ~= wasText
+            --         if child then 
+            --             child:Destroy()
+            --         end
+            --         -- for i,v in next, child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):GetChildren() do 
+            --         --     if v:FindFirstChild('AddItem') then 
+            --         --         if v.AddItem.Text:find(toBong) then -- 
+            --         --             local wasText = v.AddItem.Text
+            --         --             print('found')
+            --         --             v.Size = UDim2.new(1,1,1,1)
+            --         --             --v.AddItem.
+            --         --             --v.AddItem.Size = UDim2.new(4,4,4,4)
+            --         --             v.ZIndex = 999
+            --         --             --v.AddItem.ZIndex = 1000
+            --         --             task.wait()
+            --         --             local toPress = {
+            --         --                 X = workspace.CurrentCamera.ViewportSize.X/2;
+            --         --                 Y = workspace.CurrentCamera.ViewportSize.Y/2;
+            --         --             }
+            --         --             inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,true,game,0) -- 1319,574
+            --         --             task.wait(0.05)
+            --         --             inputManager:SendMouseButtonEvent(toPress.X,toPress.Y,0,false,game,0)
+            --         --             isTaken = true;
+            --         --             repeat task.wait() until v.AddItem.Text ~= wasText
+            --         --             --for i=1, 10 do 
+            --         --                -- task.wait(.1)
+            --         --             -- end
+            --         --             print('prssed')
+            --         --             --task.wait(1)
+            --         --             if child then 
+            --         --                 child:Destroy()
+            --         --             end
+            --         --             break
+            --         --         end
+            --         --     end
+            --         -- end
+            --         --child:WaitForChild('MainFrame').Size = UDim2.new(5,5,5,5)
+            --     end
+            -- end)
+            localPlayer.instance.PlayerGui.ChildAdded:Connect(function(child)
+                task.wait(0.1)
+                if child.Name == 'Storing' then
+                    child.Enabled = false; 
+                    local function getItem()
+                        local item
+                        for i,v in next, child:WaitForChild('MainFrame'):WaitForChild('StorageFrame'):WaitForChild('List'):GetChildren() do 
+                            if v:FindFirstChild('AddItem') then 
+                                if v.AddItem.Text:find(toBong) then -- 
+                                    --print('storing',toBong)
+                                    azfakenotify('found item',3)
+                                    item = v
+                                else
+                                    --print('nope_'..toBong..'_'..v.AddItem.Text)
                                 end
-                                print('prssed')
-                                --task.wait(1)
-                                child:Destroy()
-                                break
                             end
                         end
+                        return item
                     end
-                    --child:WaitForChild('MainFrame').Size = UDim2.new(5,5,5,5)
-                end
+                    local itemSaved
+                    repeat task.wait() itemSaved = getItem() until itemSaved
+                    typesoulsettings.functions.clickguiobject(itemSaved.AddItem) --simulateclick()
+                    isTaken = true;
+                end;
             end)
             local function instantTeleport(teleportNpc)
                 -- if teleportNpc == nelnpc  then 
@@ -42214,62 +42497,130 @@ elseif universeid == 4871329703 then -- type soul
                     remote:FireServer('Yes')       
                 end
             end)
-            maid.bonging = signals.heartbeat:connect('@bonging', function()
+            maid.bonging = signals.heartbeat:connect('@bonging v4 new', function()
+                -- needs to kill self
+                -- on spawn open nel bank (child added would run instantly, made it faster)
+                -- on spawn also teleport to bong bong to open its gui to run
+
+                -- die, get item, bong, reset
                 if bongfarm == 'nothing' and bongdelay == false then 
                     bongdelay = true;
-                    bongfarm = 'teleportingtonel'
-                    -- get 1 of item;
-                    azfakenotify('tp to nel',3)
-                    instantTeleport(nelnpc)
+                    localPlayer.character.Head:Destroy(); --:BreakJoints(); --.Head:Destroy();, anti cheat stops
+                    --task.wait() -- yes wait
+                    localPlayer.cframeteleport(cframes.cf1) ;   --localPlayer.rootPart.CFrame = ; -- teleport to nel
+                    task.wait()
+                    game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer() -- get item
+                    task.delay(0.15, function()
+                        if not localPlayer.instance.PlayerGui:FindFirstChild('Storing') and isTaken == false then 
+                            --wasOpened;
+                            game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
+                        end;
+                    end)
+                    repeat task.wait() until isTaken == true; 
+                    azfakenotify('taken', 3)
+                    localPlayer.awaitnewcharacterinstance();
+                    azfakenotify('character loaded',3)
                     
-                    bongfarm = 'teleportedtonel';
-                    game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
-                    if not localPlayer.instance.PlayerGui:FindFirstChild('Storage') then 
-                        task.wait(1.5)
-                        repeat 
-                            task.wait(1.5)
-                            if not localPlayer.instance.PlayerGui:FindFirstChild('Storage') then 
-                                game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
-                            end
-                        until localPlayer.instance.PlayerGui:FindFirstChild('Storage') or isTaken == true
-                    end
-                    bongfarm = 'teleportotbong';
-                    --localPlayer('fire', nelnpc.ClickDetector); --fireclickdetector(nelnpc.ClickDetector);
-                    task.wait(.2); 
-                    azfakenotify('shouldve taken item!!!!!!!', 2)
-                    bongfarm = 'teleportotbong';
+                    local c = false;
+                    task.spawn(function()
+                        task.wait(0.05);
+                        localPlayer('fire', bongnpc.ClickDetector); --
+                        repeat task.wait() localPlayer('fire', bongnpc.ClickDetector); until localPlayer.instance.PlayerGui:FindFirstChild('EXECHANGE ITEM')
+                        local exchangeGui = localPlayer.instance.PlayerGui:FindFirstChild('EXECHANGE ITEM');
+                        local exchangeRemote = exchangeGui.RemoteEvent;
+                        local fire_bvong = { }
+                        for i=1, 10 do 
+                            fire_bvong[i] = {
+                                ["ID"] = game.HttpService:GenerateGUID(false),
+                                ["ItemName"] = toBong,
+                                ["Rarity"] = "Legendary"
+                            }
+                        end
+                        localPlayer('fire', exchangeRemote, fire_bvong)
+                        task.wait()
+                        completed = true;
+                    end)
+                    local tickStarted = tick();
+                    repeat 
+                        task.wait()
+                        localPlayer.rootPart.CFrame = cframes.cf2;
+                    until tick() - tickStarted > 0.5 or completed == true;
+
                     bongdelay = false;
-                elseif bongfarm == 'teleportotbong' and bongdelay == false then 
-                    bongdelay = true;
-                    bongfarm = 'willtptobong';
-                    azfakenotify('tp to bong npc',3)
-                    instantTeleport(bongnpc); -- bonnp
-                    bongfarm = 'teleportedtobong';
-                    localPlayer('fire', bongnpc.ClickDetector); --
-                    task.wait(.2);
-                    repeat task.wait() localPlayer('fire', bongnpc.ClickDetector); until localPlayer.instance.PlayerGui:FindFirstChild('EXECHANGE ITEM')
-                    local exchangeGui = localPlayer.instance.PlayerGui:FindFirstChild('EXECHANGE ITEM');
-                    local exchangeRemote = exchangeGui.RemoteEvent;
-                    local fire_bvong = { }
-                    for i=1, 10 do 
-                        fire_bvong[i] = {
-                            ["ID"] = game.HttpService:GenerateGUID(false),
-                            ["ItemName"] = toBong,
-                            ["Rarity"] = "Legendary"
-                        }
-                    end
-                    localPlayer('fire', exchangeRemote, fire_bvong)
-                    task.wait(.1)
-                    azfakenotify('bongged', 2);
-                    task.wait(.5);
-                    bongfarm = 'nothing';
-                    bongdelay = false;
+
+
+                    -- signals.conceal(function()
+                    --     --
+                    -- end)
+                    --localPlayer.rootPart.CFrame = nelnpc.WorldPivot;
+                    --game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
+                    -- repeat 
+                    --     localPlayer.rootPart.CFrame = cframes.cf1; --nelnpc.WorldPivot * CFrame.new(-15,0,0);
+                    --     game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
+                    --     task.wait() 
+                    -- until isTaken == true;
+                    --azfakenotify('taken',3)
                     isTaken = false;
-                end;
+                    --repeat task.wait()
+                end
             end);
+            -- maid.bonging = signals.heartbeat:connect('@bonging', function()
+            --     if bongfarm == 'nothing' and bongdelay == false then 
+            --         bongdelay = true;
+            --         bongfarm = 'teleportingtonel'
+            --         -- get 1 of item;
+            --         azfakenotify('tp to nel',3)
+            --         instantTeleport(nelnpc)
+                    
+            --         bongfarm = 'teleportedtonel';
+            --         game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
+            --         if not localPlayer.instance.PlayerGui:FindFirstChild('Storage') then 
+            --             task.wait(1.5)
+            --             repeat 
+            --                 task.wait(1.5)
+            --                 if not localPlayer.instance.PlayerGui:FindFirstChild('Storage') then 
+            --                     game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
+            --                 end
+            --             until localPlayer.instance.PlayerGui:FindFirstChild('Storage') or isTaken == true
+            --         end
+            --         bongfarm = 'teleportotbong';
+            --         --localPlayer('fire', nelnpc.ClickDetector); --fireclickdetector(nelnpc.ClickDetector);
+            --         task.wait(.2); 
+            --         azfakenotify('shouldve taken item!!!!!!!', 2)
+            --         bongfarm = 'teleportotbong';
+            --         bongdelay = false;
+            --     elseif bongfarm == 'teleportotbong' and bongdelay == false then 
+            --         bongdelay = true;
+            --         bongfarm = 'willtptobong';
+            --         azfakenotify('tp to bong npc',3)
+            --         instantTeleport(bongnpc); -- bonnp
+            --         bongfarm = 'teleportedtobong';
+            --         localPlayer('fire', bongnpc.ClickDetector); --
+            --         task.wait(.2);
+            --         repeat task.wait() localPlayer('fire', bongnpc.ClickDetector); until localPlayer.instance.PlayerGui:FindFirstChild('EXECHANGE ITEM')
+            --         local exchangeGui = localPlayer.instance.PlayerGui:FindFirstChild('EXECHANGE ITEM');
+            --         local exchangeRemote = exchangeGui.RemoteEvent;
+            --         local fire_bvong = { }
+            --         for i=1, 10 do 
+            --             fire_bvong[i] = {
+            --                 ["ID"] = game.HttpService:GenerateGUID(false),
+            --                 ["ItemName"] = toBong,
+            --                 ["Rarity"] = "Legendary"
+            --             }
+            --         end
+            --         localPlayer('fire', exchangeRemote, fire_bvong)
+            --         task.wait(.1)
+            --         azfakenotify('bongged', 2);
+            --         task.wait(.5);
+            --         bongfarm = 'nothing';
+            --         bongdelay = false;
+            --         isTaken = false;
+            --     end;
+            -- end);
         end)
         local bong = earlyaccess:AddButton('Bong Bong Item', function()
             local newtable = typesoulsettings.selecttradeitem;
+            if speicif ~= '' then newtable = {speicif} end
             if #newtable >= 2 then table.remove(newtable,1) end;
             -- local formatted = table.concat(newtable,',')
             -- local res = library:CheckForPermission(`Are you sure you want to use bong bong on\n{newtable[1]}? Make sure you only have 1\nof the item.`)
@@ -42353,6 +42704,78 @@ elseif universeid == 4871329703 then -- type soul
         end);   -- {shouldcheck = true, ask = 'Are you sure you want to spoof?'}
         spof:AddKnowledge('Uses 1 of the item\nMake sure u have only 1')
         spof:ActivateKnowledge()
+        earlyaccess:AddButton('Scam Trade', function()
+            if not localPlayer.instance.PlayerGui:FindFirstChild('Trading') then return end
+            local list = game:GetService("Players").LocalPlayer.PlayerGui.Trading.Main.Player1.ScrollingFrame:GetChildren();
+            local toGet = '';
+            local isTaken = false;
+            local ctn; ctn = localPlayer.instance.PlayerGui.ChildAdded:Connect(function(child)
+                task.wait(0.1)
+                if child.Name == 'Storing' then
+                    --child.Enabled = false; 
+                    local function getItem()
+                        local item 
+                        for i,v in next, child:WaitForChild('MainFrame'):WaitForChild('InventoryFrame'):WaitForChild('List'):GetChildren() do 
+                            if v:FindFirstChild('AddItem') then 
+                                if v.AddItem.Text:find(toGet) then -- 
+                                    --print('storing',toBong)
+                                    azfakenotify('found item',3)
+                                    item = v
+                                else
+                                    --print('nope_'..toBong..'_'..v.AddItem.Text)
+                                end
+                            end
+                        end
+                        return item
+                    end
+                    local itemSaved
+                    repeat task.wait() itemSaved = getItem() until itemSaved
+                    typesoulsettings.functions.clickguiobject(itemSaved.AddItem) --simulateclick()
+                    isTaken = true;
+                end;
+            end)
+            for i,v in next, list do 
+                --l--ocal itemText = v.AddItem.Text;
+                if v:FindFirstChild('AddItem') and v.AddItem.Text ~= '' then 
+                    local itemText = v.AddItem.Text;
+                    local isTaken = false;
+                    azfakenotify('taking back '..itemText, 3)
+                    localPlayer.character.Head:Destroy();
+                    localPlayer.cframeteleport(workspace:WaitForChild('NPCs'):WaitForChild('Nel'):WaitForChild('Nel').WorldPivot)
+                    azfakenotify('close', 3)
+                    task.wait(.1)
+                    local canstop = false;
+                    repeat
+                        task.wait(.1)
+                        if not localPlayer.instance.PlayerGui:FindFirstChild('Storing') then
+                            --signals.VirtualiseKeypress('W', true)
+                            game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
+                            -- task.delay(0.05,function()
+                            --     if localPlayer.instance.PlayerGui:FindFirstChild('Storing') and localPlayer.instance.PlayerGui:FindFirstChild('Storing'):FindFirstChild('MainFrame') then 
+                            --         if localPlayer.instance.PlayerGui:FindFirstChild('Storing'):FindFirstChild('MainFrame').Visible == true and localPlayer.instance.PlayerGui:FindFirstChild('Storing').Enabled == true then 
+                            --             canstop = true;
+                            --         end
+                            --     end
+                            -- end)
+                        end 
+                    until canstop == true and localPlayer.instance.PlayerGui:FindFirstChild('Storing') and localPlayer.instance.PlayerGui:FindFirstChild('Storing'):FindFirstChild('MainFrame')
+                    --game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer() -- get item
+                    -- task.delay(0.15, function()
+                    --     if not localPlayer.instance.PlayerGui:FindFirstChild('Storing') and isTaken == false then 
+                    --         --wasOpened;
+                    --         game:GetService("ReplicatedStorage").Remotes.PromptStorageUI:FireServer()
+                    --     end;
+                    -- end)
+                    --
+                    repeat 
+                        task.wait()
+                    until isTaken == true
+                    
+                end;
+                ctn:Disconnect()
+            end
+            --.AddItem
+        end)
         --workspace.NPCs.RaidBoss.Kisuke.ClickDetector
     end
     newother:AddSlider("Animation Speed", 0, 1, 10, 100, function(State)
@@ -43129,9 +43552,16 @@ elseif universeid == 4871329703 then -- type soul
                -- print(animationId)
                 local IsAnimationIdRegistered = parryAnims[animationId]; --false
                 local hasHitframe = nil;
+                local customTiming = nil;
                 pcall(function()
                     hasHitframe = anim:GetTimeOfKeyframe('HitFrame');
                 end)
+                if not hasHitframe then 
+                    local regFrames = {
+                        'WindCrownThrow';
+                        ['WindArkStart'] = 0.7;
+                    }
+                end
                 if (IsAnimationIdRegistered or hasHitframe) and typesoulsettings.autoparry == true and child.PrimaryPart then 
                     --print('can parry')
                     if typesoulsettings.autoparrywhitelist ~= 'All' and (typesoulsettings.autoparrywhitelist == 'Mobs' and game.Players:GetPlayerFromCharacter(child)) then 
@@ -43174,10 +43604,10 @@ elseif universeid == 4871329703 then -- type soul
                             signals.conceal(function()
                                 local timetowait = hasHitframe - 0.2; -- 0.25; -- 0.15
                                 if typesoulsettings.pingadjuster > 0  then 
-                                    timetowait -= typesoulsettings.pingadjuster / 1400 -- 100 
+                                    timetowait -= typesoulsettings.pingadjuster /  1000; --1400 -- 100 
                                 end;
                                 if typesoulsettings.latencyadjuster > 0 then 
-                                    timetowait += typesoulsettings.latencyadjuster / 1400 -- 100 
+                                    timetowait += typesoulsettings.latencyadjuster / 1000; --1400 -- 100 
                                 end
                                 task.spawn(function()
                                     if typesoulsettings.parrynotifications then
@@ -43217,10 +43647,10 @@ elseif universeid == 4871329703 then -- type soul
                         signals.conceal(function()
                             local timetowait = registry;
                             if typesoulsettings.pingadjuster > 0  then 
-                                timetowait -= typesoulsettings.pingadjuster / 1400 -- 100 
+                                timetowait -= typesoulsettings.pingadjuster /  1000;-- 1400 -- 100 
                             end;
                             if typesoulsettings.latencyadjuster > 0 then 
-                                timetowait += typesoulsettings.latencyadjuster / 1400 -- 100 
+                                timetowait += typesoulsettings.latencyadjuster /  1000; --1400 -- 100 
                             end
                             task.wait(timetowait);
                             if anim.IsPlaying then 
