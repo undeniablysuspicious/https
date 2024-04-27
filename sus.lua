@@ -41059,10 +41059,11 @@ elseif universeid == 4871329703 then -- type soul
             local newAdd; newAdd = workspace.Entities.ChildAdded:Connect(function(b)
                 if b.Name == game.Players.LocalPlayer.Name then 
                     local beentick = tick() --os.tick()
-                    repeat 
-                        task.wait()
-                        b.PrimaryPart.CFrame = obj.WorldPivot; --tpPart.CFrame; --workspace.NPCs.RaidBoss.Kisuke.WorldPivot
-                    until (tick() - beentick ) > 1
+                    -- repeat 
+                    --     task.wait()
+                    --     b.PrimaryPart.CFrame = obj.WorldPivot; --tpPart.CFrame; --workspace.NPCs.RaidBoss.Kisuke.WorldPivot
+                    -- until (tick() - beentick ) > 1
+                    localPlayer.cframeteleport(obj.WorldPivot)
                     newAdd:Disconnect()
                 end
             end)
