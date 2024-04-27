@@ -496,122 +496,328 @@ getgenv().adminCheck = true
 
 -- azfake.repstring"{val}""
 
-function azfakenotify(text, time)
+local gameHash = cloneref(game:GetService('HttpService')):GenerateGUID(false);
+getgenv().observanthash = gameHash;
+local function gamekey(b)
+    return b == true and getgenv().observanthash == gameHash or not b and gameHash
+end
+if cloneref(game:GetService('CoreGui')):FindFirstChild('v4notiftoasty') then 
+    cloneref(game:GetService('CoreGui')):FindFirstChild('v4notiftoasty'):Destroy()
+end
+
+
+
+do 
+    local v4notiftoasty = Instance.new("ScreenGui")
+    local TopLeft = Instance.new("Frame")
+    local tmp = Instance.new("Folder")
+    local holderold = Instance.new("Frame")
+    local Frame = Instance.new("Frame")
+    local TextLabel = Instance.new("TextLabel")
+    local smaller = Instance.new("Frame")
+    local holder = Instance.new("Frame")
+    local Frame_2 = Instance.new("Frame")
+    local TextLabel_2 = Instance.new("TextButton")
+    local smaller_2 = Instance.new("Frame")
+    
+    --Properties:
+    
+    v4notiftoasty.Name = "v4notiftoasty"
+    v4notiftoasty.Parent = game:GetService('CoreGui')
+    v4notiftoasty.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    
+    TopLeft.Name = "TopLeft"
+    TopLeft.Parent = v4notiftoasty
+    TopLeft.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    TopLeft.BackgroundTransparency = 1.000
+    TopLeft.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    TopLeft.BorderSizePixel = 0
+    TopLeft.Position = UDim2.new(0, 0, 0, 96)
+    TopLeft.Size = UDim2.new(0, 160, 0, 100)
+    
+    tmp.Name = "tmp"
+    tmp.Parent = TopLeft
+    
+    holderold.Name = "holderold"
+    holderold.Parent = tmp
+    holderold.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    holderold.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    holderold.BorderSizePixel = 0
+    holderold.Size = UDim2.new(0, 110, 0, 30)
+    holderold.Visible = false
+    
+    Frame.Parent = holderold
+    Frame.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
+    Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Frame.BorderSizePixel = 0
+    Frame.Position = UDim2.new(0.063487336, 0, 0, 0)
+    Frame.Size = UDim2.new(0.936512649, 0, 1, 0)
+    
+    TextLabel.Parent = Frame
+    TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel.BackgroundTransparency = 1.000
+    TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    TextLabel.BorderSizePixel = 0
+    TextLabel.Position = UDim2.new(0.0873647034, 0, 0, 0)
+    TextLabel.Size = UDim2.new(0.912635326, 0, 1, 0)
+    TextLabel.Font = Enum.Font.SourceSans
+    TextLabel.Text = "your mom said this gui is very nice"
+    TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel.TextSize = 14.000
+    TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+    
+    smaller.Name = "smaller"
+    smaller.Parent = holderold
+    smaller.BackgroundColor3 = Color3.fromRGB(43, 163, 255)
+    smaller.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    smaller.BorderSizePixel = 0
+    smaller.Size = UDim2.new(0.0634873807, 0, 1, 0)
+    
+    holder.Name = "holder"
+    holder.Parent = tmp
+    holder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    holder.BackgroundTransparency = 1.000
+    holder.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    holder.BorderSizePixel = 0
+    holder.Size = UDim2.new(0, 110, 0, 30)
+    holder.Visible = false
+    
+    Frame_2.Parent = holder
+    Frame_2.BackgroundColor3 = Color3.fromRGB(47, 47, 47)
+    Frame_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    Frame_2.BorderSizePixel = 0
+    Frame_2.Position = UDim2.new(0.0634873509, 0, 0, 0)
+    Frame_2.Size = UDim2.new(3.90139476e-08, 0, 1, 0)
+    Frame_2.Visible = false
+    
+    TextLabel_2.Name = "TextLabel"
+    TextLabel_2.Parent = Frame_2
+    TextLabel_2.Active = false
+    TextLabel_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel_2.BackgroundTransparency = 1.000
+    TextLabel_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    TextLabel_2.BorderSizePixel = 0
+    TextLabel_2.Position = UDim2.new(0.0873647034, 0, 0, 0)
+    TextLabel_2.Selectable = false
+    TextLabel_2.Size = UDim2.new(0.912635326, 0, 1, 0)
+    TextLabel_2.Font = Enum.Font.SourceSans
+    TextLabel_2.Text = "your mom said this gui is very nice"
+    TextLabel_2.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TextLabel_2.TextSize = 14.000
+    TextLabel_2.TextXAlignment = Enum.TextXAlignment.Left
+    
+    smaller_2.Name = "smaller"
+    smaller_2.Parent = holder
+    smaller_2.BackgroundColor3 = Color3.fromRGB(43, 163, 255)
+    smaller_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    smaller_2.BorderSizePixel = 0
+    smaller_2.Size = UDim2.new(0.0634873807, 0, 1, 0)
+end
+
+local function getycalculation(r)
+    local v4notiftoasty = game:GetService('CoreGui').v4notiftoasty.TopLeft;
+    local y = {};
+    local baseWidth = 30 ;--15; 
+    local index = 1
+    for i,v in next, v4notiftoasty:GetChildren() do
+        if v.Name == 'holder' then
+            y[v] = {};
+            y[v].inset = i == 1 and 0 or (baseWidth + 2) -- * i -- 5 = gap space
+            if y[v].inset ~= 0 then
+                baseWidth += 32; --15
+            end
+        end
+    end
+    return y;
+end -- could return a massivle table
+local function newtoastynotif(r, mode)
+    local v4notiftoasty = game:GetService('CoreGui').v4notiftoasty;
+    local lastNotif = nil;
+    for i,v in next, v4notiftoasty:GetChildren() do
+        if v.Name == 'holder' then
+            lastNotif = v;
+        end
+    end
+    local new = v4notiftoasty.TopLeft.tmp.holder:Clone();
+    if lastNotif then
+        new.Position = lastNotif.Position + UDim2.new(0,0,0, 32)
+        -- {0.063, 0},{0, 0}
+    end
+    new.Parent = v4notiftoasty.TopLeft;
+    new.Frame.TextLabel.TextTruncate = 1
+    new.Frame.TextLabel.Text = r
+    local tweenSpeed = 0.05
     task.spawn(function()
-        local function find(x) r = nil; pcall(function() r=x.Parent:FindFirstChild(x.Name) end); return r end
-
-        -- local notification = Instance.new("ScreenGui")
-        -- local MainFrame = Instance.new("Frame")
-        -- local UIListLayout = Instance.new("UIListLayout")
-        -- local MessageFrame = Instance.new("Frame")
-        -- local TextButton = Instance.new("TextButton")
-        -- local MessageLine = Instance.new("Frame")
-
-
-        local notification = find(game.CoreGui:FindFirstChild('notification')) or Instance.new("ScreenGui")
-        local MainFrame = find(notification:FindFirstChild('MainFrame')) or Instance.new("Frame",notification)
-        local UIListLayout = find(MainFrame:FindFirstChild('UIListLayout')) or Instance.new('UIListLayout',MainFrame)
-        local MessageFrame =  Instance.new("Frame", MainFrame) -- 
-        local TextButton = Instance.new("TextButton", MessageFrame); 
-        local MessageLine =  Instance.new("Frame", MessageFrame); 
-
-
-        notification.Name = "notification"
-        notification.Parent = game.CoreGui
-        notification.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
-        MainFrame.Name = "MainFrame"
-        MainFrame.Parent = notification
-        MainFrame.AnchorPoint = Vector2.new(9.99999975e-05, 0)
-        MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        MainFrame.BorderSizePixel = 0
-        MainFrame.Position = UDim2.new(0.779199064, 0, 0.925575197, 0)
-        MainFrame.Size = UDim2.new(0.209408224, 0, 0.0514905155, 0)
-        MainFrame.BackgroundTransparency = 1
-        MainFrame.ZIndex = 1000
-
-        UIListLayout.Parent = MainFrame
-        UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
-        UIListLayout.Padding = UDim.new(0.200000003, 0)
-
-        MessageFrame.Name = "MessageFrame"
-        MessageFrame.Parent = MainFrame
-        MessageFrame.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
-        MessageFrame.BorderSizePixel = 0
-        MessageFrame.Position = UDim2.new(4.47058773, 0, 17.9736843, 0)
-        MessageFrame.Size = UDim2.new(0.999999881, 0, 1.02631581, 0)
-
-        -- TextButton.Visible = false;
-        TextButton.Parent = MessageFrame
-        TextButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        TextButton.BackgroundTransparency = 1.000
-        TextButton.BorderSizePixel = 0
-        TextButton.Position = UDim2.new(0.0336134471, 0, 0, 0)
-        TextButton.Size = UDim2.new(0.966386497, 0, 1, 0)
-        TextButton.Font = Enum.Font.Roboto
-        TextButton.LineHeight = 0.800
-        TextButton.Text = text
-        TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        TextButton.TextSize = 21.000
-        TextButton.TextWrapped = true
-
-        MessageLine.Name = "MessageLine"
-        MessageLine.Parent = MessageFrame
-        MessageLine.BackgroundColor3 = Color3.fromRGB(11, 157, 255)
-        MessageLine.BorderSizePixel = 0
-        MessageLine.Size = UDim2.new(0.0336134434, 0, 1, 0)
-
-        -- Frame.Parent = notification
-        -- Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        -- Frame.BackgroundTransparency = 1.000
-        -- Frame.BorderSizePixel = 0
-        -- Frame.Position = UDim2.new(0.988619149, 0, 0.924220204, 0)
-        -- Frame.Size = UDim2.new(0, 0, 0, 29)
-        TextButton.Visible =true
-        TextButton.Text = text
-        local situtated = time
-        if situtated == 'untilClick' then 
-            situtated = 'ifConnect'
-        end
-        task.wait(0.1)
-        --Main:TweenPosition(UDim2.new(1, -330, 0, 50), "Out", "Sine", 0.5)
-        local TitleBarWait = false
-        TextButton.MouseButton1Down:Connect(function()
-            TitleBarWait = true
-        end)
-        if situtated and type(situtated) ~= 'string' then 
-            task.spawn(function()
-                wait(situtated)
-                TitleBarWait = true
-            end)
-        end
-        -- if situtated == 'ifConnect' then 
-        --     -- TextButton.MouseButton1Down:Connect(function()
-        --     --     TitleBarWait = true
-        --     -- end)
-        -- else
-        --     -- task.spawn(function(
-
-        --     --     en
-        --     -- ))
-        --     task.spawn(function()
-        --         wait(situtated)
-        --         TitleBarWait = true
-        --     end)
-        -- end
-        -- TextButton.MouseButton1Down:Connect(function()
-        --     TitleBarWait = true
-        -- end)
-        repeat task.wait() until TitleBarWait == true
-        local bunda = Instance.new('Frame'); bunda.BackgroundTransparency = 1 bunda.Position = MainFrame.Position;bunda.Parent = notification;
-        bunda.Size = UDim2.new(0, 200, 0, -150)
-        MessageFrame.Parent = bunda
-        MessageFrame:TweenPosition(UDim2.new(0,2000,0,0), "Out", "Sine", 1)
-        task.wait(1.1)
-        MessageFrame:Destroy()
-        bunda:Destroy()
+        repeat 
+            new.Frame.Visible = true
+            game:GetService('TweenService'):Create(new.Frame, TweenInfo.new(tweenSpeed, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {Position = UDim2.new(0.063, 0,0, 0), Size = new.Frame.Size + UDim2.new(0.1,0,0,0)}):Play()
+            task.wait(tweenSpeed + 0.01) --(0.51)
+        until new.Frame.TextLabel.TextFits == true; --Tezxt  Tezxt
     end)
+    new.Visible = true
+    new.Frame.TextLabel.MouseButton1Down:Connect(function()
+        new:Destroy();
+    end)
+    if tonumber(mode) then 
+        task.spawn(function()
+            repeat task.wait() until new.Frame.TextLabel.TextFits == true;
+            task.wait(tonumber(mode))
+            game:GetService('TweenService'):Create(new.Frame, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {Position = UDim2.new(0.063, 0,0, 0), Size = UDim2.new(0,0,1,0)}):Play()
+            task.wait(0.11)
+            new:Destroy()
+        end)
+    end
+    return lastNotif; --y;
+end
+
+-- task.spawn(function()
+--     while task.wait(3) do
+--         newtoastynotif('shut up bozoooo', 3)
+--     end
+-- end)
+
+task.spawn(function()
+    while task.wait() do
+        if not gamekey(true) then break end;
+        local y = getycalculation();
+        for index, value in next, y do 
+            -- index = object
+            -- value = table, table has inset value
+            local newInset = value.inset;
+            game:GetService('TweenService'):Create(index, TweenInfo.new(0.2,Enum.EasingStyle.Linear,Enum.EasingDirection.Out), {Position = UDim2.new(0, 0, 0, newInset)}):Play()
+        end
+    end
+end)
+
+
+
+
+
+
+
+
+
+
+
+
+function azfakenotify(...) -- text, time
+    newtoastynotif(unpack({...}))
+    -- task.spawn(function()
+    --     local function find(x) r = nil; pcall(function() r=x.Parent:FindFirstChild(x.Name) end); return r end
+
+    --     -- local notification = Instance.new("ScreenGui")
+    --     -- local MainFrame = Instance.new("Frame")
+    --     -- local UIListLayout = Instance.new("UIListLayout")
+    --     -- local MessageFrame = Instance.new("Frame")
+    --     -- local TextButton = Instance.new("TextButton")
+    --     -- local MessageLine = Instance.new("Frame")
+
+
+    --     local notification = find(game.CoreGui:FindFirstChild('notification')) or Instance.new("ScreenGui")
+    --     local MainFrame = find(notification:FindFirstChild('MainFrame')) or Instance.new("Frame",notification)
+    --     local UIListLayout = find(MainFrame:FindFirstChild('UIListLayout')) or Instance.new('UIListLayout',MainFrame)
+    --     local MessageFrame =  Instance.new("Frame", MainFrame) -- 
+    --     local TextButton = Instance.new("TextButton", MessageFrame); 
+    --     local MessageLine =  Instance.new("Frame", MessageFrame); 
+
+
+    --     notification.Name = "notification"
+    --     notification.Parent = game.CoreGui
+    --     notification.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+    --     MainFrame.Name = "MainFrame"
+    --     MainFrame.Parent = notification
+    --     MainFrame.AnchorPoint = Vector2.new(9.99999975e-05, 0)
+    --     MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    --     MainFrame.BorderSizePixel = 0
+    --     MainFrame.Position = UDim2.new(0.779199064, 0, 0.925575197, 0)
+    --     MainFrame.Size = UDim2.new(0.209408224, 0, 0.0514905155, 0)
+    --     MainFrame.BackgroundTransparency = 1
+    --     MainFrame.ZIndex = 1000
+
+    --     UIListLayout.Parent = MainFrame
+    --     UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    --     UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+    --     UIListLayout.Padding = UDim.new(0.200000003, 0)
+
+    --     MessageFrame.Name = "MessageFrame"
+    --     MessageFrame.Parent = MainFrame
+    --     MessageFrame.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+    --     MessageFrame.BorderSizePixel = 0
+    --     MessageFrame.Position = UDim2.new(4.47058773, 0, 17.9736843, 0)
+    --     MessageFrame.Size = UDim2.new(0.999999881, 0, 1.02631581, 0)
+
+    --     -- TextButton.Visible = false;
+    --     TextButton.Parent = MessageFrame
+    --     TextButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    --     TextButton.BackgroundTransparency = 1.000
+    --     TextButton.BorderSizePixel = 0
+    --     TextButton.Position = UDim2.new(0.0336134471, 0, 0, 0)
+    --     TextButton.Size = UDim2.new(0.966386497, 0, 1, 0)
+    --     TextButton.Font = Enum.Font.Roboto
+    --     TextButton.LineHeight = 0.800
+    --     TextButton.Text = text
+    --     TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    --     TextButton.TextSize = 21.000
+    --     TextButton.TextWrapped = true
+
+    --     MessageLine.Name = "MessageLine"
+    --     MessageLine.Parent = MessageFrame
+    --     MessageLine.BackgroundColor3 = Color3.fromRGB(11, 157, 255)
+    --     MessageLine.BorderSizePixel = 0
+    --     MessageLine.Size = UDim2.new(0.0336134434, 0, 1, 0)
+
+    --     -- Frame.Parent = notification
+    --     -- Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    --     -- Frame.BackgroundTransparency = 1.000
+    --     -- Frame.BorderSizePixel = 0
+    --     -- Frame.Position = UDim2.new(0.988619149, 0, 0.924220204, 0)
+    --     -- Frame.Size = UDim2.new(0, 0, 0, 29)
+    --     TextButton.Visible =true
+    --     TextButton.Text = text
+    --     local situtated = time
+    --     if situtated == 'untilClick' then 
+    --         situtated = 'ifConnect'
+    --     end
+    --     task.wait(0.1)
+    --     --Main:TweenPosition(UDim2.new(1, -330, 0, 50), "Out", "Sine", 0.5)
+    --     local TitleBarWait = false
+    --     TextButton.MouseButton1Down:Connect(function()
+    --         TitleBarWait = true
+    --     end)
+    --     if situtated and type(situtated) ~= 'string' then 
+    --         task.spawn(function()
+    --             wait(situtated)
+    --             TitleBarWait = true
+    --         end)
+    --     end
+    --     -- if situtated == 'ifConnect' then 
+    --     --     -- TextButton.MouseButton1Down:Connect(function()
+    --     --     --     TitleBarWait = true
+    --     --     -- end)
+    --     -- else
+    --     --     -- task.spawn(function(
+
+    --     --     --     en
+    --     --     -- ))
+    --     --     task.spawn(function()
+    --     --         wait(situtated)
+    --     --         TitleBarWait = true
+    --     --     end)
+    --     -- end
+    --     -- TextButton.MouseButton1Down:Connect(function()
+    --     --     TitleBarWait = true
+    --     -- end)
+    --     repeat task.wait() until TitleBarWait == true
+    --     local bunda = Instance.new('Frame'); bunda.BackgroundTransparency = 1 bunda.Position = MainFrame.Position;bunda.Parent = notification;
+    --     bunda.Size = UDim2.new(0, 200, 0, -150)
+    --     MessageFrame.Parent = bunda
+    --     MessageFrame:TweenPosition(UDim2.new(0,2000,0,0), "Out", "Sine", 1)
+    --     task.wait(1.1)
+    --     MessageFrame:Destroy()
+    --     bunda:Destroy()
+    -- end)
+    return
 end
 getgenv().__getnotify = azfakenotify
 
@@ -45783,18 +45989,20 @@ elseif universeid == 1511883870 then --  shindo life
         end
         if type(shindolifesettings.spinfor) == 'table' and shindolifesettings.spinfor ~= '' then 
             for _,v in next, shindolifesettings.spinfor do 
-                if table.find(CurrentBloodlines, v) then 
-                    AchievedGenkai = true
-                    azfakenotify('got bloodline '..v,3) -- seeking after
-                end
-                for __,vv in next, game:GetService("Players").LocalPlayer.statz.genkailevel:GetChildren() do 
-                    if v == vv.Name or string.lower(v) == vv.Name then  
+                if string.len(tostring(v)) > 2 then 
+                    if table.find(CurrentBloodlines, v) then 
                         AchievedGenkai = true
+                        azfakenotify('got bloodline '..v,3) -- seeking after
                     end
-                    local nosub = string.gsub(v,' ','')
-                    nosub = string.gsub(nosub,'-','')
-                    if string.lower(nosub) == string.lower(vv.Name) then 
-                        AchievedGenkai = true
+                    for __,vv in next, game:GetService("Players").LocalPlayer.statz.genkailevel:GetChildren() do 
+                        if v == vv.Name or string.lower(v) == vv.Name then  
+                            AchievedGenkai = true
+                        end
+                        local nosub = string.gsub(v,' ','')
+                        nosub = string.gsub(nosub,'-','')
+                        if string.lower(nosub) == string.lower(vv.Name) then 
+                            AchievedGenkai = true
+                        end
                     end
                 end
             end
@@ -45886,13 +46094,14 @@ elseif universeid == 1511883870 then --  shindo life
                 SetRollback()
                 --Spin()
                 
-                
+                local shoudStopSpin = false;
                 repeat 
-                    task.wait(1) 
+                    task.wait(0.5) --(1) 
                     Spin()
-                until CheckForGenkai() == true or game:GetService("Players").LocalPlayer.statz.spins.Value == 0 or shindolifesettings.infinitespin == false
+                    shoudStopSpin = CheckForGenkai()  --== true 
+                until shoudStopSpin or game:GetService("Players").LocalPlayer.statz.spins.Value == 0 or shindolifesettings.infinitespin == false
                 
-                if shindolifesettings.infinitespin == nil then 
+                if shindolifesettings.infinitespin == nil and shoudStopSpin == false then 
                     game:GetService("TeleportService"):teleport(game.PlaceId)
                 else
                     RevertRollback()
