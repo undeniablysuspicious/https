@@ -35878,7 +35878,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             end;
         end)
     end)
-    infts:CreateHintOnItem(infts, 'Turn off if not using')
+    sector:CreateHintOnItem(infts, 'Turn off if not using')
     sector:AddToggle('Get All Skills',false,function(xstate)
         getgenv().aotfreedomwar['getallskills'] = xstate
     end)
@@ -35938,7 +35938,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 pcall(function()
                     for i=1, 3 do 
                         game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada').Eat:FireServer();
-                        task.wait()
+                        task.wait(0.01)
                     end
                 end)
                 task.wait(0.001)
