@@ -7225,10 +7225,11 @@ else
     print("Anti Spy Didn't load due to debug commands")
 end
 
+if vs == 'debug' then print('library loading') end
 -- put before library because library has getgenv
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/hairlinebrockeb/-back-ups-for-libs/main/cat", true))()
 -- 492, 598 "Azfake V3{"..vs..','..game.PlaceId..'}' -- M1xup Azzfake Azfake V3 M1xact
-
+if vs == 'debug' then print('library loaded') end
 local OpenGUBUTTON = Enum.KeyCode.LeftAlt --Insert
 local window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(492, 598), OpenGUBUTTON) -- 2nd argument is the size, 3rd is the show/hide ofc
 local wtm = library:CreateWatermark('Azfake HUB V3',Vector3.new(100,100,50))
@@ -8191,10 +8192,10 @@ local function setupAimbotTab(globaltable)
                     
                     local predictionnumber = globaltable['aimbotsettings']['predictionpower'] /100
                     if globaltable['aimbotsettings']['robloxvirtualmouse'] == true then
-                        local RedirectPos = Redirect.Position
-                        local Tuple, Visible = WorldToViewportPoint(workspace.CurrentCamera, globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart));
+                        --local RedirectPos = Redirect.Position
+                        local Tuple, Visible = workspace.Camera:WorldToViewportPoint(workspace.CurrentCamera.CoordinateFrame.p, globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position);
                         local CharacterVec2 = Vector2.new(Tuple.X, Tuple.Y);
-                        mousemoveabs(CharacterVec2.X, CharacterVec2.Y); -- + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Velocity * 0.05
+                        inputManager:SendMouseMoveEvent(CharacterVec2.X, CharacterVec2.Y); -- mousemove(CharacterVec2.X, CharacterVec2.Y); -- + globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Velocity * 0.05
                     elseif globaltable['aimbotsettings']['smoiothaimbot'] == false then 
                         workspace.CurrentCamera.CoordinateFrame = CFrame.new(
                             workspace.CurrentCamera.CoordinateFrame.p,--game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position  ,
@@ -8223,10 +8224,10 @@ local function setupAimbotTab(globaltable)
                         game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').CFrame = CFrame.lookAt(game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart').Position,globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position)
                     end
                     if globaltable['aimbotsettings']['robloxvirtualmouse'] == true then 
-                        local RedirectPos = Redirect.Position
-                        local Tuple, Visible = WorldToViewportPoint(workspace.CurrentCamera, globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart));
+                        --local RedirectPos = Redirect.Position
+                        local Tuple, Visible = workspace.Camera:WorldToViewportPoint(workspace.CurrentCamera.CoordinateFrame.p, globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart).Position);
                         local CharacterVec2 = Vector2.new(Tuple.X, Tuple.Y);
-                        mousemoveabs(CharacterVec2.X, CharacterVec2.Y);
+                        inputManager:SendMouseMoveEvent(CharacterVec2.X, CharacterVec2.Y, game); -- mousemove(CharacterVec2.X, CharacterVec2.Y);
                     elseif globaltable['aimbotsettings']['smoiothaimbot'] == false then 
                         local AIMINGAT = globaltable['aimbotsettings']['currenttarget'].Character:FindFirstChild(AimingPart)
                         local suc, n = pcall(function()
@@ -8952,6 +8953,18 @@ local signals = {
         running = {};
     };
 };
+signals.foreach = function(a , b, yield)
+    if not yield then yield = true end;
+    for i,v in next, a:GetChildren() do 
+        if not yield then 
+            -- could use flask or coroutine modules
+            b(i,v);
+        else
+            task.spawn(b, i, v)
+        end;
+    end
+end
+-- signals.foreach(character, function(i, v) end)
 signals.get = function(a1)
     if type(a1) == 'string' then a1 = game:GetService(a1) end;
     return cloneref(a1)
@@ -35362,6 +35375,8 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         gtoimpulse = false;
         autokick = false;
         twothreads = false;
+        infinitethunderspears = false;
+        tstitan = nil;
     } -- add m1 when next to enemy shifter
 
     aotfreedomwar.functions.pretendimpulse = function() -- force impulse
@@ -35726,6 +35741,27 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end)
     --local HookSelect = sect:AddKeybindAttachment('Attach to back'):AddKeybind(); 
     sector:AddLabel('Press K to Manually Assign\nPress 4 To Use') -- eybind
+    local bbsss = sector:AddToggle('Thunder Spear Titan', false, function(xstate)
+        aotfreedomwar.tstitan = xstate;
+        if not xstate then 
+            maid.tstitan = nil;
+            return;
+        end
+        maid.tstitan = signals.heartbeat:connect('', function()
+            local hookdropget = hookdrop:Get();
+            if game.Players:FindFirstChild(hookdropget) and game.Players:FindFirstChild(hookdropget).Character and game.Players:FindFirstChild(hookdropget).Character:FindFirstChild('SNape') and localPlayer.character then 
+                -- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
+                local theirCFrfame = game.Players:FindFirstChild(hookdropget).Character.SNape.CFrame
+                local ohVector31 = theirCFrfame.Position; --localPlayer.cframe.Position; --Vector3.new(948.7035522460938, 1205.2286376953125, -543.1709594726562)
+                local ohCFrame2 = theirCFrfame; --localPlayer.cframe; --CFrame.new(948.703552, 1205.22864, -543.170959, -0.620756805, 0.12757194, 0.773554385, -7.4505806e-09, 0.986672521, -0.162718639, -0.784003198, -0.101008713, -0.61248368)
+                local ohInstance3 = localPlayer.rootPart
+
+                localPlayer.character.Gear.Events.TSThrowEvent:InvokeServer(ohVector31, ohCFrame2, ohInstance3)
+                localPlayer.character.Gear.Events.TSActivationEvent:InvokeServer(nil) 
+            end;
+        end);
+    end)
+    sector:CreateHintOnItem(bbsss, 'Turn off if not using')
     --game.Players.LocalPlayer:GetMouse().Key
     for i,v in next, game.Players:GetPlayers() do 
         if v ~= game.Players.LocalPlayer then 
@@ -35812,6 +35848,37 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     sector:AddToggle('Infinite Blades',false,function(xstate)
         getgenv().aotfreedomwar['infiniteblades'] = xstate
     end)
+    local infts = sector:AddToggle('Infinite Thunderspears', false, function(xstate)
+        aotfreedomwar.infinitethunderspears = xstate;
+        if not xstate then
+            maid.thunder = nil;
+            return;
+        end
+        task.spawn(function()
+            local foundDir = nil;
+            repeat 
+                task.wait(1) 
+                for i,v in next, workspace:GetDescendants() do 
+                    if v.Name == 'TSRefill' then 
+                        foundDir = v;
+                    end
+                end;
+            until foundDir;
+            if aotfreedomwar.infinitethunderspears == true then 
+                maid.thunder = signals.heartbeat:connect('omega lul', function()
+                    local gearname = 'Gear'
+                    local gearscript = localPlayer.character and localPlayer.character:FindFirstChild(gearname) and localPlayer.character:FindFirstChild(gearname):FindFirstChild('Events')
+                    if gearscript then 
+                        local ohString1 = "TS"
+                        local ohInstance2 = foundDir; --workspace.PracticeMap.TSRefill.Main
+                        
+                        localPlayer.character[gearname].Events.RefillEventServer:FireServer('TS', foundDir)
+                    end
+                end)
+            end;
+        end)
+    end)
+    infts:CreateHintOnItem(infts, 'Turn off if not using')
     sector:AddToggle('Get All Skills',false,function(xstate)
         getgenv().aotfreedomwar['getallskills'] = xstate
     end)
@@ -36581,6 +36648,14 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 if aotfreedomwar.autokick == true and Character and Humanoid and gearfolder and gearscript then 
                     game:GetService("Players").LocalPlayer.Character[gearname].Events.AttackingEvent:FireServer(nil,true)
                 end;
+                -- if aotfreedomwar.infinitethunderspears == true and Character and Humanoid and gearfolder and gearscript then 
+                --     local ohString1 = "TS"
+                --     local ohInstance2 = workspace.PracticeMap.TSRefill.Main
+                    
+                --     game:GetService("Players").LocalPlayer.Character[gearname].Events.RefillEventServer:FireServer('TS',ohInstance2)
+                -- end;
+
+
                 if aotfreedomwar.autohood == true and Character and Humanoid and gearfolder then
                     --aotfreedomwar.autohood = nil
 
@@ -37072,6 +37147,8 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
         end
     end
     --local setscriptes = function() end
+    -- 
+    repeat task.wait() until game.Players.LocalPlayer.Character
     local inputClient = game.Players.LocalPlayer.Character:FindFirstChild('CharacterHandler'):WaitForChild('InputClient');
 
     local function returnKeyhandler()
