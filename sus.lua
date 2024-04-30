@@ -8915,6 +8915,10 @@ metaforit.__call = function(_table,  ...) -- in our case the arguments are going
             fireclickdetector(remote) -- remtoe;
         elseif remote.ClassName == 'ProximityPrompt' then 
             fireproximityprompt(remote) -- remtoe;
+        elseif remote.ClassName == 'TextButton' or remote.ClassName == 'ImageButton' then 
+            firesignal(remote.MouseButton1Click) -- remtoe;
+            firesignal(remote.MouseButton1Down)
+            firesignal(remote.MouseButton1Up)
         end;    
 
         return true
@@ -35989,20 +35993,19 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     local function fastHeal(b)
         for i=1, 10 do 
             local connection = game.RunService.RenderStepped:Connect(function()
-                pcall(function()
-                    game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame.DestroyTool:FireServer(game.Players.LocalPlayer.Backpack.Granada)
-                end)
                 if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada') then 
-                    pcall(function()
-                        for i=1, 3 do 
+                    for i=1, 3 do 
+                        pcall(function()
                             game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada').Eat:FireServer();
-                            task.wait(0.01)
-                        end
-                    end)
-                    task.wait(0.001)
+                        end)
+                        task.wait()
+                    end
                 else
                     game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0)
                 end
+                pcall(function()
+                    game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame.DestroyTool:FireServer(game.Players.LocalPlayer.Backpack.Granada)
+                end)
             end)
             table.insert(HealConnections, connection); --connecting)
         end;
@@ -46233,6 +46236,100 @@ elseif universeid == 1511883870 then --  shindo life
                     RevertRollback()
                 end
             end
+        end
+    end)
+    AddConfigurations()
+elseif universeid == 5321619756 then 
+    local tab = window:CreateTab(gameName)
+    local sector = tab:CreateSector('Cheats','left')
+
+    getgenv().bladersrebirth = { -- beybladesettings
+        instakill = false;
+    }
+    setupAimbotTab(getgenv().bladersrebirth)
+    
+    --AddConfigurations()
+    getgenv().AddPlayerList(sector)
+    sharedRequires['CreateFlySystem'](sector, bladersrebirth)
+    sharedRequires['CreateWalkSpeedSystem'](sector, bladersrebirth)
+    sharedRequires['CreateNoclip'](sector, bladersrebirth)
+    task.spawn(function()
+        sharedRequires['SetupChatlogger'](sector, bladersrebirth)
+    end)
+
+    sector:AddToggle('Insta Kill Beyblades', false, function(x)
+        bladersrebirth.instakill = x;
+    end)
+    sector:AddToggle('Auto Farm', false, function(x)
+        bladersrebirth.autofarm = x;
+        if not x then 
+            maid.autofarm = nil;
+            return;
+        end; -- change beyblade velocity??
+        bladersrebirth.instakill = nil;
+        local hasKilled = false;
+        local canKill = false;
+        task.spawn(function()
+            while task.wait() do 
+                if maid.autofarm == nil then print('nil mob break autofarm') break end;
+                if canKill == true then 
+                    for i,v in next, workspace.Beyblades:GetChildren() do 
+                        if v.PrimaryPart and isnetworkowner(v.PrimaryPart) and v.Name ~= game.Players.LocalPlayer.Name then 
+                            pcall(function()
+                                v.PrimaryPart.CFrame *= CFrame.new(0,-1000,0)
+                                v.Controller.Health = 0
+                                canKill = false;
+                                hasKilled = true;
+                            end)
+                        end
+                    end
+                end;
+            end;
+        end)
+        local status = 'nothing'
+        maid.autofarm = signals.heartbeat:connect('@dik', function()
+            if status == 'nothing' then 
+                status = 'start'
+                for i, trainer in next, workspace.NPCs:GetChildren() do -- Trainers
+                    if trainer.Name:find('Random') then 
+                        localPlayer.rootPart.CFrame = trainer.WorldPivot;
+                        task.wait(0.1);
+                        localPlayer('fire', trainer.HumanoidRootPart.Dialogue);
+                        repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.Dialogue.Dialogue:FindFirstChild('Button2');
+                        task.wait(0.5);
+                        local btn = game:GetService("Players").LocalPlayer.PlayerGui.Dialogue.Dialogue:FindFirstChild('Button2');
+                        localPlayer('fire', btn);
+                        --firesignal(game:GetService("Players").LocalPlayer.PlayerGui.Dialogue.Dialogue.Button2.MouseButton1Click)
+                        task.wait(2);
+                        canKill = true;
+                        hasKilled = false;
+                        repeat task.wait() until canKill == false;
+                        azfakenotify('has killed',3)
+                        task.wait(4)
+                    end
+                end;
+                status = 'nothing'
+            end
+        end);
+    end)
+
+    --
+    
+    --fireproximityprompt(workspace.NPCs["Random Trainer 18"].HumanoidRootPart.Dialogue)
+    --firesignal(game:GetService("Players").LocalPlayer.PlayerGui.Dialogue.Dialogue.Button2.MouseButton1Click)
+
+    task.spawn(function()
+        while task.wait() do 
+            if getgenv().loopsUnload == true then print('nuh uh rebirth break') break end;
+            if bladersrebirth.instakill == true then 
+                for i,v in next, workspace.Beyblades:GetChildren() do 
+                    if v.PrimaryPart and isnetworkowner(v.PrimaryPart) and v.Name ~= game.Players.LocalPlayer.Name then 
+                        pcall(function()
+                            v.Controller.Health = 0
+                        end)
+                    end
+                end
+            end;
         end
     end)
     AddConfigurations()
