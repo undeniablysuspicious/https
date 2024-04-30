@@ -36006,6 +36006,11 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 pcall(function()
                     game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame.DestroyTool:FireServer(game.Players.LocalPlayer.Backpack.Granada)
                 end)
+                for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame:GetChildren() do 
+                    if tonumber(v.Name) and tonumber(v.Name) > 3 then 
+                        v:Destroy()
+                    end
+                end
             end)
             table.insert(HealConnections, connection); --connecting)
         end;
@@ -36017,6 +36022,11 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                         v:Disconnect()
                     end)
                 end;
+                for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame:GetChildren() do 
+                    if tonumber(v.Name) and tonumber(v.Name) > 3 then 
+                        v:Destroy()
+                    end
+                end
             end)
         end;
     end;
@@ -36035,6 +36045,46 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end)
     sector:AddButton('Insta Heal', function()
         fastHeal(true)
+    end)
+    sector:AddButton('No Cooldown Hooks', function()
+        for index,funct in next, getgc() do 
+            if type(funct) == 'function' and getinfo(funct).source:find('Gear') then
+                local canList = false;
+                for i,v in next, debug.getupvalues(funct) do 
+                    if tostring(v):find('Cast') then
+                        canList = true 
+                        print(i,v,index,funct,tostring(debug.getinfo(funct).name))
+                    end
+                end
+                if canList == true then 
+                    print('----')
+                    task.spawn(function()
+                        local sets = {
+                            ['43'] = false;
+                            ['9'] = false;
+                            42;
+                            46;
+                        }
+                        print('setting')
+                        repeat task.wait() 
+                            if debug.getupvalues(funct)[49] == true then 
+                                debug.setupvalue(funct, 49, false)-- = false
+                            end;
+                            if debug.getupvalues(funct)[9] == true then 
+                                --debug.setupvalue(funct, 9, false); --debug.getupvalues(funct)[9] = false --  e pressed?
+                            end;
+                            --debug.setupvalue(funct, 43, false)
+                            debug.setupvalue(funct, 42, false);
+        
+                            -- e
+                            --debug.setupvalue(funct, 19, false);
+                            debug.setupvalue(funct, 7, false);
+                            --debug.setupvalue(funct, 46, false);
+                        until 1 == 2
+                    end)
+                end
+            end
+        end
     end)
     -- ifn:ActivateKnowledge()
     -- ifn:AddKnowledge('click again if granoda doesnt disappear')
