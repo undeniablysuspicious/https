@@ -36004,7 +36004,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0)
                 end
             end)
-            table.insert(HealConnections, connecting)
+            table.insert(HealConnections, connection); --connecting)
         end;
         if b == true then 
             task.spawn(function()
