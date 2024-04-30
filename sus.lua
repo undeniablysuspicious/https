@@ -35985,6 +35985,54 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         accept = 'Yes';
         reject = 'No';
     }):AddKeybind()
+    local HealConnections = {}; -- Connections Heal
+    local function fastHeal(b)
+        for i=1, 10 do 
+            local connection = game.RunService.RenderStepped:Connect(function()
+                pcall(function()
+                    game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame.DestroyTool:FireServer(game.Players.LocalPlayer.Backpack.Granada)
+                end)
+                if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada') then 
+                    pcall(function()
+                        for i=1, 3 do 
+                            game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada').Eat:FireServer();
+                            task.wait(0.01)
+                        end
+                    end)
+                    task.wait(0.001)
+                else
+                    game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',0)
+                end
+            end)
+            table.insert(HealConnections, connecting)
+        end;
+        if b == true then 
+            task.spawn(function()
+                task.wait(1);
+                for i,v in next, HealConnections do 
+                    pcall(function()
+                        v:Disconnect()
+                    end)
+                end;
+            end)
+        end;
+    end;
+    local instahealbtn = sector:AddToggle('Inf Heal Fast', false, function(x) -- should make configurations do string.lower
+        aotfreedomwar.infhealfast = x;
+        if not x then 
+            for i,v in next, HealConnections do 
+                pcall(function()
+                    v:Disconnect()
+                end)
+            end;
+            return;
+        end
+        game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100)
+        fastHeal()
+    end)
+    sector:AddButton('Insta Heal', function()
+        fastHeal(true)
+    end)
     -- ifn:ActivateKnowledge()
     -- ifn:AddKnowledge('click again if granoda doesnt disappear')
     sector:AddToggle('Inf Spike Nets',false,function(x)
