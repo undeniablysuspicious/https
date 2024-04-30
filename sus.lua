@@ -35876,7 +35876,10 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                         local ohString1 = "TS"
                         local ohInstance2 = foundDir; --workspace.PracticeMap.TSRefill.Main
                         
-                        localPlayer.character[gearname].Events.RefillEventServer:FireServer('TS', foundDir)
+                        --
+                        pcall(function()
+                            localPlayer.character[gearname].Events.RefillEventServer:FireServer('TS', foundDir)
+                        end)
                     end
                 end)
             end;
@@ -36006,11 +36009,13 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 pcall(function()
                     game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame.DestroyTool:FireServer(game.Players.LocalPlayer.Backpack.Granada)
                 end)
-                for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame:GetChildren() do 
-                    if tonumber(v.Name) and tonumber(v.Name) > 3 then 
-                        v:Destroy()
+                pcall(function()
+                    for i,v in next, game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame:GetChildren() do 
+                        if tonumber(v.Name) and tonumber(v.Name) > 3 then 
+                            v:Destroy()
+                        end
                     end
-                end
+                end)
             end)
             table.insert(HealConnections, connection); --connecting)
         end;
