@@ -35994,7 +35994,11 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     }):AddKeybind()
     local HealConnections = {}; -- Connections Heal
     local function fastHeal(b)
-        for i=1, 10 do 
+        local amount = 10
+        if b then 
+            amount = 20
+        end;
+        for i=1, amount do -- 10 
             local connection = game.RunService.RenderStepped:Connect(function()
                 if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada') then 
                     for i=1, 3 do 
