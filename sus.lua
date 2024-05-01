@@ -41182,79 +41182,79 @@ elseif universeid == 4871329703 then -- type soul
             return;
         end;
 
-        local function onAdded(obj)
-            local hardNames = {
-                'SchwertCritical'; --,'Tenran','Byakurai'
-                'HaienFireball';
+        -- local function onAdded(obj)
+        --     local hardNames = {
+        --         'SchwertCritical'; --,'Tenran','Byakurai'
+        --         'HaienFireball';
 
-            };
-            local dontParry = {
-                'WaveshotProjectile'; -- already got parry down;
-            }
-            if obj.Name:find('hitbox') or obj.Name:find('Hitbox') or obj.Name:find('Projectile') then 
-                signals.conceal(function()
-                    local hurtPart = obj;
-                    if obj:IsA('Model') then
-                        hurtPart = obj.PrimaryPart
-                    end
-                    repeat task.wait() until not hurtPart or checkdist(6,hurtPart)
-                    if hurtPart and checkdist(6, hurtPart) then 
-                        print('@parrying hurtpart '..obj.Name)
-                        typesoulsettings.functions.parry()
-                    end
-                end)
-            elseif table.find(hardNames,obj.Name) then --obj.Name == 'SchwertCritical'  then 
-                local hurtPart = obj;
-                if obj:IsA('Model') then hurtPart = obj.PrimaryPart end;
-                signals.conceal(function()
-                    repeat task.wait() until not hurtPart or checkdist(14,hurtPart)
-                    if hurtPart and checkdist(13,hurtPart) then 
-                        print(':parrying hardname '..obj.Name)
-                        typesoulsettings.functions.parry(0.3)
-                    end
-                end)
-            -- elseif obj:IsA('BasePart') then 
-            --     signals.conceal(function()
-            --         repeat task.wait() until not obj or checkdist(10,obj)
-            --         if obj and checkdist(6,obj) then 
-            --             print(':parrying random part '..obj.Name)
-            --             typesoulsettings.functions.parry()
-            --         end
-            --     end)
-            end
-        end
+        --     };
+        --     local dontParry = {
+        --         'WaveshotProjectile'; -- already got parry down;
+        --     }
+        --     if obj.Name:find('hitbox') or obj.Name:find('Hitbox') or obj.Name:find('Projectile') then 
+        --         signals.conceal(function()
+        --             local hurtPart = obj;
+        --             if obj:IsA('Model') then
+        --                 hurtPart = obj.PrimaryPart
+        --             end
+        --             repeat task.wait() until not hurtPart or checkdist(6,hurtPart)
+        --             if hurtPart and checkdist(6, hurtPart) then 
+        --                 print('@parrying hurtpart '..obj.Name)
+        --                 typesoulsettings.functions.parry()
+        --             end
+        --         end)
+        --     elseif table.find(hardNames,obj.Name) then --obj.Name == 'SchwertCritical'  then 
+        --         local hurtPart = obj;
+        --         if obj:IsA('Model') then hurtPart = obj.PrimaryPart end;
+        --         signals.conceal(function()
+        --             repeat task.wait() until not hurtPart or checkdist(14,hurtPart)
+        --             if hurtPart and checkdist(13,hurtPart) then 
+        --                 print(':parrying hardname '..obj.Name)
+        --                 typesoulsettings.functions.parry(0.3)
+        --             end
+        --         end)
+        --     -- elseif obj:IsA('BasePart') then 
+        --     --     signals.conceal(function()
+        --     --         repeat task.wait() until not obj or checkdist(10,obj)
+        --     --         if obj and checkdist(6,obj) then 
+        --     --             print(':parrying random part '..obj.Name)
+        --     --             typesoulsettings.functions.parry()
+        --     --         end
+        --     --     end)
+        --     end
+        -- end
 
-        maid.autoparrycheck = workspace.Effects.ChildAdded:Connect(function(child)
-            if child.Name ~= game.Players.LocalPlayer.Name then 
-                local ctn; ctn = child.ChildAdded:Connect(function(obj)
-                    task.wait(0.05)
-                    onAdded(obj)
-                end)
-                typesoulsettings.connections[child.Name] = ctn;
-                --table.insert(typesoulsettings.connections,ctn);
-                child.Destroying:Connect(function()
-                    ctn:Disconnect()
-                end)
-            end;
-        end)
-        maid.autoparrycheck2 = workspace.Effects.ChildRemoved:Connect(function(child)
-            if typesoulsettings.connections[child.Name] then 
-                typesoulsettings.connections[child.Name]:Disconnect()
-                typesoulsettings.connections[child.Name] = nil;
-            end
-        end)
-        for i,v in next, workspace.Effects:GetChildren() do 
-            if v.Name ~= game.Players.LocalPlayer.Name then 
-                local ctn; ctn = v.ChildAdded:Connect(function(obj)
-                    task.wait(0.05)
-                    onAdded(obj)
-                end)
-                table.insert(typesoulsettings.connections,ctn);
-                v.Destroying:Connect(function()
-                    ctn:Disconnect()
-                end)
-            end
-        end
+        -- maid.autoparrycheck = workspace.Effects.ChildAdded:Connect(function(child)
+        --     if child.Name ~= game.Players.LocalPlayer.Name then 
+        --         local ctn; ctn = child.ChildAdded:Connect(function(obj)
+        --             task.wait(0.05)
+        --             onAdded(obj)
+        --         end)
+        --         typesoulsettings.connections[child.Name] = ctn;
+        --         --table.insert(typesoulsettings.connections,ctn);
+        --         child.Destroying:Connect(function()
+        --             ctn:Disconnect()
+        --         end)
+        --     end;
+        -- end)
+        -- maid.autoparrycheck2 = workspace.Effects.ChildRemoved:Connect(function(child)
+        --     if typesoulsettings.connections[child.Name] then 
+        --         typesoulsettings.connections[child.Name]:Disconnect()
+        --         typesoulsettings.connections[child.Name] = nil;
+        --     end
+        -- end)
+        -- for i,v in next, workspace.Effects:GetChildren() do 
+        --     if v.Name ~= game.Players.LocalPlayer.Name then 
+        --         local ctn; ctn = v.ChildAdded:Connect(function(obj)
+        --             task.wait(0.05)
+        --             onAdded(obj)
+        --         end)
+        --         table.insert(typesoulsettings.connections,ctn);
+        --         v.Destroying:Connect(function()
+        --             ctn:Disconnect()
+        --         end)
+        --     end
+        -- end
     end)
     sector:AddToggle('Feint Before Parry', false, function(e)
         typesoulsettings.m2beforeparry = e;
@@ -43542,19 +43542,19 @@ elseif universeid == 4871329703 then -- type soul
         end  
     end)
     mainright:AddToggle('Apply Kendo Stats', false, function(x)
-        typesoulsettings.statapply.kendo = true; -- threshold
+        typesoulsettings.statapply.kendo = x; -- threshold
     end)
     mainright:AddToggle('Apply Kido Stats', false, function(x)
-        typesoulsettings.statapply.kido = true;
+        typesoulsettings.statapply.kido = x;
     end)
     mainright:AddToggle('Apply Healing Stats', false, function(x)
-        typesoulsettings.statapply.healing = true;
+        typesoulsettings.statapply.healing = x;
     end)
     mainright:AddToggle('Apply Speed Stats', false, function(x)
-        typesoulsettings.statapply.speed = true;
+        typesoulsettings.statapply.speed = x;
     end)
     mainright:AddToggle('Apply Hakuda Stats', false, function(x)
-        typesoulsettings.statapply.hakuda = true;
+        typesoulsettings.statapply.hakuda = x;
     end)
     mainright:AddSeperator('-');
     mainright:AddButton('Bank All', function()
@@ -44370,7 +44370,7 @@ elseif universeid == 4871329703 then -- type soul
                         canRun = true;
                     end
                 end)
-                if typesoulsettings.functions.getentityfolder() then 
+                if typesoulsettings.functions.getentityfolder() and canRun == true then 
                     local eq = {
                         ['kido'] = 'Kido'; --'Kdi'
                         ['kendo'] = 'Kendo';
