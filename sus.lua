@@ -8269,9 +8269,13 @@ task.spawn(function()
     print('@v;;;')
     repeat task.wait(.1) until getgenv().loopsUnload == true
     print('@ended')
-    for i,v in next, maid do 
+    for i,v in next, maid._tasks do 
         pcall(function()
-            maid[i] = nil;
+            --print(i,v)
+            if typeof(v) == 'RBXScriptConnection' then 
+                print('specificially unloading',i)
+                maid[i] = nil;
+            end;
         end)
     end
     print('offloaded @maid')
@@ -8844,7 +8848,7 @@ metaforit.__index = function(table, key)
     --     return game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') or nil;
     -- end -- rootart
 end
-print(localPlayer.instance)
+--print(localPlayer.instance)
 metaforit.__call = function(_table,  ...) -- in our case the arguments are going to be a number and a string
     local args = {...} -- ./.
     local whereabouts = {
@@ -8957,6 +8961,16 @@ local signals = {
         running = {};
     };
 };
+signals.propertychanged = function(a, b, c)
+    if typeof(a) == 'table' then 
+        b = a.value -- value
+        c = a.funct -- function
+        a = a.class; -- instance
+    end;
+    return a:GetPropertyChangedSignal(b):Connect(function()
+        c();
+    end)
+end;
 signals.foreach = function(a , b, yield)
     if not yield then yield = true end;
     for i,v in next, a:GetChildren() do 
@@ -35606,9 +35620,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                         task.spawn(function()
                             local inputManager = game:GetService('VirtualInputManager')
                             local m = game.Players.LocalPlayer:GetMouse();
-                            inputManager:SendMouseButtonEvent(m.X,m.Y,0,true,game,0)
+                            inputManager:SendMouseButtonEvent(workspace.CurrentCamera.ViewportSize.X/2,workspace.CurrentCamera.ViewportSize.Y/2,0,true,game,0)
                             --task.wait(.1)
-                            inputManager:SendMouseButtonEvent(m.X,m.Y,0,false,game,0)
+                            inputManager:SendMouseButtonEvent(workspace.CurrentCamera.ViewportSize.X/2,workspace.CurrentCamera.ViewportSize.Y/2,0,false,game,0)
                         end)
                     until v:FindFirstChild('DummyNape').Cutted.Value == true -- ~= savedColor
                 end
@@ -35886,6 +35900,66 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end)
     end)
     sector:CreateHintOnItem(infts, 'Turn off if not using')
+    sector:AddToggle('No Cooldown Hooks', false, function(x)
+        aotfreedomwar.nocdhooks = x;
+        if not x then 
+            maid.nocdhooks = nil;
+            return
+        end;
+        local function makeNoCooldown()
+            for index,funct in next, getgc() do 
+                if type(funct) == 'function' and getinfo(funct).source:find('Gear') then
+                    local canList = false;
+                    for i,v in next, debug.getupvalues(funct) do 
+                        if tostring(v):find('Cast') then
+                            canList = true 
+                            print(i,v,index,funct,tostring(debug.getinfo(funct).name))
+                        end
+                    end
+                    if canList == true then 
+                        print('----')
+                        task.spawn(function()
+                            local sets = {
+                                ['43'] = false;
+                                ['9'] = false;
+                                42;
+                                46;
+                            }
+                            print('setting')
+                            repeat task.wait() 
+                                if debug.getupvalues(funct)[49] == true then 
+                                    debug.setupvalue(funct, 49, false)-- = false
+                                end;
+                                if debug.getupvalues(funct)[9] == true then 
+                                    --debug.setupvalue(funct, 9, false); --debug.getupvalues(funct)[9] = false --  e pressed?
+                                end;
+                                --debug.setupvalue(funct, 43, false)
+                                debug.setupvalue(funct, 42, false);
+            
+                                -- e
+                                --debug.setupvalue(funct, 19, false);
+                                debug.setupvalue(funct, 7, false);
+                                --debug.setupvalue(funct, 46, false);
+                            until 1 == 2
+                        end)
+                    end
+                end
+            end
+        end;
+        makeNoCooldown()
+        maid.nocdhooks = signals.propertychanged(localPlayer.instance, 'Character', function()
+            if localPlayer.instance.Character ~= nil then 
+                signals.conceal(function()
+                    repeat task.wait() until localPlayer.character and localPlayer.character:FindFirstChild('Gear');
+                    task.wait(2.5)
+                    makeNoCooldown()
+                    azfakenotify('init ncd hooks',10)
+                end)
+            else
+                azfakenotify('mustve died or character set nil',5)
+            end;
+        end); --localPlayer.instance:GetPropertyChangedSignal()
+    end)
     sector:AddToggle('Get All Skills',false,function(xstate)
         getgenv().aotfreedomwar['getallskills'] = xstate
     end)
@@ -36055,46 +36129,46 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     sector:AddButton('Insta Heal', function()
         fastHeal(true)
     end)
-    sector:AddButton('No Cooldown Hooks', function()
-        for index,funct in next, getgc() do 
-            if type(funct) == 'function' and getinfo(funct).source:find('Gear') then
-                local canList = false;
-                for i,v in next, debug.getupvalues(funct) do 
-                    if tostring(v):find('Cast') then
-                        canList = true 
-                        print(i,v,index,funct,tostring(debug.getinfo(funct).name))
-                    end
-                end
-                if canList == true then 
-                    print('----')
-                    task.spawn(function()
-                        local sets = {
-                            ['43'] = false;
-                            ['9'] = false;
-                            42;
-                            46;
-                        }
-                        print('setting')
-                        repeat task.wait() 
-                            if debug.getupvalues(funct)[49] == true then 
-                                debug.setupvalue(funct, 49, false)-- = false
-                            end;
-                            if debug.getupvalues(funct)[9] == true then 
-                                --debug.setupvalue(funct, 9, false); --debug.getupvalues(funct)[9] = false --  e pressed?
-                            end;
-                            --debug.setupvalue(funct, 43, false)
-                            debug.setupvalue(funct, 42, false);
+    -- sector:AddButton('No Cooldown Hooks', function()
+    --     for index,funct in next, getgc() do 
+    --         if type(funct) == 'function' and getinfo(funct).source:find('Gear') then
+    --             local canList = false;
+    --             for i,v in next, debug.getupvalues(funct) do 
+    --                 if tostring(v):find('Cast') then
+    --                     canList = true 
+    --                     print(i,v,index,funct,tostring(debug.getinfo(funct).name))
+    --                 end
+    --             end
+    --             if canList == true then 
+    --                 print('----')
+    --                 task.spawn(function()
+    --                     local sets = {
+    --                         ['43'] = false;
+    --                         ['9'] = false;
+    --                         42;
+    --                         46;
+    --                     }
+    --                     print('setting')
+    --                     repeat task.wait() 
+    --                         if debug.getupvalues(funct)[49] == true then 
+    --                             debug.setupvalue(funct, 49, false)-- = false
+    --                         end;
+    --                         if debug.getupvalues(funct)[9] == true then 
+    --                             --debug.setupvalue(funct, 9, false); --debug.getupvalues(funct)[9] = false --  e pressed?
+    --                         end;
+    --                         --debug.setupvalue(funct, 43, false)
+    --                         debug.setupvalue(funct, 42, false);
         
-                            -- e
-                            --debug.setupvalue(funct, 19, false);
-                            debug.setupvalue(funct, 7, false);
-                            --debug.setupvalue(funct, 46, false);
-                        until 1 == 2
-                    end)
-                end
-            end
-        end
-    end)
+    --                         -- e
+    --                         --debug.setupvalue(funct, 19, false);
+    --                         debug.setupvalue(funct, 7, false);
+    --                         --debug.setupvalue(funct, 46, false);
+    --                     until 1 == 2
+    --                 end)
+    --             end
+    --         end
+    --     end
+    -- end)
     -- ifn:ActivateKnowledge()
     -- ifn:AddKnowledge('click again if granoda doesnt disappear')
     sector:AddToggle('Inf Spike Nets',false,function(x)
@@ -40720,8 +40794,9 @@ elseif universeid == 4871329703 then -- type soul
                 v:Disconnect()
             end)
         end
-    end
+    end -- one account trades one account farms
     local tab = window:CreateTab(gameName)
+    local farmingtab = window:CreateTab('Farm')
     local betatab = window:CreateTab('Beta Features')
     if game.PlaceId == 14067600077 then 
         azfakenotify('Waiting to join game.','untilClick')
@@ -40732,9 +40807,10 @@ elseif universeid == 4871329703 then -- type soul
     local sector = tab:CreateSector('Cheats','left')
     local earlyaccess = betatab:CreateSector('Beta Cheats','left')
     local newother = tab:CreateSector('Cheats','left')
-    local lefttab = tab:CreateSector('Cheats','left')
-    local rightsect = tab:CreateSector('Cheats','right')
-    local farmrightsect = tab:CreateSector('Cheats','right')
+    local lefttab = tab:CreateSector('Cheats','right')
+    local rightsect = farmingtab:CreateSector('Cheats','left') --   right
+    local farmrightsect = farmingtab:CreateSector('Cheats','left')  --right
+    local mainright = farmingtab:CreateSector('Cheats','right')  --right
     local espsector = esptab:CreateSector('Cheats','left')
 
     local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
@@ -40871,6 +40947,13 @@ elseif universeid == 4871329703 then -- type soul
         publicwebhook = true;
         scrapeamount = 1500;
         autoparryholdtime = 0.1;
+        statapply = {
+            kido = false;
+            healing = false;
+            kendo = false;
+            hakuda = false;
+            speed = false;
+        };
     }
     typesoulsettings.functions.removecurrenttweens = function()
         for i,v in next, typesoulsettings.tweens do 
@@ -40992,12 +41075,12 @@ elseif universeid == 4871329703 then -- type soul
 
     typesoulsettings.functions.parry = function(hold)
         if not typesoulsettings.functions.getentityfolder() then return print('no entity folder') end;
-        typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Released")
+        typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Released", nil)
         if typesoulsettings.m2beforeparry then 
             azfake:returndata().character.CharacterHandler.Remotes.M2:FireServer()
         end
         if typesoulsettings.useparryvirtualiser == false then 
-            typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Pressed")
+            typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Pressed", nil)
         else
             signals.VirtualiseKeypress('F', true)
         end
@@ -41007,7 +41090,7 @@ elseif universeid == 4871329703 then -- type soul
             task.wait(typesoulsettings.autoparryholdtime); --(0.1)
         end
         if typesoulsettings.useparryvirtualiser == false then
-            typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Released")
+            typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Released", nil)
         else
             signals.VirtualiseKeypress('F', false)
         end
@@ -41022,8 +41105,11 @@ elseif universeid == 4871329703 then -- type soul
             end; 
             task.wait(timetowait) -- v
             if checkdist(dist, mob.PrimaryPart) and anim.IsPlaying then 
-                typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Pressed")
-                typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Released")
+                task.spawn(function()
+                    typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Pressed",nil)
+                    task.wait(0.1)
+                    typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.Block:FireServer("Released",nil)
+                end)
             end
         end
     end;
@@ -41045,7 +41131,7 @@ elseif universeid == 4871329703 then -- type soul
     typesoulsettings.functions.flashstep = function()
         if workspace.Entities:FindFirstChild(game.Players.LocalPlayer.Name) then 
             local folder = workspace.Entities:FindFirstChild(game.Players.LocalPlayer.Name);
-            folder.CharacterHandler.Remotes.Flashstep:FireServer('Pressed');
+            folder.CharacterHandler.Remotes.Flashstep:FireServer('Pressed', nil);
         end;
     end;    -- could make a check to get folder
 
@@ -41774,7 +41860,7 @@ elseif universeid == 4871329703 then -- type soul
                             task.wait(.03)
                             inputManager:SendKeyEvent(false,Enum.KeyCode.W,false,game)
                             local id = lootbox:GetAttribute('ID')
-                            game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(id, item)
+                            game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(id, item, nil)
                         else
                             if not tpPart then 
                                 print('gettign new tp part')
@@ -41813,7 +41899,7 @@ elseif universeid == 4871329703 then -- type soul
                                     print('grabbing with id '..ID)
                                     for i,v in next, itemsTho do 
                                         print('getting '..v)
-                                        game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(ID, v)
+                                        game:GetService("ReplicatedStorage").Lootbox.Remotes.Collect:FireServer(ID, v, nil)
                                     end
                                 else
                                     ID = closestbounty:GetAttribute('ID')
@@ -41868,7 +41954,7 @@ elseif universeid == 4871329703 then -- type soul
                             for i,jobIdTable in next, GetTable do 
                                 local shouldbreak = false
                                 if jobIdTable['JobID'] ~= game.JobId then -- check if not max 
-                                    game.TeleportService:TeleportToPlaceInstance(game.PlaceId,jobIdTable['JobID'])
+                                    game.TeleportService:TeleportToPlaceInstance(game.PlaceId,jobIdTable['JobID'], nil)
                                     --game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer(GameName,jobIdTable['JobID'])
                                 end
                             end
@@ -42083,7 +42169,7 @@ elseif universeid == 4871329703 then -- type soul
                 -- table.insert(holdingkeys, true)
                 pcall(function()
                     if #holdingkeys == 0 then 
-                        azfake:returndata().character.CharacterHandler.Remotes.Sprint:FireServer('Pressed')
+                        azfake:returndata().character.CharacterHandler.Remotes.Sprint:FireServer('Pressed', nil)
                     end
                 end)
                 table.insert(holdingkeys, k:lower())
@@ -42097,7 +42183,7 @@ elseif universeid == 4871329703 then -- type soul
                 if #holdingkeys == 0 then 
                     pcall(function()
                         print('had to release')
-                        azfake:returndata().character.CharacterHandler.Remotes.Sprint:FireServer('Released')
+                        azfake:returndata().character.CharacterHandler.Remotes.Sprint:FireServer('Released', nil)
                     end)
                 end
             end;
@@ -42208,7 +42294,7 @@ elseif universeid == 4871329703 then -- type soul
                     newItem = string.gsub(newItem,' obtained.','')
                     print('@item set',newItem)
                     repeat 
-                        typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.EquipSkill:FireServer('Equals', newItem)
+                        typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.EquipSkill:FireServer('Equals', newItem, nil)
                         task.wait(0.2)
                     until 1 == 2
                     --localPlayer.character.CharacterHandler.Remotes.EquipSkill:FireServer("Equals", child:FindFirstChildWhichIsA('TextLabel').Text)
@@ -42436,7 +42522,7 @@ elseif universeid == 4871329703 then -- type soul
                     if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] then 
                         task.wait(1)
                         pcall(function()
-                            game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
+                            game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'],nil)
                         end)
                     end
                 end
@@ -42481,7 +42567,7 @@ elseif universeid == 4871329703 then -- type soul
                                     if jobIdTable['JobID'] ~= game.JobId then 
                                         task.wait(1)
                                         pcall(function()
-                                            game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
+                                            game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'],nil)
                                         end)
                                     end
                                 end
@@ -42537,7 +42623,7 @@ elseif universeid == 4871329703 then -- type soul
                                         for i,jobIdTable in next, GetTable do 
                                             local shouldbreak = false
                                             if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] and tonumber(jobIdTable['ServerPlayers']) < 15 then 
-                                                game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
+                                                game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'],nil)
                                             end
                                         end
                                     until 1 == 2
@@ -42556,7 +42642,7 @@ elseif universeid == 4871329703 then -- type soul
                             local shouldbreak = false
                             ind += 1
                             if jobIdTable['JobID'] ~= game.JobId and not jobIdTable['Raid'] and ind > 10 and jobIdTable['ServerPlayers'] < 15 then 
-                                game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'])
+                                game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'], nil)
                             end
                         end
                     end)
@@ -42666,7 +42752,7 @@ elseif universeid == 4871329703 then -- type soul
                             task.wait(2)
                             fireclickdetector(kisuke:WaitForChild('ClickDetector'))
                         until hasKisukeAdded
-                        hasKisukeAdded:FireServer('Yes')
+                        hasKisukeAdded:FireServer('Yes', nil)
                     end)
                     -- hasKisukeAdded:workspace.NPCs.RaidBoss.Kisuke.ClickDetector
                 end
@@ -42908,10 +42994,10 @@ elseif universeid == 4871329703 then -- type soul
             localPlayer.instance.ChildAdded:Connect(function(remote)
                 if bongfarm == 'teleportedtonel' then 
                     azfakenotify('on nel dialogue', 2)
-                    bongfarm:FireServer('Yes')
+                    bongfarm:FireServer('Yes', nil)
                 elseif bongfarm == 'teleportedtobong' and remote:IsA('RemoteEvent') then 
                     azfakenotify('on bong dialogue', 2)
-                    remote:FireServer('Yes')       
+                    remote:FireServer('Yes', nil)       
                 end
             end)
             maid.bonging = signals.heartbeat:connect('@bonging v4 new', function()
@@ -43412,6 +43498,75 @@ elseif universeid == 4871329703 then -- type soul
             task.wait(.25)
         end
     end);
+    local slctedPlayer = ''
+    local toBe = {'None'}
+    for i,v in next, game.Players:GetPlayers() do 
+        table.insert(toBe,v.Name)
+    end;
+    local selectedPlayer = farmrightsect:AddDropdown("Selected Player", toBe, "None", false, function(State) -- could change to quest  getWhitelsited
+        slctedPlayer = State 
+    end)
+    local playeradded; playeradded = game.Players.PlayerAdded:Connect(function(child) --= playplayeraeraddedap
+        task.wait(.1);
+        selectedPlayer:Add(child.Name)
+    end); table.insert(typesoulsettings.connections, playeradded);
+    local playerremoved; playerremoved = game.Players.PlayerRemoving:Connect(function(child)
+        task.wait(.1);
+        selectedPlayer:Remove(child.Name)
+    end); table.insert(typesoulsettings.connections, playerremoved);
+    local function getPlayerFromDrp()
+        return game.Players:FindFirstChild(slctedPlayer)
+    end
+    farmrightsect:AddButton('Copy Vector3', function()
+        local enemy = getPlayerFromDrp()
+        if enemy then -- penemylayer
+            setclipboard('Vector3.new('..tostring(enemy.Character.HumanoidRootPart.Position)..')')
+        end  
+    end)
+    farmrightsect:AddButton('Copy CFrame', function()
+        local enemy = getPlayerFromDrp()
+        if enemy then -- penemylayer
+            setclipboard('CFrame.new('..tostring(enemy.Character.HumanoidRootPart.Position)..')')
+        end  
+    end)
+    farmrightsect:AddButton('Copy UserId', function()
+        local enemy = getPlayerFromDrp()
+        if enemy then -- penemylayer
+            setclipboard(enemy.UserId)
+        end  
+    end)
+    farmrightsect:AddButton('Copy Distance', function()
+        local enemy = getPlayerFromDrp()
+        if enemy then -- penemylayer
+            setclipboard(tostring(checkdist(100000, enemy.Character.HumanoidRootPart)))
+        end  
+    end)
+    mainright:AddToggle('Apply Kendo Stats', false, function(x)
+        typesoulsettings.statapply.kendo = true; -- threshold
+    end)
+    mainright:AddToggle('Apply Kido Stats', false, function(x)
+        typesoulsettings.statapply.kido = true;
+    end)
+    mainright:AddToggle('Apply Healing Stats', false, function(x)
+        typesoulsettings.statapply.healing = true;
+    end)
+    mainright:AddToggle('Apply Speed Stats', false, function(x)
+        typesoulsettings.statapply.speed = true;
+    end)
+    mainright:AddToggle('Apply Hakuda Stats', false, function(x)
+        typesoulsettings.statapply.hakuda = true;
+    end)
+    mainright:AddSeperator('-');
+    mainright:AddButton('Bank All', function()
+    
+    end); -- mank
+    -- her new man wasnt a new man u just never new man
+
+
+
+
+
+
     --
     local isUp = true;
     local m1con; m1con = game.Players.LocalPlayer:GetMouse().Button1Down:Connect(function()
@@ -44015,7 +44170,7 @@ elseif universeid == 4871329703 then -- type soul
                         if objdist and checkdist(typesoulsettings.autoparrydistance,objdist) then 
                             --
                             if typesoulsettings.m2beforeparry and azfake:returndata().character then 
-                                azfake:returndata().character.CharacterHandler.Remotes.M2:FireServer()
+                                azfake:returndata().character.CharacterHandler.Remotes.M2:FireServer(nil)
                             end
                             attemptLookat();
                             signals.conceal(function()
@@ -44059,7 +44214,7 @@ elseif universeid == 4871329703 then -- type soul
                             azfakenotify(`parrying {parryAnims[animationId]}`,5)
                         end
                         if typesoulsettings.m2beforeparry and azfake:returndata().character then 
-                            azfake:returndata().character.CharacterHandler.Remotes.M2:FireServer()
+                            azfake:returndata().character.CharacterHandler.Remotes.M2:FireServer(nil)
                         end
                         signals.conceal(function()
                             local timetowait = registry;
@@ -44207,6 +44362,34 @@ elseif universeid == 4871329703 then -- type soul
                 end
                 break
             end
+            if typesoulsettings.statapply.kido == true or  typesoulsettings.statapply.kendo or  typesoulsettings.statapply.healing or  typesoulsettings.statapply.hakuda or  typesoulsettings.statapply.speed then 
+                -- kidospeed;
+                local canRun = false;
+                pcall(function()
+                    if game:GetService("Players").LocalPlayer.PlayerGui.SkillTree.MainFrame.currentSPFrame.currentSPBtn.Text ~= 'Current SP: 0' then 
+                        canRun = true;
+                    end
+                end)
+                if typesoulsettings.functions.getentityfolder() then 
+                    local eq = {
+                        ['kido'] = 'Kido'; --'Kdi'
+                        ['kendo'] = 'Kendo';
+                        ['healing'] = 'Healing';
+                        ['hakuda'] = 'Hakuda';
+                        ['speed'] = 'Speed';
+                    }
+                    for i,v in next, eq do 
+                        if typesoulsettings.statapply[i] == true then 
+                            pcall(function()
+                                typesoulsettings.functions.getentityfolder().CharacterHandler.Remotes.AddSP:FireServer(v, nil)
+                            end)
+                        end
+                    end;
+                    -- if typesoulsettings.statapply.kido then 
+                    --     workspace.Entities.JoeheYTacc.CharacterHandler.Remotes.AddSP:FireServer(ohString1)
+                    -- end;
+                end
+            end;
             if typesoulsettings.fullbright == true then 
                 game.Lighting.ClockTime = 12;
                 game.Lighting.FogEnd = 1400;
@@ -44601,7 +44784,7 @@ elseif universeid == 4871329703 then -- type soul
                                                 local ohString2 = tostring(v)
                                                 local ohString3 = "Pressed"
                                             
-                                                game:GetService("ReplicatedStorage").Remotes.ServerCombatHandler:FireServer(ohString1, ohString2, ohString3)
+                                                game:GetService("ReplicatedStorage").Remotes.ServerCombatHandler:FireServer(ohString1, ohString2, ohString3, nil)
                                             end;
                                         end;
                                     end
@@ -44628,7 +44811,7 @@ elseif universeid == 4871329703 then -- type soul
                                         task.wait(1) 
                                         if azfake:returndata().character.Humanoid.WalkSpeed ~= 0 and v:FindFirstChild('HumanoidRootPart') then 
                                             rootPart.CFrame = v.HumanoidRootPart.CFrame
-                                            azfake:returndata().character.CharacterHandler.Remotes.Execute:FireServer()
+                                            azfake:returndata().character.CharacterHandler.Remotes.Execute:FireServer(nil)
                                         end
                                         task.wait(2)
                                     until azfake:returndata().character.Humanoid.WalkSpeed == 0 or not v:FindFirstChild('HumanoidRootPart')
