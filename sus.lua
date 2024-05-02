@@ -8804,6 +8804,11 @@ metaforit.cframeteleport = function(tocframe, info) -- isdist, yield
         task.spawn(teleportCFrame)
     end
 end;
+metaforit.checkdist = function(dist, pos)
+    if not game.Players.LocalPlayer.Character then return false end;
+    if not game.Players.LocalPlayer.Character:FindFirstChild('HumanoidRootPart') then return false end;
+    return (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - pos).Magnitude <= dist
+end;
 metaforit.teleport.serverHop = function(id)
     local serverId = (id == true and game.PlaceId or id)
     local Http = game:GetService("HttpService")
@@ -8842,6 +8847,9 @@ metaforit.__index = function(table, key)
         if tostring(i) == tostring(key) then 
             return v
         end
+    end
+    if not metaforit[key] then 
+        return nil
     end
     return metaforit[key]
     -- if key == 'rootPart' then 
@@ -8928,6 +8936,12 @@ metaforit.__call = function(_table,  ...) -- in our case the arguments are going
         return true
     end;
 end
+metaforit.__newindex = function(table, ...)
+    local args = {...};
+    local key = args[1];
+    local value = args[2];
+    metaforit[key] = value;
+end;
 
 -- localPlayer('destroy','head', 'character','all')
 -- localPlayer('cframe')
@@ -46578,6 +46592,105 @@ elseif universeid == 5321619756 then
             end;
         end
     end)
+    AddConfigurations()
+elseif universeid == 4777817887 then -- uni123 bladeball
+    local tab = window:CreateTab(gameName)
+    local sector = tab:CreateSector('Cheats','left')
+    local rightsector = tab:CreateSector('Cheats','right')
+
+    getgenv().bladeballsettings = {
+        autoparry = false;
+        spamblock = false;
+        customradius = 10;
+        radiuscolor = Color3.fromRGB(255, 255,255);
+        flickcamera = false;
+    }
+    sharedRequires['CreateFlySystem'](rightsector, bladeballsettings)
+    sharedRequires['CreateWalkSpeedSystem'](rightsector, bladeballsettings)
+    sharedRequires['CreateNoclip'](rightsector, bladeballsettings)
+    task.spawn(function()
+        sharedRequires['SetupChatlogger'](rightsector, bladeballsettings)
+    end)
+
+    sector:AddToggle('Auto Parry', false, function(x)
+        bladeballsettings.autoparry = x
+    end)
+    sector:AddToggle('Spam Block', false, function(x)
+        bladeballsettings.spamblock = x
+    end)
+    sector:AddSlider('Custom Radius', 0, 10, 50, 10, function(x)
+        bladeballsettings.customradius = x;
+    end);
+    sector:AddToggle('Flick Camera at Nearby', false, function(x)
+        bladeballsettings.flickcamera = x
+    end)
+    sector:AddColorpicker('Radius Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        bladeballsettings.radiuscolor = ztx;
+    end)
+    local rddelay = false;
+    local function ctnball(ball)
+        if not ball then return print('invalid ball') end;
+        signals.propertychanged(ball, 'Position', function()
+            if bladeballsettings.autoparry ~= true then return end;
+            local newPosition = ball.Position; -- 10
+            if localPlayer.checkdist(bladeballsettings.customradius, newPosition) and ball.Highlight.FillColor ~= Color3.fromRGB(1,1,1) or bladeballsettings.spamblock then 
+                task.spawn(function()
+                    local tt = tick()
+                    repeat 
+                        task.wait()
+                        signals.VirtualiseKeypress('F', true)
+                    until tick() - tt > 0.5
+                end)
+                if bladeballsettings.flickcamera then 
+                    local randomPerson = nil;
+                    for i,v in next, game.Players:GetPlayers() do 
+                        if v ~= localPlayer.instance and v.Character and v.Character:FindFirstChild('HumanoidRootPart') then 
+                            if (v.Character:FindFirstChild('HumanoidRootPart').Position - newPosition).Magnitude <= 150 then -- ball.Position
+                                if math.random(1,3) == 2 then 
+                                    randomPerson = v.Character:FindFirstChild('HumanoidRootPart')
+                                    break;
+                                end
+                            end;
+                        end;
+                    end;
+                    if randomPerson and rddelay == false then 
+                        rddelay = true;
+                        task.delay(0.5,function()
+                            rddelay = false;
+                        end)
+                        workspace.Camera.CFrame = CFrame.new(workspace.CurrentCamera.CoordinateFrame.p, randomPerson.Position )  
+                    end;  
+                end;
+            end;
+            --if newPosition localPlayer customProperti
+            if not localPlayer.radius or not localPlayer.character:FindFirstChild('radius') then 
+                localPlayer.radius = Instance.new('Part');
+                localPlayer.radius.Name = 'radius'
+                localPlayer.radius.Color = bladeballsettings.radiuscolor
+                localPlayer.radius.Shape = Enum.PartType.Ball;
+                localPlayer.radius.Material = Enum.Material.Water
+                localPlayer.radius.Transparency = 0.5
+                localPlayer.radius.Anchored = false;
+                localPlayer.radius.CanCollide = false;
+                localPlayer.radius.Massless = true;
+                local weld = Instance.new('Motor6D'); weld.Part0 = localPlayer.rootPart; weld.Part1 = localPlayer.radius; weld.Parent = localPlayer.radius
+                localPlayer.radius.Parent = localPlayer.character;
+            end;
+            local rd = bladeballsettings.customradius
+            localPlayer.radius.Size = Vector3.new(rd,rd,rd)
+            localPlayer.radius.Color = bladeballsettings.radiuscolor
+        end)
+    end;
+    workspace:WaitForChild('Balls').ChildAdded:Connect(function(child)
+        if bladeballsettings.autoparry ~= true then return end;
+        task.wait(0.1);
+        ctnball(child)
+    end)
+    for i,v in next, workspace.Balls:GetChildren() do 
+        ctnball(v)
+    end
+
+
     AddConfigurations()
 else
 
