@@ -498,7 +498,7 @@ getgenv().adminCheck = true
 
 local gameHash = cloneref(game:GetService('HttpService')):GenerateGUID(false);
 getgenv().observanthash = gameHash;
-local function gamekey(b)
+local function gamekey(b) -- mismatch
     return b == true and getgenv().observanthash == gameHash or not b and gameHash
 end
 if cloneref(game:GetService('CoreGui')):FindFirstChild('v4notiftoasty') then 
@@ -35881,18 +35881,22 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                         foundDir = v;
                     end
                 end;
-            until foundDir;
+            until foundDir or aotfreedomwar.infinitethunderspears == false or getgenv().loopsUnload == true;
             if aotfreedomwar.infinitethunderspears == true then 
                 maid.thunder = signals.heartbeat:connect('omega lul', function()
                     local gearname = 'Gear'
                     local gearscript = localPlayer.character and localPlayer.character:FindFirstChild(gearname) and localPlayer.character:FindFirstChild(gearname):FindFirstChild('Events')
-                    if gearscript then 
-                        local ohString1 = "TS"
-                        local ohInstance2 = foundDir; --workspace.PracticeMap.TSRefill.Main
-                        
-                        --
+                    if gearscript then
                         pcall(function()
-                            localPlayer.character[gearname].Events.RefillEventServer:FireServer('TS', foundDir)
+                            if localPlayer.character.Humanoid.Gear.TS.Value == 0 and localPlayer.character.Humanoid.Gear.TS.Loaded.Value == true then 
+                                local ohString1 = "TS"
+                                local ohInstance2 = foundDir; --workspace.PracticeMap.TSRefill.Main
+                                
+                                --
+                                pcall(function()
+                                    localPlayer.character[gearname].Events.RefillEventServer:FireServer('TS', foundDir)
+                                end)
+                            end
                         end)
                     end
                 end)
