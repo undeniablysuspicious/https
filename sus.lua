@@ -8747,6 +8747,12 @@ local metaforit = {};
 localPlayer.destroy = function(wehat, where)
 
 end;
+metaforit.isalive = function(enemy)
+    if enemy then 
+        return enemy and enemy:FindFirstChildWhichIsA('Humanoid') and enemy:FindFirstChildWhichIsA('Humanoid').Health > 0 or false;
+    end;
+    return game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA('Humanoid') and game.Players.LocalPlayer.Character:FindFirstChildWhichIsA('Humanoid').Health > 0 or false
+end;
 metaforit.teleport = {};
 metaforit.teleport.toInstance = function(id, job)
     local teleportId = (id == true and game.PlaceId or id)
@@ -36801,7 +36807,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     -- end)
 
     for i,v in next, workspace.OnGameTitans:GetChildren() do 
-        if getgenv().aotfreedomwar['titannapehitbox'] then 
+        if getgenv().aotfreedomwar['titannapehitbox'] and v:FindFirstChildWhichIsA('Humanoid') and v:FindFirstChildWhichIsA('Humanoid').Health > 0 then 
             changeSize(v)
         end
     end
@@ -36872,11 +36878,11 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 Character = Player.Character
                 Humanoid = Character and Character:FindFirstChild('Humanoid') or nil
                 gearfolder = Humanoid and Humanoid:FindFirstChild('Gear') or nil
-                local gearname = 'Gear'
+                gearname = 'Gear'
                 if not Character:FindFirstChild('Gear') and Character:FindFirstChild('APGear') then 
                     gearname = 'APGear'
                 end
-                local gearscript = Character and Character:FindFirstChild(gearname) and Character:FindFirstChild(gearname):FindFirstChild('Events')
+                gearscript = Character and Character:FindFirstChild(gearname) and Character:FindFirstChild(gearname):FindFirstChild('Events')
                 if aotfreedomwar.spawnnets == true and Character then 
                     local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position
                     game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
