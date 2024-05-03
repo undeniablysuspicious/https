@@ -36077,6 +36077,31 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             end;
         end); --localPlayer.instance:GetPropertyChangedSignal()
     end)
+    sector:AddToggle('Floor Platform', false, function(x)
+        aotfreedomwar.floorplatform = x;
+        if not x then
+            signals.coroutine.stop('floorplatform') 
+            return ;
+        end;
+        signals.coroutine.new('floorplatform', function()
+            while task.wait(.1) do 
+                local function createPlatform()
+                    local part = Instance.new('Part'); part.Size = Vector3.new(15,1,15);part.Transparency = 0.5
+                    part.Parent = workspace; part.Name = 'myplatform';part.Anchored = true
+                end
+                
+                local function setPlatform(cfr)
+                    if workspace:FindFirstChild('myplatform') then 
+                        workspace:FindFirstChild('myplatform').CFrame = cfr.CFrame * CFrame.new(0,-3,0)
+                    else
+                        createPlatform()
+                        workspace:WaitForChild('myplatform').CFrame = cfr.CFrame * CFrame.new(0,-3,0)
+                    end
+                end
+                setPlatform(localPlayer.rootPart);
+            end;
+        end)
+    end)
     sector:AddToggle('Get All Skills',false,function(xstate)
         getgenv().aotfreedomwar['getallskills'] = xstate
     end)
@@ -37030,12 +37055,14 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     for i,v in next, Player.PlayerGui.SkillsGui:GetChildren() do 
                         v.Enabled = true;
                     end
+                    warn('why u still runnin')
                 end
                 if gearfolder and gearfolder:FindFirstChild('Skills') and gearfolder.Skills.Dodge.Value == false and getgenv().aotfreedomwar['getallskills'] and Character and Humanoid and gearfolder and gearscript  then 
                     for i,v in next, gearfolder.Skills:GetChildren() do 
                         v.Value = true;
                         warn(`set {v.Name}`)
                     end
+                    warn('why u still runnin')
                 end
                 if gearfolder and Humanoid.Gear.BladesOut.Value == false and getgenv().aotfreedomwar['autoreload'] and Character and Humanoid and gearfolder and gearscript then 
                     game:GetService("Players").LocalPlayer.Character[gearname].Events.SafeBlades:FireServer()
