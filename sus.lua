@@ -35822,6 +35822,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
 
     local gearfolder = nil;
     local gearscript = nil;
+    local gearname = ''
 
 
 
