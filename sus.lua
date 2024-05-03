@@ -36911,7 +36911,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end
     local Player = game.Players.LocalPlayer
     task.spawn(function()
-        while task.wait(0.1) do -- tas.wait()
+        while task.wait() do -- tas.wait()
             if getgenv().loopsUnload == true then aimbotctn:Disconnect(); print('fw break end')  
                 maid.lookatcon = nil; maid.nostunshifter = nil; maid.shifterautoblock = nil;
                 maid.shifterautom1 = nil; maid.walkspeedcon = nil; maid.shifterautom2 = nil;
