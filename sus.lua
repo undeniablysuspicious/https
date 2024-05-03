@@ -35820,25 +35820,71 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end)
     
 
-
+    local gearfolder = nil;
+    local gearscript = nil;
 
 
 
     local autom1tgl = sector:AddToggle('Auto M1',false,function(xstate)
         getgenv().aotfreedomwar['autom1'] = xstate -- autom12
+        if xstate == false then 
+            maid.autom1 = nil;
+            return;
+        end;
+        maid.autom1 = signals.heartbeat:connect('why', function()
+            task.wait(0.1)
+            if aotfreedomwar.autom1 == true and localPlayer.character and localPlayer.humanoid and gearfolder and gearscript then 
+                game:GetService("Players").LocalPlayer.Character[gearname].Events.AttackingEvent:FireServer(1)
+            end;
+        end)
     end):AddKeybind()
-    local autom1tgl = sector:AddToggle('Auto Kick',false,function(xstate)
+    local automkicktgl = sector:AddToggle('Auto Kick',false,function(xstate)
         getgenv().aotfreedomwar['autokick'] = xstate -- autom12
+        if xstate == false then 
+            maid.autokick = nil;
+            return;
+        end;
+        maid.autokick = signals.heartbeat:connect('why', function()
+            task.wait(0.1)
+            if aotfreedomwar.autokick == true and Character and Humanoid and gearfolder and gearscript then 
+                game:GetService("Players").LocalPlayer.Character[gearname].Events.AttackingEvent:FireServer(nil,true)
+            end;
+        end)
     end)
     sector:AddToggle('Auto Counter',false,function(xstate)
         getgenv().aotfreedomwar['autocounter'] = xstate -- autom12
-        if xstate == false then 
-            maid.walkspeedchange = nil;
-        else
-            maid.walkspeedchange = azfake:returndata().humanoid:GetPropertyChangedSignal('WalkSpeed'):Connect(function()
-                azfake:returndata().humanoid.WalkSpeed = 25;
-            end);
+        if xtate == false then 
+            maid.autocounter = nil;
+            return;
         end;
+        maid.autocounter = signals.heartbeat:connect('omg',function()
+            task.wait(0.5)
+            if aotfreedomwar.autocounter == true and Character and Humanoid and gearfolder and gearscript then 
+                -- print('counta')
+                 if Humanoid.Counter.Value == false then
+                     if aotfreedomwar.autom1 == true then aotfreedomwar.autom1 = false end
+                     task.spawn(function()
+                         repeat 
+                             task.wait()
+                             pcall(function()
+                                 game:GetService("Players").LocalPlayer.Character[gearname].Events.MoreEvents.Counter:InvokeServer(unpack({[1] = false}))
+                             end)
+                         until Humanoid.Counter.Value == true or aotfreedomwar.autocounter == false
+                         if autom1tgl:Get() == true then 
+                             aotfreedomwar.autom1 = true
+                         end
+                     end)
+                 end
+             
+             end
+        end)
+        -- if xstate == false then 
+        --     maid.walkspeedchange = nil;
+        -- else
+        --     maid.walkspeedchange = azfake:returndata().humanoid:GetPropertyChangedSignal('WalkSpeed'):Connect(function()
+        --         azfake:returndata().humanoid.WalkSpeed = 25;
+        --     end);
+        -- end;
     end)
     -- sector:AddToggle('Auto Hood',false,function(xstate)
     --     getgenv().aotfreedomwar['autohood'] = xstate -- autom12
@@ -36815,7 +36861,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end
     local Player = game.Players.LocalPlayer
     task.spawn(function()
-        while task.wait(0.05) do -- tas.wait()
+        while task.wait(0.1) do -- tas.wait()
             if getgenv().loopsUnload == true then aimbotctn:Disconnect(); print('fw break end')  
                 maid.lookatcon = nil; maid.nostunshifter = nil; maid.shifterautoblock = nil;
                 maid.shifterautom1 = nil; maid.walkspeedcon = nil; maid.shifterautom2 = nil;
@@ -36857,19 +36903,21 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     end
                 end
                 if aotfreedomwar['adjusthookrange'] == true and Character and Humanoid and gearfolder and gearfolder:FindFirstChild('Upgrades') then 
-                    if gearfolder.Upgrades:FindFirstChild('HooksRange') then 
+                    if gearfolder.Upgrades:FindFirstChild('HooksRange') and gearfolder.Upgrades.HooksRange.Value ~=  getgenv().aotfreedomwar['hookrange'] then 
                         gearfolder.Upgrades.HooksRange.Value = getgenv().aotfreedomwar['hookrange'] 
                     end
                 end
                 if aotfreedomwar['adjustattackspeed'] == true and Character and Humanoid and gearfolder then 
-                    gearfolder.Upgrades.AttackSpeed.Value = getgenv().aotfreedomwar['attackspeed'] 
+                    if gearfolder.Upgrades:FindFirstChild('AttackSpeed') and gearfolder.Upgrades.AttackSpeed.Value ~= getgenv().aotfreedomwar['attackspeed']  then 
+                        gearfolder.Upgrades.AttackSpeed.Value = getgenv().aotfreedomwar['attackspeed']
+                    end; 
                 end
-                if aotfreedomwar.autom1 == true and Character and Humanoid and gearfolder and gearscript then 
-                    game:GetService("Players").LocalPlayer.Character[gearname].Events.AttackingEvent:FireServer(1)
-                end;
-                if aotfreedomwar.autokick == true and Character and Humanoid and gearfolder and gearscript then 
-                    game:GetService("Players").LocalPlayer.Character[gearname].Events.AttackingEvent:FireServer(nil,true)
-                end;
+                -- if aotfreedomwar.autom1 == true and Character and Humanoid and gearfolder and gearscript then 
+                --     game:GetService("Players").LocalPlayer.Character[gearname].Events.AttackingEvent:FireServer(1)
+                -- end;
+                -- if aotfreedomwar.autokick == true and Character and Humanoid and gearfolder and gearscript then 
+                --     game:GetService("Players").LocalPlayer.Character[gearname].Events.AttackingEvent:FireServer(nil,true)
+                -- end;
                 -- if aotfreedomwar.infinitethunderspears == true and Character and Humanoid and gearfolder and gearscript then 
                 --     local ohString1 = "TS"
                 --     local ohInstance2 = workspace.PracticeMap.TSRefill.Main
@@ -36893,24 +36941,6 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     --     [3] = true
                     -- }
                     -- game:GetService("Players").LocalPlayer.PlayerGui.MenuGui.ClothesChange:InvokeServer(unpack(args))
-                end
-                if aotfreedomwar.autocounter == true and Character and Humanoid and gearfolder and gearscript then 
-                   -- print('counta')
-                    if Humanoid.Counter.Value == false then
-                        if aotfreedomwar.autom1 == true then aotfreedomwar.autom1 = false end
-                        task.spawn(function()
-                            repeat 
-                                task.wait()
-                                pcall(function()
-                                    game:GetService("Players").LocalPlayer.Character[gearname].Events.MoreEvents.Counter:InvokeServer(unpack({[1] = false}))
-                                end)
-                            until Humanoid.Counter.Value == true or aotfreedomwar.autocounter == false
-                            if autom1tgl:Get() == true then 
-                                aotfreedomwar.autom1 = true
-                            end
-                        end)
-                    end
-                
                 end
                 if aotfreedomwar.nohooktension == true and Character and Humanoid and gearfolder then
                     if Humanoid.Gear:FindFirstChild('HookTensionL') then 
