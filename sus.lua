@@ -9550,6 +9550,9 @@ function signals.VirtualiseKeypress(letter, onoroff)
     local inputManager = game.VirtualInputManager; --UserInputService
     inputManager:SendKeyEvent(onoroff,Enum.KeyCode[letter],false,game)
 end;    
+function signals.untiltick(ticked, mm)
+    return tick() - ticked >= mm
+end;
 
 signals.ENCODEMENT = {
 }
@@ -35591,7 +35594,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end
     local function updateTitanNapes()
         for i,v in next, workspace.OnGameTitans:GetChildren() do 
-            if getgenv().aotfreedomwar['titannapehitbox'] then 
+            if getgenv().aotfreedomwar['titannapehitbox'] and v:FindFirstChild('Nape') and v:FindFirstChildWhichIsA('Humanoid') and  v:FindFirstChildWhichIsA('Humanoid').Health > 0 then 
                 changeSize(v)
             end
         end
@@ -36769,22 +36772,39 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end)
     end)
 
+    local function titanNapeCtn(v)
+        signals.propertychanged(v, 'Character', function()
+            task.wait()
+            local newChar = v.Character;
+            if newChar.Name:find('Titan') and getgenv().aotfreedomwar['shifternapehitbox'] then 
+                adjustNape(newChar)
+                azfakenotify('titan nape '..newChar.Name,3)
+            end;
+        end)
+    end;
+    for i,v in next, game.Players:GetPlayers() do 
+        if v ~= localPlayer.instance then 
+            titanNapeCtn(v)
+        end;
+    end;
+
     for i,v in next, workspace:GetChildren() do 
         if v.Name:find('Titan') and getgenv().aotfreedomwar['shifternapehitbox'] then 
+            azfakenotify('titan nape '..v.Name,3) -- newCvhar
             adjustNape(v)
         end
     end
-    workspace.ChildAdded:Connect(function(v)
-        if v.Name:find('Titan') and getgenv().aotfreedomwar['shifternapehitbox'] then 
-            task.spawn(function()
-                task.wait(2)
-                adjustNape(v)
-            end)
+    -- workspace.ChildAdded:Connect(function(v)
+    --     if v.Name:find('Titan') and getgenv().aotfreedomwar['shifternapehitbox'] then 
+    --         task.spawn(function()
+    --             task.wait(2)
+    --             adjustNape(v)
+    --         end)
 
-        elseif v.Name == 'CutArea' then 
-            v.CanCollide = false;
-        end
-    end)
+    --     elseif v.Name == 'CutArea' then 
+    --         v.CanCollide = false;
+    --     end
+    -- end)
 
     local function findchildwithproperty(x,b) 
         for i,v in next, x:GetChildren() do 
@@ -36795,7 +36815,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end
     local Player = game.Players.LocalPlayer
     task.spawn(function()
-        while task.wait() do 
+        while task.wait(0.05) do -- tas.wait()
             if getgenv().loopsUnload == true then aimbotctn:Disconnect(); print('fw break end')  
                 maid.lookatcon = nil; maid.nostunshifter = nil; maid.shifterautoblock = nil;
                 maid.shifterautom1 = nil; maid.walkspeedcon = nil; maid.shifterautom2 = nil;
@@ -46639,6 +46659,9 @@ elseif universeid == 4777817887 then -- uni123 bladeball
                     repeat 
                         task.wait()
                         signals.VirtualiseKeypress('F', true)
+                        local inputManager = game:GetService('VirtualInputManager')
+                        inputManager:SendMouseButtonEvent(workspace.CurrentCamera.ViewportSize.X/2,workspace.CurrentCamera.ViewportSize.Y/2,0,true,game,0)
+                        inputManager:SendMouseButtonEvent(workspace.CurrentCamera.ViewportSize.X/2,workspace.CurrentCamera.ViewportSize.Y/2,0,false,game,0)
                     until tick() - tt > 0.5
                 end)
                 if bladeballsettings.flickcamera then 
