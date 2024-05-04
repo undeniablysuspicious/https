@@ -42605,6 +42605,7 @@ elseif universeid == 4871329703 then -- type soul
                         --print('network owner')
                         if game.PlaceId == 17047374266 then 
                             if localPlayer.character and localPlayer.humanoid and localPlayer.humanoid.Health ~= localPlayer.humanoid.MaxHealth then
+                                localPlayer.humanoid.Health = 0
                                 v.PrimaryPart.CFrame *= CFrame.new(0,-5000,0)
                                 v:FindFirstChildWhichIsA('Humanoid').Health = 0
                                 if v:FindFirstChild('Head') then 
