@@ -42577,6 +42577,7 @@ elseif universeid == 4871329703 then -- type soul
         sethiddenproperty(game.Players.LocalPlayer, "SimulationRadius", math.huge)
         -- local newrem = Instance.new('RemoteEvent', game.Players.LocalPlayer); newrem.Name = 'Kisuke';
         -- newrem:FireServer('Yes')
+        local noHandlePhysics = true;
         maid.instakillctn = signals.gamestepped:connect('insta kill', function()--game.RunService:Connect(function())
             if not  azfake:returndata().character then return end;
             for i,v in next, workspace.Entities:GetChildren() do 
@@ -42589,6 +42590,18 @@ elseif universeid == 4871329703 then -- type soul
                     --         sethiddenproperty(v.HumanoidRootPart, "NetworkIsSleeping", false)
                     --     end
                     -- end
+                    if game.PlaceId == 17047374266 then 
+                        if localPlayer.character then 
+                            --localPlayer.character:Destroy()
+                        end;
+                        if v.PrimaryPart then 
+                            --v.PrimaryPart:Destroy()
+                            v.Head.CFrame = CFrame.new(0,0,0)
+                        end;
+                        --if localPlayer.character:FindFirstChild('Head') and localPlayer.humanoid and localPlayer.humanoid.Health ~= localPlayer.humanoid.MaxHealth then 
+                            --localPlayer.character.Head:Destroy()
+                        --end;
+                    end;
                     local isPrimaryPartOwner = false;
                     for indexpart, part in next, v:GetChildren() do 
                         if part:IsA('BasePart') and signals.findinstring(part.Name, 'Leg', 'Arm', 'Head', 'RootPart') then -- isnetworkowner
@@ -42601,12 +42614,51 @@ elseif universeid == 4871329703 then -- type soul
                             end
                         end
                     end;
+                    --if v.PrimaryPart and 
+                    -- if game.PlaceId == 17047374266 then 
+                    --     if localPlayer.character:FindFirstChild('Head') then 
+                    --         localPlayer.character.Head:Destroy()
+                    --     end;
+                    -- end;
                     if (isPrimaryPartOwner == true or v.PrimaryPart and isnetworkowner(v.PrimaryPart) or v:FindFirstChild('HumanoidRootPart') and isnetworkowner(v.HumanoidRootPart)) and v:FindFirstChildWhichIsA('Humanoid') then 
                         --print('network owner')
+                        local takenCF = v.PrimaryPart.CFrame
+                        if noHandlePhysics and game.PlaceId == 17047374266 then 
+                            v.PrimaryPart.Velocity = Vector3.new(math.random(1,100),math.random(1,100),math.random(1,100))
+                            noHandlePhysics = false;
+                            azfakenotify('handling bot physics',100)
+                            for index,part in next, v:GetDescendants() do 
+                                pcall(function()
+                                    v.CanCollide = false;
+                                end)
+                            end;
+                            if v:FindFirstChild('Head') then 
+                                v:FindFirstChild('Head'):Destroy()
+                            end
+                            pcall(function()
+                                v:BreakJoints()
+                            end)
+                            -- task.spawn(function()
+                            --     repeat 
+                            --         task.wait()
+                            --         v.PrimaryPart.Velocity = Vector3.new(math.random(1,100),math.random(1,100),math.random(1,100))
+                            --         --v.PrimaryPart.CFrame = takenCF * CFrame.new(math.random(1,5),math.random(1,5),math.random(1,5)); -- CFrame.new(0,50,0)
+                            --     until 1 == 2
+                            -- end)
+                            -- if v:FindFirstChild('Head') then 
+                            --     v:FindFirstChild('Head'):Destroy()
+                            -- end
+                            -- if v.PrimaryPart then 
+                            --     --v.PrimaryPart:Destroy()
+                            -- end
+                        end;
+                        -- task.spawn(function()
+                        --     repeat 
+                        --         task.wait()
+                                
+                        -- end)
                         if game.PlaceId == 17047374266 then 
-                            if localPlayer.character and localPlayer.humanoid and localPlayer.humanoid.Health ~= localPlayer.humanoid.MaxHealth then
-                                localPlayer.humanoid.Health = 0
-                                v.PrimaryPart.CFrame *= CFrame.new(0,-5000,0)
+                            if v.Humanoid.Health ~= v.Humanoid.MaxHealth and v.Humanoid.Health <( v.Humanoid.MaxHealth / 2) then 
                                 v:FindFirstChildWhichIsA('Humanoid').Health = 0
                                 if v:FindFirstChild('Head') then 
                                     v:FindFirstChild('Head'):Destroy()
@@ -42615,6 +42667,22 @@ elseif universeid == 4871329703 then -- type soul
                                     v:BreakJoints()
                                 end)
                             end;
+                            -- if localPlayer.character and localPlayer.humanoid and localPlayer.humanoid.Health ~= localPlayer.humanoid.MaxHealth then
+                            --     --localPlayer.humanoid.Health = 0
+                            --     --if localPlayer.character:FindFirstChild('Head') then 
+                            --        -- localPlayer.character.Head:Destroy()
+                            --     --end;
+                            --     --v.PrimaryPart.CFrame *= CFrame.new(0,-5000,0)
+                            --     if localPlayer.humanoid.Health < localPlayer.humanoid.MaxHealth / 2 then 
+                            --         v:FindFirstChildWhichIsA('Humanoid').Health = 0
+                            --         if v:FindFirstChild('Head') then 
+                            --             v:FindFirstChild('Head'):Destroy()
+                            --         end
+                            --         pcall(function()
+                            --             v:BreakJoints()
+                            --         end)
+                            --     end
+                            -- end;
                             return;
                         end;
                         v:FindFirstChildWhichIsA('Humanoid').Health = 0
@@ -42689,6 +42757,7 @@ elseif universeid == 4871329703 then -- type soul
             else
                 if game.PlaceId == raidWorld then 
                     if playedIt == false then 
+                        azfake:returndata().character.CharacterHandler.Remotes.Weapon:FireServer()
                         playedIt = true;
                         local willTP = false;
                         local saveEnemy = nil;
@@ -42749,7 +42818,8 @@ elseif universeid == 4871329703 then -- type soul
                                 task.spawn(function()
                                     repeat 
                                         if willTP == true then 
-                                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
+                                           game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame * CFrame.new(0,0,5);
+                                           typesoulsettings.functions.m1()
                                         end
                                         task.wait()
                                     until usestop == true
@@ -42760,6 +42830,15 @@ elseif universeid == 4871329703 then -- type soul
                                 inputManager:SendKeyEvent(false,Enum.KeyCode.W,false,game)
                             end
                         end
+                        task.spawn(function()
+                            repeat task.wait() until localPlayer.humanoid and localPlayer.humanoid.Health ~= localPlayer.humanoid.MaxHealth ;
+                            --task.wait(.2)
+                            if game.PlaceId == 17047374266 then 
+                                if localPlayer.character:FindFirstChild('Head') and localPlayer.humanoid and localPlayer.humanoid.Health ~= localPlayer.humanoid.MaxHealth then 
+                                    --localPlayer.character.Head:Destroy()
+                                end;
+                            end;
+                        end)
                         local diddie = false;
                         task.spawn(function()
                             repeat 
