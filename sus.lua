@@ -36897,7 +36897,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         signals.propertychanged(v, 'Character', function()
             task.wait()
             local newChar = v.Character;
-            if newChar.Name:find('Titan') and getgenv().aotfreedomwar['shifternapehitbox'] then 
+            if newChar and newChar.Name:find('Titan') and getgenv().aotfreedomwar['shifternapehitbox'] then 
                 adjustNape(newChar)
                 azfakenotify('titan nape '..newChar.Name,3)
             end;
