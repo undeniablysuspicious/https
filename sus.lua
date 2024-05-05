@@ -35425,6 +35425,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         infhp = false;
         antihook = false;
         damagerng = false; -- dsmagerng
+        autohandcut = false;
     } -- add m1 when next to enemy shifter
 
     localPlayer.titankey = 0;
@@ -35450,7 +35451,14 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     azfakenotify('anti hook applied',3) -- 3
                 end;
                 if aotfreedomwar.infhealth then 
-                    workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(-math.huge)
+                    --workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(-math.huge)
+                    task.spawn(function()
+                        repeat 
+                            task.wait(1)
+                            workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(-math.huge)
+                        until localPlayer.humanoid and localPlayer.humanoid.MaxHealth > 500
+                        azfakenotify('inf health applied',3)
+                    end)
                 end;
                 --
             end)
@@ -35470,7 +35478,13 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 azfakenotify('anti hook applied',3) -- 3
             end;
             if aotfreedomwar.infhealth then 
-                workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(-math.huge)
+                task.spawn(function()
+                    repeat 
+                        task.wait(1)
+                        workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(-math.huge)
+                    until localPlayer.humanoid and localPlayer.humanoid.MaxHealth > 500
+                    azfakenotify('inf health applied',3) -- inmf
+                end)
             end;
         end
     end)
@@ -36100,7 +36114,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             return 
         end;
         signals.coroutine.new('antihook', function()
-            while task.wait(1) do 
+            while task.wait(0.1) do 
                 if getgenv().aotfreedomwar['antihook'] == false or getgenv().loopsUnload == true then 
                     break
                 end;
@@ -37160,6 +37174,12 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     gearname = 'APGear'
                 end
                 gearscript = Character and Character:FindFirstChild(gearname) and Character:FindFirstChild(gearname):FindFirstChild('Events')
+                if aotfreedomwar.autohandcut == true and gearfolder and gearscript and localPlayer.humanoid and localPlayer.humanoid:FindFirstChild('Grabbed') and localPlayer.humanoid:FindFirstChild('Grabbed').Value == true then 
+                    --if then 
+                        --Character[gearname].Events.MoreEvents.HandCut:FireServer()
+                    --end;
+                    Character[gearname].Events.MoreEvents.HandCut:FireServer()
+                end;
                 if aotfreedomwar.spawnnets == true and Character then 
                     local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position
                     game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
