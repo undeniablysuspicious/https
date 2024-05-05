@@ -35420,8 +35420,72 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         twothreads = false;
         infinitethunderspears = false;
         tstitan = nil;
+        killaura = false;
+        tpkillaura = false;
     } -- add m1 when next to enemy shifter
 
+    localPlayer.titankey = 0;
+    local titanKeyCtn = nil;
+    signals.propertychanged(localPlayer.instance, 'Character', function()
+        task.wait()
+        local newChar = localPlayer.instance.Character
+        if newChar ~= nil then 
+            task.spawn(function()
+                newChar:WaitForChild('Gear'):WaitForChild('Events'):WaitForChild('SCE')
+                azfakenotify('new key giver',3)
+                titanKeyCtn = game.Players.LocalPlayer.Character.Gear.Events.SCE.OnClientEvent:Connect(function(a)
+                    localPlayer.titankey = a
+                end)
+                azfakenotify('attached key giver',3)
+            end)
+        end;
+    end)
+    task.spawn(function()
+        repeat task.wait() until localPlayer.character and localPlayer.humanoid;
+        localPlayer.character:WaitForChild('Gear'):WaitForChild('Events'):WaitForChild('SCE')
+        if titanKeyCtn == nil then 
+            titanKeyCtn = game.Players.LocalPlayer.Character.Gear.Events.SCE.OnClientEvent:Connect(function(a)
+                localPlayer.titankey = a
+            end)
+            azfakenotify('attached key giver',3)
+        end
+    end)
+    aotfreedomwar.functions.killtitans = function()
+        for i,v in next, workspace.OnGameTitans:GetChildren() do 
+            local canContinue = true;
+            game.Players.LocalPlayer.Character.Gear.Events.HitEvent:FireServer(v:WaitForChild('Nape'), aotfreedomwar.spoofdamagenumber, localPlayer.titankey, 1)
+            -- repeat 
+            --     task.wait()
+            --     if aotfreedomwar.tpkillaura then 
+            --         game.Players.LocalPlayer.Character.PrimaryPart.CFrame = v:WaitForChild('Nape').CFrame
+            --     end;
+            --     --game.Players.LocalPlayer.Character.PrimaryPart.CFrame = v:WaitForChild('Nape').CFrame
+            --     game.Players.LocalPlayer.Character.Gear.Events.HitEvent:FireServer(v.Nape, 670, key, 1)
+            -- until v.Humanoid.Health == 0 --br == true
+            if aotfreedomwar.tpkillaura then 
+                canContinue = false;
+                task.spawn(function()
+                    local dead = false;
+                    repeat 
+                        task.wait()
+                        if aotfreedomwar.tpkillaura and v.Humanoid.Health > 0 then 
+                            game.Players.LocalPlayer.Character.Gear.Events.HitEvent:FireServer(v:WaitForChild('Nape'), aotfreedomwar.spoofdamagenumber, localPlayer.titankey, 1)
+                            game.Players.LocalPlayer.Character.PrimaryPart.CFrame = v:WaitForChild('Nape').CFrame
+                            if v.Humanoid.Health > 0 then 
+                                dead = false
+                            else
+                                dead = true
+                            end
+                        end;
+                    until dead or aotfreedomwar.killaura == false
+                    canContinue = true; 
+                end)     
+            end;
+            if canContinue == false then 
+                repeat task.wait() until canContinue;
+            end;
+        end;
+    end;
     aotfreedomwar.functions.pretendimpulse = function() -- force impulse
         local inputManager = game:GetService('VirtualInputManager')
         for i=1, 4 do 
@@ -35962,6 +36026,25 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         --         azfake:returndata().humanoid.WalkSpeed = 25;
         --     end);
         -- end;
+    end)
+    sector:AddToggle('Kill Aura',false,function(xstate)
+        getgenv().aotfreedomwar['killaura'] = xstate -- autom12
+        if xtate == false then 
+            return;
+        end;
+        local bkey = 0;
+        task.spawn(function()
+            repeat 
+                task.wait(0.5);
+                if bkey ~= localPlayer.titankey then 
+                    
+                end;
+                aotfreedomwar.functions.killtitans(); --localPlayer.killtitans();
+            until aotfreedomwar.killaura == false;
+        end)
+    end)
+    sector:AddToggle('TP Kill Aura',false,function(xstate)
+        getgenv().aotfreedomwar['tpkillaura'] = xstate -- autom12
     end)
     -- sector:AddToggle('Auto Hood',false,function(xstate)
     --     getgenv().aotfreedomwar['autohood'] = xstate -- autom12
