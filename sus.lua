@@ -8267,21 +8267,7 @@ end
 
 local Maid = loadstring(game:HttpGet('https://raw.githubusercontent.com/Quenty/NevermoreEngine/version2/Modules/Shared/Events/Maid.lua'))();
 local maid = Maid.new()
-task.spawn(function()
-    print('@v;;;')
-    repeat task.wait(.1) until getgenv().loopsUnload == true
-    print('@ended')
-    for i,v in next, maid._tasks do 
-        pcall(function()
-            --print(i,v)
-            if typeof(v) == 'RBXScriptConnection' then 
-                print('specificially unloading',i)
-                maid[i] = nil;
-            end;
-        end)
-    end
-    print('offloaded @maid')
-end)
+-- offload place
 
 function AddConfigurations()
     local Configiuration= window:CreateTab('Configiuration')
@@ -8983,6 +8969,26 @@ local signals = {
         running = {};
     };
 };
+task.spawn(function()
+    print('@v;;;')
+    repeat task.wait(.1) until getgenv().loopsUnload == true
+    print('@ended')
+    for i,v in next, maid._tasks do 
+        pcall(function()
+            --print(i,v)
+            if typeof(v) == 'RBXScriptConnection' then 
+                print('specificially unloading',i)
+                maid[i] = nil;
+            end;
+        end)
+    end
+    print('offloaded @maid')
+    for i,v in next, signals.coroutine.threads do 
+        task.cancel(signals.coroutine.threads[i])
+        signals.coroutine.threads[i] = nil;
+    end;
+    print('offloaded @threads')
+end)
 signals.propertychanged = function(a, b, c)
     if typeof(a) == 'table' then 
         b = a.value -- value
@@ -35461,6 +35467,8 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         antihook = false;
         damagerng = false; -- dsmagerng
         autohandcut = false;
+        antihookctn = nil;
+        antihooking = false; -- g before n
     } -- add m1 when next to enemy shifter
 
     localPlayer.titankey = 0;
@@ -35469,6 +35477,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     local function assignCharq()
 
     end;
+    --local function
     signals.propertychanged(localPlayer.instance, 'Character', function()
         task.wait()
         local newChar = localPlayer.instance.Character
@@ -35480,9 +35489,32 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     localPlayer.titankey = a
                 end)
                 azfakenotify('attached key giver',3)
-                if aotfreedomwar.antihook then 
-                    local args = {[1] = localPlayer.rootPart}
-                    localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack(args))
+                if aotfreedomwar.antihook then
+                    if aotfreedomwar.antihookctn then 
+                        pcall(function()
+                            aotfreedomwar.antihookctn:Disconnect()
+                        end)
+                    end;
+                    --local args = {[1] = localPlayer.rootPart}
+                    --localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack(args))
+                    local removingOurs = false;
+                    aotfreedomwar.antihookctn = localPlayer.rootPart.ChildAdded:Connect(function(child)
+                        task.wait();
+                        if child.Name == 'QAttachment' or child.Name == 'EAttachment' and removingOurs == false then 
+                            removingOurs = true;
+                            if aotfreedomwar.antihooking == false then 
+                                aotfreedomwar.antihooking = true;
+                                localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack({localPlayer.rootPart}));
+                                localPlayer.character.Gear.Events.MoreEvents.NoQKey:FireServer(true);
+                                task.delay(0.05,function()
+                                    aotfreedomwar.antihooking = false;
+                                end)
+                            end
+                        elseif child.Name == 'QAttachment' or child.Name == 'EAttachment' and removingOurs == true then 
+                            child:Destroy();
+                            removingOurs = false;
+                        end;
+                    end)
                     azfakenotify('anti hook applied',3) -- 3
                 end;
                 if aotfreedomwar.infhp then -- infhealth
@@ -35507,10 +35539,22 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 localPlayer.titankey = a
             end)
             azfakenotify('attached key giver',3)
-            if aotfreedomwar.antihook then 
-                local args = {[1] = localPlayer.rootPart}
-                localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack(args))
-                azfakenotify('anti hook applied',3) -- 3
+            if aotfreedomwar.antihook and not aotfreedomwar.antihookctn then 
+                --local args = {[1] = localPlayer.rootPart}
+                --localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack(args))
+                local removingOurs = false;
+                aotfreedomwar.antihookctn = localPlayer.rootPart.ChildAdded:Connect(function(child)
+                    task.wait();
+                    if child.Name == 'QAttachment' or child.Name == 'EAttachment' and removingOurs == false then 
+                        removingOurs = true;
+                        localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack({localPlayer.rootPart}));
+                        localPlayer.character.Gear.Events.MoreEvents.NoQKey:FireServer(true);
+                    elseif child.Name == 'QAttachment' or child.Name == 'EAttachment' and removingOurs == true then 
+                        child:Destroy();
+                        removingOurs = false;
+                    end;
+                end)
+                azfakenotify('anti hook applied on load',3) -- 3
             end;
             if aotfreedomwar.infhp then 
                 task.spawn(function()
@@ -35816,7 +35860,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     weirdsector:AddButton('Rejoin Same Server',function()
         game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, game.JobId)
     end)
-
+    weirdsector:AddButton('Serverhop',function()
+        localPlayer.teleport.serverHop(true);
+    end)
     weirdsector:AddToggle('Watermark',true,function(x)
         aotfreedomwar.watermark = x
         if x == true then 
@@ -36142,23 +36188,48 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end; 
         workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(-math.huge)
     end)
+    --local bteck; 
     local bbnt = sector:AddToggle('Anti Hook',false,function(xstate)
         getgenv().aotfreedomwar['antihook'] = xstate -- autom12
         if not xstate then 
-            signals.coroutine.stop('antihook')
+            --signals.coroutine.stop('antihook')
+            if aotfreedomwar.antihookctn then --bteck then 
+                aotfreedomwar.antihookctn:Disconnect(); --bteck:Disconnect()
+            end
             return 
         end;
-        signals.coroutine.new('antihook', function()
-            while task.wait(0.1) do 
-                if getgenv().aotfreedomwar['antihook'] == false or getgenv().loopsUnload == true then 
-                    break
-                end;
-                pcall(function()
-                    local args = {[1] = localPlayer.rootPart}
-                    localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack(args))
-                end)
-            end
+        local removingOurs = false;
+        aotfreedomwar.antihookctn = localPlayer.rootPart.ChildAdded:Connect(function(child)
+            task.wait();
+            if child.Name == 'QAttachment' or child.Name == 'EAttachment' and removingOurs == false then 
+                removingOurs = true;
+                --localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack({localPlayer.rootPart}));
+                --localPlayer.character.Gear.Events.MoreEvents.NoQKey:FireServer(true);
+                if aotfreedomwar.antihooking == false then 
+                    aotfreedomwar.antihooking = true;
+                    localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack({localPlayer.rootPart}));
+                    localPlayer.character.Gear.Events.MoreEvents.NoQKey:FireServer(true);
+                    task.delay(0.05,function()
+                        aotfreedomwar.antihooking = false;
+                    end)
+                end
+            elseif child.Name == 'QAttachment' or child.Name == 'EAttachment' and removingOurs == true then 
+                child:Destroy();
+                removingOurs = false;
+            end;
         end)
+        azfakenotify('anti hook applied toggl;e',3)
+        -- signals.coroutine.new('antihook', function()
+        --     while task.wait(0.1) do 
+        --         if getgenv().aotfreedomwar['antihook'] == false or getgenv().loopsUnload == true then 
+        --             break
+        --         end;
+        --         pcall(function()
+        --             local args = {[1] = localPlayer.rootPart}
+        --             localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack(args))
+        --         end)
+        --     end
+        -- end)
     end)
     sector:CreateHintOnItem(bbnt, 'unhooks people that hook u')
     -- sector:AddToggle('Auto Hood',false,function(xstate)
@@ -36354,6 +36425,21 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     end)
     sector:AddToggle('Auto Kill Insub',false,function(xstate)
         getgenv().aotfreedomwar['autoattackwhennearenemy'] = xstate
+    end)
+    local instahealbtn = sector:AddToggle('New Infinite Heal', false, function(x) -- should make configurations do string.lower
+        aotfreedomwar.newinfheal = x;
+        if not x then 
+            signals.coroutine.stop('newinfheal')
+            return;
+        end;
+        signals.coroutine.new('newinfheal', function() -- inf heal
+            while task.wait(1) do 
+                if localPlayer.humanoid and localPlayer.humanoid.Health ~= localPlayer.humanoid.MaxHealth then 
+                    local healthNeed = localPlayer.humanoid.MaxHealth - localPlayer.humanoid.Health
+                    workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(-healthNeed)
+                end;
+            end;
+        end);
     end)
     sector:AddToggle('Two Threads Inf Heal',false,function(xstate)
         getgenv().aotfreedomwar['twothreads'] = xstate
