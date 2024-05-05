@@ -37104,7 +37104,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     Humanoid.Grabbed.Value = false;
                     Humanoid.Handcuffed.Value = false;
                     Humanoid.Handcuffed.Timer.Value = 0
-                    Humanoid.God.Value = true;
+                    --Humanoid.God.Value = true;
                 end
                 if getgenv().aotfreedomwar['notitanattack'] and Character and Humanoid and gearfolder and gearscript then 
                     Humanoid.Invinsible.Value = true;
