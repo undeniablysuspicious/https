@@ -35464,25 +35464,37 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             -- until v.Humanoid.Health == 0 --br == true
             if aotfreedomwar.tpkillaura then 
                 canContinue = false;
-                task.spawn(function()
-                    local dead = false;
-                    repeat 
-                        task.wait()
-                        if aotfreedomwar.tpkillaura and v.Humanoid.Health > 0 then 
-                            game.Players.LocalPlayer.Character.Gear.Events.HitEvent:FireServer(v:WaitForChild('Nape'), aotfreedomwar.spoofdamagenumber, localPlayer.titankey, 1)
-                            game.Players.LocalPlayer.Character.PrimaryPart.CFrame = v:WaitForChild('Nape').CFrame
-                            if v.Humanoid.Health > 0 then 
-                                dead = false
-                            else
-                                dead = true
-                            end
-                        end;
-                    until dead or aotfreedomwar.killaura == false
-                    canContinue = true; 
-                end)     
+                repeat 
+                    task.wait()
+                    if aotfreedomwar.tpkillaura and v.Humanoid.Health > 0 then 
+                        game.Players.LocalPlayer.Character.Gear.Events.HitEvent:FireServer(v:WaitForChild('Nape'), aotfreedomwar.spoofdamagenumber, localPlayer.titankey, 1)
+                        game.Players.LocalPlayer.Character.PrimaryPart.CFrame = v:WaitForChild('Nape').CFrame
+                        if v.Humanoid.Health > 0 then 
+                            dead = false
+                        else
+                            dead = true
+                        end
+                    end;
+                until dead or aotfreedomwar.killaura == false
+                -- task.spawn(function()
+                --     local dead = false;
+                --     repeat 
+                --         task.wait()
+                --         if aotfreedomwar.tpkillaura and v.Humanoid.Health > 0 then 
+                --             game.Players.LocalPlayer.Character.Gear.Events.HitEvent:FireServer(v:WaitForChild('Nape'), aotfreedomwar.spoofdamagenumber, localPlayer.titankey, 1)
+                --             game.Players.LocalPlayer.Character.PrimaryPart.CFrame = v:WaitForChild('Nape').CFrame
+                --             if v.Humanoid.Health > 0 then 
+                --                 dead = false
+                --             else
+                --                 dead = true
+                --             end
+                --         end;
+                --     until dead or aotfreedomwar.killaura == false
+                --     canContinue = true; 
+                -- end)     
             end;
             if canContinue == false then 
-                repeat task.wait() until canContinue;
+                --repeat task.wait() until canContinue;
             end;
         end;
     end;
@@ -42690,7 +42702,7 @@ elseif universeid == 4871329703 then -- type soul
         -- newrem:FireServer('Yes')
         local noHandlePhysics = true;
         maid.instakillctn = signals.gamestepped:connect('insta kill', function()--game.RunService:Connect(function())
-            if not  azfake:returndata().character then return end;
+            --if not  azfake:returndata().character then return end;
             for i,v in next, workspace.Entities:GetChildren() do 
                 if not game.Players:GetPlayerFromCharacter(v) then 
                     -- if v.PrimaryPart and v.PrimaryPart.ReceiveAge == 0 then
@@ -42707,7 +42719,7 @@ elseif universeid == 4871329703 then -- type soul
                         end;
                         if v.PrimaryPart then 
                             --v.PrimaryPart:Destroy()
-                            v.Head.CFrame = CFrame.new(0,0,0)
+                            --v.Head.CFrame = CFrame.new(0,0,0)
                         end;
                         --if localPlayer.character:FindFirstChild('Head') and localPlayer.humanoid and localPlayer.humanoid.Health ~= localPlayer.humanoid.MaxHealth then 
                             --localPlayer.character.Head:Destroy()
@@ -42720,7 +42732,7 @@ elseif universeid == 4871329703 then -- type soul
                             if isnetworkowner(part) then 
                                 isPrimaryPartOwner = true;
                                 for i,v in next, part:GetChildren() do 
-                                    if v:IsA('Motor6D') or v:IsA('Weld') then v:Destroy() end;
+                                    --if v:IsA('Motor6D') or v:IsA('Weld') then v:Destroy() end;
                                 end
                             end
                         end
@@ -42733,16 +42745,23 @@ elseif universeid == 4871329703 then -- type soul
                     -- end;
                     if (isPrimaryPartOwner == true or v.PrimaryPart and isnetworkowner(v.PrimaryPart) or v:FindFirstChild('HumanoidRootPart') and isnetworkowner(v.HumanoidRootPart)) and v:FindFirstChildWhichIsA('Humanoid') then 
                         --print('network owner')
+                        if typesoulsettings.diebeofekill and localPlayer.humanoid.Health > 0 then 
+                            if localPlayer.humanoid and localPlayer.humanoid.Health > 0 then 
+                                return;
+                            end;
+                            return;
+                        end;
                         local takenCF = v.PrimaryPart.CFrame
                         if noHandlePhysics and game.PlaceId == 17047374266 then 
-                            v.PrimaryPart.Velocity = Vector3.new(math.random(1,100),math.random(1,100),math.random(1,100))
+                            --v.PrimaryPart.Velocity = Vector3.new(math.random(1,100),math.random(1,100),math.random(1,100))
                             noHandlePhysics = false;
                             azfakenotify('handling bot physics',100)
-                            for index,part in next, v:GetDescendants() do 
-                                pcall(function()
-                                    v.CanCollide = false;
-                                end)
-                            end;
+                            -- for index,part in next, v:GetDescendants() do 
+                            --     pcall(function()
+                            --         v.CanCollide = false;
+                            --     end)
+                            -- end;
+                            v:FindFirstChildWhichIsA('Humanoid').Health = 0
                             if v:FindFirstChild('Head') then 
                                 v:FindFirstChild('Head'):Destroy()
                             end
@@ -42769,6 +42788,10 @@ elseif universeid == 4871329703 then -- type soul
                                 
                         -- end)
                         if game.PlaceId == 17047374266 then 
+                            v:FindFirstChildWhichIsA('Humanoid').Health = 0
+                            if v:FindFirstChild('Head') then 
+                                v:FindFirstChild('Head'):Destroy()
+                            end
                             if v.Humanoid.Health ~= v.Humanoid.MaxHealth and v.Humanoid.Health <( v.Humanoid.MaxHealth / 2) then 
                                 v:FindFirstChildWhichIsA('Humanoid').Health = 0
                                 if v:FindFirstChild('Head') then 
@@ -42836,7 +42859,9 @@ elseif universeid == 4871329703 then -- type soul
     newother:AddToggle('TP To NPC before Boss',true,function(e, wasclicked)
         typesoulsettings.teleportKisukeBeforeUse = e;
     end)
-    
+    newother:AddToggle('Die Before Killing', false,function(e, wasclicked)
+        typesoulsettings.diebeofekill = e;
+    end)
     local autokisuke = newother:AddToggle('Auto Kisuke',false,function(e, wasclicked)
         typesoulsettings.autokisuke = e;
         if not e then 
@@ -42917,20 +42942,48 @@ elseif universeid == 4871329703 then -- type soul
                         local enemy = nil
                         local usestop = false
                         repeat task.wait() until #workspace:WaitForChild('Entities'):GetChildren() >= 2
-                        task.wait(0.1)
+                        --localPlayer.character.Head:Destroy()
+                        game.Players.LocalPlayer.Character.CharacterHandler.Remotes.Shiftlocked:FireServer(false)
+                        task.delay(0.6,function()
+                            localPlayer.character.Head:Destroy()
+                        end)
+
+                        local enttiyspawnl; workspace.Entities.ChildAdded:Connect(function(ch)
+                            task.wait()
+                            if ch == localPlayer.character then 
+                                repeat task.wait() until ch.PrimaryPart;
+                                ch.PrimaryPart.CFrame = enemy.PrimaryPart.CFrame
+                                azfake:returndata().character.CharacterHandler.Remotes.Weapon:FireServer()
+                            end
+                        end)
+                        task.wait(); --(0.1)
                         for i,v in next, workspace:WaitForChild('Entities'):GetChildren() do 
                             if not game.Players:GetPlayerFromCharacter(v) and v.PrimaryPart then 
                                 enemy = v;
+                                task.spawn(function()
+                                    repeat task.wait() until enemy.PrimaryPart;
+                                    repeat task.wait() until isnetworkowner(enemy.PrimaryPart);
+                                    sethiddenproperty(v.PrimaryPart, "NetworkIsSleeping", false)
+                                    enemy.PrimaryPart.Velocity = Vector3.new(0,-100,0)
+                                    enemy.PrimaryPart.CFrame *= CFrame.new(100,200,100)
+                                end)
                                 saveEnemy = v;
                                 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
+                                task.delay(0.01,function()
+                                    typesoulsettings.functions.m2()
+                                    typesoulsettings.functions.m2()
+                                    typesoulsettings.functions.m2()
+                                end)
                                 task.delay(4,function()
                                     usestop = false
                                 end)
                                 task.spawn(function()
                                     repeat 
                                         if willTP == true then 
-                                           game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame * CFrame.new(0,0,5);
-                                           typesoulsettings.functions.m1()
+                                            pcall(function()
+                                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame * CFrame.new(0,0,5);
+                                            end)
+                                           typesoulsettings.functions.m2()
                                         end
                                         task.wait()
                                     until usestop == true
