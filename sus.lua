@@ -656,6 +656,8 @@ local function newtoastynotif(r, mode)
     end)
     new.Visible = true
     new.Frame.TextLabel.MouseButton1Down:Connect(function()
+        game:GetService('TweenService'):Create(new.Frame, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {Position = UDim2.new(0.063, 0,0, 0), Size = UDim2.new(0,0,1,0)}):Play()
+        task.wait(0.11)
         new:Destroy();
     end)
     if tonumber(mode) then 
@@ -36546,7 +36548,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     esp_lib.Players = false;
     esp_lib.Boxes = false;
     esp_lib.Names = true;
-    esp_lib.AutoRemove = false;
+    esp_lib.AutoRemove = true;
     esp_lib.Settings.usecustomespcolor = true;
     esp_lib:Toggle(true)
     local titanespsave = esp_lib:AddObjectListener(workspace.OnGameTitans, {
@@ -37102,6 +37104,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     Humanoid.Grabbed.Value = false;
                     Humanoid.Handcuffed.Value = false;
                     Humanoid.Handcuffed.Timer.Value = 0
+                    Humanoid.God.Value = true;
                 end
                 if getgenv().aotfreedomwar['notitanattack'] and Character and Humanoid and gearfolder and gearscript then 
                     Humanoid.Invinsible.Value = true;
