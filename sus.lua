@@ -37265,8 +37265,53 @@ elseif game.PlaceId == 11534222714 then -- aot freedom war main menu
         table.insert(ServerList,v.Value)
     end
 
-    local Servers = sector:AddDropdown("Spam Join Server", ServerList, "", false, function(dropdownv)
+    local Servers = sector:AddDropdown("Join Server", ServerList, "", false, function(dropdownv) -- Spam 
         ServerChosen = dropdownv;
+    end) Servers.dontsave = true;
+    sector:AddButton('Join Server',function()
+        for i,v in next, Servers:Get() do 
+            v:Remove()
+        end
+        for i,v in pairs(FolderDir:GetChildren()) do 
+            Servers:Add(v.Value)
+        end
+    end)
+    local specificstage = {};
+    local scount = 15; -- servercount
+    local above = false;
+    sector:AddDropdown("Specific Stage", {'1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'}, "", true, function(dropdownv) -- Spam 
+        local toStage = type(dropdownv) == 'string' and {dropdownv} or dropdownv
+        specificstage = toStage;
+    end);
+    sector:AddToggle('Above Stage', false, function(x)
+        above = x;
+    end)
+    sector:AddSlider("Specific Player Count (below)", 0, 15, 30, 1, function(x) -- Spam 
+        scount = x;
+    end)
+    sector:AddButton('Join Specific Server',function()
+        local stageRequirement = 0;
+        for i,v in next, specificstage do 
+            if tonumber(v) and tonumber(v) > stageRequirement then 
+                stageRequirement = tonumber(v)
+            end;
+        end;
+        for i,v in next, game:GetService("Players").DumbLines.PlayerGui.MainMenuGui.ServerList.ScrollingFrame:GetChildren() do 
+            if v:IsA('Frame') and v:FindFirstChild('JoinButton') then 
+                local PlayerCount = tonumber(v.PlayersValue.Text:sub(1,2));
+                local JobId = v.IdValue.Text;
+                local Stage = tonumber(v.StageValue.Text);
+                pcall(function()
+                    if (stageRequirement < Stage and above or stageRequirement >= Stage and not above) and PlayerCount <= scount then 
+                        print(stageRequirement,Stage)
+                        azfakenotify('joining a server '..tostring(Stage)..'-'..tostring(scount))
+                        pcall(function()
+                            localPlayer.teleport.toInstance(11564374799, JobId)
+                        end)
+                    end;
+                end)
+            end;
+        end;
     end)
     sector:AddToggle('Spam Join',false,function(x)
         bum = x;
