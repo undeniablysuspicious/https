@@ -35406,7 +35406,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         watermark = true;
         chatlogger = true;
         superjumpmidair = false;
-        titans = {'AttackTitan','FemaleTitan','ColossalTitan','ArmoredTitan'};
+        titans = {'AttackTitan','FemaleTitan','ColossalTitan','ArmoredTitan','BeastTitan'};
         tptooriginalpos = false;
         voidplayer = false;
         diewithem = false;
@@ -35422,10 +35422,17 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         tstitan = nil;
         killaura = false;
         tpkillaura = false;
+        infhp = false;
+        antihook = false;
+        damagerng = false; -- dsmagerng
     } -- add m1 when next to enemy shifter
 
     localPlayer.titankey = 0;
     local titanKeyCtn = nil;
+
+    local function assignCharq()
+
+    end;
     signals.propertychanged(localPlayer.instance, 'Character', function()
         task.wait()
         local newChar = localPlayer.instance.Character
@@ -35437,6 +35444,15 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     localPlayer.titankey = a
                 end)
                 azfakenotify('attached key giver',3)
+                if aotfreedomwar.antihook then 
+                    local args = {[1] = localPlayer.rootPart}
+                    localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack(args))
+                    azfakenotify('anti hook applied',3) -- 3
+                end;
+                if aotfreedomwar.infhealth then 
+                    workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(-math.huge)
+                end;
+                --
             end)
         end;
     end)
@@ -35448,6 +35464,14 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 localPlayer.titankey = a
             end)
             azfakenotify('attached key giver',3)
+            if aotfreedomwar.antihook then 
+                local args = {[1] = localPlayer.rootPart}
+                localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack(args))
+                azfakenotify('anti hook applied',3) -- 3
+            end;
+            if aotfreedomwar.infhealth then 
+                workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(-math.huge)
+            end;
         end
     end)
     aotfreedomwar.functions.killtitans = function()
@@ -35462,11 +35486,12 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             --     --game.Players.LocalPlayer.Character.PrimaryPart.CFrame = v:WaitForChild('Nape').CFrame
             --     game.Players.LocalPlayer.Character.Gear.Events.HitEvent:FireServer(v.Nape, 670, key, 1)
             -- until v.Humanoid.Health == 0 --br == true
-            if aotfreedomwar.tpkillaura then 
+            if aotfreedomwar.tpkillaura and v.Humanoid.Health > 0 then 
                 canContinue = false;
                 repeat 
                     task.wait()
                     if aotfreedomwar.tpkillaura and v.Humanoid.Health > 0 then 
+                        game:GetService("ReplicatedStorage").ServerTeleportFunction:InvokeServer(v:WaitForChild('Nape'))
                         game.Players.LocalPlayer.Character.Gear.Events.HitEvent:FireServer(v:WaitForChild('Nape'), aotfreedomwar.spoofdamagenumber, localPlayer.titankey, 1)
                         game.Players.LocalPlayer.Character.PrimaryPart.CFrame = v:WaitForChild('Nape').CFrame
                         if v.Humanoid.Health > 0 then 
@@ -35901,7 +35926,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 local ohInstance3 = localPlayer.rootPart
 
                 localPlayer.character.Gear.Events.TSThrowEvent:InvokeServer(ohVector31, ohCFrame2, ohInstance3)
-                localPlayer.character.Gear.Events.TSActivationEvent:InvokeServer(nil) 
+                localPlayer.character.Gear.Events.TSActivationEvent:FireServer(nil) 
             end;
         end);
     end)
@@ -36051,13 +36076,42 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 if bkey ~= localPlayer.titankey then 
                     
                 end;
-                aotfreedomwar.functions.killtitans(); --localPlayer.killtitans();
+                pcall(function()
+                    aotfreedomwar.functions.killtitans();
+                end)
+                --aotfreedomwar.functions.killtitans(); --localPlayer.killtitans();
             until aotfreedomwar.killaura == false;
         end)
     end)
     sector:AddToggle('TP Kill Aura',false,function(xstate)
         getgenv().aotfreedomwar['tpkillaura'] = xstate -- autom12
     end)
+    sector:AddToggle('Infinite HP',false,function(xstate)
+        getgenv().aotfreedomwar['infinitehealth'] = xstate -- autom12
+        if not xstate then 
+            return;
+        end; 
+        workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(-math.huge)
+    end)
+    local bbnt = sector:AddToggle('Anti Hook',false,function(xstate)
+        getgenv().aotfreedomwar['antihook'] = xstate -- autom12
+        if not xstate then 
+            signals.coroutine.stop('antihook')
+            return 
+        end;
+        signals.coroutine.new('antihook', function()
+            while task.wait(1) do 
+                if getgenv().aotfreedomwar['antihook'] == false or getgenv().loopsUnload == true then 
+                    break
+                end;
+                pcall(function()
+                    local args = {[1] = localPlayer.rootPart}
+                    localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack(args))
+                end)
+            end
+        end)
+    end)
+    sector:CreateHintOnItem(bbnt, 'unhooks people that hook u')
     -- sector:AddToggle('Auto Hood',false,function(xstate)
     --     getgenv().aotfreedomwar['autohood'] = xstate -- autom12
     --     if xstate == true then -- game:GetService("Players").LocalPlayer.PlayerGui.MenuGui.MenuLocalSript
@@ -36119,11 +36173,11 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             until foundDir or aotfreedomwar.infinitethunderspears == false or getgenv().loopsUnload == true;
             if aotfreedomwar.infinitethunderspears == true then 
                 maid.thunder = signals.heartbeat:connect('omega lul', function()
-                    local gearname = 'Gear'
-                    local gearscript = localPlayer.character and localPlayer.character:FindFirstChild(gearname) and localPlayer.character:FindFirstChild(gearname):FindFirstChild('Events')
+                   -- local gearname = 'Gear'
+                    --local gearscript = localPlayer.character and localPlayer.character:FindFirstChild(gearname) and localPlayer.character:FindFirstChild(gearname):FindFirstChild('Events')
                     if gearscript then
                         pcall(function()
-                            if localPlayer.character.Humanoid.Gear.TS.Value == 0 and localPlayer.character.Humanoid.Gear.TS.Loaded.Value == true then 
+                            --if localPlayer.character.Humanoid.Gear.TS.Value == 0 and localPlayer.character.Humanoid.Gear.TS.Loaded.Value == true then 
                                 local ohString1 = "TS"
                                 local ohInstance2 = foundDir; --workspace.PracticeMap.TSRefill.Main
                                 
@@ -36131,7 +36185,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                                 pcall(function()
                                     localPlayer.character[gearname].Events.RefillEventServer:FireServer('TS', foundDir)
                                 end)
-                            end
+                            --end
                         end)
                     end
                 end)
@@ -36630,6 +36684,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     weirdsector:AddToggle('Use Spoof Damage',false,function(xstate)
         getgenv().aotfreedomwar['spoofdamage'] = xstate
     end)
+    weirdsector:AddToggle('RNG Damage',false,function(xstate)
+        getgenv().aotfreedomwar['damagerng'] = xstate
+    end)
     weirdsector:AddSlider('Spoof Damage',0,670,1170,1,function(xstate) -- min def max dec
         getgenv().aotfreedomwar['spoofdamagenumber'] = xstate
     end)
@@ -36764,6 +36821,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 elseif game.Players.LocalPlayer.Character.Name == 'ArmoredTitan' then 
                     local ohString1 = "MediumAttack"
                     game.Players.LocalPlayer.Character.ARLocal.Events.AttackEvent:FireServer(ohString1)
+                elseif game.Players.LocalPlayer.Character.Name == 'BeastTitan' then 
+                    local ohString1 = "MediumAttack"
+                    game.Players.LocalPlayer.Character.BELocal.Events.AttackEvent:FireServer(ohString1) -- BETitan
                 end
             end
         end)-- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
@@ -36784,6 +36844,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 elseif game.Players.LocalPlayer.Character.Name == 'ArmoredTitan' then 
                     local ohString1 = "HeavyAttack"
                     game.Players.LocalPlayer.Character.ARLocal.Events.AttackEvent:FireServer(ohString1)
+                elseif game.Players.LocalPlayer.Character.Name == 'BeastTitan' then 
+                    local ohString1 = "HeavyAttack"
+                    game.Players.LocalPlayer.Character.BELocal.Events.AttackEvent:FireServer(ohString1)
                 end
             end
         end)-- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
@@ -36804,6 +36867,9 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 elseif game.Players.LocalPlayer.Character.Name == 'ArmoredTitan' then 
                     local ohString1 = true
                     game.Players.LocalPlayer.Character.ARLocal.Events.BlockEvent:FireServer(ohBoolean1)
+                elseif game.Players.LocalPlayer.Character.Name == 'BeastTitan' then 
+                    local ohString1 = true
+                    game.Players.LocalPlayer.Character.BELocal.Events.BlockEvent:FireServer(ohBoolean1)
                 end
             end
         end)-- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
@@ -36821,6 +36887,8 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     game.Players.LocalPlayer.Character.FELocal.Events.UnstunnedEvent:FireServer()
                 elseif game.Players.LocalPlayer.Character.Name == 'ArmoredTitan' then 
                     game.Players.LocalPlayer.Character.ARLocal.Events.UnstunnedEvent:FireServer()
+                elseif game.Players.LocalPlayer.Character.Name == 'BeastTitan' then 
+                    game.Players.LocalPlayer.Character.BELocal.Events.UnstunnedEvent:FireServer()
                 end
             end
         end)-- This script was generated by Hydroxide's RemoteSpy: https://github.com/Upbolt/Hydroxide
@@ -36980,7 +37048,26 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         elseif call_type == 'Kick' then 
             return
         elseif call_type == 'FireServer'  and tostring(self) == 'HitEvent' and aotfreedomwar.spoofdamage  then 
-            args[2] = aotfreedomwar.spoofdamagenumber
+            args[2] = aotfreedomwar.spoofdamagenumber -- prefered damage 
+            if aotfreedomwar.damagerng then 
+                local chances = math.random(1,100);
+                local damageNumberChancesOutcome = {
+                    ['10'] = 1190;
+                    ['20'] = 1180;
+                    ['25'] = 1170;
+                    ['50'] = 690;
+                    ['55'] = 800;
+                    ['60'] = 720;
+                    ['75'] = 670;
+                    ['80'] = 680
+                }
+                for index, value in next, damageNumberChancesOutcome do 
+                    if tonumber(index) >= chances then 
+                        args[2] = value;
+                        break
+                    end;
+                end;
+            end;
             return metahook(self,unpack(args))
         elseif call_type == 'GetState'  and aotfreedomwar['superjumpmidair'] then 
             return Enum.HumanoidStateType.Running
@@ -37279,6 +37366,7 @@ elseif game.PlaceId == 11534222714 then -- aot freedom war main menu
     local specificstage = {};
     local scount = 15; -- servercount
     local above = false;
+    local abovec = false;
     sector:AddDropdown("Specific Stage", {'1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'}, "", true, function(dropdownv) -- Spam 
         local toStage = type(dropdownv) == 'string' and {dropdownv} or dropdownv
         specificstage = toStage;
@@ -37286,8 +37374,11 @@ elseif game.PlaceId == 11534222714 then -- aot freedom war main menu
     sector:AddToggle('Above Stage', false, function(x)
         above = x;
     end)
-    sector:AddSlider("Specific Player Count (below)", 0, 15, 30, 1, function(x) -- Spam 
+    sector:AddSlider("Specific Player Count", 0, 15, 30, 1, function(x) -- Spam    (below)
         scount = x;
+    end)
+    sector:AddToggle('Above Count', false, function(x)
+        abovec = x;
     end)
     sector:AddButton('Join Specific Server',function()
         local stageRequirement = 0;
@@ -37302,7 +37393,7 @@ elseif game.PlaceId == 11534222714 then -- aot freedom war main menu
                 local JobId = v.IdValue.Text;
                 local Stage = tonumber(v.StageValue.Text);
                 pcall(function()
-                    if (stageRequirement < Stage and above or stageRequirement >= Stage and not above) and PlayerCount <= scount then 
+                    if (stageRequirement < Stage and above or stageRequirement >= Stage and not above) and (PlayerCount <= scount and abovec == false or PlayerCount >= scount and abovec == true)  then 
                         print(stageRequirement,Stage)
                         azfakenotify('joining a server '..tostring(Stage)..'-'..tostring(scount))
                         pcall(function()
@@ -37343,6 +37434,7 @@ elseif game.PlaceId == 11534222714 then -- aot freedom war main menu
             end
         end
     end)
+    AddConfigurations()
 
 elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring(game.PlaceId)) and vs == 'debug' then 
     window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(700, 598), OpenGUBUTTON)
