@@ -18909,6 +18909,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         end   
         if detect(v,'rbxassetid://8687295215') and cancelAll == false then -- sharko spray
             task.wait(.1)
+            --if not v.IsPlaying then return end;
             getgenv().fastparry()
             cancelAll = true
             repeat 
@@ -19012,6 +19013,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://9984057511') and cancelAll == false then -- owl swing 1
             task.wait(.23)
+            if not detect(v,'rbxassetid://9984057511') then return end;
             getgenv().parry()
             cancelAll = true
         end   
@@ -19063,6 +19065,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://10225217835') and cancelAll == false then   -- rapier1
             task.wait(.1)
+            if not detect(v,'rbxassetid://10225217835') then return end;
             if checkStun() then getgenv().roll()
             else
                 getgenv().parry()
@@ -19082,6 +19085,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         end
         if detect(v,'rbxassetid://10225390984') and cancelAll == false then --rapier2
             task.wait(.1)
+            if not detect(v,'rbxassetid://10225390984') then return end; -- detailed
             if checkStun() then getgenv().roll()
             else
                 getgenv().parry()
@@ -19118,38 +19122,42 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://10013909049') and cancelAll == false then -- axe swing 1
             task.wait(.17)
-            -- if not detect(v,'rbxassetid://10013909049') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://10013909049') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end   
         if detect(v,'rbxassetid://10013911426') and cancelAll == false then -- axe swing 12
             task.wait(.17)
-            -- if not detect(v,'rbxassetid://10013911426') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://10013911426') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end   
         if detect(v,'rbxassetid://10013915154') and cancelAll == false then -- axe swing 3
             task.wait(.17)
-            -- if not detect(v,'rbxassetid://10013915154') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://10013915154') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end   
         if detect(v,'rbxassetid://10013919534') and cancelAll == false then -- axe run swing
             task.wait(.15)
-            -- if not detect(v,'rbxassetid://10013919534') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://10013919534') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end
         if detect(v,'rbxassetid://10022838306') and cancelAll == false then -- axe crit
             print('DOING AXE CRIT')
+            if not detect(v,'rbxassetid://10013919534') then 
+                print('AXE CRIT STOPPED')
+                return;
+            end;
             task.wait(.3)
             getgenv().parry()
             cancelAll = true
@@ -19196,15 +19204,18 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://12684972344') and cancelAll == false then 
             task.wait(.32)
+            if not detect(v,'rbxassetid://12684972344') then return end;
             getgenv().roll()
             cancelAll = true
         end   
         if detect(v,'rbxassetid://12684978333') and cancelAll == false then 
             task.wait(.32)
+            if not detect(v,'rbxassetid://12684978333') then return end;
             getgenv().roll()
             cancelAll = true
         end   
         if detect(v,'rbxassetid://12684981181') and cancelAll == false then 
+            if not detect(v,'rbxassetid://12684981181') then return end;
             task.wait(.38)
             getgenv().roll()
             cancelAll = true
@@ -19221,25 +19232,25 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://10787560419') and cancelAll == false then 
             task.wait(.2)
-            -- if not detect(v,'rbxassetid://10787560419') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://10787560419') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://10873957240') and cancelAll == false then 
             task.wait(.2)
-            -- if not detect(v,'rbxassetid://10873957240') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://10873957240') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://10771933209') and cancelAll == false then -- greatsword runswing
             task.wait(.4)
-            -- if not detect(v,'rbxassetid://10771933209') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://10771933209') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
@@ -19323,49 +19334,49 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://8698443433') and cancelAll == false then -- and distance < 15 
             task.wait( getWaitTime() )
-            -- if not detect(v,'rbxassetid://8698443433') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://8698443433') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://8699014368') and cancelAll == false then 
             task.wait( getWaitTime() )
-            -- if not detect(v,'rbxassetid://8699014368') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://8699014368') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://9215215492') and cancelAll == false then 
             task.wait( getWaitTime() )
-            -- if not detect(v,'rbxassetid://9215215492') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://9215215492') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://9255163830') and cancelAll == false then 
             task.wait( getWaitTime() )
-            -- if not detect(v,'rbxassetid://9255163830') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://9255163830') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://8779280417') and cancelAll == false then -- sword run swing
             task.wait(.15)
-            -- if not detect(v,'rbxassetid://8779280417') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://8779280417') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end
         if detect(v,'rbxassetid://9112351440') and cancelAll == false  then -- sword and spear aerual check what weapon they have though
             task.wait(.05)
-            -- if not detect(v,'rbxassetid://9112351440') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://9112351440') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end
@@ -19374,6 +19385,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://8787495611') and cancelAll == false  then 
             task.wait(.23)
+            if not detect(v,'rbxassetid://8787495611') then return end;
             cancelAll = true 
             getgenv().parry()
             print('sword crit')
@@ -19390,33 +19402,33 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://11363516302') and cancelAll == false then 
             task.wait(.1)
-            -- if not detect(v,'rbxassetid://11363516302') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://11363516302') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://11363591881') and cancelAll == false then 
             task.wait(.1)
-            -- if not detect(v,'rbxassetid://11363591881') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://11363591881') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://11404159898') and cancelAll == false then 
             task.wait(.1)
-            -- if not detect(v,'rbxassetid://11404159898') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://11404159898') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://11404162476') and cancelAll == false then 
             task.wait(.1)
-            -- if not detect(v,'rbxassetid://11404162476') then 
-            --     return
-            -- end
+            if not detect(v,'rbxassetid://11404162476') then 
+                return
+            end
             getgenv().parry()
             cancelAll = true
         end  
@@ -19430,6 +19442,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://8924706624') and cancelAll == false then 
             task.wait(.15)
+            if not detect(v,'rbxassetid://8924706624') then return end;
             getgenv().parry()
             cancelAll = true
             --task.wait(.22)
@@ -19446,11 +19459,13 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         end  
         if detect(v,'rbxassetid://8916943692') and cancelAll == false then 
             task.wait(.2)
+            if not detect(v,'rbxassetid://8916943692') then return end;
             getgenv().parry()
             cancelAll = true
         end  
         if detect(v,'rbxassetid://8917108290') and cancelAll == false then 
             task.wait(.2)
+            if not detect(v,'rbxassetid://8917108290') then return end;
             getgenv().parry()
             cancelAll = true
         end  
@@ -19628,36 +19643,43 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://13217644106') then -- punch 1
             task.wait(.2)
+            if not detect(v,'rbxassetid://8917108290') then return end;
             getgenv().parry()
             cancelAll = true
         end
         if detect(v,'rbxassetid://13217809061') then -- punch 2
             task.wait(.2)
+            if not detect(v,'rbxassetid://13217809061') then return end;
             getgenv().parry()
             cancelAll = true
         end
         if detect(v,'rbxassetid://13218081574') then -- punch 3
             task.wait(.2)
+            if not detect(v,'rbxassetid://13218081574') then return end;
             getgenv().parry()
             cancelAll = true
         end
         if detect(v,'rbxassetid://13241762838') then -- punch 4
             task.wait(.2)
+            if not detect(v,'rbxassetid://13241762838') then return end;
             getgenv().parry()
             cancelAll = true
         end
         if detect(v,'rbxassetid://10558610693') then -- way of navae aerial   and legion kata fist 
             task.wait(.1)
+            if not detect(v,'rbxassetid://10558610693') then return end;
             getgenv().parry()
             cancelAll = true 
         end
         if detect(v,'rbxassetid://9891303051') then -- way of navae run punch  and legion kata
             task.wait(.1)
+            if not detect(v,'rbxassetid://9891303051') then return end;
             getgenv().parry()
             cancelAll = true 
         end
         if detect(v,'rbxassetid://13234414776') then -- way of navae stomp
             task.wait(.5)
+            if not detect(v,'rbxassetid://13234414776') then return end;
             getgenv().parry()
             cancelAll = true 
         end
@@ -19667,21 +19689,25 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
         -- legon kata
         if detect(v,'rbxassetid://13049291895') then -- punch one
             task.wait(.15)
+            if not detect(v,'rbxassetid://13049291895') then return end;
             getgenv().parry()
             cancelAll = true
         end
         if detect(v,'rbxassetid://13144191563') then -- punch two
             task.wait(.15)
+            if not detect(v,'rbxassetid://13144191563') then return end;
             getgenv().parry()
             cancelAll = true
         end
         if detect(v,'rbxassetid://13144489543') then -- punch three
             task.wait(.15)
+            if not detect(v,'rbxassetid://13144489543') then return end;
             getgenv().parry()
             cancelAll = true
         end
         if detect(v,'rbxassetid://13147163529') then -- punch four
             task.wait(.15)
+            if not detect(v,'rbxassetid://13147163529') then return end;
             getgenv().parry()
             cancelAll = true
         end
@@ -19689,6 +19715,7 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
             --print('legion crit')
             if is_mob == false then 
                 task.wait(.1)
+                if not detect(v,'rbxassetid://13047366938') then return end;
                 print('legion parry')
                 getgenv().parry()
                 cancelAll = true
@@ -19703,35 +19730,41 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://9890788066') then -- fist anims from 1 to 4 cuz i never actually hardcoded them :skull: (1)
             task.wait(.1)
+            if not detect(v,'rbxassetid://9890788066') then return end;
             getgenv().parry()
             cancelAll = true
         end
 
         if detect(v,'rbxassetid://9890790186') then -- fist anims from 1 to 4 cuz i never actually hardcoded them :skull: (1)
             task.wait(.1)
+            if not detect(v,'rbxassetid://9890790186') then return end;
             getgenv().parry()
             cancelAll = true
         end
         
         if detect(v,'rbxassetid://9890792365') then -- fist anims from 1 to 4 cuz i never actually hardcoded them :skull: (1)
             task.wait(.1)
+            if not detect(v,'rbxassetid://9890792365') then return end;
             getgenv().parry()
             cancelAll = true
         end
         
         if detect(v,'rbxassetid://9890796934') then -- fist anims from 1 to 4 cuz i never actually hardcoded them :skull: (1)
             task.wait(.1)
+            if not detect(v,'rbxassetid://9890796934') then return end;
             getgenv().parry()
             cancelAll = true
         end
 
         if detect(v,'rbxassetid://9891303051') then -- fist anims from 1 to 4 cuz i never actually hardcoded them :skull: (1)
             task.wait(.2)
+            if not detect(v,'rbxassetid://9891303051') then return end;
             getgenv().parry()
             cancelAll = true
         end
         if detect(v,'rbxassetid://9890800691') then -- fist anims crit cuz i never actually hardcoded them :skull: (1)
             task.wait(.36)
+            if not detect(v,'rbxassetid://9890800691') then return end;
             getgenv().parry()
             cancelAll = true
         end
@@ -19748,12 +19781,14 @@ elseif game.PlaceId == 8350658333 then --// fakewoken 3
 
         if detect(v,'rbxassetid://10206784771') then -- gun shoot 1 
             task.wait(.05)
+            if not detect(v,'rbxassetid://10206784771') then return end;
             getgenv().parry()
             cancelAll = true
         end
 
         if detect(v,'rbxassetid://10206804975') then -- gun shoot 2
             task.wait(.05)
+            if not detect(v,'rbxassetid://10206804975') then return end;
             getgenv().parry()
             cancelAll = true
         end
@@ -35450,7 +35485,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                     localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack(args))
                     azfakenotify('anti hook applied',3) -- 3
                 end;
-                if aotfreedomwar.infhealth then 
+                if aotfreedomwar.infhp then -- infhealth
                     --workspace:WaitForChild("HumanEvents"):WaitForChild("DamageEvent"):FireServer(-math.huge)
                     task.spawn(function()
                         repeat 
@@ -35477,7 +35512,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                 localPlayer.character.Gear.Events.MoreEvents.CastQKey:FireServer(unpack(args))
                 azfakenotify('anti hook applied',3) -- 3
             end;
-            if aotfreedomwar.infhealth then 
+            if aotfreedomwar.infhp then 
                 task.spawn(function()
                     repeat 
                         task.wait(1)
@@ -36101,7 +36136,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         getgenv().aotfreedomwar['tpkillaura'] = xstate -- autom12
     end)
     sector:AddToggle('Infinite HP',false,function(xstate)
-        getgenv().aotfreedomwar['infinitehealth'] = xstate -- autom12
+        getgenv().aotfreedomwar['infhp'] = xstate -- autom12
         if not xstate then 
             return;
         end; 
@@ -37179,7 +37214,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                         --Character[gearname].Events.MoreEvents.HandCut:FireServer()
                     --end;
                     Character[gearname].Events.MoreEvents.HandCut:FireServer()
-                end;
+                end; -- hancut  wait manipulaaation
                 if aotfreedomwar.spawnnets == true and Character then 
                     local ohVector31 = game.Players.LocalPlayer.Character.PrimaryPart.Position
                     game:GetService("ReplicatedStorage").SpikeNetDeploy:FireServer(ohVector31)
