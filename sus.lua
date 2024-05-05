@@ -35684,6 +35684,31 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end
         -- chatlogger could return table so chatlogger:disable()
     end)
+    weirdsector:AddButton('Lag Spike Server', function()
+        task.spawn(function()
+            local start = tick();
+            repeat 
+                task.wait()
+                game.Players.LocalPlayer.Character.Gear.Events.GearEvent:InvokeServer()
+            until tick() - start > 0.5
+        end)
+    end)
+    local tglcrash = weirdsector:AddToggle('Crash Server', false, function(x)
+        aotfreedomwar.crashserver = x;
+        if not x then 
+            signals.coroutine.stop('crashserver')
+            return;
+        end;
+        signals.coroutine.new('crashserver', function()
+            while task.wait(1) do 
+                if aotfreedomwar.crashserver == false or getgenv().loopsUnload == true then 
+                    break
+                end;
+                game.Players.LocalPlayer.Character.Gear.Events.GearEvent:InvokeServer()
+            end;
+        end)
+    end);
+    tglcrash.info = {shouldcheck =  true, ask = 'This may crash you. Are you sure?'}
     local voidfor = ''
     local specificvoid = weirdsector:AddDropdown("Specific Void", {'none'}, "", false, function(dropdownv)
         voidfor = dropdownv;
