@@ -7683,14 +7683,15 @@ azfake.traceresp = function(opposing,info)
     return prep
 end
 
-local function setupEspTab(globaltable) -- Espwindow
+local function setupEspTab(globaltable, esp_lib2) -- Espwindow
     local EspTab = window:CreateTab('ESP')
     local playerespsector = EspTab:CreateSector('Player Esp','left')
-    local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
-    esp_lib.Players = false;
-    esp_lib.Boxes = false;
-    esp_lib.Names = false;
+    local esp_lib = esp_lib2 or loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
+    esp_lib.Players = esp_lib2 and esp_lib2.Players or false;
+    esp_lib.Boxes = esp_lib2 and esp_lib2.Boxes or false;
+    esp_lib.Names = esp_lib2 and esp_lib2.Names or false;
     --esp_lib.AutoRemove = true;
+    print(esp_lib2.Boxes)
     esp_lib.Settings.usecustomespcolor = true;
     esp_lib:Toggle(true)
 
@@ -35810,9 +35811,17 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             end
         end
     end
-    
+    local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
+    esp_lib.Settings.usecustomespcolor = true;
+    esp_lib.Players = false;
+    esp_lib.Boxes = true;
+    esp_lib.Names = true;
+    esp_lib.AutoRemove = true;
+    esp_lib.Settings.usecustomespcolor = true;
+    esp_lib:Toggle(true)
+
     setupAimbotTab(getgenv().aotfreedomwar)
-    setupEspTab(getgenv().aotfreedomwar)
+    setupEspTab(getgenv().aotfreedomwar, esp_lib)
     getgenv().AddPlayerList(weirdsector) -- make nape cancollide off?
 
     if game.PlaceId == 11860234207 then --.P{la}
@@ -36282,15 +36291,15 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             return;
         end
         task.spawn(function()
-            local foundDir = nil;
-            repeat 
-                task.wait(1) 
-                for i,v in next, workspace:GetDescendants() do 
-                    if v.Name == 'TSRefill' then 
-                        foundDir = v;
-                    end
-                end;
-            until foundDir or aotfreedomwar.infinitethunderspears == false or getgenv().loopsUnload == true;
+            --local foundDir = nil;
+            -- repeat 
+            --     task.wait(1) 
+            --     for i,v in next, workspace:GetDescendants() do 
+            --         if v.Name == 'TSRefill' then 
+            --             foundDir = v;
+            --         end
+            --     end;
+            -- until foundDir or aotfreedomwar.infinitethunderspears == false or getgenv().loopsUnload == true;
             if aotfreedomwar.infinitethunderspears == true then 
                 maid.thunder = signals.heartbeat:connect('omega lul', function()
                    -- local gearname = 'Gear'
@@ -36299,7 +36308,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                         pcall(function()
                             --if localPlayer.character.Humanoid.Gear.TS.Value == 0 and localPlayer.character.Humanoid.Gear.TS.Loaded.Value == true then 
                                 local ohString1 = "TS"
-                                local ohInstance2 = foundDir; --workspace.PracticeMap.TSRefill.Main
+                                local ohInstance2 = localPlayer.rootPart; --foundDir; --workspace.PracticeMap.TSRefill.Main
                                 
                                 --
                                 pcall(function()
@@ -36855,14 +36864,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     weirdsector:AddSlider('Attack Speed',0,0.6,0.6,10,function(xstate) -- min def max dec
         getgenv().aotfreedomwar['attackspeed'] = xstate
     end)
-    local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
-    esp_lib.Settings.usecustomespcolor = true;
-    esp_lib.Players = false;
-    esp_lib.Boxes = false;
-    esp_lib.Names = true;
-    esp_lib.AutoRemove = true;
-    esp_lib.Settings.usecustomespcolor = true;
-    esp_lib:Toggle(true)
+    -- esp lib
     local titanespsave = esp_lib:AddObjectListener(workspace.OnGameTitans, {
         --Name = 'Titan';
         CustomName = 'Titan';
