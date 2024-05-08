@@ -36312,7 +36312,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
                                 
                                 --
                                 pcall(function()
-                                    localPlayer.character[gearname].Events.RefillEventServer:FireServer('TS', foundDir)
+                                    localPlayer.character[gearname].Events.RefillEventServer:FireServer('TS', localPlayer.rootPart)
                                 end)
                             --end
                         end)
@@ -43004,6 +43004,7 @@ elseif universeid == 4871329703 then -- type soul
                         --if localPlayer.character:FindFirstChild('Head') and localPlayer.humanoid and localPlayer.humanoid.Health ~= localPlayer.humanoid.MaxHealth then 
                             --localPlayer.character.Head:Destroy()
                         --end;
+                        return
                     end;
                     local isPrimaryPartOwner = false;
                     for indexpart, part in next, v:GetChildren() do 
@@ -43150,6 +43151,8 @@ elseif universeid == 4871329703 then -- type soul
         end;
         -- local newrem = Instance.new('RemoteEvent', game.Players.LocalPlayer); newrem.Name = 'Kisuke';
         -- newrem:FireServer('Yes')
+        sethiddenproperty(game.Players.LocalPlayer, "MaxSimulationRadius", math.huge) -- Playuers
+        sethiddenproperty(game.Players.LocalPlayer, "SimulationRadius", math.huge)
         local playedIt = false;
         local hasAttemptedToTeleport = false;
         local canUseKisuke = 0;
@@ -43181,7 +43184,7 @@ elseif universeid == 4871329703 then -- type soul
                         task.spawn(function()
                             while task.wait(1) do 
                                 KisukeTime += 1
-                                if saveEnemy then 
+                                if saveEnemy then --kiske, kiskue
                                     EnemyTime += 1
                                 end;
                                 if typesoulsettings.kisukedelay == true and typesoulsettings. KisukeTime < typesoulsettings.timetowait and saveEnemy ~= nil then 
@@ -43206,68 +43209,163 @@ elseif universeid == 4871329703 then -- type soul
                                 local GetTable = game:GetService("ReplicatedStorage").Requests.RequestServerList:InvokeServer("Karakura Town")
                                 if not GetTable then return end;
                                 local foundTP = nil;
-                                for i,jobIdTable in next, GetTable do 
-                                    local shouldbreak = false
-                                    if jobIdTable['JobID'] ~= game.JobId then 
-                                        task.wait(1)
-                                        pcall(function()
-                                            game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'],nil)
-                                        end)
+
+                                repeat 
+                                    task.wait()
+                                    for i,jobIdTable in next, GetTable do 
+                                        local shouldbreak = false
+                                        if jobIdTable['JobID'] ~= game.JobId then 
+                                            task.wait(1)
+                                            pcall(function()
+                                                game.Players.LocalPlayer.Character.CharacterHandler.Remotes.ServerListTeleport:FireServer("Karakura Town",jobIdTable['JobID'],nil)
+                                            end)
+                                        end
                                     end
-                                end
+                                until 1 == 2
                             end)   
                         end)
 
                         
                         local enemy = nil
                         local usestop = false
+                        workspace.Entities.ChildAdded:Connect(function(ch)
+                            localPlayer.character:Destroy()
+                            task.spawn(function()
+                                repeat task.wait() until ch.PrimaryPart;
+                                if ch ~= localPlayer.character then 
+                                    ch.PrimaryPart.CFrame *= CFrame.new(0,-6000,0)
+                                end;
+                                local BV = Instance.new("BodyVelocity") --create bodyvelocity to apply constant physics packets and retain ownership
+                                BV.Name = "NetworkRetainer"
+                                BV.MaxForce = Vector3.new(1/0,1/0,1/0)
+                                BV.P = 1/0
+                                BV.Velocity = Vector3.new(30,30,30)
+                                BV.Parent = ch.PrimaryPart
+                            end)
+                            print('early manipulation')
+                            repeat 
+                                task.wait()
+                                pcall(function()
+                                    if isnetworkowner(ch.PrimaryPart) then 
+                                        ch.Head.CFrame = CFrame.new(0,0,0)
+                                        ch.PrimaryPart.CFrame *= CFrame.new(0,-6000,0)
+                                    end;
+                                end)
+                            until 1 == 2
+                        end)
                         repeat task.wait() until #workspace:WaitForChild('Entities'):GetChildren() >= 2
                         --localPlayer.character.Head:Destroy()
                         game.Players.LocalPlayer.Character.CharacterHandler.Remotes.Shiftlocked:FireServer(false)
-                        task.delay(0.6,function()
-                            localPlayer.character.Head:Destroy()
+                        --localPlayer.character.Head:Destroy()
+                        task.delay(0.1,function()
+                            --localPlayer.character.Head:Destroy()
                         end)
 
                         local enttiyspawnl; workspace.Entities.ChildAdded:Connect(function(ch)
                             task.wait()
                             if ch == localPlayer.character then 
-                                repeat task.wait() until ch.PrimaryPart;
-                                ch.PrimaryPart.CFrame = enemy.PrimaryPart.CFrame
+                                repeat task.wait() until ch.PrimaryPart and enemy;
+                                --ch.PrimaryPart.CFrame = enemy.PrimaryPart.CFrame
+                                task.wait(8)
+                                task.spawn(function()
+                                    repeat 
+                                        task.wait(1)
+                                        ch.PrimaryPart.CFrame = enemy.PrimaryPart.CFrame
+                                        task.wait()
+                                    until 1 == 2
+                                end)
+                                enemy.PrimaryPart.Velocity = Vector3.new(100,-10000,100)
                                 azfake:returndata().character.CharacterHandler.Remotes.Weapon:FireServer()
                             end
                         end)
-                        task.wait(); --(0.1)
+                        --task.wait(); --(0.1)
                         for i,v in next, workspace:WaitForChild('Entities'):GetChildren() do 
+                            repeat task.wait() until v.PrimaryPart
                             if not game.Players:GetPlayerFromCharacter(v) and v.PrimaryPart then 
                                 enemy = v;
+                                task.spawn(function() -- i like to keep snippets of old code in new code incase i need it which i regularly dont
+                                    repeat 
+                                        task.wait() 
+                                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame * CFrame.new(0,0,5)
+                                        typesoulsettings.functions.m1()
+                                    until v:FindFirstChildOfClass('Humanoid') and v:FindFirstChildOfClass('Humanoid').Health ~= v:FindFirstChildOfClass('Humanoid').MaxHealth
+                                    --localPlayer.character:BreakJoints(); --.Humanoid.Health = 0 --.Head:Destroy()
+                                end)
+
                                 task.spawn(function()
-                                    repeat task.wait() until enemy.PrimaryPart;
-                                    repeat task.wait() until isnetworkowner(enemy.PrimaryPart);
-                                    sethiddenproperty(v.PrimaryPart, "NetworkIsSleeping", false)
-                                    enemy.PrimaryPart.Velocity = Vector3.new(0,-100,0)
-                                    enemy.PrimaryPart.CFrame *= CFrame.new(100,200,100)
+                                    repeat task.wait() until enemy.PrimaryPart and isnetworkowner(enemy.PrimaryPart)  --and not localPlayer.character:FindFirstChild('Head'); -- and enemy:FindFirstChildOfClass('Humanoid') and venemy:FindFirstChildOfClass('Humanoid').Health ~= enemy:FindFirstChildOfClass('Humanoid').MaxHealth;
+                                    --repeat task.wait() until isnetworkowner(enemy.PrimaryPart);
+                                    local BV = Instance.new("BodyVelocity") --create bodyvelocity to apply constant physics packets and retain ownership
+                                    BV.Name = "NetworkRetainer"
+                                    BV.MaxForce = Vector3.new(1/0,1/0,1/0)
+                                    BV.P = 1/0
+                                    BV.Velocity = Vector3.new(30,30,30)
+                                    BV.Parent = enemy.PrimaryPart
+                                    azfakenotify('nw owner (potential kill)',3)
+                                    sethiddenproperty(enemy.PrimaryPart, "NetworkIsSleeping", true)
+                                    if enemy:FindFirstChild('Head') and enemy:FindFirstChild('Head'):FindFirstChild('Neck') then 
+                                        enemy:FindFirstChild('Head'):FindFirstChild('Neck'):Destroy()
+                                    end;
+                                    enemy.PrimaryPart.Velocity = Vector3.new(100,-10000,100)
+                                    --enemy.PrimaryPart.Anchored = true;
+                                    enemy:BreakJoints()
+                                    
+                                    pcall(function()
+                                        enemy.Head.CFrame = CFrame.new(0,0,0)
+                                    end)
+                                    --enemy.Humanoid.Health -= math.huge
+                                    task.spawn(function()
+                                        repeat 
+                                            task.wait()
+                                            if isnetworkowner(enemy.PrimaryPart) then 
+                                                print('still woner')
+                                                enemy.PrimaryPart.CFrame *= CFrame.new(100,-6000,100) -- math.huge  4980
+                                                --enemy.PrimaryPart.Velocity = Vector3.new(100,-math.huge,100)
+                                                --enemy.PrimaryPart.Anchored = true;
+                                                enemy:BreakJoints()
+                                                pcall(function()
+                                                    enemy.Head:Destroy()
+                                                    --enemy.Head.CFrame = CFrame.new(0,0,0)
+                                                end)
+                                                if enemy:FindFirstChild('Head') and enemy:FindFirstChild('Head'):FindFirstChild('Neck') then 
+                                                    enemy:FindFirstChild('Head'):FindFirstChild('Neck'):Destroy()
+                                                end;
+                                            end;
+                                            pcall(function()
+                                                --game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(math.random(1,300),math.random(1,300),math.random(1,300))
+                                                --game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Torso.CFrame
+                                                task.delay(0.1,function()
+                                                    pcall(function()
+                                                        --game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Torso.CFrame
+                                                    end)
+                                                end)
+                                            end)
+                                        until 1 == 2
+                                    end)
+                                    --enemy:Destroy()
                                 end)
                                 saveEnemy = v;
-                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
+                                --game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame * CFrame.new(0,0,0)
                                 task.delay(0.01,function()
-                                    typesoulsettings.functions.m2()
-                                    typesoulsettings.functions.m2()
-                                    typesoulsettings.functions.m2()
+                                    typesoulsettings.functions.m1()
+                                    typesoulsettings.functions.m1()
+                                    --typesoulsettings.functions.m2()
+                                    --typesoulsettings.functions.m2()
                                 end)
                                 task.delay(4,function()
                                     usestop = false
                                 end)
-                                task.spawn(function()
-                                    repeat 
-                                        if willTP == true then 
-                                            pcall(function()
-                                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame * CFrame.new(0,0,5);
-                                            end)
-                                           typesoulsettings.functions.m2()
-                                        end
-                                        task.wait()
-                                    until usestop == true
-                                end)
+                                -- task.spawn(function()
+                                --     repeat 
+                                --         if willTP == true then 
+                                --             pcall(function()
+                                --                 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame * CFrame.new(0,0,0) --CFrame.new(0,0,5);
+                                --             end)
+                                --            typesoulsettings.functions.m2()
+                                --         end
+                                --         task.wait()
+                                --     until usestop == true
+                                --end)
                                 local inputManager = game.VirtualInputManager
                                 inputManager:SendKeyEvent(true,Enum.KeyCode.W,false,game)
                                 task.wait(.1)
@@ -43292,6 +43390,7 @@ elseif universeid == 4871329703 then -- type soul
                                 end)
                             until diddie == true
                         end)
+                        repeat task.wait() until enemy
                         enemy.Humanoid.Died:Connect(function()
                             diddie = true;
                             azfakenotify('wow killed boss', 'untilClick')
@@ -44779,12 +44878,14 @@ elseif universeid == 4871329703 then -- type soul
         signals.conceal(function()
             child:WaitForChild('Humanoid')
             child:WaitForChild('HumanoidRootPart')
-            pcall(function()
-                typesoulsettings.connections[child.Name]:Disconnect();
-            end)
-            pcall(function()
-                typesoulsettings.connections[child.Name] = nil;
-            end)
+            if game.PlaceId ~= 17047374266 then 
+                pcall(function()
+                    typesoulsettings.connections[child.Name]:Disconnect();
+                end)
+                pcall(function()
+                    typesoulsettings.connections[child.Name] = nil;
+                end)
+            end
             local hasAnimationPlayed = false; -- = 0
             for i,v in next, typesoulsettings.connections do 
                 if i == child.Name and v ~= nil then 
@@ -44918,20 +45019,22 @@ elseif universeid == 4871329703 then -- type soul
             typesoulsettings.connections[child.Name] = ctn
             --table.insert(typesoulsettings.connections,ctn)
             local diedctn;diedctn = child.Humanoid.Died:Connect(function()
-                local index = 0
-                for i,v in next, typesoulsettings.connections do 
-                    index += 1
-                    if i == child.Name then 
-                        table.remove(typesoulsettings.connections, index)
-                        typesoulsettings.connections[i]:Disconnect()
-                        typesoulsettings.connections[i] = nil; --['noway']
-                        print('removing',child.Name)
+                if game.PlaceId ~= 17047374266 then 
+                    local index = 0
+                    for i,v in next, typesoulsettings.connections do 
+                        index += 1
+                        if i == child.Name then 
+                            table.remove(typesoulsettings.connections, index)
+                            typesoulsettings.connections[i]:Disconnect()
+                            typesoulsettings.connections[i] = nil; --['noway']
+                            print('removing',child.Name)
+                        end
                     end
+                    pcall(function()
+                        ctn:Disconnect();
+                    end)
+                    diedctn:Disconnect()
                 end
-                pcall(function()
-                    ctn:Disconnect();
-                end)
-                diedctn:Disconnect()
             end)
         end)
     end;    
@@ -44948,7 +45051,7 @@ elseif universeid == 4871329703 then -- type soul
         end;
     end)
     workspace.Entities.ChildRemoved:Connect(function(v)
-        if typesoulsettings.connections[v.Name] then 
+        if typesoulsettings.connections[v.Name] and game.PlaceId ~= 17047374266  then 
             pcall(function()
                 typesoulsettings.connections[v.Name]:Disconnect()
             end)
