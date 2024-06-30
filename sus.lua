@@ -7174,7 +7174,7 @@ if (identifyexecutor() and identifyexecutor():find('Codex')) then
     ExpectedGlobalsOnLoad = 270 
 end
 if (identifyexecutor() and identifyexecutor():find('Wave')) then
-    ExpectedGlobalsOnLoad = 240 
+    ExpectedGlobalsOnLoad = 265; -- 240 
 end
 local ExpectedGlobalRun = 0
 local ExpectedUnderscoreRun = 0
@@ -7185,6 +7185,9 @@ end
 for _,v in next, _G do 
     ExpectedUnderscoreRun += 1
 end
+if vs == 'debug' then 
+    print(`EXPECTED {ExpectedGlobalRun}. RECEIVED {ExpectedGlobalsOnLoad}, ID = {identifyexecutor()}`)
+end;
 -- ExpectedGlobalsOnLoad > expectedglobalrun
 if ExpectedGlobalRun > ExpectedGlobalsOnLoad and vs ~= 'debug' then -- ~= check if its bigger
     postattempt('GetGenv Globals on load different to expected.','GETGENV REPORT THIS TO THE OWNER('..ExpectedGlobalRun..') given '..ExpectedGlobalsOnLoad) -- make it list what was different
@@ -7235,7 +7238,10 @@ if vs == 'debug' then print('library loaded') end
 local OpenGUBUTTON = Enum.KeyCode.LeftAlt --Insert
 local window = library:CreateWindow("Azfake V3{"..game.PlaceId..'}', Vector2.new(492, 598), OpenGUBUTTON) -- 2nd argument is the size, 3rd is the show/hide ofc
 local wtm = library:CreateWatermark('Azfake HUB V3',Vector3.new(100,100,50))
-
+-- to me in the future, i wonder wtf ur yapping about to be looking here LOL
+-- was going over my azfakescript custom syntax etc , to me in the future again
+-- make sure you dont stop working on descents even if the game doesnt get tracktion from the start
+-- only I know what 'tracktion' m eans cuz i made it (the word)
 
 getgenv().AddBasicESP = function(sectAdd)
 
@@ -7691,7 +7697,7 @@ local function setupEspTab(globaltable, esp_lib2) -- Espwindow
     esp_lib.Boxes = esp_lib2 and esp_lib2.Boxes or false;
     esp_lib.Names = esp_lib2 and esp_lib2.Names or false;
     --esp_lib.AutoRemove = true;
-    print(esp_lib2.Boxes)
+    --print(esp_lib2.Boxes)
     esp_lib.Settings.usecustomespcolor = true;
     esp_lib:Toggle(true)
 
@@ -8990,6 +8996,10 @@ task.spawn(function()
     end;
     print('offloaded @threads')
 end)
+signals.setproperty = function(obj, p, v) -- game.Players.LocalPlayer, 'Name', 'Nobody'
+    return loadstring(obj:GetFullName()..'.'..tostring(p)..'='..v)();
+end;
+
 signals.propertychanged = function(a, b, c)
     if typeof(a) == 'table' then 
         b = a.value -- value
@@ -47460,6 +47470,159 @@ elseif universeid == 4777817887 then -- uni123 bladeball
         ctnball(v)
     end
 
+
+    AddConfigurations()
+elseif universeid == 4658598196 then 
+    local tab = window:CreateTab(gameName)
+    local sector = tab:CreateSector('Cheats','left')
+    getgenv().aotrevolution = {
+        autofarm = false;
+        status = 'idle'; -- idle = false (idle is an upvalue in script)
+        viewnape = false;
+    }
+    local itme; itme = sector:AddToggle('Auto Farm', false, function(on)
+        --if not on 
+        aotrevolution.autofarm = on;
+    end)
+    sector:AddToggle('View Napes', false, function(on)
+        --if not on 
+        aotrevolution.viewnape = on;
+    end)
+    sector:CreateHintOnItem(itme, 'Use inside specific map')
+
+    sharedRequires['CreateFlySystem'](sector, aotrevolution)
+    sharedRequires['CreateWalkSpeedSystem'](sector, aotrevolution)
+    sharedRequires['CreateNoclip'](sector, aotrevolution)
+    task.spawn(function()
+        sharedRequires['SetupChatlogger'](sector, aotrevolution)
+    end)
+
+    queue_on_teleport([[
+        task.wait(4)
+        if not game.Players.LocalPlayer.Character then 
+            game:GetService('TeleportService'):teleport(game.PlaceId)
+        end;
+    ]])
+    
+    local inputManager = game:GetService('VirtualInputManager')
+    local lastTIkc = tick()
+    signals.conceal(function()
+        game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild('Interface'):WaitForChild('Buttons').ChildAdded:Connect(function(b)
+            local timeago  = tick() - lastTIkc > 1
+            if timeago then 
+                local b1 = tick()
+                repeat
+                    task.wait(0.001)
+                    inputManager:SendKeyEvent(true,Enum.KeyCode[b.Name],false,game)
+                    task.wait(timeago and 0.1 or 0.01)
+                    inputManager:SendKeyEvent(false,Enum.KeyCode[b.Name],false,game)
+                until tick() - b1 > 1
+            else
+                task.wait(timeago and 1 or 0.01)
+            end
+            inputManager:SendKeyEvent(true,Enum.KeyCode[b.Name],false,game)
+            task.wait(timeago and 0.1 or 0.01)
+            inputManager:SendKeyEvent(false,Enum.KeyCode[b.Name],false,game)
+            lastTIkc = tick()
+        end)
+        game:GetService("Players").LocalPlayer.PlayerGui.Interface:WaitForChild('Rewards'):GetPropertyChangedSignal('Visible'):Connect(function() 
+            task.wait(1)
+            game:GetService('TeleportService'):teleport(game.PlaceId)
+        end)
+    end)
+    local function getstatus()
+        return aotrevolution.status;
+    end;
+    local function setstatus(b)
+        aotrevolution.status = b;
+        return aotrevolution.status;
+    end
+    local refilling = false;
+    local reloading = false;
+    local function refill()
+        inputManager:SendKeyEvent(true,Enum.KeyCode.R,false,game)
+        task.wait(0.1)
+        inputManager:SendKeyEvent(false,Enum.KeyCode.R,false,game)
+        task.wait(2)
+        local tanks = workspace.Unclimbable.Reloads:GetChildren() --[8]
+        local tank = tanks[math.random(1, #tanks)];
+        task.spawn(function()
+            repeat 
+                task.wait()
+                localPlayer.rootPart.CFrame = tank.GasTank.GasTank.CFrame;
+            until refilling == false
+        end)
+        repeat task.wait() until tick() - lastTIkc > 1
+        task.wait(1)
+        inputManager:SendKeyEvent(true,Enum.KeyCode.R,false,game)
+        task.wait(0.1)
+        inputManager:SendKeyEvent(false,Enum.KeyCode.R,false,game)
+        task.wait(6);
+        refilling = false;
+    end;
+    local function reload()
+        task.spawn(function()
+            repeat task.wait() until tick() - lastTIkc > 1
+            task.wait(0.5)
+            inputManager:SendKeyEvent(true,Enum.KeyCode.R,false,game)
+            task.wait(0.1)
+            inputManager:SendKeyEvent(false,Enum.KeyCode.R,false,game)
+            task.wait(0.5);
+            reloading = false; -- realo
+        end)
+    end;
+    azfakenotify('LOADED GAME FUNCS')
+    task.spawn(function()
+        while task.wait() do 
+            if getgenv().loopsUnload then print('revo break') break end;
+            if aotrevolution.autofarm and getstatus() == 'idle' then 
+                setstatus('farming')
+                for i,v in next, workspace.Titans:GetChildren() do 
+                    azfakenotify (`[{i}] : Current Titan`) -- ('Farming Titan '..tostring(i),10)
+                    if not aotrevolution.autofarm then 
+                        break
+                    end; -- or status == idle
+                    local getowner = v.PrimaryPart or v:FindFirstChild('HumanoidRootPart');
+                    local humanoid = v:FindFirstChildWhichIsA('Humanoid')
+                    if not getowner or not humanoid then continue end;
+                    local health = humanoid.Health
+                    local nape = v.Hitboxes.Hit.Nape
+                    nape.Size = Vector3.new(50,50,50);
+                    if aotrevolution.viewnape then 
+                        nape.Transparency = 0.4;
+                    end;
+                    local b = 0
+                    repeat 
+                        task.wait()
+                        pcall(function()
+                            local set = game:GetService("Players").LocalPlayer.PlayerGui.Interface.HUD.Main.Top.Blade.Sets; -- Rig_undetectablex
+                            local bladeHand = game.Players.LocalPlayer.Character[`Rig_{game.Players.LocalPlayer.Name}`].LeftHand.Blade_2
+                            if set.Text == '0 / 3' and refilling == false then 
+                                refilling = true;
+                                refill()
+                            elseif bladeHand.Transparency == 1 and reloading == false then 
+                                reloading = true
+                                reload()
+                            end
+                        end)
+                        if refilling then return end;
+                        pcall(function()
+                            local isone = b % 2 == 0
+                            localPlayer.rootPart.CFrame = nape.CFrame * CFrame.new(0,isone and 0 or 50,isone and 30 or 0) -- 15
+                            inputManager:SendMouseButtonEvent(workspace.CurrentCamera.ViewportSize.X/2,workspace.CurrentCamera.ViewportSize.Y/2,0,true,game,0)
+                            inputManager:SendMouseButtonEvent(workspace.CurrentCamera.ViewportSize.X/2,workspace.CurrentCamera.ViewportSize.Y/2,0,false,game,0)        
+                        end)
+                        b += 1
+                    until not v:FindFirstChild('Fake') or  v.Fake.RightUpperLeg.Transparency ~= 0 or not aotrevolution.autofarm; -- v.UpperTorso.Transparency == 1; -- .Hitboxes.Hit humanoid.Health ~= health
+                    task.wait()
+                end;  
+                setstatus('idle')              
+            end;
+            if not aotrevolution.autofarm and getstatus() == 'farming' then 
+                setstatus('idle')
+            end;
+        end;
+    end)
 
     AddConfigurations()
 else
