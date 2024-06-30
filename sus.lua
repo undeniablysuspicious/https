@@ -495,7 +495,7 @@ getgenv().adminCheck = true
 -- so if 3 is a boolean, 4 is a table and you want to put arg 4 without 3 you can put the the arg4 first
 
 -- azfake.repstring"{val}""
-
+setthreadidentity(8)
 local gameHash = cloneref(game:GetService('HttpService')):GenerateGUID(false);
 getgenv().observanthash = gameHash;
 local function gamekey(b) -- mismatch
