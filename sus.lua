@@ -6,6 +6,8 @@ end
 
 ]])()
 
+local nwfqONE = 'mivbiv'..tostring(math.random(1,99))
+
 local function MIXOUS_SECURE(func)
     return function(b)
         func()
@@ -14,7 +16,23 @@ end;
 
 setthreadidentity = set_thread_identity;
 setthreadcaps = set_thread_identity
-
+if not newcclosure then 
+    newcclosure = function(f)
+        local MIXOUS = function()
+            --return f
+            --f()
+        end;
+        --MIXOUS() --()
+        return f()
+    end;
+end
+newmixousclosure = newcclosure(function(f, key)
+    local compiled = function()
+        if key ~= nwfqONE then return end;
+        f()
+    end;
+    return compiled()
+end);
 
 
 local service_cache = {}
@@ -44,63 +62,63 @@ local services = setmetatable({}, {
 
 
 --for k,v in pairs(getgc(true)) do if pcall(function() return rawget(v,"indexInstance") end) and type(rawget(v,"indexInstance")) == "table" and (rawget(v,"indexInstance"))[1] == "kick" then v.tvk = {"kick",function() return game.Workspace:WaitForChild("") end} end end
--- do 
---     local getinfo = getinfo or debug.getinfo
---     local DEBUG = false
---     local Hooked = {}
+do 
+    local getinfo = getinfo or debug.getinfo
+    local DEBUG = false
+    local Hooked = {}
     
---     local Detected, Kill
+    local Detected, Kill
     
---     setthreadidentity(2)
+    setthreadidentity(2)
     
---     for i, v in getgc(true) do
---         if typeof(v) == "table" then
---             local DetectFunc = rawget(v, "Detected")
---             local KillFunc = rawget(v, "Kill")
+    for i, v in getgc(true) do
+        if typeof(v) == "table" then
+            local DetectFunc = rawget(v, "Detected")
+            local KillFunc = rawget(v, "Kill")
         
---             if typeof(DetectFunc) == "function" and not Detected then
---                 Detected = DetectFunc
+            if typeof(DetectFunc) == "function" and not Detected then
+                Detected = DetectFunc
                 
---                 local Old; Old = hookfunction(Detected, function(Action, Info, NoCrash)
---                     if Action ~= "_" then
---                         if DEBUG then
---                             warn(`Adonis AntiCheat flagged\nMethod: {Action}\nInfo: {Info}`)
---                         end
---                     end
+                local Old; Old = hookfunction(Detected, function(Action, Info, NoCrash)
+                    if Action ~= "_" then
+                        if DEBUG then
+                            warn(`Adonis AntiCheat flagged\nMethod: {Action}\nInfo: {Info}`)
+                        end
+                    end
                     
---                     return true
---                 end)
+                    return true
+                end)
     
---                 table.insert(Hooked, Detected)
---             end
+                table.insert(Hooked, Detected)
+            end
     
---             if rawget(v, "Variables") and rawget(v, "Process") and typeof(KillFunc) == "function" and not Kill then
---                 Kill = KillFunc
---                 local Old; Old = hookfunction(Kill, function(Info)
---                     if DEBUG then
---                         warn(`Adonis AntiCheat tried to kill (fallback): {Info}`)
---                     end
---                 end)
+            if rawget(v, "Variables") and rawget(v, "Process") and typeof(KillFunc) == "function" and not Kill then
+                Kill = KillFunc
+                local Old; Old = hookfunction(Kill, function(Info)
+                    if DEBUG then
+                        warn(`Adonis AntiCheat tried to kill (fallback): {Info}`)
+                    end
+                end)
     
---                 table.insert(Hooked, Kill)
---             end
---         end
---     end
+                table.insert(Hooked, Kill)
+            end
+        end
+    end
     
---     local Old; Old = hookfunction(getrenv().debug.info, newcclosure(function(...)
---         local LevelOrFunc, Info = ...
+    local Old; Old = hookfunction(getrenv().debug.info, newcclosure(function(...)
+        local LevelOrFunc, Info = ...
     
---         if Detected and LevelOrFunc == Detected then
---             if DEBUG then
---                 warn(`Adonis AntiCheat sanity check detected and broken`)
---             end
+        if Detected and LevelOrFunc == Detected then
+            if DEBUG then
+                warn(`Adonis AntiCheat sanity check detected and broken`)
+            end
     
---             return coroutine.yield(coroutine.running())
---         end
+            return coroutine.yield(coroutine.running())
+        end
         
---         return Old(...)
---     end))
--- end
+        return Old(...)
+    end))
+end
 setthreadidentity(9)
 setthreadidentity(7)
 local LRM_UserNote
