@@ -541,12 +541,13 @@ getgenv().observanthash = gameHash;
 local function gamekey(b) -- mismatch
     return b == true and getgenv().observanthash == gameHash or not b and gameHash
 end
-local coreGuiReference, didntLoadReference = cloneref(game:GetService('CoreGui')), false;
+local coreGuiReference, didntLoadReference = game.CoreGui,false -- cloneref(game:GetService('CoreGui')), false;
 if not coreGuiReference then 
     setthreadidentity(8)
     didntLoadReference = true
     coreGuiReference = game.CoreGui;
 end --coureg
+printidentity()
 if coreGuiReference:FindFirstChild('v4notiftoasty') then 
     coreGuiReference:FindFirstChild('v4notiftoasty'):Destroy()
 end
@@ -8515,7 +8516,7 @@ sharedRequires['CreateWalkSpeedSystem'] = function(sector, gnvtable)
             maid.walkspeedcon = nil;
             return ;
         end;   
-        maid.walkspeedcon = game.RunService.RenderStepped:Connect(function() 
+        maid.walkspeedcon = game['Run Service'].RenderStepped:Connect(function() 
             local RootPart = azfake:returndata().humanoidrootpart
             local Humanoid = azfake:returndata().humanoid
             if not RootPart then return end;
@@ -9293,14 +9294,14 @@ end;
 
 function signals.gamestepped:connect(desc,func)
 	print('@connecting '..desc);
-	local connection = game['Run Service'].RenderStepped:Connect(function() -- game.RunService
+	local connection = game['Run Service'].RenderStepped:Connect(function() -- game['Run Service']
 		func()
 	end)
 	return connection
 end
 function signals.heartbeat:connect(desc,func)
 	print('@connecting '..desc);
-	local connection = game['Run Service'].Heartbeat:Connect(function() -- game.RunService
+	local connection = game['Run Service'].Heartbeat:Connect(function() -- game['Run Service']
 		func()
 	end)
 	return connection
@@ -24827,73 +24828,73 @@ elseif game.PlaceId == 7162704734 then -- fighting game
         game.Players.LocalPlayer.Character:BreakJoints()
     end)
     sector:AddButton('Attempt to Crash Client',function()
-        game.RunService.RenderStepped:Connect(function()
+        game['Run Service'].RenderStepped:Connect(function()
             local ohNumber1 = 42.92091715335846
             game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-            game.RunService.RenderStepped:Connect(function()
+            game['Run Service'].RenderStepped:Connect(function()
                 local ohNumber1 = 42.92091715335846
                 game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                game.RunService.RenderStepped:Connect(function()
+                game['Run Service'].RenderStepped:Connect(function()
                     local ohNumber1 = 42.92091715335846
                     game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                    game.RunService.RenderStepped:Connect(function()
+                    game['Run Service'].RenderStepped:Connect(function()
                         local ohNumber1 = 42.92091715335846
                         game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                        game.RunService.RenderStepped:Connect(function()
+                        game['Run Service'].RenderStepped:Connect(function()
                             local ohNumber1 = 42.92091715335846
                             game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                            game.RunService.RenderStepped:Connect(function()
+                            game['Run Service'].RenderStepped:Connect(function()
                                 local ohNumber1 = 42.92091715335846
                                 game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                game.RunService.RenderStepped:Connect(function()
+                                game['Run Service'].RenderStepped:Connect(function()
                                     local ohNumber1 = 42.92091715335846
                                     game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                    game.RunService.RenderStepped:Connect(function()
+                                    game['Run Service'].RenderStepped:Connect(function()
                                         local ohNumber1 = 42.92091715335846
                                         game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                        game.RunService.RenderStepped:Connect(function()
+                                        game['Run Service'].RenderStepped:Connect(function()
                                             local ohNumber1 = 42.92091715335846
                                             game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                            game.RunService.RenderStepped:Connect(function()
+                                            game['Run Service'].RenderStepped:Connect(function()
                                                 local ohNumber1 = 42.92091715335846
                                                 game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)
-                                                game.RunService.RenderStepped:Connect(function()
+                                                game['Run Service'].RenderStepped:Connect(function()
                                                     local ohNumber1 = 42.92091715335846
                                                     game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                                    game.RunService.RenderStepped:Connect(function()
+                                                    game['Run Service'].RenderStepped:Connect(function()
                                                         local ohNumber1 = 42.92091715335846
                                                         game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                                        game.RunService.RenderStepped:Connect(function()
+                                                        game['Run Service'].RenderStepped:Connect(function()
                                                             local ohNumber1 = 42.92091715335846
                                                             game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                                            game.RunService.RenderStepped:Connect(function()
+                                                            game['Run Service'].RenderStepped:Connect(function()
                                                                 local ohNumber1 = 42.92091715335846
                                                                 game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                                                game.RunService.RenderStepped:Connect(function()
+                                                                game['Run Service'].RenderStepped:Connect(function()
                                                                     local ohNumber1 = 42.92091715335846
                                                                     game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                                                    game.RunService.RenderStepped:Connect(function()
+                                                                    game['Run Service'].RenderStepped:Connect(function()
                                                                         local ohNumber1 = 42.92091715335846
                                                                         game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                                                        game.RunService.RenderStepped:Connect(function()
+                                                                        game['Run Service'].RenderStepped:Connect(function()
                                                                             local ohNumber1 = 42.92091715335846
                                                                             game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                                                            game.RunService.RenderStepped:Connect(function()
+                                                                            game['Run Service'].RenderStepped:Connect(function()
                                                                                 local ohNumber1 = 42.92091715335846
                                                                                 game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                                                                game.RunService.RenderStepped:Connect(function()
+                                                                                game['Run Service'].RenderStepped:Connect(function()
                                                                                     local ohNumber1 = 42.92091715335846
                                                                                     game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                                                                    game.RunService.RenderStepped:Connect(function()
+                                                                                    game['Run Service'].RenderStepped:Connect(function()
                                                                                         local ohNumber1 = 42.92091715335846
                                                                                         game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                                                                        game.RunService.RenderStepped:Connect(function()
+                                                                                        game['Run Service'].RenderStepped:Connect(function()
                                                                                             local ohNumber1 = 42.92091715335846
                                                                                             game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)
-                                                                                            game.RunService.RenderStepped:Connect(function()
+                                                                                            game['Run Service'].RenderStepped:Connect(function()
                                                                                                 local ohNumber1 = 42.92091715335846
                                                                                                 game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
-                                                                                                game.RunService.RenderStepped:Connect(function()
+                                                                                                game['Run Service'].RenderStepped:Connect(function()
                                                                                                     local ohNumber1 = 42.92091715335846
                                                                                                     game:GetService("ReplicatedStorage").FallDamage:FireServer(ohNumber1)  
                                                                                                 end)
@@ -36342,7 +36343,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
     sector:AddToggle('Accelerate ODM',false,function(xstate)
         getgenv().aotfreedomwar['accelerateodm'] = xstate -- autom12
         if xstate then 
-            maid.accelerateodm = game.RunService.RenderStepped:Connect(function()
+            maid.accelerateodm = game['Run Service'].RenderStepped:Connect(function()
                 if azfake:returndata().humanoidrootpart and azfake:returndata().humanoidrootpart:FindFirstChild('Velocity') then 
                     azfake:returndata().humanoidrootpart:FindFirstChild('Velocity').Velocity *= aotfreedomwar.acceleration
                     azfake:returndata().humanoidrootpart:FindFirstChild('Velocity').MaxForce *= 2
@@ -36539,7 +36540,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             return
         end;
         game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100)
-        maid.infhealth = game.RunService.RenderStepped:Connect(function()
+        maid.infhealth = game['Run Service'].RenderStepped:Connect(function()
             -- task.delay(0.1,function()
             --     if game.Players.LocalPlayer.Backpack:FindFirstChild('Granada') then 
             --         game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame.DestroyTool:FireServer(game.Players.LocalPlayer.Backpack.Granada)
@@ -36569,7 +36570,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end)
         if aotfreedomwar.twothreads then 
             game:GetService("ReplicatedStorage").BuyEvent:FireServer('Granada',100)
-            maid.infhealth2 = game.RunService.RenderStepped:Connect(function()
+            maid.infhealth2 = game['Run Service'].RenderStepped:Connect(function()
                 -- task.delay(0.1,function()
                 --     if game.Players.LocalPlayer.Backpack:FindFirstChild('Granada') then 
                 --         game:GetService("Players").LocalPlayer.PlayerGui.ToolsBar.Frame.DestroyTool:FireServer(game.Players.LocalPlayer.Backpack.Granada)
@@ -36610,7 +36611,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             amount = 20
         end;
         for i=1, amount do -- 10 
-            local connection = game.RunService.RenderStepped:Connect(function()
+            local connection = game['Run Service'].RenderStepped:Connect(function()
                 if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild('Granada') then 
                     for i=1, 3 do 
                         pcall(function()
@@ -36839,7 +36840,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         getgenv().aotfreedomwar['instakillkeybind'] = xstate
     end)
     weirdsector:AddButton('Hook Everyone',function() -- they nerfed my shit
-        -- game.RunService.RenderStepped(LPH_NO_VIRTUALIZE(function()
+        -- game['Run Service'].RenderStepped(LPH_NO_VIRTUALIZE(function()
         --     for i,v in next, game.Players:GetPlayers() do 
         --         if v.Character then 
         --             local obj = v.Character.Head
@@ -37020,7 +37021,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             maid.shifterautom1 = nil;
             return;
         end;
-        maid.shifterautom1 = game.RunService.RenderStepped:Connect(function()
+        maid.shifterautom1 = game['Run Service'].RenderStepped:Connect(function()
             if game.Players.LocalPlayer.Character then 
                 print('ok')
                 if game.Players.LocalPlayer.Character.Name == 'AttackTitan' then 
@@ -37045,7 +37046,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             maid.shifterautom2 = nil;
             return;
         end;
-        maid.shifterautom2 = game.RunService.RenderStepped:Connect(function()
+        maid.shifterautom2 = game['Run Service'].RenderStepped:Connect(function()
             if game.Players.LocalPlayer.Character then 
                 if game.Players.LocalPlayer.Character.Name == 'AttackTitan' then 
                     local ohString1 = "HeavyAttack"
@@ -37068,7 +37069,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             maid.shifterautoblock = nil;
             return;
         end;
-        maid.shifterautoblock = game.RunService.RenderStepped:Connect(function()
+        maid.shifterautoblock = game['Run Service'].RenderStepped:Connect(function()
             if game.Players.LocalPlayer.Character then 
                 if game.Players.LocalPlayer.Character.Name == 'AttackTitan' then 
                     local ohString1 = true
@@ -37091,7 +37092,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
             maid.nostunshifter = nil;
             return;
         end;
-        maid.nostunshifter = game.RunService.RenderStepped:Connect(function()
+        maid.nostunshifter = game['Run Service'].RenderStepped:Connect(function()
             if game.Players.LocalPlayer.Character then 
                 if game.Players.LocalPlayer.Character.Name == 'AttackTitan' then 
                     game.Players.LocalPlayer.Character.ATLocal.Events.UnstunnedEvent:FireServer()
@@ -37155,7 +37156,7 @@ elseif table.find({'11567929685','11564374799','11860234207'},tostring(game.Plac
         end
     end)
     --expand legs toggle
-    local aimbotctn; aimbotctn = game.RunService.RenderStepped:Connect(function() -- couldve done ainmbot or mouthaimbot then distinguish it in the fucntion
+    local aimbotctn; aimbotctn = game['Run Service'].RenderStepped:Connect(function() -- couldve done ainmbot or mouthaimbot then distinguish it in the fucntion
         if aimbot then 
             pcall(function()
                 local Character = game.Players.LocalPlayer.Character
@@ -38465,7 +38466,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
             maid.noclipcentre = nil;
             return;
         end;
-        maid.noclipcentre = game.RunService.Stepped:Connect(function()
+        maid.noclipcentre = game['Run Service'].Stepped:Connect(function()
             local myCharacterParts = azfake:returndata().parts;
             local isKnocked = effectReplicator:FindEffect('Knocked');
             local disableNoClipWhenKnocked = deepwokensettings.disablenoclipknock;
@@ -38516,7 +38517,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
             maid.voidmobs = nil;
             return;
         end;
-        maid.voidmobs = game.RunService.Heartbeat:Connect(function()
+        maid.voidmobs = game['Run Service'].Heartbeat:Connect(function()
             --print('voiding')
             sethiddenproperty(LocalPlayer, "MaxSimulationRadius", math.huge)
             sethiddenproperty(LocalPlayer, "SimulationRadius", math.huge)
@@ -38844,7 +38845,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
             maid.playerproximitycon = nil;
             return; 
         end;
-        maid.playerproximitycon = game.RunService.Heartbeat:Connect(LPH_NO_VIRTUALIZE(function()
+        maid.playerproximitycon = game['Run Service'].Heartbeat:Connect(LPH_NO_VIRTUALIZE(function()
             local HumanoidRootPart = azfake:returndata().humanoidrootpart
             if not HumanoidRootPart then return end;
             -- print(#PlayersInProximity)
@@ -39009,7 +39010,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
             maid.checkifblind = nil;
             return;
         end;
-        maid.checkifblind = game.RunService.Heartbeat:Connect(LPH_NO_VIRTUALIZE(function()
+        maid.checkifblind = game['Run Service'].Heartbeat:Connect(LPH_NO_VIRTUALIZE(function()
             if LocalPlayer and LocalPlayer.Backpack and LocalPlayer.Backpack:FindFirstChild('Talent:Blinded') then 
                 LocalPlayer.Backpack:FindFirstChild('Talent:Blinded').Parent = LocalPlayer;
             end
@@ -39024,7 +39025,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
             maid.checkfog = nil;
             return;
         end;
-        maid.checkfog = game.RunService.Heartbeat:Connect(LPH_NO_VIRTUALIZE(function()
+        maid.checkfog = game['Run Service'].Heartbeat:Connect(LPH_NO_VIRTUALIZE(function()
             game.Lighting.FogStart = 10000000000
             game.Lighting.FogEnd = 10000000000
             if game.Lighting:FindFirstChildOfClass("Atmosphere") then
@@ -39038,7 +39039,7 @@ elseif table.find({'4111023553','5735553160','6032399813','8668476218'},tostring
             maid.checkwind = nil;
             return;
         end;
-        maid.checkwind = game.RunService.Heartbeat:Connect(LPH_NO_VIRTUALIZE(function()
+        maid.checkwind = game['Run Service'].Heartbeat:Connect(LPH_NO_VIRTUALIZE(function()
             local rootPart = azfake:returndata().humanoidrootpart;
             if (not rootPart) then return end;
 
@@ -42822,7 +42823,7 @@ elseif universeid == 4871329703 then -- type soul
                 maid.antiaagun = nil;
                 return
             end;
-            maid.antiaagun = signals.gamestepped:connect('no anims', function()--game.RunService:Connect(function())
+            maid.antiaagun = signals.gamestepped:connect('no anims', function()--game['Run Service']:Connect(function())
                 if not  azfake:returndata().character then return end;
                 if not  azfake:returndata().humanoid then return end;
                 local haswalk = false
@@ -42861,14 +42862,14 @@ elseif universeid == 4871329703 then -- type soul
                 return
             end;
             oldHRPVelo = azfake:returndata().humanoidrootpart.Velocity;
-            maid.mobaibreak1 = signals.heartbeat:connect('no anims', function()--game.RunService:Connect(function())
+            maid.mobaibreak1 = signals.heartbeat:connect('no anims', function()--game['Run Service']:Connect(function())
                 if not  azfake:returndata().character then return end;
                 if not  azfake:returndata().humanoid then return end;
                 if not azfake:returndata().humanoidrootpart then return end;
                 local rootPart = azfake:returndata().humanoidrootpart
                 rootPart.Velocity = (rootPart.CFrame.LookVector.Unit * 20) + Vector3.new(0,-1000,0);
             end)
-            maid.mobaibreak2 = signals.gamestepped:connect('no anims', function()--game.RunService:Connect(function())
+            maid.mobaibreak2 = signals.gamestepped:connect('no anims', function()--game['Run Service']:Connect(function())
                 if not  azfake:returndata().character then return end;
                 if not  azfake:returndata().humanoid then return end;
                 if not azfake:returndata().humanoidrootpart then return end;
@@ -42883,7 +42884,7 @@ elseif universeid == 4871329703 then -- type soul
             maid.speedchange = nil;
             return
         end;
-        maid.speedchange = signals.gamestepped:connect('no anims', function()--game.RunService:Connect(function())
+        maid.speedchange = signals.gamestepped:connect('no anims', function()--game['Run Service']:Connect(function())
             if not  azfake:returndata().character then return end;
             if not  azfake:returndata().humanoid then return end;
             if azfake:returndata().character:FindFirstChild('Head') then 
@@ -43056,7 +43057,7 @@ elseif universeid == 4871329703 then -- type soul
         -- local newrem = Instance.new('RemoteEvent', game.Players.LocalPlayer); newrem.Name = 'Kisuke';
         -- newrem:FireServer('Yes')
         local noHandlePhysics = true;
-        maid.instakillctn = signals.gamestepped:connect('insta kill', function()--game.RunService:Connect(function())
+        maid.instakillctn = signals.gamestepped:connect('insta kill', function()--game['Run Service']:Connect(function())
             --if not  azfake:returndata().character then return end;
             for i,v in next, workspace.Entities:GetChildren() do 
                 if not game.Players:GetPlayerFromCharacter(v) then 
@@ -43231,7 +43232,7 @@ elseif universeid == 4871329703 then -- type soul
         local playedIt = false;
         local hasAttemptedToTeleport = false;
         local canUseKisuke = 0;
-        maid.autokisukectn = signals.heartbeat:connect('kisuke tp', function()--game.RunService:Connect(function())
+        maid.autokisukectn = signals.heartbeat:connect('kisuke tp', function()--game['Run Service']:Connect(function())
             local basicworld = {14069678431, 17047374266}
             local raidWorld = 17047374266
             if not table.find(basicworld,game.PlaceId) then 
@@ -44147,7 +44148,7 @@ elseif universeid == 4871329703 then -- type soul
             maid.fastanim2 = nil;
             return
         end;
-        maid.fastanim = signals.gamestepped:connect('no anims', function()--game.RunService:Connect(function())
+        maid.fastanim = signals.gamestepped:connect('no anims', function()--game['Run Service']:Connect(function())
             if not  azfake:returndata().character then return end;
             if not  azfake:returndata().humanoid then return end;
             if not maid.fastanim2 and typesoulsettings.fasteranimations == true then -- azfake:returndata().character and
@@ -44164,7 +44165,7 @@ elseif universeid == 4871329703 then -- type soul
             maid.noanims2 = nil;
             return
         end;
-        maid.noanims = signals.gamestepped:connect('no anims', function()--game.RunService:Connect(function())
+        maid.noanims = signals.gamestepped:connect('no anims', function()--game['Run Service']:Connect(function())
             if not  azfake:returndata().character then return end;
             if not  azfake:returndata().humanoid then return end;
             if not maid.noanims2 and typesoulsettings.noanims == true then -- azfake:returndata().character and
