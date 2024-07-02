@@ -99,7 +99,7 @@ local Old; Old = hookfunction(getrenv().debug.info, newcclosure(function(...)
     
     return Old(...)
 end))
--- setthreadidentity(9)
+setthreadidentity(9)
 setthreadidentity(7)
 local LRM_UserNote
 local LRM_LinkedDiscordID 
@@ -541,8 +541,14 @@ getgenv().observanthash = gameHash;
 local function gamekey(b) -- mismatch
     return b == true and getgenv().observanthash == gameHash or not b and gameHash
 end
-if cloneref(game:GetService('CoreGui')):FindFirstChild('v4notiftoasty') then 
-    cloneref(game:GetService('CoreGui')):FindFirstChild('v4notiftoasty'):Destroy()
+local coreGuiReference, didntLoadReference = cloneref(game:GetService('CoreGui')), false;
+if not coreGuiReference then 
+    setthreadidentity(8)
+    didntLoadReference = true
+    coreGuiReference = game.CoreGui;
+end --coureg
+if coreGuiReference:FindFirstChild('v4notiftoasty') then 
+    coreGuiReference:FindFirstChild('v4notiftoasty'):Destroy()
 end
 
 
@@ -735,8 +741,9 @@ end)
 
 
 
-
-
+if didntLoadReference == true then 
+    newtoastynotif('wasnt able to load coregui')
+end;
 
 
 
