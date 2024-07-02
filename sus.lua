@@ -44,61 +44,63 @@ local services = setmetatable({}, {
 
 
 --for k,v in pairs(getgc(true)) do if pcall(function() return rawget(v,"indexInstance") end) and type(rawget(v,"indexInstance")) == "table" and (rawget(v,"indexInstance"))[1] == "kick" then v.tvk = {"kick",function() return game.Workspace:WaitForChild("") end} end end
-local getinfo = getinfo or debug.getinfo
-local DEBUG = false
-local Hooked = {}
-
-local Detected, Kill
-
-setthreadidentity(2)
-
-for i, v in getgc(true) do
-    if typeof(v) == "table" then
-        local DetectFunc = rawget(v, "Detected")
-        local KillFunc = rawget(v, "Kill")
+do 
+    local getinfo = getinfo or debug.getinfo
+    local DEBUG = false
+    local Hooked = {}
     
-        if typeof(DetectFunc) == "function" and not Detected then
-            Detected = DetectFunc
-            
-            local Old; Old = hookfunction(Detected, function(Action, Info, NoCrash)
-                if Action ~= "_" then
-                    if DEBUG then
-                        warn(`Adonis AntiCheat flagged\nMethod: {Action}\nInfo: {Info}`)
-                    end
-                end
+    local Detected, Kill
+    
+    setthreadidentity(2)
+    
+    for i, v in getgc(true) do
+        if typeof(v) == "table" then
+            local DetectFunc = rawget(v, "Detected")
+            local KillFunc = rawget(v, "Kill")
+        
+            if typeof(DetectFunc) == "function" and not Detected then
+                Detected = DetectFunc
                 
-                return true
-            end)
-
-            table.insert(Hooked, Detected)
+                local Old; Old = hookfunction(Detected, function(Action, Info, NoCrash)
+                    if Action ~= "_" then
+                        if DEBUG then
+                            warn(`Adonis AntiCheat flagged\nMethod: {Action}\nInfo: {Info}`)
+                        end
+                    end
+                    
+                    return true
+                end)
+    
+                table.insert(Hooked, Detected)
+            end
+    
+            if rawget(v, "Variables") and rawget(v, "Process") and typeof(KillFunc) == "function" and not Kill then
+                Kill = KillFunc
+                local Old; Old = hookfunction(Kill, function(Info)
+                    if DEBUG then
+                        warn(`Adonis AntiCheat tried to kill (fallback): {Info}`)
+                    end
+                end)
+    
+                table.insert(Hooked, Kill)
+            end
         end
-
-        if rawget(v, "Variables") and rawget(v, "Process") and typeof(KillFunc) == "function" and not Kill then
-            Kill = KillFunc
-            local Old; Old = hookfunction(Kill, function(Info)
-                if DEBUG then
-                    warn(`Adonis AntiCheat tried to kill (fallback): {Info}`)
-                end
-            end)
-
-            table.insert(Hooked, Kill)
-        end
-    end
-end
-
-local Old; Old = hookfunction(getrenv().debug.info, newcclosure(function(...)
-    local LevelOrFunc, Info = ...
-
-    if Detected and LevelOrFunc == Detected then
-        if DEBUG then
-            warn(`Adonis AntiCheat sanity check detected and broken`)
-        end
-
-        return coroutine.yield(coroutine.running())
     end
     
-    return Old(...)
-end))
+    local Old; Old = hookfunction(getrenv().debug.info, newcclosure(function(...)
+        local LevelOrFunc, Info = ...
+    
+        if Detected and LevelOrFunc == Detected then
+            if DEBUG then
+                warn(`Adonis AntiCheat sanity check detected and broken`)
+            end
+    
+            return coroutine.yield(coroutine.running())
+        end
+        
+        return Old(...)
+    end))
+end
 setthreadidentity(9)
 setthreadidentity(7)
 local LRM_UserNote
@@ -534,7 +536,7 @@ getgenv().adminCheck = true
 -- azfake.repstring"{val}""
 setthreadidentity(6)
 setthreadidentity(7)
-setthreadidentity(8)
+set_thread_identity(8)
 
 local gameHash = cloneref(game:GetService('HttpService')):GenerateGUID(false);
 getgenv().observanthash = gameHash;
@@ -543,7 +545,7 @@ local function gamekey(b) -- mismatch
 end
 local coreGuiReference, didntLoadReference = game.CoreGui,false -- cloneref(game:GetService('CoreGui')), false;
 if not coreGuiReference then 
-    setthreadidentity(8)
+    set_thread_identity(8)
     didntLoadReference = true
     coreGuiReference = game.CoreGui;
 end --coureg
