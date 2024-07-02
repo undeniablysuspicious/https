@@ -6,6 +6,43 @@ end
 
 ]])()
 
+local function MIXOUS_SECURE(func)
+    return function(b)
+        func()
+    end
+end;
+
+setthreadidentity = set_thread_identity;
+setthreadcaps = set_thread_identity
+
+
+
+local service_cache = {}
+local gs = game.GetService;
+local services = setmetatable({}, {
+    __index = MIXOUS_SECURE(function(self, index)
+        local cached_service = service_cache[index]
+        
+        if not cached_service then  
+            service_cache[index] = (index == "CoreGui" or index == "RunService") and index ~= "Players" or gs(game,index)--select(2, pcall(game.GetService, game, index))
+            return service_cache[index]
+        end 
+        
+        return cached_service
+    end),
+    __call = MIXOUS_SECURE(function(self,index)
+        local cached_service = service_cache[index]
+        
+        if not cached_service then  
+            service_cache[index] = (index == "CoreGui" or index == "RunService")  or gs(game,index)--select(2, pcall(game.GetService, game, index))
+            return service_cache[index]
+        end 
+        
+        return cached_service
+    end)
+})
+
+
 --for k,v in pairs(getgc(true)) do if pcall(function() return rawget(v,"indexInstance") end) and type(rawget(v,"indexInstance")) == "table" and (rawget(v,"indexInstance"))[1] == "kick" then v.tvk = {"kick",function() return game.Workspace:WaitForChild("") end} end end
 local getinfo = getinfo or debug.getinfo
 local DEBUG = false
@@ -495,7 +532,10 @@ getgenv().adminCheck = true
 -- so if 3 is a boolean, 4 is a table and you want to put arg 4 without 3 you can put the the arg4 first
 
 -- azfake.repstring"{val}""
+setthreadidentity(6)
+setthreadidentity(7)
 setthreadidentity(8)
+
 local gameHash = cloneref(game:GetService('HttpService')):GenerateGUID(false);
 getgenv().observanthash = gameHash;
 local function gamekey(b) -- mismatch
@@ -7305,11 +7345,16 @@ pcall(function()
 end)
 
 if gameName == nil then 
+    local waited = tick()
     repeat task.wait()
         pcall(function()
             gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
         end)
-    until gameName ~= nil
+    until gameName ~= nil or tick() - waited >= 2
+    if not gameName and tick() - waited >= 2 then 
+        azfakenotify('unable to find game name, marketplace being a bum' ,3)
+        gameName = 'no game detected' -- RECEIVED NIL
+    end;    
 end
 --[[
     data; could add a player and set their character to ours. or add a player, rename to us and we leave
@@ -8742,6 +8787,9 @@ local metaforit = {};
 localPlayer.destroy = function(wehat, where)
 
 end;
+metaforit.find = function(what, wit, yield)
+    return what:FindFirstChild(wit, yield and true or false)
+end;
 metaforit.isalive = function(enemy)
     if enemy then 
         return enemy and enemy:FindFirstChildWhichIsA('Humanoid') and enemy:FindFirstChildWhichIsA('Humanoid').Health > 0 or false;
@@ -8975,7 +9023,11 @@ local signals = {
     flask = {
         running = {};
     };
+    connectionHandler = {};
 };
+local connectionHandler = function(ctn)
+    table.insert(signals.connectionHandler, ctn)
+end;
 task.spawn(function()
     print('@v;;;')
     repeat task.wait(.1) until getgenv().loopsUnload == true
@@ -8995,6 +9047,12 @@ task.spawn(function()
         signals.coroutine.threads[i] = nil;
     end;
     print('offloaded @threads')
+    for i,v in next, signals.connectionHandler do 
+        pcall(function()
+            v:Disconnect();
+        end)
+    end;
+    print('offloaded @connections')
 end)
 signals.setproperty = function(obj, p, v) -- game.Players.LocalPlayer, 'Name', 'Nobody'
     return loadstring(obj:GetFullName()..'.'..tostring(p)..'='..v)();
@@ -9228,14 +9286,14 @@ end;
 
 function signals.gamestepped:connect(desc,func)
 	print('@connecting '..desc);
-	local connection = game.RunService.RenderStepped:Connect(function()
+	local connection = game['Run Service'].RenderStepped:Connect(function() -- game.RunService
 		func()
 	end)
 	return connection
 end
 function signals.heartbeat:connect(desc,func)
 	print('@connecting '..desc);
-	local connection = game.RunService.Heartbeat:Connect(function()
+	local connection = game['Run Service'].Heartbeat:Connect(function() -- game.RunService
 		func()
 	end)
 	return connection
@@ -47527,8 +47585,17 @@ elseif universeid == 4658598196 then
         end)
         game:GetService("Players").LocalPlayer.PlayerGui.Interface:WaitForChild('Rewards'):GetPropertyChangedSignal('Visible'):Connect(function() 
             task.wait(1)
-            game:GetService('TeleportService'):teleport(game.PlaceId)
+            repeat
+                task.wait()
+                pcall(function()
+                    game:GetService('TeleportService'):teleport(game.PlaceId)
+                end)
+            until 1 == 2
         end)
+        local blacklist = game.ReplicatedStorage.Assets.Remotes.GET:InvokeServer("Data", "Get").Is_Blacklisted;
+        if blacklist then 
+            azfakenotify('potential ban, u r listed')
+        end
     end)
     local function getstatus()
         return aotrevolution.status;
@@ -47577,7 +47644,23 @@ elseif universeid == 4658598196 then
             if getgenv().loopsUnload then print('revo break') break end;
             if aotrevolution.autofarm and getstatus() == 'idle' then 
                 setstatus('farming')
-                for i,v in next, workspace.Titans:GetChildren() do 
+                localPlayer.rootPart.Anchored = true
+                local titanList = {};
+                for i,v in next, workspace.Titans:GetChildren() do
+                    local lastIndex = titanList[i - 1];
+                    if not lastIndex then 
+                        --table.insert(titanList, v);
+                        titanList[i] = {dist = (localPlayer.rootPart.Position - v.HumanoidRootPart.Position).Magnitude, val = v}
+                        continue
+                    end;
+                    if lastIndex.dist > (localPlayer.rootPart.Position - v.HumanoidRootPart.Position).Magnitude then 
+                        titanList[i] = {dist = lastIndex.dist, val = v}
+                        titanList[i-1] = {dist = (localPlayer.rootPart.Position - v.HumanoidRootPart.Position).Magnitude, val = v}
+                        --table.insert()
+                    end;
+                end
+                for i,v in next, workspace.Titans:GetChildren() do --titanList do 
+                    --local v = val.val
                     azfakenotify (`[{i}] : Current Titan`) -- ('Farming Titan '..tostring(i),10)
                     if not aotrevolution.autofarm then 
                         break
@@ -47591,9 +47674,18 @@ elseif universeid == 4658598196 then
                     if aotrevolution.viewnape then 
                         nape.Transparency = 0.4;
                     end;
+                    local newDistCalc = (localPlayer.rootPart.Position - v.HumanoidRootPart.Position).Magnitude
+                    newDistCalc = newDistCalc / 400 -- --250 -- 100 + speed
+                    game.TweenService:Create(localPlayer.rootPart, TweenInfo.new(newDistCalc, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {CFrame = getowner.CFrame * CFrame.new(0,30,0) }):Play()
+                    task.wait(newDistCalc + 0.1)
                     local b = 0
+                    localPlayer.rootPart.Anchored = false
                     repeat 
                         task.wait()
+                        pcall(function()
+                            local nape = v.Hitboxes.Hit.Nape
+                            nape.Size = Vector3.new(100,100,100);
+                        end)
                         pcall(function()
                             local set = game:GetService("Players").LocalPlayer.PlayerGui.Interface.HUD.Main.Top.Blade.Sets; -- Rig_undetectablex
                             local bladeHand = game.Players.LocalPlayer.Character[`Rig_{game.Players.LocalPlayer.Name}`].LeftHand.Blade_2
@@ -47607,22 +47699,534 @@ elseif universeid == 4658598196 then
                         end)
                         if refilling then return end;
                         pcall(function()
-                            local isone = b % 2 == 0
-                            localPlayer.rootPart.CFrame = nape.CFrame * CFrame.new(0,isone and 0 or 50,isone and 30 or 0) -- 15
+                            local isone = b % 2 == 0 -- isone and 4 or -4 -- isone and 4 or -4  CFrame.new(0,0, 10) *
+                            localPlayer.rootPart.CFrame = nape.CFrame *  CFrame.new(0,isone and -10 or 50,isone and 30 or 0) --  * CFrame.new(0 ,isone and 1 or -1 , isone and 4 or -4)  -- * CFrame.new(0,isone and 0 or 50,isone and 30 or 0) -- 15
                             inputManager:SendMouseButtonEvent(workspace.CurrentCamera.ViewportSize.X/2,workspace.CurrentCamera.ViewportSize.Y/2,0,true,game,0)
                             inputManager:SendMouseButtonEvent(workspace.CurrentCamera.ViewportSize.X/2,workspace.CurrentCamera.ViewportSize.Y/2,0,false,game,0)        
                         end)
                         b += 1
                     until not v:FindFirstChild('Fake') or  v.Fake.RightUpperLeg.Transparency ~= 0 or not aotrevolution.autofarm; -- v.UpperTorso.Transparency == 1; -- .Hitboxes.Hit humanoid.Health ~= health
+                    localPlayer.rootPart.Anchored = true
                     task.wait()
                 end;  
                 setstatus('idle')              
             end;
             if not aotrevolution.autofarm and getstatus() == 'farming' then 
                 setstatus('idle')
+                localPlayer.rootPart.Anchored = false
             end;
         end;
     end)
+
+    AddConfigurations()
+elseif universeid == 5434161916 then  -- shinobi lienage
+    local tab = window:CreateTab(gameName)
+    local esptab = window:CreateTab('ESP')
+    local espsector = esptab:CreateSector('Cheats', 'left')
+    local sector = tab:CreateSector('Cheats','left')
+    local rightsect = tab:CreateSector('Cheats','right')
+    local esp_lib = loadstring(game:HttpGet('https://raw.githubusercontent.com/hairlinebrockeb/esp-library/main/lib.lua'))()
+    esp_lib.Settings.usecustomespcolor = true;
+    esp_lib.Players = false;
+    esp_lib.Boxes = true;
+    esp_lib.Names = true;
+    esp_lib.AutoRemove = true;
+    esp_lib.Settings.usecustomespcolor = true;
+    esp_lib:Toggle(true)
+
+    getgenv().shinobilineage = {
+        functions = {
+
+        };
+        manapoint = false;
+        manapointvalue = 50;
+        chargestatus = nil;
+        nostun = false;
+        instakill = false;
+        nofalldamage = false;
+        npcesp = false;
+        npcespcolor = Color3.fromRGB(255,255,255);
+        npcespdistance = 200;
+        playeresp = false;
+        playerespcolor = Color3.fromRGB(255,255,255);
+        playerespdistance = 200;
+        mobesp = false;
+        mobespcolor = Color3.fromRGB(255,255,255);
+        mobespdistance = 200;
+    };
+    sethiddenproperty(game.Players.LocalPlayer, "SimulationRadius", math.huge)
+    sethiddenproperty(game.Players.LocalPlayer, "MaximumSimulationRadius", math.huge)
+
+    local function onLoad()
+        repeat task.wait(0.1) until localPlayer.character
+        shinobilineage.falldamageremote = localPlayer.character:WaitForChild('FallDamage'):WaitForChild('RemoteFunction')
+        if shinobilineage.nofalldamage then 
+            shinobilineage.falldamageremote:Destroy()
+        end;    
+    end; -- init
+    task.spawn(function()
+        onLoad()
+    end)
+    signals.propertychanged(localPlayer.instance, 'Character', function()
+        task.wait()
+        local newChar = localPlayer.instance.Character
+        if newChar ~= nil then 
+            task.spawn(function()
+                onLoad()
+                -- local args = {
+                --     [1] = 14.141910634142286
+                -- }
+
+                -- game:GetService("Players").LocalPlayer.Character.FallDamage.RemoteFunction:InvokeServer(unpack(args))
+            end)
+        end
+    end)
+    shinobilineage.functions.chargeMana = function(state)
+        shinobilineage.functions.isCharging = state;
+        game:GetService("Players").LocalPlayer.Character.CharacterHandler.Remotes.KeyInput:FireServer(Enum.KeyCode.G, state)    
+    end
+    setupAimbotTab(getgenv().shinobilineage)
+    sharedRequires['CreateFlySystem'](rightsect, shinobilineage)
+    sharedRequires['CreateWalkSpeedSystem'](rightsect, shinobilineage)
+    sharedRequires['CreateNoclip'](rightsect, shinobilineage)
+    task.spawn(function()
+        sharedRequires['SetupChatlogger'](rightsect, shinobilineage)
+    end)
+
+    task.spawn(function()
+        workspace:WaitForChild('AliveData'):WaitForChild(localPlayer.instance.Name).DescendantAdded:Connect(function(child)
+            if shinobilineage.nostun then 
+                child.Name = '<>.NOSTUN.NIGGER'
+            end;    
+        end)
+    end)
+    local metahook;
+    metahook = hookmetamethod(game,'__namecall',function(self,...)
+        local args = {...}
+        local call_type = getnamecallmethod();
+        
+        --local rem = game.Players.LocalPlayer.Character.FallDamage.RemoteFunction
+        local pcheck = pcall(function()
+            return  tostring(self.Parent) == 'FallDamage'; -- self.Parent.Name == 'FallDamage'
+        end)
+        if call_type == 'InvokeServer' and shinobilineage.nofalldamage and tonumber(args[1]) and #args == 1 and pcheck and tostring(self) == 'RemoteFunction' then -- tostring(self) == 'AddCoin' then -- Invo ekS
+            print('no fd')
+            return --print('no fd')
+        end
+        return metahook(self,...)
+    end)
+    -- local metahook;
+    -- metahook = hookmetamethod(game,'__namecall',function(self,...)
+    --     local args = {...}
+    --     local call_type = getnamecallmethod();
+        
+    
+    --     if call_type == 'InvokeServer' and shinobilineage.nofalldamage and localPlayer.character and localPlayer.find(localPlayer.character,'FallDamage') and localPlayer.character.FallDamage:FindFirstChild('RemoteFunction') and self == localPlayer.character.FallDamage.RemoteFunction then -- tostring(self) == 'AddCoin' then -- Invo ekS
+    --         print('no fd')
+    --         return --print('no fd')
+    --     end
+    --     return metahook(self,...)
+    -- end)
+    --[[
+        local args = {
+            [1] = 14.141910634142286
+        }
+
+        game:GetService("Players").LocalPlayer.Character.FallDamage.RemoteFunction:InvokeServer(unpack(args))
+
+    ]]
+
+    local function getTrinketFolder()
+        task.spawn(function()
+            local folder;
+            repeat 
+                task.wait(1)
+                for i,v in next, workspace:GetChildren() do 
+                    if not v:IsA('Folder') then continue end;
+                    if i % 100 == 0 then task.wait() end;
+                    if v.Name == 'Folder' and #v:GetChildren() > 0 then 
+                        folder = v;
+                        break
+                    end
+                end;
+            until folder;
+            azfakenotify('got trinket folder', 1)
+            shinobilineage.trinketfolder = folder;
+        end)
+    end; getTrinketFolder()
+
+    sector:AddToggle('Mana Point', false, function(e)
+        shinobilineage.manapoint = e;
+        if not e then
+            maid.charging = nil 
+            return
+        end;
+        maid.charging = signals.heartbeat:connect('charge beat', function()
+            --print('1')
+            if not localPlayer.character then return end;
+            --print('2')
+            if not localPlayer.character:FindFirstChild('Stats') then return end;
+            local amanaDirectory = localPlayer.character.Stats:FindFirstChild('Mana') ;
+            --print('0')
+            -- if amanaDirectory then 
+            --     amanaDirectory = amanaDirectory:FindFirstChild('Mana') 
+            -- end; --.Mana
+            if not amanaDirectory then return end;
+            --print('p1')
+            if amanaDirectory.Value >= shinobilineage.manapointvalue then -- info.mana 
+                if shinobilineage.functions.isCharging  then 
+                    shinobilineage.functions.chargeMana(false); --manaCharge(false);
+                end;
+            else
+                shinobilineage.functions.chargeMana(true); --manaCharge(true);
+            end;
+        end)
+    end)
+    sector:AddSlider('Mana Point Value',0,50,100,1, function(e)
+        shinobilineage.manapointvalue = e;
+    end)
+    sector:AddToggle('No Stun', false, function(e)
+        shinobilineage.nostun = e;
+    end)
+    local fdbtn = sector:AddToggle('No Fall Damage', false, function(e)
+        shinobilineage.nofalldamage = e;
+        if not e then return end;
+        if shinobilineage.falldamageremote then 
+            shinobilineage.falldamageremote:Destroy()
+        end
+    end)
+    fdbtn.info = {shouldcheck =  true, ask = 'You wont experience falldamage until you restart your game. Continue?'} -- This may crash you. Are you sure?
+    sector:AddToggle('No Killbricks', false, function(e) -- Killbrcisk
+        shinobilineage.nokillbricks = e;
+        for i,v in next, workspace.Map.KillBricks:GetChildren() do 
+            if not v:IsA('BasePart') then continue end;
+            -- Killbricks
+            v.CanTouch = not e
+        end;    
+    end)
+    sector:AddToggle('Auto Pickup', false, function(e)
+        shinobilineage.autopickup = e;
+        if not e then 
+            signals.coroutine.stop('autopickup')
+            return
+        end;
+        signals.coroutine.new('autopickup', function()
+            while task.wait(0.5) do 
+                if not shinobilineage.trinketfolder then 
+                    continue
+                end;
+                for i,v in next, shinobilineage.trinketfolder:GetChildren() do 
+                    if not v:IsA('BasePart') then continue end;
+                    if v:FindFirstChildWhichIsA('BasePart') and v:FindFirstChildWhichIsA('BasePart'):FindFirstChildOfClass('ClickDetector') then 
+                        if shinobilineage.stickypickup then 
+                            localPlayer.cframeteleport(v.CFrame)
+                        end
+                        local click = v:FindFirstChildWhichIsA('BasePart'):FindFirstChildOfClass('ClickDetector');
+                        fireclickdetector(click, 100)
+                        --print('fre', v:GetFullName())
+                        -- if shinobilineage.stickypickup then 
+                        --     repeat
+                        --         task.wait(0.001)
+                        --         fireclickdetector(click, 100)
+                        --         localPlayer.cframeteleport(v.CFrame)
+                        --     until not v
+                        -- end
+                    end;
+                end;
+            end;
+        end)
+    end)
+    local stickypick = sector:AddToggle('Sticky Pickup', false, function(e)
+        shinobilineage.stickypickup = e;
+    end)
+    sector:CreateHintOnItem(stickypick, 'works with auto pickup, blatant.')
+    --sector:CreateHintOnItem(stickypick.Label, 'works with auto pickup, blatant.')
+    sector:AddToggle('Attempt Instant Kill', false, function(e)
+        shinobilineage.instakill = e;
+        if not e then maid.instakill = nil return end;
+        maid.instakill = signals.heartbeat:connect('instakiller', function()
+            if not workspace:FindFirstChild('Alive') then return end;
+            for i, mob in next, workspace.Alive:GetChildren() do 
+                if mob == localPlayer.character then continue end;
+                if game.Players:GetPlayerFromCharacter(mob) then continue end;
+                local rootNetwork = mob.PrimaryPart or mob:FindFirstChild('HumanoidRootPart'); -- rootNetowkr 
+                local humanoid = mob:FindFirstChildWhichIsA('Humanoid')
+                if not rootNetwork or not humanoid then continue end;
+                if isnetworkowner(rootNetwork) and mob.Target.Value == localPlayer.character and mob.Target.Value ~= nil then 
+                    --humanoid.Health = 0;
+                    pcall(function()
+                        mob.HumanoidRootPart.CFrame *= CFrame.new(0,-1000,0)
+                        -- until died then set humanoid back up so we get chest
+                    end)
+                    pcall(function()
+                        --mob:BreakJoints();
+                    end)
+                    pcall(function()
+                        mob.Head:Destroy()
+                    end)
+                end;
+            end;    
+        end)
+    end) -- UIS:IsKeyDown
+    sector:AddSeperator('FARMING')
+    sector:AddButton('Teleport To Zetsu', function()
+        for i,v in next, workspace.Alive:GetChildren() do 
+            if game.Players:GetPlayerFromCharacter(v) then continue end;
+            if v.Name:sub(1,5) == 'Zetsu' then 
+                task.spawn(function()
+                    local t = tick()
+                    repeat 
+                        task.wait()            
+                        localPlayer.rootPart.CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0,7,0) -- localPlayer.cframeteleport(v.HumanoidRootPart.CFrame)
+                    until tick() - t > 5
+                end)
+                break
+            end;
+        end
+    end)
+    sector:AddButton('Teleport To Active Boss', function()
+        for i,v in next, workspace.Alive:GetChildren() do 
+            if game.Players:GetPlayerFromCharacter(v) then continue end;
+            if v.Name:find('Boss') then 
+                task.spawn(function()
+                    local t = tick()
+                    repeat 
+                        task.wait()
+                        localPlayer.rootPart.CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0,7,0) --localPlayer.cframeteleport(v.HumanoidRootPart.CFrame)
+                    until tick() - t > 5
+                end)
+                break
+            end;
+        end
+    end)
+    rightsect:AddSeperator('BOTS')
+    rightsect:AddToggle('Load Offloaded Trinkets', false, function(e)
+        shinobilineage.offloadtrinkets = e; -- offloadtrinketys
+        if not e then signals.coroutine.stop('offloadtrinkets') return end;
+        task.spawn(function() -- gettrinketfolder can return a global variable or get a newe one
+            repeat task.wait() until shinobilineage.trinketfolder
+            for i,v in next, getnilinstances() do 
+                if v.Name:sub(1,1) == '{' then 
+                    pcall(function()
+                        v.Parent = shinobilineage.trinketfolder
+                    end)
+                    v:GetPropertyChangedSignal('Parent'):Connect(function()
+                        pcall(function()
+                            v.Parent = shinobilineage.trinketfolder
+                        end)
+                    end)
+                end;
+            end -- most things should've offloaded, reboot for a fresh restart.  msot
+        end)
+        signals.coroutine.new('offloadtrinkets', function()
+            while task.wait(2) do 
+                if not shinobilineage.trinketfolder then continue end;
+                for i,v in next, getnilinstances() do 
+                    if v.Name:sub(1,1) == '{' then 
+                        pcall(function()
+                            v.Parent = shinobilineage.trinketfolder
+                        end)
+                        v:GetPropertyChangedSignal('Parent'):Connect(function()
+                            pcall(function()
+                                v.Parent = shinobilineage.trinketfolder
+                            end)
+                        end)
+                    end;
+                end -- most things should've offloaded, reboot for a fresh restart.  msot
+            end;   
+        end)
+    end)
+    rightsect:AddToggle('Trinket Farm', false, function(e)
+        shinobilineage.trinketfarm = e;
+        if not e then signals.coroutine.stop('trinketfarmer') return end; -- tfarm
+        signals.coroutine.new('trinketfarmer', function()
+            while task.wait() do 
+                if not shinobilineage.trinketfolder then continue end;
+                for i,v in next, shinobilineage.trinketfolder:GetChildren() do 
+                    localPlayer.cframeteleport(v.CFrame);
+                end;    
+            end;
+        end)
+    end)
+    rightsect:AddToggle('Orbit Farm', false, function(e)
+        shinobilineage.orbitfarm = e;
+        if not e then signals.coroutine.stop('orbitfarm') return end; -- tfarm
+        signals.coroutine.new('orbitfarm', function()
+            while task.wait() do 
+                for i, part in next, workspace.Spawns:GetChildren() do 
+                    local theta = 0.2
+                    local root = part.CFrame; --localPlayer.rootPart.CFrame;
+                    local radius = 500
+                    local began = tick()
+                    repeat
+                        if getgenv().liooob then 
+                            getgenv().liooob = false
+                            break
+                        end
+                        theta += 0.2
+                        localPlayer.rootPart.CFrame = CFrame.new(root.X + radius*math.sin(theta), root.Y + 1, root.Z + radius*math.cos(theta))
+                        task.wait()
+                    until tick() - began >= 10
+                end;
+            end;
+        end)
+    end)
+    local function rayEsp(t)
+        -- could set the global esp[flag] = {}
+        local child = t.child
+        local flag = t.flag
+        local distcap = t.maxdist
+        local color = t.color
+        local nobox = t.nobox or false;
+        local notracer = t.notracer or false; -- notraceror notraror notraacer
+        local givenaname = t.name -- supposed to be given name
+        local activet = t.active
+        local disableremove = t.removeondisable
+        local pivoting = t.usepivot
+        local selfname = t.selfname
+        local primarypart = t.primarypart -- ppart
+        local entity = t.entity
+        local b = esp_lib:Add(child, {
+            SelfName = selfname;
+            IsEnabled = flag;
+            flag = flag;
+            tag = flag;
+            maxdistance = distcap;
+            Color = t.color;
+            NoTracer = notracer;
+            NoBox = nobox;
+            Name = givenaname;
+            active = activet;
+            removeondisable = disableremove;
+            usepivot = pivoting;
+            PrimaryPart = primarypart;
+            entity = entity;
+        });
+        return b
+    end
+
+    espsector:AddToggle('Enable ESP', false, function(xstate)
+        esp_lib:Toggle(xstate)
+    end)
+    espsector:AddToggle('Use Names', false, function(xstate)
+        shinobilineage.espnames = xstate;
+        esp_lib.Names = xstate
+    end)
+    espsector:AddToggle('Use Boxes', false, function(xstate)
+        shinobilineage.boxesp = xstate;
+        esp_lib.Boxes = xstate
+    end)
+    espsector:AddToggle('Use Tracers', false, function(xstate)
+        shinobilineage.tracers = xstate;
+        esp_lib.Tracers = xstate
+    end)
+    espsector:AddToggle('Player Esp', false, function(xstate)
+        shinobilineage.playeresp = xstate;
+        esp_lib.Players = xstate
+    end)
+    espsector:AddColorpicker('Player Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        shinobilineage['playerespcolor'] = ztx
+        esp_lib.Settings.playerespcolor = shinobilineage.playerespcolor
+    end)
+    espsector:AddSlider("Player Esp Range", 0, 200, 5000, 1, function(State)
+        shinobilineage['playerespdistance'] = State
+        esp_lib.Settings.playerespdistance = shinobilineage.playerespdistance
+    end)
+
+    espsector:AddToggle('NPC Esp',false,function(e)
+        shinobilineage.npcesp = e;
+        if not e then return end;
+        for i,v in next, workspace.NPCs:GetDescendants() do -- workspace.MissionBoards:GetChildren()  
+            if v.Parent:FindFirstChild('Humanoid') then 
+                rayEsp{
+                    child = v.Parent;
+                    usepivot = true;
+                    Name = function()
+                        return v.Parent.Name
+                    end;
+                    flag = 'npc';
+                    maxdist = function()
+                        return shinobilineage.npcespdistance
+                    end,
+                    color = function()
+                        return shinobilineage.npcespcolor
+                    end,
+                    active = function()
+                        return shinobilineage.npcesp
+                    end;
+                    nobox = true;
+                    notracer = true;
+                    removeondisable = true;
+                }
+            end
+        end
+    end)
+    espsector:AddColorpicker('NPC Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        shinobilineage['npcespcolor'] = ztx
+    end)
+    espsector:AddSlider("NPC Esp Range", 0, 200, 5000, 1, function(State)
+        shinobilineage['npcespdistance'] = State
+    end)
+
+    espsector:AddToggle('Mob Esp',false,function(e)
+        shinobilineage.mobesp = e;
+        if not e then return end;
+        for i,v in next, workspace.Alive:GetChildren() do -- workspace.MissionBoards:GetChildren() 
+            if not game.Players:GetPlayerFromCharacter(v) then 
+                rayEsp{
+                    child = v;
+                    PrimaryPart = v.PrimaryPart;
+                    selfname = true;
+                    entity = true;
+                    flag = 'mobesp';
+                    maxdist = function()
+                        return shinobilineage.mobespdistance
+                    end,
+                    color = function()
+                        return shinobilineage.mobespcolor
+                    end,
+                    active = function()
+                        return shinobilineage.mobesp
+                    end;
+                    --nobox = true;
+                    --notracer = true;
+                    removeondisable = true;
+                }   
+            end
+        end
+    end)
+    espsector:AddColorpicker('Mob Esp Colour',Color3.fromRGB(255, 255,255), function(ztx)
+        shinobilineage.mobespcolor = ztx
+    end)
+    espsector:AddSlider("Mob Esp Range", 0, 200, 5000, 1, function(State)
+        shinobilineage.mobespdistance = State -- ['lootboxespdistance']
+    end)   
+    connectionHandler(workspace:WaitForChild('Alive').ChildAdded:Connect(function(child)
+        task.wait(0.5)
+        if shinobilineage.mobesp then 
+            if not game.Players:GetPlayerFromCharacter(child) then 
+                rayEsp{
+                    child = child;
+                    PrimaryPart = child.PrimaryPart;
+                    selfname = true;
+                    entity = true;
+                    flag = 'mobesp';
+                    maxdist = function()
+                        return shinobilineage.mobespdistance
+                    end,
+                    color = function()
+                        return shinobilineage.mobespcolor
+                    end,
+                    active = function()
+                        return shinobilineage.mobesp
+                    end;
+                    --nobox = true;
+                    --notracer = true;
+                    removeondisable = true;
+                }   
+            end
+        end
+    end))
 
     AddConfigurations()
 else
